@@ -6,6 +6,7 @@
 
 import sys
 import time
+import argparse
 from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
 from connection.MessageHandling import *
@@ -13,15 +14,32 @@ from pyswip.prolog import Prolog
 from pyswip.easy import *
 
 ####################################################################################################
+class VortexWriter():#clase auxiliar utilizada en caso de que NO se escriba en logs
+    def write(self, s):
+        pass
+
+    def close(self):
+        pass
+####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS):
+    def __init__(self, USER, PASS, useLog, sharedServerPort):
         print "Basic initialization"
         self.HOST = "127.0.0.1"
         self.PORT = 12300
         self.USER = USER
         self.PASS = PASS
-        self.log  = open('log-' + USER + '.txt', 'w')
+        self.SHSERVERPORT = sharedServerPort
+        if useLog:
+            self.log  = open('log-' + USER + '.txt', 'w')
+        else:
+            self.log = VortexWriter()
+        if sharedServerPort:
+            #inicializar conexion con el server, supongo
+            pass
+        else:
+            #imagino que deberemos inventar algo en caso de que NO se use, similar al VortexWriter
+            pass
 
     def connect(self):
         # Connect and authenticate.
@@ -78,8 +96,8 @@ class Agent():
 ####################################################################################################
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, prolog_source):
-        Agent.__init__(self, USER, PASS)
+    def __init__(self, USER, PASS, prolog_source, log, shServerPort):
+        Agent.__init__(self, USER, PASS, log, shServerPort)
         print "Prolog initialization"
         # Creo una conexion con SWI.
         self.prolog = Prolog()
@@ -128,14 +146,17 @@ class PrologAgent(Agent):
 
 ####################################################################################################
 if (__name__== "__main__"):
-    if (len(sys.argv) == 3):
-        USER = sys.argv[1]
-        PASS = sys.argv[2]
-    else:
-        print "Usage: python Agent.py USERNAME PASSWORD"
-        sys.exit()
+    parser = argparse.ArgumentParser(description="Pyeismassim agent initializer")
+    parser.add_argument('user', metavar='USER', help="the agent's username")
+    parser.add_argument('password', metavar='PASSWORD', help="the agent's password")
+    parser.add_argument('-l', help="write-to-log mode.", action='store_const', const=True, dest='log')
+    parser.add_argument('-s', metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port", dest='shServerPort')
 
-    agent = PrologAgent(USER, PASS, "pl/kb.pl")
+    args=parser.parse_args()
+
+    user, password, log, shServerPort = args.user, args.password, args.log, args.shServerPort
+
+    agent = PrologAgent(user, password, "pl/kb.pl", log, shServerPort)
     agent.connect()
     agent.perceiveActLoop()
     agent.disconnect()
