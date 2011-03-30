@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javaAgentsConfig>
+  <agents>
+    <agent name="agentA1" entity="connectionA1" class="massim.javaagents.agents2011.SimpleExplorerAgent" team="A"/>
+    <agent name="agentA2" entity="connectionA2" class="massim.javaagents.agents2011.SimpleExplorerAgent" team="A"/>
+    <agent name="agentA3" entity="connectionA3" class="massim.javaagents.agents2011.SimpleRepairerAgent" team="A"/>
+    <agent name="agentA4" entity="connectionA4" class="massim.javaagents.agents2011.SimpleRepairerAgent" team="A"/>
+    <agent name="agentA5" entity="connectionA5" class="massim.javaagents.agents2011.SimpleSaboteurAgent" team="A"/>
+    <agent name="agentA6" entity="connectionA6" class="massim.javaagents.agents2011.SimpleSaboteurAgent" team="A"/>
+    <agent name="agentA7" entity="connectionA7" class="massim.javaagents.agents2011.SimpleSentinelAgent" team="A"/>
+    <agent name="agentA8" entity="connectionA8" class="massim.javaagents.agents2011.SimpleSentinelAgent" team="A"/>
+    <agent name="agentA9" entity="connectionA9" class="massim.javaagents.agents2011.SimpleInspectorAgent" team="A"/>
+    <agent name="agentA10" entity="connectionA10" class="massim.javaagents.agents2011.SimpleInspectorAgent" team="A"/>
+    <agent name="agentB1" entity="connectionB1" class="massim.javaagents.agents2011.SimpleExplorerAgent" team="B"/>
+    <agent name="agentB2" entity="connectionB2" class="massim.javaagents.agents2011.SimpleExplorerAgent" team="B"/>
+    <agent name="agentB3" entity="connectionB3" class="massim.javaagents.agents2011.SimpleRepairerAgent" team="B"/>
+    <agent name="agentB4" entity="connectionB4" class="massim.javaagents.agents2011.SimpleRepairerAgent" team="B"/>
+    <agent name="agentB5" entity="connectionB5" class="massim.javaagents.agents2011.SimpleSaboteurAgent" team="B"/>
+    <agent name="agentB6" entity="connectionB6" class="massim.javaagents.agents2011.SimpleSaboteurAgent" team="B"/>
+    <agent name="agentB7" entity="connectionB7" class="massim.javaagents.agents2011.SimpleSentinelAgent" team="B"/>
+    <agent name="agentB8" entity="connectionB8" class="massim.javaagents.agents2011.SimpleSentinelAgent" team="B"/>
+    <agent name="agentB9" entity="connectionB9" class="massim.javaagents.agents2011.SimpleInspectorAgent" team="B"/>
+    <agent name="agentB10" entity="connectionB10" class="massim.javaagents.agents2011.SimpleInspectorAgent" team="B"/>
+  </agents>
+</javaAgentsConfig>

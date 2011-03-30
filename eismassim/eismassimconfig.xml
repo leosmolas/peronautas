@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interfaceConfig scenario="mars2011" host="localhost" port="12300" scheduling="yes" times="no" notifications="no">
+  <entities>
+    <entity name="connectionA1" username="a1" password="1" xml="yes"/>
+    <entity name="connectionA2" username="a2" password="1" xml="yes"/>
+    <entity name="connectionA3" username="a3" password="1" xml="yes"/>
+    <entity name="connectionA4" username="a4" password="1" xml="yes"/>
+    <entity name="connectionA5" username="a5" password="1" xml="yes"/>
+    <entity name="connectionA6" username="a6" password="1" xml="yes"/>
+    <entity name="connectionA7" username="a7" password="1" xml="yes"/>
+    <entity name="connectionA8" username="a8" password="1" xml="yes"/>
+    <entity name="connectionA9" username="a9" password="1" xml="yes"/>
+    <entity name="connectionA10" username="a10" password="1" xml="yes"/>
+    <entity name="connectionB1" username="b1" password="1" xml="yes"/>
+    <entity name="connectionB2" username="b2" password="1" xml="yes"/>
+    <entity name="connectionB3" username="b3" password="1" xml="yes"/>
+    <entity name="connectionB4" username="b4" password="1" xml="yes"/>
+    <entity name="connectionB5" username="b5" password="1" xml="yes"/>
+    <entity name="connectionB6" username="b6" password="1" xml="yes"/>
+    <entity name="connectionB7" username="b7" password="1" xml="yes"/>
+    <entity name="connectionB8" username="b8" password="1" xml="yes"/>
+    <entity name="connectionB9" username="b9" password="1" xml="yes"/>
+    <entity name="connectionB10" username="b10" password="1" xml="yes"/>
+  </entities>
+  <logger toTerminal="yes" toFile="yes" toFiles="yes"/>
+  <backup file="backup1.xml"/>
+</interfaceConfig>
