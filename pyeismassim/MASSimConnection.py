@@ -2,31 +2,27 @@ import socket
 import sys
 import time
 
-class serverConnection:
+class MASSimConnection:
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print "@Connection: socket initialized."
 
-    def connect(self, host, port):
-        self.lastHost = host
-        self.lastPort = port
-        #try:
-        #    print "@Connection: connecting to " + host + ":" + str(port)
-        #    self.sock.connect((host, port))
-        #    self.connected = True
-        #    print "@Connection: succeeded. sockname:", self.sock.getsockname()
-        #except:
-        #    self.connected = False
-        #    print "@Connection: failed."
+    def connect(self, host, port, username, password):
+        self.host     = host
+        self.port     = port
+        self.username = username
+        self.password = password
         print "@Connection: connecting to " + host + ":" + str(port)
         code = self.sock.connect_ex((host, port))
         if (code == 0):
             self.connected = True
-            print "@Connection: succeeded. sockname:", self.sock.getsockname()
+            print "@Connection: succeeded. socket name:", self.sock.getsockname()
         else:
             self.connected = False
             print "@Connection: failed. Error:", code
+        time.sleep(2)
+        self.authenticate(username, password)
 
     def disconnect(self):
         self.sock.shutdown(socket.SHUT_RDWR)
@@ -80,3 +76,6 @@ class serverConnection:
             print "@Connection: waiting for reply."
             authentication_reply = self.receive()
             print "@Connection: received: ", authentication_reply
+
+            # TODO: validate reply message, and return True or False according 
+            # result.
