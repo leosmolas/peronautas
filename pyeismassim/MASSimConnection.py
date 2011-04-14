@@ -3,6 +3,8 @@ import sys
 import time
 from BeautifulSoup import BeautifulStoneSoup
 
+MAX_CONNECTION_TRIES = 10
+
 class MASSimConnection:
 
     def __init__(self):
@@ -10,6 +12,7 @@ class MASSimConnection:
         # Standard XML Header
         self.sxmlh = u'<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
         print "@Connection: socket initialized."
+
 
     def connect(self, host, port, username, password):
         self.host     = host
@@ -45,18 +48,20 @@ class MASSimConnection:
         Lo hacemos aca adentro para desligar al programador usuario de esa 
         responsabilidad.
         """
-        if (self.connected):
+        if (self.connectionValid()):
             msg = msg + "\0"
             msg_length = len(msg)
-            print "@Connection: message length:", msg_length
             bytes_sent = 0
             while (bytes_sent < msg_length):
                 sent = self.sock.send(msg[bytes_sent:])
                 bytes_sent += sent
-                print "@Connection: sent", sent, "bytes:", msg[:bytes_sent]
+                print "@Connection: sent %s bytes: %s" %(sent, msg[:bytes_sent])
                 if (sent == 0):
-                    raise RuntimeError("socket connection broken")
-            print "@Connection: exiting send."
+                    self.connected = False
+                    raise RuntimeError("Server connection lost!")
+        else:
+            raise("Server connection lost!")
+
 
     def receive(self):
         """
@@ -64,25 +69,40 @@ class MASSimConnection:
         final del mensaje, que deberia ser </message>, intenta recibir mas 
         informacion. Devuelve el string recibido por el socket.
         """
-        if (self.connected):
+        if (self.connectionValid()):
+            print "@Connection: starting to receive a message..."
             stop = False
             msg  = ''
             while (not stop):
-                msg += self.sock.recv(256)
-                if (msg[-10:] == "</message>"):
+                msg += self.sock.recv(2048)
+                if (msg[-1]=='\0'):
                     stop = True
-            print "@Connection: message received:", msg
+            print "@Connection: message received from socket: %s" % msg
             return msg
+        else:
+            raise("Server connection lost")
 
+
+    def connectionValid(self):
+        i = 0
+        while (not self.connected) and (i < MAX_CONNECTION_TRIES):
+            self.connect(self.host, self.port, self.username, self.password)
+            i += 1
+            #si no logramos conectarnos, hacemos espera progresiva
+            sleep(i)
+        return self.connected
+            
     def authenticate(self, username, password):
-        if (self.connected):
-            authentication_message = self.sxmlh + u'<message type="auth-request"><authentication password="' + password + '" username="' + username + '"/></message>'
+        # TODO: validate reply message, and return True or False according 
+        # to result.
+        # arreglar el tema del header que queda horrendo asi, hay que usar la libreria de MessageHandling, hay que usar la libreria de MessageHandling
+        if (self.connectionValid()):
+            sxmlh = u'<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+            authentication_message = sxmlh + u'<message type="auth-request"><authentication password="' + password + '" username="' + username + '"/></message>'
             print "@Connection: sending authentication message."
             self.send(authentication_message)
             print "@Connection: waiting for reply."
             authentication_reply = self.receive()
-            print "@Connection: received: ", authentication_reply
+        else:
+            raise("Server connection lost")
 
-            xml = BeautifulStoneSoup(authentication_reply)
-            # TODO: validate reply message, and return True or False according 
-            # to result.

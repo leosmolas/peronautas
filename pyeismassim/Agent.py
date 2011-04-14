@@ -14,9 +14,10 @@ PASS = "1"
 
 connection = MASSimConnection()
 connection.connect(HOST, PORT, USER, PASS)
-#while True:
-#    msg = connection.receive()
-#    print "@Agent: received: '%s'" % msg
-#    sys.stdin.readline()
+while True:
+    print "@Agent: Starting to receive connection"
+    msg = connection.receive()
+    print "@Agent: received: '%s'" % msg
+    sys.stdin.readline()
 
 connection.disconnect()
