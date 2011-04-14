@@ -1,11 +1,14 @@
 import socket
 import sys
 import time
+from BeautifulSoup import BeautifulStoneSoup
 
 class MASSimConnection:
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Standard XML Header
+        self.sxmlh = u'<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
         print "@Connection: socket initialized."
 
     def connect(self, host, port, username, password):
@@ -20,7 +23,7 @@ class MASSimConnection:
             print "@Connection: succeeded. socket name:", self.sock.getsockname()
         else:
             self.connected = False
-            print "@Connection: failed. Error:", code
+            print "@Connection: failed. error:", code
         time.sleep(2)
         self.authenticate(username, password)
 
@@ -30,6 +33,10 @@ class MASSimConnection:
         self.connected = False
 
     def send(self, msg):
+        # TODO: 
+        # - make sure the termination check is ok, verify the server also 
+        # null-terminates strings and we can use the same mechanism to ensure
+        # complete data transmission.
         """
         Calcula la longitud del mensaje a enviar, y mantiene la cantidad de 
         bytes enviados en cada llamada a send(), y sigue llamando hasta que se 
@@ -67,15 +74,15 @@ class MASSimConnection:
             print "@Connection: message received:", msg
             return msg
 
-    def authenticate(self, user, password):
+    def authenticate(self, username, password):
         if (self.connected):
-            sxmlh = u'<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-            authentication_message = sxmlh + u'<message type="auth-request"><authentication password="' + password + '" username="' + user + '"/></message>'
+            authentication_message = self.sxmlh + u'<message type="auth-request"><authentication password="' + password + '" username="' + username + '"/></message>'
             print "@Connection: sending authentication message."
             self.send(authentication_message)
             print "@Connection: waiting for reply."
             authentication_reply = self.receive()
             print "@Connection: received: ", authentication_reply
 
+            xml = BeautifulStoneSoup(authentication_reply)
             # TODO: validate reply message, and return True or False according 
-            # result.
+            # to result.
