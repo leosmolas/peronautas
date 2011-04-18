@@ -1,7 +1,5 @@
 # TODO:
 # - make sure the disconnect method playes nice with the server, i.e. sends the appropriate message so server does not say premature end of file.
-# - implement the rest of the methods facilitating sending of actions
-# - make the connection run in a thread, in which each continuously receives percepts
 
 import sys
 import time
@@ -12,6 +10,7 @@ PORT = 12300
 USER = "a1"
 PASS = "1"
 
+file = open('xml.txt', 'w')
 connection = MASSimConnection()
 connection.connect(HOST, PORT, USER, PASS)
 while True:
