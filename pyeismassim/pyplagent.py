@@ -47,9 +47,9 @@ for step in range(1,11):
     print "Action id:", action_id
 	
     #le consulto a prolog que accion tomar
-    accion = list(prolog.query("accion(X)")) #lo casteo a lista porque viene con un formato trosko, que es un iterable asi que el cambio funca bien
-    
-    connection.send(action(action_id, accion[0]["X"])) #le pongo 0 porque puede devolver varias rtas (como si pusieras ;)
+    accion = prolog.query("accion(X)") #lo casteo a lista porque viene con un formato trosko, que es un iterable asi que el cambio funca bien
+
+    connection.send(action(action_id, accion.next()["X"])) #le pongo 0 porque puede devolver varias rtas (como si pusieras ;)
 
 log.close()
 
