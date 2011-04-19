@@ -6,7 +6,7 @@ import sys
 import time
 from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
-from MessageHandling import *
+from connection.MessageHandling import *
 
 
 HOST = "127.0.0.1"
