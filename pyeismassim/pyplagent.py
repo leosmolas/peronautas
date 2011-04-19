@@ -6,7 +6,7 @@ import sys
 import time
 from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
-from MessageHandling import * #vasco que carajo es esto?
+from connection.MessageHandling import * #vasco que carajo es esto?
 from pyswip.prolog import Prolog
 from pyswip.easy import *
 
@@ -25,10 +25,10 @@ print "@Agent: Waiting for simulation start notification."
 xml = connection.receive()
 print xml
 log.write(xml)
-# msg = parse(xml)
+msg = parse(xml)
 
 print "@Agent: received:"
-#print_message(msg)
+print_message(msg)
 
 steps = int(msg['steps'])
 #for step in range(steps):
@@ -41,14 +41,15 @@ for step in range(1,11):
     print "@Agent: step", step
     xml = connection.receive()
     log.write(xml)
-    #msg = parse(xml)	
-    #print_message(msg)
+    msg = parse(xml)	
+    print_message(msg)
     action_id = msg['id']
     print "Action id:", action_id
 	
     #le consulto a prolog que accion tomar
-    accion = prolog.query("accion(X)")
-    connection.send(action(action_id, accion["X"].name))
+    accion = list(prolog.query("accion(X)")) #lo casteo a lista porque viene con un formato trosko, que es un iterable asi que el cambio funca bien
+    
+    connection.send(action(action_id, accion[0]["X"])) #le pongo 0 porque puede devolver varias rtas (como si pusieras ;)
 
 log.close()
 
