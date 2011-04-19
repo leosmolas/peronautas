@@ -1,0 +1,2 @@
+﻿Copiar easy.py a donde se haya instalado pyswip
+En test.py puse un par de ejemplos que muestran como se puede acceder a los datos de cada tipo distinto (lista, átomo, functor)
