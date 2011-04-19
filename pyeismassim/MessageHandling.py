@@ -33,8 +33,10 @@ def parse_auth_response(xml):
     return result
 
 def parse_sim_start(xml):
-    message_tag    = xml.contents[1]
-    simulation_tag = message_tag.contents[0]
+    print xml.contents[1].contents[0]
+
+    message_tag    = xml.find('message')
+    simulation_tag = xml.find('simulation')
 
     timestamp_attr = message_tag['timestamp']
     type_attr      = message_tag['type']
@@ -106,17 +108,18 @@ def parse_request_action(xml):
     result['score']               = team_tag['score']             
 
     if (achievements_tag != None):
+        # This check is done because if the xml has no visible vertices tag, it will be None.
         achievements_list = []
         for i in range(len(achievements_tag.contents)):
-            achievements_list.append(achievements_tag.contents[i]['name'])
+            if (achievements_tag.contents[i].__class__.__name__ == "Tag"):
+                # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
+                # In the latter case, it is most probably a space or junk and will not be indexable with strings.
+                achievements_list.append(achievements_tag.contents[i]['name'])
         result['achievements'] = achievements_list
     
     if (vis_verts_tag != None):
-        # This check is done because if the xml has no visible vertices tag, it will be None.
         vis_verts_list = []
         for i in range(len(vis_verts_tag.contents)):
-            # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
-            # In the latter case, it is most probably a space or junk and will not be indexable with strings.
             if (vis_verts_tag.contents[i].__class__.__name__ == "Tag"):
                 vis_vert = {}
                 vis_vert['name'] = vis_verts_tag.contents[i]['name']
@@ -199,24 +202,45 @@ def print_message(result):
     """
     Use this function to pretty-print a parsed message.
     """
-    for key, value in result.iteritems():
-        if (value.__class__.__name__ == 'list'):
-            print "   ", key
-            for i in value:
-                print "       ",
-                for k2, v2  in i.iteritems():
-                    print k2, ":", v2, "|", 
+    # LIST COMPREHENSION MAGIC :D
+
+    # This is a list comprehension; the part inside max() creates a list with the len function applied to every element in result.keys()
+    max_key_length = max([len(k) for k in result.keys()])
+    for key, value in sorted(result.iteritems()):
+        # For every key,value pair in the dictionary:
+        print "   ", key.ljust(max_key_length), ":",
+        # If the value is a list with more than one element, it is most likely a list of dicts, and they all have the same set of keys. 
+        # Except for the achievements, which is a list of strings. 
+        # So recover one set of keys, calculate the length for each key, and use that as the column width for that key.
+        if (value.__class__.__name__ == 'list' and (len(value) > 0)):
+            if (value[0].__class__.__name__ == 'dict'):
                 print
+                # Esto es como dos for anidades que recorre primero todos los valores v1 en value, 
+                # y luego cada clave k2 dentro de cada valor v1, y para cada clave k2 calcula la longitud de la clave, 
+                # y se queda con el maximo entre todos.
+                # Luego hace lo mismo para los valores en los valores de value.
+                # Esto es para que todo quede alineado bonito y para que mi OCD me deje dormir de noche.
+                key_column_width = max( [ max([ len(k2) for k2 in v1.keys()   ]) for v1 in value] )
+                val_column_width = max( [ max([ len(v2) for v2 in v1.values() ]) for v1 in value] )
+                for i in value:
+                    print "       ", 
+                    for k2, v2  in i.iteritems():
+                        print k2.rjust(key_column_width), ":", v2.ljust(val_column_width), "|", 
+                    print
+            else:
+                # It is a list of something else
+                # TODO: pretty print list of something else
+                print value
         else:
-            print "   ", key, ":", value
+            print value
 
 # Generation
 
 def auth_request(username, password):
-    return '<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="auth-request"><authentication password="%s" username="%s"/></message>' % (password, username)
+    return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="auth-request"><authentication password="%s" username="%s"/></message>\0' % (password, username)
 
 def bye():
-    return '<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="bye"></message>'
+    return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="bye"/></message>\0'
 
 def action(action_id, action_type, action_parameter = None):
     """
@@ -229,34 +253,38 @@ def action(action_id, action_type, action_parameter = None):
     If the parameter is not what the MASSim server expects, the message will not be valid but will still be generated.
     """
     if (action_parameter == None):
-        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s"/></message>' % (action_id, action_type)
+        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s"/></message>\0' % (action_id, action_type)
     else:
-        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s" param="%s"/></message>' % (action_id, action_type, action_parameter)
+        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s" param="%s"/></message>\0' % (action_id, action_type, action_parameter)
+
+
+
 
 if (__name__ == "__main__"):
-    print auth_request("USER", "PASS")
-    print bye()
-    print action("action-id", "parry")
-    print action("action-id", "probe")
-    print action("action-id", "survey")
-    print action("action-id", "inspect")
-    print action("action-id", "recharge")
-    print action("action-id", "skip")
-    print action("action-id", "goto", "vertex1")
-    print action("action-id", "attack", "agent1")
-    print action("action-id", "repair", "agent1")
-    print action("action-id", "buy", "battery")
+    #print auth_request("USER", "PASS")
+    #print bye()
+    #print action("14", "parry")
+    #print action("14", "probe")
+    #print action("14", "survey")
+    #print action("14", "inspect")
+    #print action("14", "recharge")
+    #print action("14", "skip")
+    #print action("14", "goto", "vertex1")
+    #print action("14", "attack", "agent1")
+    #print action("14", "repair", "agent1")
+    #print action("14", "buy", "battery")
 
-    auth_response   = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><message timestamp="1297263037617" type="auth-response"><authentication result="ok"></message>'
-    sim_start       = '<?xml version="1.0" encoding="UTF-8"?><message timestamp="1302894016107" type="sim-start"><simulation edges="44" id="0" steps="1000" vertices="20"/></message>'
-    request_action1 = '<?xml version="1.0" encoding="UTF-8"?><message timestamp="1302894016202" type="request-action"><perception deadline="1302894018202" id="1"><simulation step="0"/><self energy="12" health="4" lastAction="skip" lastActionResult="successful" maxEnergy="12" maxEnergyDisabled="12" maxHealth="4" position="vertex1" strength="0" visRange="2" zoneScore="0"/><team lastStepScore="0" money="0" score="0" zonesScore="0"/><visibleVertices><visibleVertex name="vertex4" team="none"/><visibleVertex name="vertex12" team="none"/><visibleVertex name="vertex19" team="none"/> <visibleVertex name="vertex15" team="none"/><visibleVertex name="vertex11" team="none"/><visibleVertex name="vertex17" team="none"/> <visibleVertex name="vertex7" team="none"/> <visibleVertex name="vertex1" team="none"/> <visibleVertex name="vertex2" team="none"/> <visibleVertex name="vertex3" team="none"/> <visibleVertex name="vertex9" team="none"/> <visibleVertex name="vertex16" team="none"/> </visibleVertices> <visibleEdges> <visibleEdge node1="vertex1" node2="vertex7"/> <visibleEdge node1="vertex3" node2="vertex15"/> <visibleEdge node1="vertex15" node2="vertex19"/> <visibleEdge node1="vertex9" node2="vertex16"/> <visibleEdge node1="vertex4" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex3"/> <visibleEdge node1="vertex9" node2="vertex11"/> <visibleEdge node1="vertex1" node2="vertex15"/> <visibleEdge node1="vertex9" node2="vertex12"/> <visibleEdge node1="vertex7" node2="vertex17"/> <visibleEdge node1="vertex2" node2="vertex7"/> <visibleEdge node1="vertex1" node2="vertex2"/> <visibleEdge node1="vertex9" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex9"/> <visibleEdge node1="vertex7" node2="vertex12"/> </visibleEdges> <visibleEntities> <visibleEntity name="a9" node="vertex4" status="normal" team="A"/> <visibleEntity name="b2" node="vertex1" status="normal" team="B"/> <visibleEntity name="a5" node="vertex7" status="normal" team="A"/> <visibleEntity name="b7" node="vertex2" status="normal" team="B"/> <visibleEntity name="a6" node="vertex2" status="normal" team="A"/> <visibleEntity name="a2" node="vertex4" status="normal" team="A"/> <visibleEntity name="a10" node="vertex12" status="normal" team="A"/> <visibleEntity name="b5" node="vertex2" status="normal" team="B"/> <visibleEntity name="a3" node="vertex12" status="normal" team="A"/> <visibleEntity name="a1" node="vertex1" status="normal" team="A"/> <visibleEntity name="b4" node="vertex4" status="normal" team="B"/> <visibleEntity name="b8" node="vertex3" status="normal" team="B"/> </visibleEntities> </perception> </message>'
-    request_action2 = '<?xml version="1.0" encoding="UTF-8"?><message timestamp="1302894018781" type="request-action"> <perception deadline="1302894020781" id="2"> <simulation step="1"/> <self energy="12" health="4" lastAction="skip" lastActionResult="successful" maxEnergy="12" maxEnergyDisabled="12" maxHealth="4" position="vertex1" strength="0" visRange="2" zoneScore="0"/> <team lastStepScore="8" money="0" score="8" zonesScore="8"/> <visibleVertices> <visibleVertex name="vertex4" team="A"/> <visibleVertex name="vertex12" team="A"/> <visibleVertex name="vertex19" team="none"/> <visibleVertex name="vertex15" team="none"/> <visibleVertex name="vertex11" team="A"/> <visibleVertex name="vertex17" team="A"/> <visibleVertex name="vertex7" team="A"/> <visibleVertex name="vertex1" team="none"/> <visibleVertex name="vertex2" team="B"/> <visibleVertex name="vertex3" team="B"/> <visibleVertex name="vertex9" team="A"/> <visibleVertex name="vertex16" team="none"/> </visibleVertices> <visibleEdges> <visibleEdge node1="vertex1" node2="vertex7"/> <visibleEdge node1="vertex3" node2="vertex15"/> <visibleEdge node1="vertex15" node2="vertex19"/> <visibleEdge node1="vertex9" node2="vertex16"/> <visibleEdge node1="vertex4" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex3"/> <visibleEdge node1="vertex9" node2="vertex11"/> <visibleEdge node1="vertex1" node2="vertex15"/> <visibleEdge node1="vertex9" node2="vertex12"/> <visibleEdge node1="vertex7" node2="vertex17"/> <visibleEdge node1="vertex2" node2="vertex7"/> <visibleEdge node1="vertex1" node2="vertex2"/> <visibleEdge node1="vertex9" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex9"/> <visibleEdge node1="vertex7" node2="vertex12"/> </visibleEdges> <visibleEntities> <visibleEntity name="a9" node="vertex4" status="normal" team="A"/> <visibleEntity name="b2" node="vertex1" status="normal" team="B"/> <visibleEntity name="a5" node="vertex7" status="normal" team="A"/> <visibleEntity name="b7" node="vertex2" status="normal" team="B"/> <visibleEntity name="a6" node="vertex2" status="normal" team="A"/> <visibleEntity name="a2" node="vertex4" status="normal" team="A"/> <visibleEntity name="a10" node="vertex12" status="normal" team="A"/> <visibleEntity name="b5" node="vertex2" status="normal" team="B"/> <visibleEntity name="a3" node="vertex12" status="normal" team="A"/> <visibleEntity name="a1" node="vertex1" status="normal" team="A"/> <visibleEntity name="b4" node="vertex4" status="normal" team="B"/> <visibleEntity name="b8" node="vertex3" status="normal" team="B"/> </visibleEntities> </perception> </message>'
-    request_action3 = '<?xml version="1.0" encoding="UTF-8"?><message timestamp="1302894021363" type="request-action"> <perception deadline="1302894023363" id="3"> <simulation step="2"/> <self energy="12" health="4" lastAction="skip" lastActionResult="successful" maxEnergy="12" maxEnergyDisabled="12" maxHealth="4" position="vertex1" strength="0" visRange="2" zoneScore="0"/> <team lastStepScore="8" money="0" score="16" zonesScore="8"/> <visibleVertices> <visibleVertex name="vertex4" team="A"/> <visibleVertex name="vertex12" team="A"/> <visibleVertex name="vertex19" team="none"/> <visibleVertex name="vertex15" team="none"/> <visibleVertex name="vertex11" team="A"/> <visibleVertex name="vertex17" team="A"/> <visibleVertex name="vertex7" team="A"/> <visibleVertex name="vertex1" team="none"/> <visibleVertex name="vertex2" team="B"/> <visibleVertex name="vertex3" team="B"/> <visibleVertex name="vertex9" team="A"/> <visibleVertex name="vertex16" team="none"/> </visibleVertices> <visibleEdges> <visibleEdge node1="vertex1" node2="vertex7"/> <visibleEdge node1="vertex3" node2="vertex15"/> <visibleEdge node1="vertex15" node2="vertex19"/> <visibleEdge node1="vertex9" node2="vertex16"/> <visibleEdge node1="vertex4" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex3"/> <visibleEdge node1="vertex9" node2="vertex11"/> <visibleEdge node1="vertex1" node2="vertex15"/> <visibleEdge node1="vertex9" node2="vertex12"/> <visibleEdge node1="vertex7" node2="vertex17"/> <visibleEdge node1="vertex2" node2="vertex7"/> <visibleEdge node1="vertex1" node2="vertex2"/> <visibleEdge node1="vertex9" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex9"/> <visibleEdge node1="vertex7" node2="vertex12"/> </visibleEdges> <visibleEntities> <visibleEntity name="a9" node="vertex4" status="normal" team="A"/> <visibleEntity name="b2" node="vertex1" status="normal" team="B"/> <visibleEntity name="a5" node="vertex7" status="normal" team="A"/> <visibleEntity name="b7" node="vertex2" status="normal" team="B"/> <visibleEntity name="a6" node="vertex2" status="normal" team="A"/> <visibleEntity name="a2" node="vertex4" status="normal" team="A"/> <visibleEntity name="a10" node="vertex12" status="normal" team="A"/> <visibleEntity name="b5" node="vertex2" status="normal" team="B"/> <visibleEntity name="a3" node="vertex12" status="normal" team="A"/> <visibleEntity name="a1" node="vertex1" status="normal" team="A"/> <visibleEntity name="b4" node="vertex4" status="normal" team="B"/> <visibleEntity name="b8" node="vertex3" status="normal" team="B"/> </visibleEntities> </perception> </message>'
-    request_action4 = '<?xml version="1.0" encoding="UTF-8"?><message timestamp="1302894023957" type="request-action"> <perception deadline="1302894025957" id="4"> <simulation step="3"/> <self energy="12" health="4" lastAction="skip" lastActionResult="successful" maxEnergy="12" maxEnergyDisabled="12" maxHealth="4" position="vertex1" strength="0" visRange="2" zoneScore="0"/> <team lastStepScore="8" money="0" score="24" zonesScore="8"/> <visibleVertices> <visibleVertex name="vertex4" team="A"/> <visibleVertex name="vertex12" team="A"/> <visibleVertex name="vertex19" team="none"/> <visibleVertex name="vertex15" team="none"/> <visibleVertex name="vertex11" team="A"/> <visibleVertex name="vertex17" team="A"/> <visibleVertex name="vertex7" team="A"/> <visibleVertex name="vertex1" team="none"/> <visibleVertex name="vertex2" team="B"/> <visibleVertex name="vertex3" team="B"/> <visibleVertex name="vertex9" team="A"/> <visibleVertex name="vertex16" team="none"/> </visibleVertices> <visibleEdges> <visibleEdge node1="vertex1" node2="vertex7"/> <visibleEdge node1="vertex3" node2="vertex15"/> <visibleEdge node1="vertex15" node2="vertex19"/> <visibleEdge node1="vertex9" node2="vertex16"/> <visibleEdge node1="vertex4" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex9"/> <visibleEdge node1="vertex3" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex3"/> <visibleEdge node1="vertex9" node2="vertex11"/> <visibleEdge node1="vertex1" node2="vertex15"/> <visibleEdge node1="vertex9" node2="vertex12"/> <visibleEdge node1="vertex7" node2="vertex17"/> <visibleEdge node1="vertex2" node2="vertex7"/> <visibleEdge node1="vertex1" node2="vertex2"/> <visibleEdge node1="vertex9" node2="vertex19"/> <visibleEdge node1="vertex1" node2="vertex9"/> <visibleEdge node1="vertex7" node2="vertex12"/> </visibleEdges> <visibleEntities> <visibleEntity name="a9" node="vertex4" status="normal" team="A"/> <visibleEntity name="b2" node="vertex1" status="normal" team="B"/> <visibleEntity name="a5" node="vertex7" status="normal" team="A"/> <visibleEntity name="b7" node="vertex2" status="normal" team="B"/> <visibleEntity name="a6" node="vertex2" status="normal" team="A"/> <visibleEntity name="a2" node="vertex4" status="normal" team="A"/> <visibleEntity name="a10" node="vertex12" status="normal" team="A"/> <visibleEntity name="b5" node="vertex2" status="normal" team="B"/> <visibleEntity name="a3" node="vertex12" status="normal" team="A"/> <visibleEntity name="a1" node="vertex1" status="normal" team="A"/> <visibleEntity name="b4" node="vertex4" status="normal" team="B"/> <visibleEntity name="b8" node="vertex3" status="normal" team="B"/> </visibleEntities> </perception> </message>'
+    #print "AUTHENTICATION RESPONSE:"
+    #file = open('./testdata/auth_res.txt', 'r')
+    #for line in file:
+    #    print_message(parse(line))
+            
+    print "SIMULATION START:"
+    file = open('./testdata/sim_start.txt', 'r')
+    for line in file:
+        print_message(parse(line))
 
-    print_message(parse(auth_response))
-    print_message(parse(sim_start))
-    parse(request_action1)
-    parse(request_action2)
-    parse(request_action3)
-    print_message(parse(request_action4))
+    print "ACTION REQUEST:"
+    file = open('./testdata/action_requests.txt', 'r')
+    for line in file:
+        print_message(parse(line))
