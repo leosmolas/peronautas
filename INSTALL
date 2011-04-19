@@ -1,0 +1,6 @@
+Instalar python 2.6/2.7
+Instalar beautifulSoup:
+	Para esto está la carpeta en / beatifulSoup. Ejecutar:
+	
+$ python setup.py install
+

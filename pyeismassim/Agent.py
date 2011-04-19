@@ -3,7 +3,7 @@
 
 import sys
 import time
-from MASSimConnection import MASSimConnection
+from connection.MASSimConnection import MASSimConnection
 
 HOST = "127.0.0.1"
 PORT = 12300
