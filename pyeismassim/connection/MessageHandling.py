@@ -255,9 +255,8 @@ def action(action_id, action_type, action_parameter = None):
     if (action_parameter == None):
         return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s"/></message>\0' % (action_id, action_type)
     else:
-        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s" param="%s"/></message>\0' % (action_id, action_type, action_parameter)
-
-
+        return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" param="%s" type="%s"/></message>\0' % (action_id, action_parameter, action_type)
+                                                                                                                                                                            
 
 
 if (__name__ == "__main__"):
@@ -274,10 +273,10 @@ if (__name__ == "__main__"):
     #print action("14", "repair", "agent1")
     #print action("14", "buy", "battery")
 
-    #print "AUTHENTICATION RESPONSE:"
-    #file = open('./testdata/auth_res.txt', 'r')
-    #for line in file:
-    #    print_message(parse(line))
+    print "AUTHENTICATION RESPONSE:"
+    file = open('./testdata/auth_response.txt', 'r')
+    for line in file:
+        print_message(parse(line))
             
     print "SIMULATION START:"
     file = open('./testdata/sim_start.txt', 'r')
