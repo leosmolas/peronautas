@@ -8,12 +8,15 @@ from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
 from connection.MessageHandling import *
 
-
 if (__name__== "__main__"):
     HOST = "127.0.0.1"
     PORT = 12300
-    USER = "a1"
-    PASS = "1"
+    if (len(sys.argv) == 3):
+        USER = sys.argv[1]
+        PASS = sys.argv[2]
+    else:
+        print "Usage: python Agent.py USERNAME PASSWORD"
+        sys.exit()
 
     log = open('xml.txt', 'w')
     # Connect and authenticate.
@@ -29,20 +32,20 @@ if (__name__== "__main__"):
     print "@Agent: received:"
     print_message(msg)
 
-    steps = int(msg['steps'])
-    #for step in range(steps):
-    for step in range(1,11):
-        print "@Agent: step", step
+    quit = False
+    while (not quit):
         xml = connection.receive()
         log.write(xml)
-        msg = parse(xml)	
+        msg = parse(xml)
         print_message(msg)
-        action_id = msg['id']
-        print "Action id:", action_id
-        connection.send(action(action_id, "skip"))
+        if (msg['type'] == 'bye'):
+            quit = True
+        elif (msg['type'] == 'request_action'):
+            action_id = msg['id']
+            print "Action id:", action_id
+            action_xml = action(action_id, "skip")
+            log.write(action_xml)
+            connection.send(action_xml)
 
     log.close()
-
-    # Send bye message and disconnect.
-    connection.send(bye())
     connection.disconnect()

@@ -72,7 +72,6 @@ class MASSimConnection:
         else:
             raise RuntimeError("Server connection lost")
 
-
     def connectionValid(self):
         i = 0
         while (not self.connected) and (i < MAX_CONNECTION_TRIES):

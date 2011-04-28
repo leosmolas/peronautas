@@ -1,1 +1,39 @@
+doc: design documentation
 pyeismassim: partial implementation in Python of the eismassim library.
+pyswig test: code testing the pyswig python-prolog bridge
+
+eismassim: the eismassim jar files
+javaagents: the javaagents jar files
+    This has one additional directory in the conf directory named my dummyteam,
+    which configures the agent interpreter to start two teams with one explorer 
+    agent each.
+massim: the original massim server jar files
+massim-netbeans: a folder containing a netbeans project with the code for the 
+    massim server, with some small modifications. 
+    The massim-netbeans/AgentContest/save folder contains the modified scripts 
+    necessary to run the server, and also contain a modified xml file named 
+    my2011-conf1.xml to configure the server for a single match between two 
+    teams with one explorer agent each.
+    A copy of this file is also located in the original server's conf directory.
+    Instructions: 
+        import into netbeans, 
+        create a library in library manager called AgentContest 
+            (Tools menu -> 
+             Libraries -> 
+             New Library -> 
+             OK -> 
+             Add Jar/Folder -> 
+             add all jar files in massim-netbeans/AgentContest/dependency -> 
+             Ok) 
+        add library to AgentContest project
+            (right click on AgentContest project in Projects pane ->
+            Properties ->
+            Libraries ->
+            Add Library ->
+            select AgentContest ->
+            Add Library ->
+            Ok)
+        build, 
+        *copy* massim-netbeans/AgentContest/save/* to the generated dist folder, 
+        and run the startServer.sh script to run the modified server,
+        choosing the my2011-conf1.xml file.
