@@ -26,4 +26,15 @@ for sol in prolog.query("padre(homero, Res)"):
 		print type(x)
 		print x
 		
+		
+print
+print
+print
+for sol in prolog.query("heavy(X)"):
+	print type(sol['X']),sol['X'].args
+	for x in sol['X'].args[0]:
+		print x
+		
+	if sol['X'].name=="b":
+		print "asd",type(sol['X'].args)
 	

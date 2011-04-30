@@ -10,3 +10,5 @@ suma(s(X), Y, s(Z)):- suma(X, Y, Z).
 
 list_sum([], 0).
 list_sum([Head | Tail], TotalSum) :- list_sum(Tail, Sum1), TotalSum is Head + Sum1.
+
+heavy(b([12,b(literal),"as",'as',s(0)])).

@@ -5,15 +5,15 @@ from BeautifulSoup import BeautifulStoneSoup
 #
 # Functions:
 #   parse(xml_string)
-#       parses a string representing an xml message from the server
+#       parses a string that represents an xml message from the server
 #   print_message(parse_message)
 #       pretty prints a parsed xml message
 #   auth_request(username, password)
-#       generates a string representing an autorization request xml message
+#       generates a string that represents an autorization request xml message
 #   bye()
-#       generates a string representing a goodbye xml message
+#       generates a string that represents a goodbye xml message
 #   action(action_id, action_type[, action_parameter])
-#       generates a string representing an action xml message
+#       generates a string that represents an action xml message
 
 # Parsing
 
@@ -87,7 +87,7 @@ def parse_request_action(xml):
     achievements_tag   = xml.find('achievements')
 
     result                        = {}
-    result['timestamp']           = message_tag['timestamp']      
+    result['timestamp']           = message_tag['timestamp']      #Leo: @Iñaki: estoy seguro que tiene que ver una forma más fácil y rápida de hacer esto. Creo que onda result.append(message_tag). Pero de cualquier manera está bueno porque es fácil ver los atributos. Debería quedar esto documentado y si se puede hacer masivamente, mejor.
     result['type']                = message_tag['type']           
     result['deadline']            = perception_tag['deadline']    
     result['id']                  = perception_tag['id']          
@@ -111,7 +111,7 @@ def parse_request_action(xml):
         # This check is done because if the xml has no visible vertices tag, it will be None.
         achievements_list = []
         for i in range(len(achievements_tag.contents)):
-            if (achievements_tag.contents[i].__class__.__name__ == "Tag"):
+            if (achievements_tag.contents[i].__class__.__name__ == "Tag"): #Leo: @Iñaki: podés hacer en vez de esto isinstance(achievements_tag.contents[i], Tag)
                 # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
                 # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                 achievements_list.append(achievements_tag.contents[i]['name'])
@@ -237,7 +237,11 @@ def print_message(result):
 # Generation
 
 def auth_request(username, password):
-    return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="auth-request"><authentication password="%s" username="%s"/></message>\0' % (password, username)
+    return u'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<message type="auth-request">
+    <authentication password="%s" username="%s"/>
+</message>
+\0''' % (password, username)
 
 def bye():
     return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="bye"/></message>\0'

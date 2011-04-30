@@ -6,7 +6,7 @@ import sys
 import time
 from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
-from connection.MessageHandling import * #vasco que carajo es esto?
+from connection.MessageHandling import * 
 from pyswip.prolog import Prolog
 from pyswip.easy import *
 
