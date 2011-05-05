@@ -592,7 +592,8 @@ public class XMLSocketSimulationAgent extends AbstractSimulationAgent implements
 				buffer = new byte[amount];
 				System.out.println("666: @socketThreadReceive:593 about to read something");
 				in.read(buffer);
-                                System.out.println("666: @socketThreadReceive:595 read something, process it");
+                                System.out.println("666: @socketThreadReceive:595 read something, process it IT IS DIFFERENTE");
+                                System.out.println("666: check");
 				// process read bytes
 				int firstnotcopied=0;
 				for (int i=0;i<amount;i++) {
@@ -605,6 +606,7 @@ public class XMLSocketSimulationAgent extends AbstractSimulationAgent implements
 							seeknextend=true;
 						} else // and write possibly data to packet buffer
 						packetbuffer.write(buffer,firstnotcopied,i-firstnotcopied+(buffer[i]==0 ? 0 : 1));
+                                                System.out.println(packetbuffer.toString());
 					}
 					if (buffer[i] == 0) { // if we've found a null byte some packet has to end here.
 						//convert packet to XML

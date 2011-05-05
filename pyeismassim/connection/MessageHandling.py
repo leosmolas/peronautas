@@ -38,37 +38,34 @@ def parse_sim_start(xml):
     message_tag    = xml.find('message')
     simulation_tag = xml.find('simulation')
 
-    timestamp_attr = message_tag['timestamp']
-    type_attr      = message_tag['type']
-    edges_attr     = simulation_tag['edges'] 
-    id_attr        = simulation_tag['id']
-    steps_attr     = simulation_tag['steps']
-    vertices_attr  = simulation_tag['vertices']
-
     result              = {}
-    result['timestamp'] = timestamp_attr
-    result['type']      = type_attr
-    result['edges']     = edges_attr
-    result['id']        = id_attr
-    result['steps']     = steps_attr
-    result['vertices']  = vertices_attr
+    result['timestamp'] = message_tag['timestamp']   
+    result['type']      = message_tag['type']        
+    result['edges']     = simulation_tag['edges']    
+    result['id']        = simulation_tag['id']       
+    result['steps']     = simulation_tag['steps']    
+    result['vertices']  = simulation_tag['vertices'] 
 
     return result
 
 def parse_sim_end(xml):
-    message_tag    = xml.contents[1]
-    sim_result_tag = message_tag.contents[0]
 
-    timestamp_attr = message_tag['timestamp']
-    type_attr      = message_tag['type']
-    ranking_attr   = sim_result_tag['ranking']
-    score_attr     = sim_result_tag['score']
+    message_tag    = xml.find('message')
+    sim_result_tag = xml.find('sim-result')
 
     result              = {}
-    result['timestamp'] = timestamp_attr
-    result['type']      = type_attr
-    result['ranking']   = ranking_attr
-    result['score']     = score_attr
+    result['timestamp'] = message_tag['timestamp']  
+    result['type']      = message_tag['type']       
+    result['ranking']   = sim_result_tag['ranking'] 
+    result['score']     = sim_result_tag['score']   
+
+    return result
+
+def parse_bye(xml):
+    message_tag         = xml.find('message')
+
+    result              = {}
+    result['timestamp'] = message_tag['timestamp']
 
     return result
 
@@ -192,11 +189,19 @@ def parse(msg):
     parse_functions = { "auth-response"  : parse_auth_response,
                         "sim-start"      : parse_sim_start,
                         "sim-end"        : parse_sim_end,
-                        "request-action" : parse_request_action 
+                        "request-action" : parse_request_action,
+                        "bye"            : parse_bye
                       }
-    xml          = BeautifulStoneSoup(msg, selfClosingTags=['authentication'])
-    message_type = xml.contents[1]['type']
-    return parse_functions[message_type](xml)
+    xml = BeautifulStoneSoup(msg, selfClosingTags=['authentication'])
+
+    result = {}
+    if (xml != None):
+        message_tag  = xml.find('message')
+        message_type = message_tag['type']
+        result = parse_functions[message_type](xml)
+    else:
+        raise Exception
+    return result
 
 def print_message(result):
     """
@@ -256,8 +261,6 @@ def action(action_id, action_type, action_parameter = None):
         return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" type="%s"/></message>\0' % (action_id, action_type)
     else:
         return u'<?xml version="1.0" encoding="UTF-8" standalone="no"?><message type="action"><action id="%s" param="%s" type="%s"/></message>\0' % (action_id, action_parameter, action_type)
-                                                                                                                                                                            
-
 
 if (__name__ == "__main__"):
     #print auth_request("USER", "PASS")
