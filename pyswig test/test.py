@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-from pyswip.prolog import Prolog
+from pyswip.prolog import *
 from pyswip.easy import *
 
 
@@ -29,7 +29,7 @@ for sol in prolog.query("padre(homero, Res)"):
 		
 print
 print
-print
+print "aca esta la papa", list(prolog.query("heavy(X)"))
 for sol in prolog.query("heavy(X)"):
 	print type(sol['X']),sol['X'].args
 	for x in sol['X'].args[0]:
@@ -38,3 +38,30 @@ for sol in prolog.query("heavy(X)"):
 	if sol['X'].name=="b":
 		print "asd",type(sol['X'].args)
 	
+#prolog.query(":-dynamic action/1")
+list(prolog.query("retract(action(_))"))
+list(prolog.query("assertz(action(skip))"))
+for sol in prolog.query("action(X)"):
+	print type(sol['X']),sol['X']
+# print  bool(prolog.query("asserteameEsta(skip)"))
+# print  prolog.query("action(X)").next()['X']
+	
+		
+
+# assertz = Functor("assert", 1)
+# retract = Functor("retract", 1)
+# father = Functor("father", 2)
+# padre = Functor("padre",2)
+# Res = Variable()
+# call(assertz(father("a","b")))
+# q = Query(father("x","b"))
+# print u"debería dar false", q.nextSolution()
+# call(retract(father("_","_")))
+# call(assertz(father("x","b")))
+# q = Query(father("x","b"))
+# print u"debería dar true", q.nextSolution()
+# q = Query(padre("homero",Res))
+# print u"debería dar lisa", q.nextSolution(), Res.value
+# q = Query(padre("homero",Res))
+# print u"debería dar lisa", q.nextSolution()
+
