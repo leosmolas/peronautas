@@ -11,15 +11,11 @@ HOST = "127.0.0.1"
 PORT = 12300
 USER = "a1"
 PASS = "1"
-assert_ = Functor("assert")
-assert_ = Functor("assert")
-
-
 
 def processPerception(msg,p):
     # p.query("last_action(_)") # %(x,x,msg[x]))
     # p.assertz("last_action(skip)")
-    for x in ['position','energy','last_action','last_action_result','money']: 
+    for x in ['position','energy','last_action','last_action_result','money','max_health','max_energy']: 
         print x,msg[x],list(p.query("retract(%s(_))" % x))
         print bool(list(p.query("assert(%s(%s))" % (x,msg[x]))))
     aux = []
@@ -39,7 +35,7 @@ def processPerception(msg,p):
     vert = "["
     print "aux",aux
     for x in aux:
-        vert+="arco(%s,%s)," %(x[0],x[1])
+        vert+="edge(%s,%s)," %(x[0],x[1])
     vert2 = vert[:-1]+"]"
     print vert2,list(p.query("actualizarListas(%s,edges)" % vert2 ))
     
@@ -66,7 +62,7 @@ if __name__=="__main__":
     prolog = Prolog()
     prolog.consult("pl/kb.pl")
 
-    for step in range(1,11):
+    for step in range(1,100):
         print "@Agent: step", step
         xml = connection.receive()
         log.write(xml)
@@ -82,12 +78,16 @@ if __name__=="__main__":
         processPerception(msg,prolog)
         print prolog.query("verts(X)").next()["X"]
         print prolog.query("edges(X)").next()["X"]
-        #le consulto a prolog que accion tomar
-        # accion = list(prolog.query("action(X)"))
-        
-
+        # neigh = prolog.query("searchNeigh(X)").next()["X"]
+        list(prolog.query("argumentation"))
+        list(prolog.query("planning"))
+        actionList = prolog.query("exec(X)").next()["X"]
+        print action
         # connection.send(action(action_id, accion.next()["X"])) #le pongo next porque puede devolver varias rtas (como si pusieras ;)
-        connection.send(action(action_id, "skip")) #le pongo next porque puede devolver varias rtas (como si pusieras ;)
+        if len(actionList)==2:
+            connection.send(action(action_id, actionList[0],actionList[1])) 
+        else:
+            connection.send(action(action_id, actionList[0])) 
 
     log.close()
 
