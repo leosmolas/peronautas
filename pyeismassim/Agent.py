@@ -37,15 +37,20 @@ if (__name__== "__main__"):
         xml = connection.receive()
         log.write(xml)
         msg = parse(xml)
-        print_message(msg)
-        if (msg['type'] == 'bye'):
-            quit = True
-        elif (msg['type'] == 'request_action'):
+        if (msg['type'] == 'request-action'):
             action_id = msg['id']
-            print "Action id:", action_id
+            print "@Agent: received request-action. id:", action_id
             action_xml = action(action_id, "skip")
             log.write(action_xml)
             connection.send(action_xml)
+        elif (msg['type'] == 'bye'):
+            print "@Agent: received bye"
+            quit = True
+        elif (msg['type'] == 'sim-end'):
+            print "@Agent: received sim-end"
+            quit = True
+        else:
+            print "@Agent: en area 51"
 
     log.close()
     connection.disconnect()

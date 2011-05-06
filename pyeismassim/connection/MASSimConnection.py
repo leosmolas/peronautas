@@ -23,7 +23,7 @@ class MASSimConnection:
         else:
             self.connected = False
             print "@Connection: failed. error:", code
-        time.sleep(2)
+        #time.sleep(2)
         self.authenticate(username, password)
 
     def disconnect(self):
