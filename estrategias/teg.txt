@@ -1,0 +1,7 @@
+Estrategias de exploración para el explorar (local):
+	Hacer probe del nodo en el que esta parado actualmente (si no se conoce el peso)
+	Hacer probe (si es necesario) de un nodo que este controlado por nuestro o equipo (o bien, en una zona cercana) y no se conozca su peso.
+	Si conoce un peso de un camino a un nodo que no tiene valor, ir a ese nodo con la intencion de hacerle probe.
+	Si no conoce el peso de algun arco, pero los nodos cercanos ya fueron probeados, hacer un survey.
+	Cuando ya se conoce la zona propia, tanto el valor de los arcos como de los nodos, se comienza a explorar en profundidad lugares desconocidos del mapa, como la zona de tu enemigo.
+	Cuando se conoce la mayoría del mapa, quedarte a defender tu zona.
