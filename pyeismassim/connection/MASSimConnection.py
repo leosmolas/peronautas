@@ -90,7 +90,7 @@ class MASSimConnection:
             self.send(auth_request(username, password))
             print "@Connection: waiting for reply."
             auth_reply = self.receive()
-            result = parse(auth_reply)
+            _, _, result = parse(auth_reply)
             if (result['result'] != 'ok'):
                 raise RuntimeError("Authentication failed.")
             else:

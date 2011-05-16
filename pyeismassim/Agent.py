@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
+
 # TODO:
-# - make sure the disconnect method playes nice with the server, i.e. sends the appropriate message so server does not say premature end of file.
 # - fix behaviour in case the server dies unexpectedly on the agent, make sure he cleans up and dies gracefully.
 
 import sys
@@ -26,27 +27,29 @@ if (__name__== "__main__"):
     # Receive simulation start notification.
     print "@Agent: Waiting for simulation start notification."
     xml = connection.receive()
-    msg = parse(xml)
+    _, _, msg = parse(xml, 'dict')
     log.write(xml)
 
     print "@Agent: received:"
-    print_message(msg)
+    print_message(msg, 'dict')
 
     quit = False
     while (not quit):
         xml = connection.receive()
         log.write(xml)
-        msg = parse(xml)
-        if (msg['type'] == 'request-action'):
-            action_id = msg['id']
+        msg_type, action_id, msg = parse(xml, 'prolog')
+        log.write(str(msg))
+        #sys.stdin.read(1)
+        if (msg_type == 'request-action'):
             print "@Agent: received request-action. id:", action_id
             action_xml = action(action_id, "skip")
             log.write(action_xml)
+            print_message(msg, 'prolog') # DEBUG
             connection.send(action_xml)
-        elif (msg['type'] == 'bye'):
+        elif (msg_type == 'bye'):
             print "@Agent: received bye"
             quit = True
-        elif (msg['type'] == 'sim-end'):
+        elif (msg_type == 'sim-end'):
             print "@Agent: received sim-end"
             quit = True
         else:

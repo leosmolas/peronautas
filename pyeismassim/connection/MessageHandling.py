@@ -38,7 +38,7 @@ def parse_auth_response(xml, output = 'dict'):
             'result(%s)'    % authentication_tag['result']          ]
     else:
         raise Exception
-    return result
+    return ('auth-response', None, result)
 
 #------------------------------------------------------------------------------#
 def parse_sim_start(xml, output = 'dict'):
@@ -63,7 +63,7 @@ def parse_sim_start(xml, output = 'dict'):
             'vertices(%s)'  % simulation_tag['vertices'] ]
     else:
         raise Exception
-    return result
+    return ('sim-start', None, result)
 
 #------------------------------------------------------------------------------#
 def parse_sim_end(xml, output = 'dict'):
@@ -84,7 +84,7 @@ def parse_sim_end(xml, output = 'dict'):
             'score(%s)'     % sim_result_tag['score']   ]
     else:
         raise Exception
-    return result
+    return ('sim-end', None, result)
 
 #------------------------------------------------------------------------------#
 def parse_bye(xml, putput = 'dict'):
@@ -99,7 +99,7 @@ def parse_bye(xml, putput = 'dict'):
             'timestamp(%s)' % message_tag['timestamp'] ]
     else:
         raise Exception
-    return result
+    return ('bye', None, result)
 
 #------------------------------------------------------------------------------#
 def parse_request_action(xml, output = 'dict'):
@@ -115,6 +115,7 @@ def parse_request_action(xml, output = 'dict'):
     surveyed_edges_tag = xml.find('surveyededges')
     inspected_ents_tag = xml.find('inspectedentities')
     achievements_tag   = xml.find('achievements')
+    action_id          = perception_tag['id']
     
     if (output == "dict"):
         result = {
@@ -164,7 +165,7 @@ def parse_request_action(xml, output = 'dict'):
                     vis_edges_list.append({ 
                         'node1' : vis_edges_tag.contents[i]['node1'] ,
                         'node2' : vis_edges_tag.contents[i]['node2'] })
-                result['vis_edges'] = vis_edges_list
+            result['vis_edges'] = vis_edges_list
 
         if (vis_ents_tag != None):
             vis_ents_list = []
@@ -258,7 +259,7 @@ def parse_request_action(xml, output = 'dict'):
                 if (vis_edges_tag.contents[i].__class__.__name__ == "Tag"):
                     vis_edges_list.append('vis_edge(%s,%s)' % (vis_edges_tag.contents[i]['node1'], 
                                                                vis_edges_tag.contents[i]['node2']))
-                result += vis_edges_list
+            result += vis_edges_list
 
         if (vis_ents_tag != None):
             vis_ents_list = []
@@ -303,7 +304,7 @@ def parse_request_action(xml, output = 'dict'):
             result += inspected_ents_list
     else:
         raise Exception
-    return result
+    return ('request-action', action_id, result)
 
 #------------------------------------------------------------------------------#
 def parse(msg, output = "dict"):
