@@ -22,6 +22,30 @@ from string import replace, lower
 # Parsing
 
 #------------------------------------------------------------------------------#
+def parse_tournament(xml, output = 'dict'):
+    tournament_tag = xml.find('tournament')
+    team_tag       = xml.find('team')
+    match_tag      = xml.find('match')
+
+#<?xml version="1.0" encoding="UTF-8"?>
+#<tournament tournament-name="Mars2011">
+#<team name="A"/><team name="B"/>
+#<match blue="B" red="A"/>
+#</tournament>
+
+    if (output == 'dict'):
+        result = {
+                'result' : xml.prettify()
+                }
+    elif (output == 'prolog'):
+        result = [
+                xml.prettify()
+                ]
+    else:
+        raise Exception
+    return ('tournament', None, result)
+        
+#------------------------------------------------------------------------------#
 def parse_auth_response(xml, output = 'dict'):
     message_tag        = xml.find('message')
     authentication_tag = xml.find('authentication')
@@ -87,7 +111,7 @@ def parse_sim_end(xml, output = 'dict'):
     return ('sim-end', None, result)
 
 #------------------------------------------------------------------------------#
-def parse_bye(xml, putput = 'dict'):
+def parse_bye(xml, output = 'dict'):
     message_tag = xml.find('message')
     if (output == 'dict'):
         result = { 
@@ -307,7 +331,15 @@ def parse_request_action(xml, output = 'dict'):
     return ('request-action', action_id, result)
 
 #------------------------------------------------------------------------------#
-def parse(msg, output = "dict"):
+def parse_as_dict(msg):
+    return parse(msg, "dict")
+
+#------------------------------------------------------------------------------#
+def parse_as_list(msg):
+    return parse(msg, 'prolog')
+
+#------------------------------------------------------------------------------#
+def parse(msg, output):
     """The output parameter may be 'dict' or 'prolog'."""
     parse_functions = { "auth-response"  : parse_auth_response,
                         "sim-start"      : parse_sim_start,
@@ -319,11 +351,22 @@ def parse(msg, output = "dict"):
     result = {}
     if (xml != None):
         message_tag  = xml.find('message')
-        message_type = message_tag['type']
-        result = parse_functions[message_type](xml, output)
+        if (message_tag == None):
+            result = parse_tournament(xml, output)
+        else:
+            message_type = message_tag['type']
+            result = parse_functions[message_type](xml, output)
     else:
         raise Exception
     return result
+
+#------------------------------------------------------------------------------#
+def print_dict_message(result):
+    print_message(result, 'dict')
+
+#------------------------------------------------------------------------------#
+def print_list_message(result):
+    print_message(result, 'prolog')
 
 #------------------------------------------------------------------------------#
 def print_message(result, input = 'dict'):

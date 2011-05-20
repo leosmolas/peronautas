@@ -14,10 +14,12 @@ Areas de interes segun Diego Martine:
     planning
     
 TAREAS INMEDIATAS:
-    mergear lo de molas con lo mio
-    implementar el compartido de percepciones
-    ver la libreria del tuqui para comunicacion entre agentes
-    implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
+    [X] mergear lo de molas con lo mio
+    [ ] implementar el compartido de percepciones
+        que pasa cuando tenes dos agentes, y los dos mandan toda su percepcion, y colision e.g. el health de cada uno?
+        solo mandamos cosas comunes como la estructura del grafo y agentes enemigos, o interesa saber la energia/salud de los demas?
+    [ ] ver la libreria del tuqui para comunicacion entre agentes
+    [ ] implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
         la estructura del grafo se almacena con hechos
         los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
         vertex/1.

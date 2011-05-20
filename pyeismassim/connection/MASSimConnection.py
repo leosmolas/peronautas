@@ -2,7 +2,7 @@ import socket
 import sys
 import time
 from MessageHandling import auth_request
-from MessageHandling import parse
+from MessageHandling import parse_as_dict
 
 MAX_CONNECTION_TRIES = 10
 
@@ -90,7 +90,7 @@ class MASSimConnection:
             self.send(auth_request(username, password))
             print "@Connection: waiting for reply."
             auth_reply = self.receive()
-            _, _, result = parse(auth_reply)
+            _, _, result = parse_as_dict(auth_reply)
             if (result['result'] != 'ok'):
                 raise RuntimeError("Authentication failed.")
             else:

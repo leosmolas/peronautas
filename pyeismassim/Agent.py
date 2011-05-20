@@ -34,10 +34,10 @@ class Agent():
         print "@Agent: Waiting for simulation start notification."
         xml = self.connection.receive()
         self.log.write(xml)
-        _, _, msg = parse(xml, 'dict')
+        _, _, msg = parse_as_dict(xml)
 
         print "@Agent: received:"
-        print_message(msg, 'dict')
+        print_dict_message(msg)
 
         quit = False
         step = 0
@@ -46,13 +46,13 @@ class Agent():
             print "Step:", step
             xml = self.connection.receive()
             self.log.write(xml)
-            msg_type, action_id, msg = parse(xml, 'prolog')
+            msg_type, action_id, msg = parse_as_list(xml)
             #sys.stdin.read(1)
             if (msg_type == 'request-action'):
                 print "@Agent: received request-action. id:", action_id
                 action_xml = action(action_id, "skip")
                 self.log.write(action_xml)
-                print_message(msg, 'prolog') # DEBUG
+                print_list_message(msg) # DEBUG
                 self.connection.send(action_xml)
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
@@ -74,12 +74,8 @@ class DummyAgent(Agent):
 class PrologAgent(Agent):
 
     def processPerception(self, msg, p):
-        # p.query("last_action(_)") # %(x,x,msg[x]))
-        # p.assertz("last_action(skip)")
-        for x in ['position','energy','last_action','last_action_result','money','max_health','max_energy']: 
-            #print x, msg[x], list(p.query("retract(%s(_))" % x))
+        for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
             list(p.query("retract(%s(_))" % x))
-            #print bool(list(p.query("assert(%s(%s))" % (x,msg[x]))))
             list(p.query("assert(%s(%s))" % (x, msg[x])))
         aux = []
         for x in msg['vis_verts']:
@@ -89,18 +85,15 @@ class PrologAgent(Agent):
             vert += x + ","
         vert2 = vert[:-1] + "]"
         
-        #print vert2,list(p.query("actualizarListas(%s,verts)" % vert2 ))
         list(p.query("actualizarListas(%s,verts)" % vert2 ))
         aux = []
         for x in msg['vis_edges']:
-            #print (x['node1'],x['node2'])
             aux.append((x['node1'],x['node2']))
         vert = "["
         #print "aux",aux
         for x in aux:
             vert += "edge(%s,%s)," %(x[0],x[1])
         vert2 = vert[:-1]+"]"
-        #print vert2, list(p.query("actualizarListas(%s,edges)" % vert2 ))
         list(p.query("actualizarListas(%s,edges)" % vert2 ))
         
     def perceive_act_loop(self, prolog_source):
@@ -108,11 +101,11 @@ class PrologAgent(Agent):
         # Receive simulation start notification.
         print "@Agent: Waiting for simulation start notification."
         xml = self.connection.receive()
-        self.log.write(xml)
-        _, _, msg = parse(xml, 'dict')
+        #self.log.write(xml)
+        _, _, msg = parse_as_dict(xml)
 
         print "@Agent: received:"
-        print_message(msg, 'dict')
+        print_dict_message(msg)
 
         steps = int(msg['steps'])
 
@@ -126,8 +119,16 @@ class PrologAgent(Agent):
             step += 1
             print "Step:", step
             xml = self.connection.receive()
-            self.log.write(xml)
-            msg_type, action_id, msg = parse(xml, 'dict')
+            #self.log.write(xml)
+            msg_type, action_id, msg = parse_as_dict(xml)
+
+            # DEGUG
+            _, _, list_msg = parse_as_list(xml)
+            print_list_message(list_msg)
+            self.log.write("PROLOG PERCEPT:\n")
+            for line in list_msg:
+                self.log.write('   ' + line + '\n')
+
             if (msg_type == 'request-action'):
                 print "@Agent: received request-action. id:", action_id
 
@@ -147,11 +148,12 @@ class PrologAgent(Agent):
                 self.log.write(action_xml)
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
-                quit = True
+                #quit = True
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
-                quit = True
+                #quit = True
             else:
+                quit = True
                 print "@Agent: en area 51"
 
 if (__name__== "__main__"):
