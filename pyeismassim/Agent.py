@@ -8,10 +8,153 @@ import time
 from timeit import Timer
 from connection.MASSimConnection import MASSimConnection
 from connection.MessageHandling import *
+from pyswip.prolog import Prolog
+from pyswip.easy import *
+
+class Agent():
+    
+    def __init__(self, USER, PASS):
+        self.HOST = "127.0.0.1"
+        self.PORT = 12300
+        self.USER = USER
+        self.PASS = PASS
+        self.log = open('log-' + USER + '.txt', 'w')
+
+    def connect(self):
+        # Connect and authenticate.
+        self.connection = MASSimConnection()
+        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)
+
+    def disconnect(self):
+        self.log.close()
+        self.connection.disconnect()
+
+    def perceive_act_loop(self):
+        # Receive simulation start notification.
+        print "@Agent: Waiting for simulation start notification."
+        xml = self.connection.receive()
+        self.log.write(xml)
+        _, _, msg = parse(xml, 'dict')
+
+        print "@Agent: received:"
+        print_message(msg, 'dict')
+
+        quit = False
+        step = 0
+        while (not quit):
+            step += 1
+            print "Step:", step
+            xml = self.connection.receive()
+            self.log.write(xml)
+            msg_type, action_id, msg = parse(xml, 'prolog')
+            #sys.stdin.read(1)
+            if (msg_type == 'request-action'):
+                print "@Agent: received request-action. id:", action_id
+                action_xml = action(action_id, "skip")
+                self.log.write(action_xml)
+                print_message(msg, 'prolog') # DEBUG
+                self.connection.send(action_xml)
+            elif (msg_type == 'bye'):
+                print "@Agent: received bye"
+                quit = True
+            elif (msg_type == 'sim-end'):
+                print "@Agent: received sim-end"
+                quit = True
+            else:
+                print "@Agent: en area 51"
+
+class DummyAgent(Agent):
+
+    def __init__(self):
+        pass
+
+    def perceive_act_loop(self, actions):
+        pass
+
+class PrologAgent(Agent):
+
+    def processPerception(self, msg, p):
+        # p.query("last_action(_)") # %(x,x,msg[x]))
+        # p.assertz("last_action(skip)")
+        for x in ['position','energy','last_action','last_action_result','money','max_health','max_energy']: 
+            #print x, msg[x], list(p.query("retract(%s(_))" % x))
+            list(p.query("retract(%s(_))" % x))
+            #print bool(list(p.query("assert(%s(%s))" % (x,msg[x]))))
+            list(p.query("assert(%s(%s))" % (x, msg[x])))
+        aux = []
+        for x in msg['vis_verts']:
+            aux.append(x['name'])
+        vert = "["
+        for x in aux:
+            vert += x + ","
+        vert2 = vert[:-1] + "]"
+        
+        #print vert2,list(p.query("actualizarListas(%s,verts)" % vert2 ))
+        list(p.query("actualizarListas(%s,verts)" % vert2 ))
+        aux = []
+        for x in msg['vis_edges']:
+            #print (x['node1'],x['node2'])
+            aux.append((x['node1'],x['node2']))
+        vert = "["
+        #print "aux",aux
+        for x in aux:
+            vert += "edge(%s,%s)," %(x[0],x[1])
+        vert2 = vert[:-1]+"]"
+        #print vert2, list(p.query("actualizarListas(%s,edges)" % vert2 ))
+        list(p.query("actualizarListas(%s,edges)" % vert2 ))
+        
+    def perceive_act_loop(self, prolog_source):
+
+        # Receive simulation start notification.
+        print "@Agent: Waiting for simulation start notification."
+        xml = self.connection.receive()
+        self.log.write(xml)
+        _, _, msg = parse(xml, 'dict')
+
+        print "@Agent: received:"
+        print_message(msg, 'dict')
+
+        steps = int(msg['steps'])
+
+        # Creo una conexion con SWI.
+        prolog = Prolog()
+        prolog.consult(prolog_source)
+
+        quit = False
+        step = 0
+        while (not quit):
+            step += 1
+            print "Step:", step
+            xml = self.connection.receive()
+            self.log.write(xml)
+            msg_type, action_id, msg = parse(xml, 'dict')
+            if (msg_type == 'request-action'):
+                print "@Agent: received request-action. id:", action_id
+
+                # Process perception.
+                self.processPerception(msg, prolog)
+                prolog.query("verts(X)").next()["X"]
+                prolog.query("edges(X)").next()["X"]
+                #prolog.query("searchNeigh(X)").next()["X"]
+                list(prolog.query("argumentation"))
+                list(prolog.query("planning"))
+                actionList = prolog.query("exec(X)").next()["X"]
+                if len(actionList) == 2:
+                    action_xml = action(action_id, actionList[0], actionList[1])
+                else:
+                    action_xml = action(action_id, actionList[0])
+                self.connection.send(action_xml)
+                self.log.write(action_xml)
+            elif (msg_type == 'bye'):
+                print "@Agent: received bye"
+                quit = True
+            elif (msg_type == 'sim-end'):
+                print "@Agent: received sim-end"
+                quit = True
+            else:
+                print "@Agent: en area 51"
 
 if (__name__== "__main__"):
-    HOST = "127.0.0.1"
-    PORT = 12300
     if (len(sys.argv) == 3):
         USER = sys.argv[1]
         PASS = sys.argv[2]
@@ -19,41 +162,19 @@ if (__name__== "__main__"):
         print "Usage: python Agent.py USERNAME PASSWORD"
         sys.exit()
 
-    log = open('xml.txt', 'w')
-    # Connect and authenticate.
-    connection = MASSimConnection()
-    connection.connect(HOST, PORT, USER, PASS)
+    agent = PrologAgent(USER, PASS)
+    agent.connect()
+    agent.perceive_act_loop("pl/kb.pl")
+    agent.disconnect()
 
-    # Receive simulation start notification.
-    print "@Agent: Waiting for simulation start notification."
-    xml = connection.receive()
-    _, _, msg = parse(xml, 'dict')
-    log.write(xml)
+    #if (len(sys.argv) == 3):
+    #    USER = sys.argv[1]
+    #    PASS = sys.argv[2]
+    #else:
+    #    print "Usage: python Agent.py USERNAME PASSWORD"
+    #    sys.exit()
 
-    print "@Agent: received:"
-    print_message(msg, 'dict')
-
-    quit = False
-    while (not quit):
-        xml = connection.receive()
-        log.write(xml)
-        msg_type, action_id, msg = parse(xml, 'prolog')
-        log.write(str(msg))
-        #sys.stdin.read(1)
-        if (msg_type == 'request-action'):
-            print "@Agent: received request-action. id:", action_id
-            action_xml = action(action_id, "skip")
-            log.write(action_xml)
-            print_message(msg, 'prolog') # DEBUG
-            connection.send(action_xml)
-        elif (msg_type == 'bye'):
-            print "@Agent: received bye"
-            quit = True
-        elif (msg_type == 'sim-end'):
-            print "@Agent: received sim-end"
-            quit = True
-        else:
-            print "@Agent: en area 51"
-
-    log.close()
-    connection.disconnect()
+    #agent = Agent(USER, PASS)
+    #agent.connect()
+    #agent.perceive_act_loop()
+    #agent.disconnect()

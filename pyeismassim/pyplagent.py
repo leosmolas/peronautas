@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+﻿# -*- CODINg: utf-8 -*-
 import sys
 import time
 from timeit import Timer
@@ -51,10 +51,10 @@ if __name__=="__main__":
     xml = connection.receive()
     print xml
     log.write(xml)
-    msg = parse(xml)
+    _, _, msg = parse(xml, 'dict')
 
     print "@Agent: received:"
-    print_message(msg)
+    #print_message(msg)
 
     steps = int(msg['steps'])
 
@@ -66,9 +66,8 @@ if __name__=="__main__":
         print "@Agent: step", step
         xml = connection.receive()
         log.write(xml)
-        msg = parse(xml)	
+        action_id, msg_type, msg = parse(xml)	
         
-        action_id = msg['id']
         print "Action id:", action_id
         
         #######
@@ -82,7 +81,7 @@ if __name__=="__main__":
         list(prolog.query("argumentation"))
         list(prolog.query("planning"))
         actionList = prolog.query("exec(X)").next()["X"]
-        print action
+        print "ActionList:",actionList
         # connection.send(action(action_id, accion.next()["X"])) #le pongo next porque puede devolver varias rtas (como si pusieras ;)
         if len(actionList)==2:
             connection.send(action(action_id, actionList[0],actionList[1])) 
