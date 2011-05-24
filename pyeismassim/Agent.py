@@ -31,28 +31,31 @@ class Agent():
 
     def perceive_act_loop(self):
         # Receive simulation start notification.
-        print "@Agent: Waiting for simulation start notification."
+        print "@Agent: waiting for simulation start notification."
         xml = self.connection.receive()
         self.log.write(xml)
         _, _, msg = parse_as_dict(xml)
 
-        print "@Agent: received:"
-        print_dict_message(msg)
+        print "@Agent: received simulation start notification."
+        #print_dict_message(msg)
 
         quit = False
         step = 0
         while (not quit):
             step += 1
-            print "Step:", step
+            print "@Agent: step:", step
             xml = self.connection.receive()
             self.log.write(xml)
             msg_type, action_id, msg = parse_as_list(xml)
-            #sys.stdin.read(1)
+            time.sleep(1.5)
+            #reception = time.time()
+            #while (time.time() - reception < 1.5):
+            #    print "waiting"
             if (msg_type == 'request-action'):
                 print "@Agent: received request-action. id:", action_id
                 action_xml = action(action_id, "skip")
                 self.log.write(action_xml)
-                print_list_message(msg) # DEBUG
+                #print_list_message(msg) # DEBUG
                 self.connection.send(action_xml)
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
@@ -129,6 +132,7 @@ class PrologAgent(Agent):
             for line in list_msg:
                 self.log.write('   ' + line + '\n')
 
+            time.sleep(1.5)
             if (msg_type == 'request-action'):
                 print "@Agent: received request-action. id:", action_id
 
@@ -168,6 +172,11 @@ if (__name__== "__main__"):
     agent.connect()
     agent.perceive_act_loop("pl/kb.pl")
     agent.disconnect()
+
+    #agent = Agent(USER, PASS)
+    #agent.connect()
+    #agent.perceive_act_loop()
+    #agent.disconnect()
 
     #if (len(sys.argv) == 3):
     #    USER = sys.argv[1]
