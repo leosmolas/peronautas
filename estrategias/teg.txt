@@ -18,7 +18,7 @@ TAREAS INMEDIATAS:
     [ ] implementar el compartido de percepciones
         que pasa cuando tenes dos agentes, y los dos mandan toda su percepcion, y colision e.g. el health de cada uno?
         solo mandamos cosas comunes como la estructura del grafo y agentes enemigos, o interesa saber la energia/salud de los demas?
-    [ ] ver la libreria del tuqui para comunicacion entre agentes
+    [ ] ver la libreria del tucky para comunicacion entre agentes
     [ ] implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
         la estructura del grafo se almacena con hechos
         los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
@@ -65,15 +65,29 @@ ESTRATEGIA:
         puede haber un nodo vacio entre dos agentes para que se forme frontera
 
     DEFENSA (equipo)
-        tener uno o mas saboteadores de pivot?
+        los agentes con capacidad defensiva son: reparador,saboteador,sentinela
+        el explorador y el inspector pueden servir para definir zonas
 
     ATAQUE (equipo)
         si se identifica un nodo que es punto debil de una zona enemiga, atacarlo
+        el unico agente que hay que considerar para ataque es el saboteador
 
     COMPRA (equipo)
         argumentar dentro de un agente y entre agentes si que se va a comprar y porque
         cuando conviene quedarse con la plata por puntaje o comprar algo?
         cuando conviene que lo compre un agente en lugar de otro?
+        mientras quedan nodos sin probar, la plata deberia ir para la energia para los exploradores
+
+    (explorador)
+        [skip,goto,      survey,buy,recharge,probe]
+    (inspector)
+        [skip,goto,      survey,buy,recharge,inspect]
+    (reparador)
+        [skip,goto,parry,survey,buy,recharge,repair]
+    (saboteador)
+        [skip,goto,parry,survey,buy,recharge,attack]
+    (sentinela)
+        [skip,goto,parry,survey,buy,recharge]
 
 ACTIONS
     skip:     0 cost

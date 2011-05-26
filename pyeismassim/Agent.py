@@ -78,8 +78,8 @@ class PrologAgent(Agent):
 
     def processPerception(self, msg, p):
         for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
-            list(p.query("retract(%s(_))" % x))
-            list(p.query("assert(%s(%s))" % (x, msg[x])))
+            p.query("retract(%s(_))" % x).next()
+            p.query("assert(%s(%s))" % (x, msg[x])).next()
         aux = []
         for x in msg['vis_verts']:
             aux.append(x['name'])
@@ -88,7 +88,7 @@ class PrologAgent(Agent):
             vert += x + ","
         vert2 = vert[:-1] + "]"
         
-        list(p.query("actualizarListas(%s,verts)" % vert2 ))
+        p.query("actualizarListas(%s,verts)" % vert2 ).next()
         aux = []
         for x in msg['vis_edges']:
             aux.append((x['node1'],x['node2']))
