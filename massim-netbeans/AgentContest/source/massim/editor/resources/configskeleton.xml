@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><!-- launch-sync-type = timer or key
+--><conf backuppath="backup" launch-sync-type="key" reportpath="./" time-to-launch="10000" tournamentmode="0" tournamentname="GridSimulation">
+<simulation-server backlog="10" port="12300"/>
+<match>
+<simulation 
+	configurationclass="massim.competition2010.GridSimulationConfigurationHandCrafted" 
+	file-simulationlog="./log" 
+	id="" 
+	rmiobserver="massim.competition2010.GridSimulationRMIObservers" 
+	rmixmlobserver="massim.competition2010.GridSimulationRMIXMLDocumentObserver" 
+	rmixmlobsserverhost="localhost"
+	rmixmlobserverweb="massim.competition2010.GridSimulationRMIXMLDocumentObserverWebInterface"
+	rmixmlobsserverport="1099" 
+	simulationclass="massim.competition2010.GridSimulation" 
+	visualisationobserver="massim.competition2010.GridSimulationVisualizationObserver" 
+	xmlobserver="massim.competition2010.GridSimulationXMLObserver" 
+	xmlobserverpath="." 
+	xmlstatisticsobserver="massim.competition2010.GridSimulationXMLStatisticsObserver">
+<configuration xmlns:meta="http://www.multiagentcontest.org/" agentSpeed="1" agentWeight="-200" cowAttractedWeight="10" cowPrivateField="3" cowScareWeight="-7" cowSight="5" cowSpeed="3" emptyWeight="3" epsilon="0.2" htaccess="1" lineOfSight="3" maxNumberOfSteps="100" numberOfAgents="" numberOfCows="" numberOfFences="" numberOfObstacles="" obstacleWeight="-4" sizex="" sizey="" weight="0.3">
+</configuration>
+<agents>
+<agent agentclass="massim.competition2010.GridSimulationAgent" agentcreationclass="massim.competition2010.GridSimulationAgentParameter" team=""><configuration/></agent>
+</agents>
+</simulation>
+</match>
+<accounts>
+<actionclassmap name="Grid">
+<actionclass class="massim.competition2010.GridSimulationAgentAction" id="action"/>
+<actionclass class="massim.framework.InvalidAction" id="invalid"/>
+</actionclassmap>
+<account actionclassmap="Grid" auxtimeout="500" defaultactionclass="massim.competition2010.GridSimulationAgentAction" maxpacketlength="65536" password="1" team="" timeout="8000" username=""/>
+</accounts>
+</conf>

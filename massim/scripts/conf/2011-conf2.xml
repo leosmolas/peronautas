@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DOCTYPE conf SYSTEM "helpers/2010/config.dtd"-->
+<!-- launch-sync-type = timer or key-->
+<conf   backuppath="backup"
+		launch-sync-type="key"
+		reportpath="./backup/"
+		time-to-launch="10000"
+		tournamentmode="0"
+		tournamentname="GraphSimulation">
+	<simulation-server><network-agent backlog="10" port="12300"/></simulation-server>
+	<match>
+		<simulation
+				configurationclass="massim.competition2011.GraphSimulationConfiguration"
+				file-simulationlog="./backup/"
+				id="graph1"
+				rmixmlobsserverhost="localhost"
+				rmixmlobsserverport="1099"
+				rmixmlobserver="massim.competition2011.GraphSimulationRMIXMLDocumentObserver"
+				simulationclass="massim.competition2011.GraphSimulation"
+				
+		>
+			<configuration
+					xmlns:meta="http://www.tu-clausthal.de/"
+					maxNumberOfSteps="5"
+					numberOfAgents="20"
+					numberOfTeams="2"
+					agentsPerTeam="1"
+					numberOfNodes="20"
+					gridWidth="5"
+					gridHeight="5"
+					cellWidth="100"
+					minNodeWeight="1"
+					maxNodeWeight="10"
+					minEdgeCost="1"
+					maxEdgeCost="10"
+			>
+				<actions>
+					<action
+						name="attack"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="parry"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="goto"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="probe"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="survey"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="inspect"
+						energyCost="1" energyCostFailed="1" energyCostDisabled="2" energyCostFailedDisabled="2"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="repair"
+						energyCost="2" energyCostFailed="1" energyCostDisabled="4" energyCostFailedDisabled="4"
+						healthCost="0" healthCostFailed="0" healthCostDisabled="0" healthCostFailedDisabled="0"
+						pointsCost="0" pointsCostFailed="0" pointsCostDisabled="0" pointsCostFailedDisabled="0"
+					/>
+					<action
+						name="buy"
+						energyCost="1"  energyCostFailed="1" energyCostDisabled="1"  energyCostFailedDisabled="1"
+						healthCost="0"  healthCostFailed="0" healthCostDisabled="0"  healthCostFailedDisabled="0"
+						pointsCost="10" pointsCostFailed="0" pointsCostDisabled="20" pointsCostFailedDisabled="20"
+					/>
+					<action
+						name="skip"
+						energyCost="20" energyCostFailed="0"  energyCostDisabled="20" energyCostFailedDisabled="0"
+						healthCost="0"  healthCostFailed="0"  healthCostDisabled="0"  healthCostFailedDisabled="0"
+						pointsCost="0"  pointsCostFailed="0"  pointsCostDisabled="0"  pointsCostFailedDisabled="0"
+					/>
+				</actions>
+				<roles>
+					<role name="master"
+							maxEnergy="9" maxBuyEnergy="20"  rateBuyEnergy="2" maxEnergyDisabled="4" rateBuyEnergyDisabled="1"
+							maxHealth="9" maxBuyHealth="15"  rateBuyHealth="2"
+							strength="5" maxBuyStrength="5"  rateBuyStrength="0"
+							visRange="2"  maxBuyVisRange="5" rateBuyVisRange="1">
+						<actions>
+							<action name="skip"/>
+							<action name="goto"/>
+							<action name="attack"/>
+							<action name="parry"/>
+							<action name="probe"/>
+							<action name="survey"/>
+							<action name="inspect"/>
+							<action name="repair"/>
+							<action name="buy"/>
+						</actions>
+						<actionsDisable>
+							<action name="skip"/>
+							<action name="goto"/>
+							<action name="attack"/>
+							<action name="parry"/>
+							<action name="probe"/>
+							<action name="survey"/>
+							<action name="inspect"/>
+							<action name="repair"/>
+							<action name="buy"/>
+						</actionsDisable>
+					</role>
+					<role name="alive" 
+							maxEnergy="8" maxBuyEnergy="18"  rateBuyEnergy="2" maxEnergyDisabled="4" rateBuyEnergyDisabled="1"
+							maxHealth="9" maxBuyHealth="15"  rateBuyHealth="2"
+							strength="6"  maxBuyStrength="6" rateBuyStrength="0"
+							visRange="2"  maxBuyVisRange="5" rateBuyVisRange="1">
+						<actions>
+							<action name="skip"/>
+							<action name="goto"/>
+							<action name="attack"/>
+							<action name="parry"/>
+							<action name="probe"/>
+							<action name="survey"/>
+							<action name="inspect"/>
+							<action name="repair"/>
+							<action name="buy"/>
+						</actions>
+						<actionsDisable>
+							<action name="skip"/>
+						</actionsDisable>
+					</role>
+					<role name="disable"
+							maxEnergy="5"  maxBuyEnergy="18"  rateBuyEnergy="2" maxEnergyDisabled="3" rateBuyEnergyDisabled="1"
+							maxHealth="20" maxBuyHealth="35"  rateBuyHealth="2"
+							strength="4"   maxBuyStrength="4" rateBuyStrength="0"
+							visRange="2"   maxBuyVisRange="5" rateBuyVisRange="1">					
+						<actions>
+							<action name="skip"/>
+						</actions>
+						<actionsDisable>
+							<action name="skip"/>
+						</actionsDisable>
+					</role>
+				</roles>
+				<achievements>
+					<achievement class="probedVertices" name="Proved 5 vertices" quantity="5" points="10"/>
+					<achievement class="probedVertices" name="Proved 10 vertices" quantity="10" points="10"/>
+					<achievement class="probedVertices" name="Proved 20 vertices" quantity="20" points="10"/>
+					<achievement class="probedVertices" name="Proved 40 vertices" quantity="40" points="10"/>
+					<achievement class="probedVertices" name="Proved 80 vertices" quantity="80" points="10"/>
+					<achievement class="probedVertices" name="Proved 160 vertices" quantity="160" points="10"/>
+					<achievement class="probedVertices" name="Proved 320 vertices" quantity="320" points="10"/>
+					<achievement class="probedVertices" name="Proved 640 vertices" quantity="640" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 10 edges" quantity="10" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 20 edges" quantity="20" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 40 edges" quantity="40" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 80 edges" quantity="80" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 160 edges" quantity="160" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 320 edges" quantity="320" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 640 edges" quantity="640" points="10"/>
+					<achievement class="surveyedEdges" name="Surveyed 1280 edges" quantity="1280" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 5 Agents" quantity="5" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 10 Agents" quantity="10" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 20 Agents" quantity="20" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 40 Agents" quantity="40" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 80 Agents" quantity="80" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 160 Agents" quantity="160" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 320 Agents" quantity="320" points="10"/>
+					<achievement class="inspectedAgents" name="Inspected 640 Agents" quantity="640" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 5 agents" quantity="5" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 10 agents" quantity="10" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 20 agents" quantity="20" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 40 agents" quantity="40" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 80 agents" quantity="80" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 160 agents" quantity="160" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 320 agents" quantity="320" points="10"/>
+					<achievement class="successfulAttacks" name="Attacked 640 agents" quantity="640" points="10"/>
+					<achievement class="successfulParries" name="Parried 5 attacks" quantity="5" points="10"/>
+					<achievement class="successfulParries" name="Parried 10 attacks" quantity="10" points="10"/>
+					<achievement class="successfulParries" name="Parried 20 attacks" quantity="20" points="10"/>
+					<achievement class="successfulParries" name="Parried 40 attacks" quantity="40" points="10"/>
+					<achievement class="successfulParries" name="Parried 80 attacks" quantity="80" points="10"/>
+					<achievement class="successfulParries" name="Parried 160 attacks" quantity="160" points="10"/>
+					<achievement class="successfulParries" name="Parried 320 attacks" quantity="320" points="10"/>
+					<achievement class="successfulParries" name="Parried 640 attacks" quantity="640" points="10"/>
+					<achievement class="areaValue" name="Created area worth 10" quantity="10" points="10"/>
+					<achievement class="areaValue" name="Created area worth 20" quantity="20" points="10"/>
+					<achievement class="areaValue" name="Created area worth 40" quantity="40" points="10"/>
+					<achievement class="areaValue" name="Created area worth 80" quantity="80" points="10"/>
+					<achievement class="areaValue" name="Created area worth 160" quantity="160" points="10"/>
+					<achievement class="areaValue" name="Created area worth 320" quantity="320" points="10"/>
+					<achievement class="areaValue" name="Created area worth 640" quantity="640" points="10"/>
+					<achievement class="areaValue" name="Created area worth 1280" quantity="1280" points="10"/> 
+				</achievements>
+			</configuration>
+			<agents>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="disable"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="disable"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="disable"/>
+				</agent>
+				<!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+					<configuration roleName="alive"/>
+				</agent-->
+				
+
+				
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="master"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="alive"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="disable"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="disable"/>
+				</agent>
+				<agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="disable"/>
+				</agent>
+				<!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+					<configuration roleName="alive"/>
+				</agent-->
+			</agents>
+		</simulation>
+	</match>
+	<accounts><!--xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2011/accounts.xml"-->
+		<actionclassmap name="Graph">
+			<actionclass class="massim.competition2011.GraphSimulationAgentAction" id="action"/>
+			<actionclass class="massim.framework.InvalidAction" id="invalid"/>
+		</actionclassmap>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a1" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a2" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a3" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a4" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a5" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a7" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a8" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a9" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+		<!--account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/-->
+
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b1" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b2" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b3" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b4" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b5" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b7" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b8" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b9" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+		<!--account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/-->
+	</accounts>
+</conf>

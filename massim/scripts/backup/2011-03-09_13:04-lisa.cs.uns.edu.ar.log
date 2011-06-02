@@ -1,0 +1,6 @@
+20110209 13:04:23.781 1 massim.server.Server.config:151  Server launched
+20110209 13:04:23.813 1 massim.framework.connection.InetSocketListener.<init>:16  InetSocketListener created. Set to port 12300 with backlog 10
+node:[match: null]
+20110209 13:04:23.874 1 massim.server.Server.createRMI:693  Create rmiregistry on port  1099
+20110209 13:04:23.876 10 massim.framework.connection.InetSocketListener.waitForIncomingSocket:28
+20110209 13:04:23.877 10 massim.framework.connection.InetSocketListener.waitForIncomingSocket:31  waiting for connection...
