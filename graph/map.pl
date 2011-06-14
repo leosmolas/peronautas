@@ -1,4 +1,5 @@
 :-['edges.pl', 'nodes.pl', 'agents.pl'].
+:- dynamic neighborOwner/2.
 
 %paths(+Start, +Finish, -Path)
 %Pretty obvius actually but returns a path in Path with start point at node Start and endpoint in node Finish.
@@ -23,11 +24,27 @@ agentsInNode(Node, Agents) :- findall(Agent, position(Agent, _, Node), Agents).
 %returns in Teams a list of Teams which are present in a Node.
 teamsInNode(Node, Teams) :- findall(Team, position(_, Team, Node), Teams).
 
+% doNotFail(X) :- call(X), !.
+% doNotFail(_).              ._.
 
-%teamsInNeighbors(+Node, -Teams)
-%returns in Teams a list of Teams that own neighbor Nodes.
-teamsInNeighbors(Node, Teams) :- neighbors(Node, Neighbors),                           
-                                 findall(Owner, (member(Neigh, Neighbors), node(Neigh, _, Owner)), Teams).
+%teamsInNeighbors(+Neighbors, -TeamsNeighborsCount)
+%returns in TeamsNeighborsCount a list of Teams that own neighbor Nodes.
+
+teamsInNeighbors([], TeamsNeighborsCount) :- findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
+                                             retractall(neighborOwner(_,_)).
+
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+                                                                  neighborOwner(Owner,Count), !,
+                                                                  retract(neighborOwner(Owner,Count)),
+                                                                  Count2 is Count + 1,
+                                                                  assert(neighborOwner(Owner,Count2)),
+                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+                                                                  assert(neighborOwner(Owner,1)),
+                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
+                                                    %findall(Owner, (member(Neigh, Neighbors), node(Neigh, _, Owner)), Teams).
                                                   
 
 %appears(+Element, +List, -Count)
@@ -47,17 +64,35 @@ checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams),
                                     setOwner([Node], Team).
 checkMajorityInNode(_, _).
 
+maximum([[Team, Count]], Team) :- Count > 1.
+maximum([[Team1, Count1], [_Team2,Count2] | Rest], Team) :- Count1 > Count2,
+                                                           maximumAux(Rest, [Team1, Count1], Count2, [Team, Count]),
+                                                           Count > 1.
+maximum([[_Team1, Count1], [Team2,Count2] | Rest], Team) :- Count1 =< Count2,
+                                                           maximumAux(Rest, [Team2, Count2], Count1, [Team, Count]),
+                                                           Count > 1.
+                                                           
+maximumAux([], [Team, Max1], Max2, [Team, Max1]) :- Max1 > Max2.
+maximumAux([[_Team1, Count] | Rest], [Team, Max], Max2, [TeamR, CountR]) :- Count < Max,
+                                                                            maximumAux(Rest, [Team, Max], Max2, [TeamR, CountR]).
+maximumAux([[_Team1, Count] | Rest], [Team, Max], _Max2, [TeamR, CountR]) :- Count = Max,
+                                                                            maximumAux(Rest, [Team, Max], Count, [TeamR, CountR]).
+maximumAux([[Team1, Count] | Rest], [_Team, Max], _Max2, [TeamR, CountR]) :- Count > Max,
+                                                                            maximumAux(Rest, [Team1, Count], Max, [TeamR, CountR]).
 
-%checkMajorityInNeighbors(+Node, +Team)
-%check if the number of controlled neighbor nodes of Node are majority of team Team.
-checkMajorityInNeighbors(Node, Team) :- teamsInNeighbors(Node, TeamsInNeighbors),
-                                        appears(Team, TeamsInNeighbors, TeamInTeamsInNeighbors),
-                                        length(TeamsInNeighbors, CountTeamsInNeighbors),
-                                        Majority is floor(CountTeamsInNeighbors / 2),
-                                        TeamInTeamsInNeighbors > Majority,
-                                        TeamInTeamsInNeighbors > 1,
-                                        setOwner([Node], Team).
-checkMajorityInNeighbors(_, _).
+%checkMajorityInNeighbors(+Node)
+%sets the color if the number of controlled neighbor nodes of Node are majority of a team.
+checkMajorityInNeighbors(Node) :- neighbors(Node, Neighbors),
+                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount),
+                                  maximum(TeamsNeighborsCount, MaxTeam),
+                                  setOwner([Node], MaxTeam).
+%                                         appears(Team, TeamsInNeighbors, TeamInTeamsInNeighbors),
+%                                         length(TeamsInNeighbors, CountTeamsInNeighbors),
+%                                         Majority is floor(CountTeamsInNeighbors / 2),
+%                                         TeamInTeamsInNeighbors > Majority,
+%                                         TeamInTeamsInNeighbors > 1,
+%                                         setOwner([Node], Team).
+%checkMajorityInNeighbors(_, _).
 
 
 %atLeastOne(+List1, +List2)
@@ -106,9 +141,8 @@ step1 :- teams(Teams),
 
 % step2
 % second step of the coloring algorithm
-step2 :- teams(Teams),
-         nodes(Nodes),
-         foreach(member(Team,Teams), (foreach(emptyNode(Node, Nodes), (checkMajorityInNeighbors(Node, Team))))).
+step2 :- nodes(Nodes),
+         foreach(emptyNode(Node, Nodes), (checkMajorityInNeighbors(Node))).
 
 
 % step3
