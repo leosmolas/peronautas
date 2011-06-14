@@ -44,8 +44,8 @@ checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams),
                                     length(Teams, TeamsInNode), 
                                     Majority is floor(TeamsInNode / 2), 
                                     TeamInNode > Majority,
-                                    setOwner(Node, Team).
-checkMajorityInNode(_, _) :- true.                            
+                                    setOwner([Node], Team).
+checkMajorityInNode(_, _).
 
 
 %checkMajorityInNeighbors(+Node, +Team)
@@ -55,8 +55,9 @@ checkMajorityInNeighbors(Node, Team) :- teamsInNeighbors(Node, TeamsInNeighbors)
                                         length(TeamsInNeighbors, CountTeamsInNeighbors),
                                         Majority is floor(CountTeamsInNeighbors / 2),
                                         TeamInTeamsInNeighbors > Majority,
-                                        setOwner(Node, Team).
-checkMajorityInNeighbors(_, _) :- true.
+                                        TeamInTeamsInNeighbors > 1,
+                                        setOwner([Node], Team).
+checkMajorityInNeighbors(_, _).
 
 
 %atLeastOne(+List1, +List2)
@@ -72,13 +73,13 @@ checkPaths([Head | Tail], ListOfPaths) :- atLeastOne(Head, ListOfPaths), !, chec
 
 % dfs(+Node, +Team)
 % Checks depth first if this node is isolated from the enemy team... and if it is, it sets the owner to the Team.
-dfs(Node, Team) :- depthfirst(Node, [Node], Team), !, setOwner(Node, Team).
-dfs(_,_) :- true.
+dfs(Node, Team) :- depthfirst(Node, [Node], Team, ReachedNodes), !, setOwner(ReachedNodes, Team).
+dfs(_,_).
 
 
-% depthfirst(+Node, +Visited, +Team)
+% depthfirst(+Node, +Visited, +Team, -ReachedNodes)
 % implements the search for neighbors and depth first them.
-depthfirst(Node, Visited, Team) :- neighbors(Node, Neighbors), checkNeighbors(Node, Neighbors, Visited, Team).
+depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), checkNeighbors(Node, Neighbors, Visited, Team, ReachedNodes).
 
 
 % checkNeighbors(+Node, +Neighbors, +Visited, +Team)
@@ -87,11 +88,13 @@ depthfirst(Node, Visited, Team) :- neighbors(Node, Neighbors), checkNeighbors(No
 %  if there is an agent of the other team in the Node, then at least one agent of the enemy team can reach the Node, so its no isolated.
 %  if my team is the owner of the Node, wont go deeper, becuase enemies must pass through this node to reach the analized node.
 %  if none of above happens i countinue the depth first search from the actual node.
-checkNeighbors(_Node, [], _Visited, _Team).
-checkNeighbors(_Node, [Head|_Tail], _Visited, Team) :- otherTeam(Team, OtherTeam), position(_, OtherTeam, Head), !, false.
-checkNeighbors(Node, [Head|Tail], Visited, Team) :- member(Head, Visited), !, checkNeighbors(Node, Tail, Visited, Team).
-checkNeighbors(Node, [Head|Tail], Visited, Team) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, [Head|Visited], Team).
-checkNeighbors(Node, [Head|Tail], Visited, Team) :- depthfirst(Head, [Head|Visited], Team), checkNeighbors(Node, Tail, [Head|Visited], Team).
+checkNeighbors(_Node, [], Visited, _Team, Visited).
+checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(_, OtherTeam, Head), !, false.
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes).
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),
+                                                                  checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
+                                                                  append(ReachedNodes1, ReachedNodes2, ReachedNodes).
 
 
 % step1

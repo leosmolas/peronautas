@@ -6,9 +6,10 @@
 insertNode(Name, Value) :- retract(nodes(Z)), append(Z,[Name],X), asserta(nodes(X)), assertz(node(Name,Value, null)).
 
 
-% setOwner(+Node, +Owner)
-% sets the owner of the node Node to Owner.
-setOwner(Node, Owner) :- retract(node(Node, Value, _)), assertz(node(Node, Value, Owner)).
+% setOwner(+Nodes, +Owner)
+% sets the owner of the node Nodes to Owner.
+setOwner([], _).
+setOwner([Node | Nodes], Owner) :- retract(node(Node, Value, _)), assertz(node(Node, Value, Owner)), setOwner(Nodes, Owner).
 
 
 % nodesOfTeam(+Team, -NodesOfTeam)
