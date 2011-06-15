@@ -19,6 +19,7 @@ from string import replace, lower
 #   action(action_id, action_type[, action_parameter])
 #       generates a string that represents an action xml message
 
+
 # Parsing
 
 #------------------------------------------------------------------------------#
