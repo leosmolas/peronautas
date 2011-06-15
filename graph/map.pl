@@ -34,6 +34,7 @@ teamsInNeighbors([], TeamsNeighborsCount) :- findall([Owner,Count], neighborOwne
                                              retractall(neighborOwner(_,_)).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+                                                                  Owner \= no,
                                                                   neighborOwner(Owner,Count), !,
                                                                   retract(neighborOwner(Owner,Count)),
                                                                   Count2 is Count + 1,
@@ -41,8 +42,12 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_
                                                                   teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+                                                                  Owner \= no, !,                                                                 
                                                                   assert(neighborOwner(Owner,1)),
                                                                   teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
+teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :- teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
 
                                                     %findall(Owner, (member(Neigh, Neighbors), node(Neigh, _, Owner)), Teams).
                                                   
@@ -92,7 +97,7 @@ checkMajorityInNeighbors(Node) :- neighbors(Node, Neighbors),
 %                                         TeamInTeamsInNeighbors > Majority,
 %                                         TeamInTeamsInNeighbors > 1,
 %                                         setOwner([Node], Team).
-%checkMajorityInNeighbors(_, _).
+checkMajorityInNeighbors(_).
 
 
 %atLeastOne(+List1, +List2)
@@ -126,7 +131,7 @@ depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), che
 checkNeighbors(_Node, [], Visited, _Team, Visited).
 checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(_, OtherTeam, Head), !, false.
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
-checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes).
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),
                                                                   checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
                                                                   append(ReachedNodes1, ReachedNodes2, ReachedNodes).
