@@ -28,8 +28,8 @@ emptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), not(position(_,_, Nod
 
 
 % nonEmptyNode(+Node, +ListOfNodes)
-% checks if the node is present in the ListOfNodes and the node has no owner
-nonEmptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), node(Node, _, no).
+% checks if the node is present in the ListOfNodes and the node has no agent on it.
+nonEmptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), position(_, _, Node).
 
 
 % checkOwner(+Node, +Team)
