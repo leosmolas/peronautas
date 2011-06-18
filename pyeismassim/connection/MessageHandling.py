@@ -44,7 +44,7 @@ def parse_tournament(xml, output = 'dict'):
                 ]
     else:
         raise Exception
-    return ('tournament', None, result)
+    return ('tournament', None, result, None)
         
 #------------------------------------------------------------------------------#
 def parse_auth_response(xml, output = 'dict'):
@@ -63,7 +63,7 @@ def parse_auth_response(xml, output = 'dict'):
             'result(%s)'    % authentication_tag['result']          ]
     else:
         raise Exception
-    return ('auth-response', None, result)
+    return ('auth-response', None, result, None)
 
 #------------------------------------------------------------------------------#
 def parse_sim_start(xml, output = 'dict'):
@@ -88,7 +88,7 @@ def parse_sim_start(xml, output = 'dict'):
             'vertices(%s)'  % simulation_tag['vertices'] ]
     else:
         raise Exception
-    return ('sim-start', None, result)
+    return ('sim-start', None, result, None)
 
 #------------------------------------------------------------------------------#
 def parse_sim_end(xml, output = 'dict'):
@@ -109,7 +109,7 @@ def parse_sim_end(xml, output = 'dict'):
             'score(%s)'     % sim_result_tag['score']   ]
     else:
         raise Exception
-    return ('sim-end', None, result)
+    return ('sim-end', None, result, None)
 
 #------------------------------------------------------------------------------#
 def parse_bye(xml, output = 'dict'):
@@ -124,7 +124,7 @@ def parse_bye(xml, output = 'dict'):
             'timestamp(%s)' % message_tag['timestamp'] ]
     else:
         raise Exception
-    return ('bye', None, result)
+    return ('bye', None, result, None)
 
 #------------------------------------------------------------------------------#
 def parse_request_action(xml, output = 'dict'):
@@ -143,7 +143,7 @@ def parse_request_action(xml, output = 'dict'):
     action_id          = perception_tag['id']
     
     if (output == "dict"):
-        result = {
+        result_private = {
             'type'                : 'request-action'             ,
             'timestamp'           : message_tag['timestamp']     ,
             'deadline'            : perception_tag['deadline']   ,
@@ -156,13 +156,16 @@ def parse_request_action(xml, output = 'dict'):
             'max_energy'          : self_tag['maxenergy']        ,
             'max_energy_disabled' : self_tag['maxenergydisabled'],
             'max_health'          : self_tag['maxhealth']        ,
-            'position'            : self_tag['position']         ,
             'strength'            : self_tag['strength']         ,
             'vis_range'           : self_tag['visrange']         ,
             'zone_score'          : self_tag['zonescore']        ,
             'last_step_score'     : team_tag['laststepscore']    ,
             'money'               : team_tag['money']            ,
-            'score'               : team_tag['score']            }
+            'score'               : team_tag['score']            
+            }
+        result_public = {
+            'position'            : self_tag['position']
+            }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
@@ -172,7 +175,7 @@ def parse_request_action(xml, output = 'dict'):
                     # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
                     # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                     achievements_list.append(achievements_tag.contents[i]['name'])
-            result['achievements'] = achievements_list
+            result_private['achievements'] = achievements_list
         
         if (vis_verts_tag != None):
             vis_verts_list = []
@@ -181,7 +184,7 @@ def parse_request_action(xml, output = 'dict'):
                     vis_verts_list.append({ 
                         'name' : vis_verts_tag.contents[i]['name']         ,
                         'team' : vis_verts_tag.contents[i]['team'].lower() })
-            result['vis_verts'] = vis_verts_list
+            result_public['vis_verts'] = vis_verts_list
 
         if (vis_edges_tag != None):
             vis_edges_list = []
@@ -190,7 +193,7 @@ def parse_request_action(xml, output = 'dict'):
                     vis_edges_list.append({ 
                         'node1' : vis_edges_tag.contents[i]['node1'] ,
                         'node2' : vis_edges_tag.contents[i]['node2'] })
-            result['vis_edges'] = vis_edges_list
+            result_public['vis_edges'] = vis_edges_list
 
         if (vis_ents_tag != None):
             vis_ents_list = []
@@ -200,7 +203,7 @@ def parse_request_action(xml, output = 'dict'):
                         'name' : vis_ents_tag.contents[i]['name']         ,
                         'node' : vis_ents_tag.contents[i]['node']         ,
                         'team' : vis_ents_tag.contents[i]['team'].lower() })
-            result['vis_ents'] = vis_ents_list
+            result_public['vis_ents'] = vis_ents_list
 
         if (probed_verts_tag != None):
             probed_verts_list = []
@@ -209,7 +212,7 @@ def parse_request_action(xml, output = 'dict'):
                     probed_verts_list.append({ 
                         'name'  : probed_verts_tag.contents[i]['name']  ,
                         'value' : probed_verts_tag.contents[i]['value'] })
-            result['probed_verts'] = probed_verts_list
+            result_public['probed_verts'] = probed_verts_list
 
         if (surveyed_edges_tag != None):
             surveyed_edges_list = []
@@ -219,7 +222,7 @@ def parse_request_action(xml, output = 'dict'):
                         'node1'  : surveyed_edges_tag.contents[i]['node1']  ,
                         'node2'  : surveyed_edges_tag.contents[i]['node2']  ,
                         'weight' : surveyed_edges_tag.contents[i]['weight'] })
-            result['survey_edges'] = surveyed_edges_list
+            result_public['surveyed_edges'] = surveyed_edges_list
 
         if (inspected_ents_tag != None):
             inspected_ents_list = []
@@ -236,10 +239,10 @@ def parse_request_action(xml, output = 'dict'):
                         'strength'   : inspected_ents_tag.contents[i]['strength']     ,
                         'team'       : inspected_ents_tag.contents[i]['team'].lower() ,
                         'vis_range'  : inspected_ents_tag.contents[i]['vis_range']    })
-            result['inspected_ents'] = inspected_ents_list
+            result_public['inspected_ents'] = inspected_ents_list
             
     elif (output == "prolog"):
-        result = [
+        result_private = [
             'type(request_action)'                                    ,
             'timestamp(%s)'           % message_tag['timestamp']      ,
             'deadline(%s)'            % perception_tag['deadline']    ,
@@ -252,13 +255,16 @@ def parse_request_action(xml, output = 'dict'):
             'max_energy(%s)'          % self_tag['maxenergy']         ,
             'max_energy_disabled(%s)' % self_tag['maxenergydisabled'] ,
             'max_health(%s)'          % self_tag['maxhealth']         ,
-            'position(%s)'            % self_tag['position']          ,
             'strength(%s)'            % self_tag['strength']          ,
             'vis_range(%s)'           % self_tag['visrange']          ,
             'zone_score(%s)'          % self_tag['zonescore']         ,
             'last_step_score(%s)'     % team_tag['laststepscore']     ,
             'money(%s)'               % team_tag['money']             ,
-            'score(%s)'               % team_tag['score']             ]
+            'score(%s)'               % team_tag['score']             
+            ]
+        result_public = [
+            'position(%s)'            % self_tag['position']
+            ]
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
@@ -268,7 +274,7 @@ def parse_request_action(xml, output = 'dict'):
                     # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
                     # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                     achievements_list.append('achievement(%s)' % achievements_tag.contents[i]['name'])
-            result += achievements_list
+            result_private += achievements_list
         
         if (vis_verts_tag != None):
             vis_verts_list = []
@@ -276,7 +282,7 @@ def parse_request_action(xml, output = 'dict'):
                 if (vis_verts_tag.contents[i].__class__.__name__ == "Tag"):
                     vis_verts_list.append('vis_vert(%s,%s)' % (vis_verts_tag.contents[i]['name'], 
                                                                vis_verts_tag.contents[i]['team'].lower()))
-            result += vis_verts_list
+            result_public += vis_verts_list
 
         if (vis_edges_tag != None):
             vis_edges_list = []
@@ -293,7 +299,7 @@ def parse_request_action(xml, output = 'dict'):
                     vis_ents_list.append('vis_ent(%s,%s,%s)' % (vis_ents_tag.contents[i]['name'], 
                                                                 vis_ents_tag.contents[i]['node'], 
                                                                 vis_ents_tag.contents[i]['team'].lower()))
-            result += vis_ents_list
+            result_public += vis_ents_list
 
         if (probed_verts_tag != None):
             probed_verts_list = []
@@ -301,7 +307,7 @@ def parse_request_action(xml, output = 'dict'):
                 if (probed_verts_tag.contents[i].__class__.__name__ == "Tag"):
                     probed_verts_list.append('probed_vert(%s,%s)' % (probed_verts_tag.contents[i]['name'], 
                                                                      probed_verts_tag.contents[i]['value']))
-            result += probed_verts_list
+            result_public += probed_verts_list
 
         if (surveyed_edges_tag != None):
             surveyed_edges_list = []
@@ -310,7 +316,7 @@ def parse_request_action(xml, output = 'dict'):
                     surveyed_edges_list.append('surveyed_edge(%s,%s,%s)' % (surveyed_edges_tag.contents[i]['node1'], 
                                                                             surveyed_edges_tag.contents[i]['node2'], 
                                                                             surveyed_edges_tag.contents[i]['weight']))
-            result += surveyed_edges_list
+            result_public += surveyed_edges_list
 
         if (inspected_ents_tag != None):
             inspected_ents_list = []
@@ -326,10 +332,10 @@ def parse_request_action(xml, output = 'dict'):
                                                                                                  inspected_ents_tag.contents[i]['strength'], 
                                                                                                  inspected_ents_tag.contents[i]['team'].lower(), 
                                                                                                  inspected_ents_tag.contents[i]['vis_range']))
-            result += inspected_ents_list
+            result_public += inspected_ents_list
     else:
         raise Exception
-    return ('request-action', action_id, result)
+    return ('request-action', action_id, result_private, result_public)
 
 #------------------------------------------------------------------------------#
 def parse_as_dict(msg):
@@ -362,11 +368,11 @@ def parse(msg, output):
     return result
 
 #------------------------------------------------------------------------------#
-def print_dict_message(result):
+def print_message_dict(result):
     print_message(result, 'dict')
 
 #------------------------------------------------------------------------------#
-def print_list_message(result):
+def print_message_list(result):
     print_message(result, 'prolog')
 
 #------------------------------------------------------------------------------#
