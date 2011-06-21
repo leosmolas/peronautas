@@ -37,3 +37,41 @@ massim-netbeans: a folder containing a netbeans project with the code for the
         *copy* massim-netbeans/AgentContest/save/* to the generated dist folder, 
         and run the startServer.sh script to run the modified server,
         choosing the my2011-conf1.xml file.
+
+        
+-----------------------------------------------------------------------------------
+
+[X] 1 conexion 
+[X] 2 integracion python prolog
+[ ] 3 delirar soluciones al problema
+[X] 4 diseño arquitectonico agentes (bdi)
+[ ] 5 diseño interno
+[ ] 6 diseño de comunicacion entre agentes
+[ ] 7 implementacion interna
+[ ] 8 hablar de argumentacion uy como usarlo
+
+Areas de interes segun Diego Martine:
+    arquitectura
+    criterio de compracion
+    comunicacion entre agentes
+    planning
+    
+TAREAS INMEDIATAS:
+    mergear lo de molas con lo mio
+    implementar el compartido de percepciones
+    ver la libreria del tuqui para comunicacion entre agentes
+    implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
+        la estructura del grafo se almacena con hechos
+        los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
+        vertex/1.
+        arc/2.
+
+Cosas interesantes a implementar:
+    predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo
+    predicado is_bottleneck que identifica cuando un nodo es un cuello de botello
+
+PREGUNTAS:
+    pregunta: que pasa si no hay suficiente plata para comprar algo?
+    pregunta: como afecta el tema de las percepciones compartidas
+    pregunta: que suposiciones se pueden hacer sobre composicion de equipo?
+    pregunta: que pasa si el valor de auxtimeout es distinto para distintos equipos o distintos miembros de un equipo?

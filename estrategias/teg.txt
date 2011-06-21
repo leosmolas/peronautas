@@ -1,38 +1,3 @@
-[X] 1 conexion 
-[X] 2 integracion python prolog
-[ ] 3 delirar soluciones al problema
-[X] 4 diseño arquitectonico agentes (bdi)
-[ ] 5 diseño interno
-[ ] 6 diseño de comunicacion entre agentes
-[ ] 7 implementacion interna
-[ ] 8 hablar de argumentacion uy como usarlo
-
-Areas de interes segun Diego Martine:
-    arquitectura
-    criterio de compracion
-    comunicacion entre agentes
-    planning
-    
-TAREAS INMEDIATAS:
-    mergear lo de molas con lo mio
-    implementar el compartido de percepciones
-    ver la libreria del tuqui para comunicacion entre agentes
-    implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
-        la estructura del grafo se almacena con hechos
-        los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
-        vertex/1.
-        arc/2.
-
-Cosas interesantes a implementar:
-    predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo
-    predicado is_bottleneck que identifica cuando un nodo es un cuello de botello
-
-PREGUNTAS:
-    pregunta: que pasa si no hay suficiente plata para comprar algo?
-    pregunta: como afecta el tema de las percepciones compartidas
-    pregunta: que suposiciones se pueden hacer sobre composicion de equipo?
-    pregunta: que pasa si el valor de auxtimeout es distinto para distintos equipos o distintos miembros de un equipo?
-
 ESTRATEGIA:
     
     para cada 'area', exploracion, expansion, defensa, ataque, y compra, habra estrategias de equipo y estrategias de rol
@@ -88,3 +53,87 @@ ACTIONS
 disabled agents (health = 0):
     goto, repair, skip, recharge
 
+-------------------------------------------------------------------------------------
+
+Todos los algoritmos se instancian para cada nodo donde sea posible realizar la acción, generando argumentos distintos.
+En ninguno se tuvo en cuenta la distancia al nodo, que restará puntaje.
+Son todos generales, para todos los roles.
+
+Expansión a X: (pertenezco a la frontera, y moviéndome la aumento)
+    - Estoy en la frontera.
+    - Si me muevo a X, aumento la frontera.
+    - COMUNICAR DECISIÓN.
+    - Si los robots de la frontera están de acuerdo:
+        - Moverse.
+        
+@Argumentación otAN (over thA network)
+Pedido de Movilización de la frontera:
+    - Estoy en la frontera.
+    - Un nodo adyacente tiene buen puntaje (P)
+    - Si me muevo, rompo la frontera.
+    - Si es aceptado:
+        - Para cada C de mis compañeros de frontera cercanos (adyacentes):
+            - Calculo a dónde se debería mover (X) para que la zona no se rompa (debería ser un nodo de la frontera), sin considerar el resto de la frontera.
+            - Comunico "Movete a X, y avisame, porque ganamos P".
+            - Me comunica que si, por lo que me muevo.
+            
+@AotAN
+Recibido pedido anterior (X,P):
+    - Si moviendome a X no rompo la zona:
+        - Calculo cuanto se pierde (L).
+        - Si L<P:
+            - Aviso, y me muevo.
+        - Sino:
+            - Aviso que no voy.
+    - Sino:
+        - Calculo dónde se tiene que mover (Y) el siguiente adyacente.
+        - Llamo con pedido de movilización de la frontera con (Y,P).
+        
+Aumento de zona: (estoy afuera de la zona, y si voy a un nodo a distancia máx 2 de la frontera, la aumento)
+    - Estoy afuera de la zona.
+    - Consigo los nodos que estén afuera de la zona, a distancia máxima 2 de los robots que estén en la frontera.
+    - Para cada nodo X de esos:
+        - Genero una instancia nueva de aumento de zona.
+        - Calculo el puntaje de la zona.
+    - COMUNICAR DECISIÓN.
+    - Si todos están de acuerdo:
+        - Generar camino hasta X.
+        
+Defender proactivo:
+    - 
+    
+Defender reactivo:
+
+
+Defender preventivo: (La idea es mantenerse en el medio de la zona, de tal manera que si un enemigo entra, se genere una zona más pequeña con uno en la frontera, de tal manera que no se pierda la totalidad de la zona.)
+
+    - Estoy dentro de la zona. (no es necesario...)
+    - Moviendome a X consigo estar a distancia 2 de un robot de frontera, o uno que esté defendiendo preventivamente.
+    - El puntaje de la defensa está dado por:
+        - Siendo C cantidad de zonas dadas por las generadas con un enemigo entrando por un dado nodo de la frontera, Pn (n = número de la zona) el puntaje de las zonas, Pm el puntaje máximo.
+        
+        (\Sigma [i = 1; C] ((Pm - Pi) ^ 2)) / C
+
+        
+Atacar zona 1: (Cualquier robot va a romper la zona del enemigo)
+    - Veo la zona del enemigo.
+    - Tomo todos los nodos que pertenecen a la frontera enemiga.
+    - Preferentemente evitar a saboteadores cerca.
+    - Preferir nodos con pocos robots alrededor. (que no haya más de uno en radio uno)
+    - Si tengo los valores de los nodos, prefiero el más alto.
+
+    
+Atacar zona en conjunto: (dos robots se ponen de acuerdo para ir juntos)
+
+
+Buscar reparador: (estoy deshabilitado)
+    - Comunico a los reparadores que necesito asistencia.
+    - Mientras espero que me contesten, me muevo al más cercano.
+    - Si el más cercano me da una respuesta negativa, me voy al otro.
+    
+
+@reparador
+Recibido pedido de asistencia:
+    - Considero ayudarlo (comparado con otras posibilidades). (Generalmente se va a dar que esta sea la tarea más importante del reparador, porque lo que pocas veces dirá que no. Un ejemplo de cuando puede decir que no es cuando el reparador está en frontera, y si sale rompe todo; entonces es mejor esperar a que venga el robot roto (si es que está cerca))
+    - Si decido que debo hacerlo, le aviso, y emprendo un acercamiento al robot.
+    - Cuando llego, lo reparo.
