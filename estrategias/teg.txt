@@ -1,7 +1,90 @@
-Estrategias de exploración para el explorar (local):
-	Hacer probe del nodo en el que esta parado actualmente (si no se conoce el peso)
-	Hacer probe (si es necesario) de un nodo que este controlado por nuestro o equipo (o bien, en una zona cercana) y no se conozca su peso.
-	Si conoce un peso de un camino a un nodo que no tiene valor, ir a ese nodo con la intencion de hacerle probe.
-	Si no conoce el peso de algun arco, pero los nodos cercanos ya fueron probeados, hacer un survey.
-	Cuando ya se conoce la zona propia, tanto el valor de los arcos como de los nodos, se comienza a explorar en profundidad lugares desconocidos del mapa, como la zona de tu enemigo.
-	Cuando se conoce la mayoría del mapa, quedarte a defender tu zona.
+[X] 1 conexion 
+[X] 2 integracion python prolog
+[ ] 3 delirar soluciones al problema
+[X] 4 diseño arquitectonico agentes (bdi)
+[ ] 5 diseño interno
+[ ] 6 diseño de comunicacion entre agentes
+[ ] 7 implementacion interna
+[ ] 8 hablar de argumentacion uy como usarlo
+
+Areas de interes segun Diego Martine:
+    arquitectura
+    criterio de compracion
+    comunicacion entre agentes
+    planning
+    
+TAREAS INMEDIATAS:
+    mergear lo de molas con lo mio
+    implementar el compartido de percepciones
+    ver la libreria del tuqui para comunicacion entre agentes
+    implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
+        la estructura del grafo se almacena con hechos
+        los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
+        vertex/1.
+        arc/2.
+
+Cosas interesantes a implementar:
+    predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo
+    predicado is_bottleneck que identifica cuando un nodo es un cuello de botello
+
+PREGUNTAS:
+    pregunta: que pasa si no hay suficiente plata para comprar algo?
+    pregunta: como afecta el tema de las percepciones compartidas
+    pregunta: que suposiciones se pueden hacer sobre composicion de equipo?
+    pregunta: que pasa si el valor de auxtimeout es distinto para distintos equipos o distintos miembros de un equipo?
+
+ESTRATEGIA:
+    
+    para cada 'area', exploracion, expansion, defensa, ataque, y compra, habra estrategias de equipo y estrategias de rol
+    las estrategias de equipo son estrategias para cuando todo el equipo tiene una meta comun
+        ejemplos: cuando todo el equipo explora, durante la fasa inicial vs la estrategia de exploracion de un explorador
+                  cuando todos deciden defender una zona o nodo bajo ataque de otro equipo vs la estrategia de defensa de un sentinela
+
+    LOGRO DE ACHIEVEMENTS
+
+    EXPLORACION (equipo)
+        una fase inicial de exploracion
+        despues alternacion entre expansion, defensa, ataque y compra
+        se sabe cuantos nodos hay en el grafo, la exploracion puede cortarse cuando se conocen todos los nodos / arcos (pensar)
+        siempre conviene hacer el survey
+        el explorador siempre tiene que hacer preferencia de probe
+        a la hora de ir explorando lo que primero se va a hacer es mandar la accion tentativa al buffer de accion y luego argumentar con el resto de los agentes sobre la posicion a la que nos vamos a mover. Asi los agentes no se mueven al mismo nodo para exploracion, o si fuese el caso y decidieran moverse al mismo nodo hacerlo. De esta forma tendriamos que los agentes deciden un posible movimiento y debaten para ver si alguno tiene que cambiar de accion.
+
+    EXPLORACION (explorador)
+        Hacer probe del nodo en el que esta parado actualmente (si no se conoce el peso)
+        Hacer probe (si es necesario) de un nodo que este controlado por nuestro o equipo (o bien, en una zona cercana) y no se conozca su peso.
+        Si conoce un peso de un camino a un nodo que no tiene valor, ir a ese nodo con la intencion de hacerle probe.
+        Si no conoce el peso de algun arco, pero los nodos cercanos ya fueron probeados, hacer un survey.
+        Cuando ya se conoce la zona propia, tanto el valor de los arcos como de los nodos, se comienza a explorar en profundidad lugares desconocidos del mapa, como la zona de tu enemigo.
+        Cuando se conoce la mayoría del mapa, quedarte a defender tu zona / patrullar.
+
+    EXPANSION (equipo)
+        si se identifica un nodo cuello de botella, definir una zona detras del nodo la cual se puede defender de manera facil
+        puede haber un nodo vacio entre dos agentes para que se forme frontera
+
+    DEFENSA (equipo)
+        tener uno o mas saboteadores de pivot?
+
+    ATAQUE (equipo)
+        si se identifica un nodo que es punto debil de una zona enemiga, atacarlo
+
+    COMPRA (equipo)
+        argumentar dentro de un agente y entre agentes si que se va a comprar y porque
+        cuando conviene quedarse con la plata por puntaje o comprar algo?
+        cuando conviene que lo compre un agente en lugar de otro?
+
+ACTIONS
+    skip:     0 cost
+    recharge: increases energy 20%, result = succesful | failed (if attacked)
+    attack:   succesful | failed (lack of energy) | parried | wrongParameter (wrong parameter)
+    parry:    2 cost, result = succesful | useless
+    goto:     variable cost, result = successful | failed (lack of energy) | wrongParameter
+    probe:    1 cost, result = successful | failed (lack of energy)
+    survey:   1 cost, result = successful | failed (lack of energy)
+    inspect:  2 cost, result = successful | failed (lack of energy, attacked)
+    buy:      2 cost, result = successful, failed (wrong role, lack of energy, attacked) | wrongParameter, parameters = battery | sensor | shield | sabotageDevice
+    repair:   2 cost, result = successful | failed (no such agent, lack of energy) | wrongParameter
+
+disabled agents (health = 0):
+    goto, repair, skip, recharge
+
