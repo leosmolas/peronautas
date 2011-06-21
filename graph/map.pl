@@ -143,6 +143,15 @@ checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Hea
                                                                   append(ReachedNodes1, ReachedNodes2, ReachedNodes).
 
 
+% coloringAlgorithm
+% clears the owner of all teams and runs the 3 steps of the coloring algorithm.
+coloringAlgorithm :- nodes(Nodes),
+                     setOwner(Nodes, no),
+                     step1,
+                     step2,
+                     step3.
+
+
 % step1
 % first step of the coloring algorithm
 step1 :- nodes(Nodes),
