@@ -1,3 +1,4 @@
+                                  
             ##             ##     
 #####        #   #        # #     
  #   #       #            #       
@@ -11,18 +12,17 @@
 De toda la información que manipula el agente, consideramos la siguiente información:
 
 	Información general sobre:
-		Nodos (valor, probeado, arcos, coloreado, etc)
-        Nodos vistos actualmente.
+		Nodos (valor, prubeado, arcos, coloreado, etc)
 		Arcos (costo, nodos extremos, test valor final)
-		Agentes aliados (posicion, rol, BDI)
+		Agentes aliados (todo)
 		Agentes enemigos (todo)
 	
-	Información sobre la zonas aliadas capturadas:
-		Nodos que las forman
+	Información sobre la zona aliada capturada:
+		Nodos que la forman
 		Producción de puntos por turnos
 		Cantidad de agentes que la están manteniendo
 
-	Información sobre las zonas enemigas capturadas:
+	Información sobre la zona enemiga capturada:
 		Nodos que la forman
 		Producción de puntos por turnos
 		Cantidad de agentes que la están manteniendo
