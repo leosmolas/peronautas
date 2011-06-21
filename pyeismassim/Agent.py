@@ -78,26 +78,20 @@ class PrologAgent(Agent):
 
     def processPerception(self, msg, p):
         for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
-            p.query("retract(%s(_))" % x).next()
+            p.query("retractall(%s(_))" % x).next() # cambiamos retract por retractall porque hay problemas al principio
             p.query("assert(%s(%s))" % (x, msg[x])).next()
-        aux = []
-        for x in msg['vis_verts']:
-            aux.append(x['name'])
         vert = "["
-        for x in aux:
-            vert += x + ","
+        for x in msg['vis_verts']:
+            vert += "vert(%s, %s, unknown)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
         
-        p.query("actualizarListas(%s,verts)" % vert2 ).next()
-        aux = []
-        for x in msg['vis_edges']:
-            aux.append((x['node1'],x['node2']))
+        p.query("updateVerts(%s)" % vert2 ).next()
         vert = "["
+        for x in msg['vis_edges']:
+            vert += "edge(%s,%s,unknown)," % (x['node1'],x['node2'])
         #print "aux",aux
-        for x in aux:
-            vert += "edge(%s,%s)," %(x[0],x[1])
         vert2 = vert[:-1]+"]"
-        list(p.query("actualizarListas(%s,edges)" % vert2 ))
+        list(p.query("updateEdges(%s)" % vert2 ))
         
     def perceive_act_loop(self, prolog_source):
 

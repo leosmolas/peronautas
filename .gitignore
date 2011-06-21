@@ -1,3 +1,4 @@
 *.pyc
 *.bak
 *.db
+massim/scripts/.tmp_serverconfig.xml
