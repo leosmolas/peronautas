@@ -17,12 +17,12 @@ neighbors(Node, Neighbors) :- findall(Neigh, edge(Node,Neigh,_), Neighbors).
 
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
-agentsInNode(Node, Agents) :- findall(Agent, position(Agent, _, Node), Agents).
+agentsInNode(Node, Agents) :- findall(Agent, position(Agent, Node), Agents).
 
 
 % teamsInNode(+Node, -Teams)
 % returns in Teams a list of Teams which are present in a Node.
-teamsInNode(Node, Teams) :- findall(Team, position(_, Team, Node), Teams).
+teamsInNode(Node, Teams) :- findall(Team, (position(Agent, Node), teamOfAgent(Agent, Team)), Teams).
 
 % doNotFail(X) :- call(X), !.
 % doNotFail(_).              ._.
@@ -135,7 +135,7 @@ depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), che
 %  if my team is the owner of the Node, wont go deeper, becuase enemies must pass through this node to reach the analized node.
 %  if none of above happens i countinue the depth first search from the actual node.
 checkNeighbors(_Node, [], Visited, _Team, Visited).
-checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(_, OtherTeam, Head), !, false.
+checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(Agent, Head), teamOfAgent(Agent, OtherTeam), !, false.
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),

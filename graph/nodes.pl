@@ -42,17 +42,17 @@ nodesOfTeam(Team, NodesOfTeam) :- findall(Node, node(Node, _, Team), NodesOfTeam
 
 % clearNode(+Node, -ListOfNodes)
 % checks if Node is present in the ListOfNodes and there is no agent at the node, and has no owner
-clearNode(Node, ListOfNodes) :- member(Node, ListOfNodes), not(position(_,_, Node)), node(Node, _, no).
+clearNode(Node, ListOfNodes) :- member(Node, ListOfNodes), not(position(_, Node)), node(Node, _, no).
 
 
 % emptyNode(+Node, +ListOfNodes)
 % checks if the Node is present in the ListOfNodes and there is no agent positioned at the node
-emptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), not(position(_,_, Node)).
+emptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), not(position(_, Node)).
 
 
 % nonEmptyNode(+Node, +ListOfNodes)
 % checks if the node is present in the ListOfNodes and the node has no agent on it.
-nonEmptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), position(_, _, Node).
+nonEmptyNode(Node, ListOfNodes) :- member(Node, ListOfNodes), position(_, Node).
 
 
 % checkOwner(+Node, +Team)
