@@ -3,11 +3,12 @@
            last_action/1,
            last_action_result/1,
            money/1,
-           vert/3,
+           node/3,
            edge/3,
            intention/1,
            max_health/1,
-           plan/1,max_energy/1.
+           plan/1,
+           max_energy/1.
 
 % Beliefs
 last_action(a).
@@ -41,27 +42,27 @@ updateEdges([X|Xs]) :-
     assertz(X),
     updateEdges(Xs).
 
-updateValue(vert(Name, Team, Value), Value) :-
-    vert(Name, _, unknown), !.
-updateValue(vert(Name, Team, unknown), NewValue) :-
-    vert(Name, _, NewValue).
+updateValue(node(Name, Value, Team), Value) :-
+    node(Name, unknown, _), !.
+updateValue(node(Name, unknown, Team), NewValue) :-
+    node(Name, NewValue, _).
 
 % Formato de los nodos:
-% vert(Name, Team, Value)
+% node(Name, Team, Value)
 % Value es unknown si no sabemos cuanto vale el nodo
-updateVerts([]).
+updateNodes([]).
 % cuando no conocemos el valor de un nodo, simplemente
 % actualizamos su owner
-updateVerts([X|Xs]) :-
-    X = vert(Name, CurrentTeam, Value),
-    vert(Name, OldTeam, OldValue), !,
+updateNodes([X|Xs]) :-
+    X = node(Name, Value, CurrentTeam),
+    node(Name, OldValue, OldTeam), !,
     updateValue(X, NewValue),
-    retract(vert(Name, _, _)),
-    assertz(vert(Name, CurrentTeam, NewValue)),
-    updateVerts(Xs).
-updateVerts([X|Xs]) :-
+    retract(node(Name, _, _)),
+    assertz(node(Name, NewValue, CurrentTeam)),
+    updateNodes(Xs).
+updateNodes([X|Xs]) :-
     assertz(X),
-    updateVerts(Xs).
+    updateNodes(Xs).
 
 %member(X, [X | _]).
 %member(X, [Y | Ys]) :- 
@@ -111,12 +112,10 @@ planning :-
 
 searchNeigh(N) :- 
     position(Pos),
-    edges(E),
-    member( edge(Pos, N), E). % Inferencia mapa.
+    edge(Pos, N, _), !.
 searchNeigh(N) :- 
     position(Pos),
-    edges(E),
-    member( edge(N, Pos), E).
+    edge(N, Pos, _).
 
 % Ejecutar.
 

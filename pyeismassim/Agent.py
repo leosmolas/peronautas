@@ -77,16 +77,22 @@ class DummyAgent(Agent):
 class PrologAgent(Agent):
 
     def processPerception(self, msg, p):
+        # actualizamos cada uno de los campos individuales del agente
         for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
-            p.query("retractall(%s(_))" % x).next() # cambiamos retract por retractall porque hay problemas al principio
+            # cambiamos retract por retractall porque hay problemas al principio
+            p.query("retractall(%s(_))" % x).next() 
             p.query("assert(%s(%s))" % (x, msg[x])).next()
+        print "@Agent: Mi posicion es %s" % msg['position']
         vert = "["
+        # actualizamos el estado del mapa con los nodos
         for x in msg['vis_verts']:
-            vert += "vert(%s, %s, unknown)," % (x['name'], x['team'])
+            vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
+        print "@PrologAgent: Llamando!\nupdateNodes(%s)" % vert2
         
-        p.query("updateVerts(%s)" % vert2 ).next()
+        p.query("updateNodes(%s)" % vert2 ).next()
         vert = "["
+        # actualizamos el estado del mapa con los arcos
         for x in msg['vis_edges']:
             vert += "edge(%s,%s,unknown)," % (x['node1'],x['node2'])
         #print "aux",aux
@@ -132,9 +138,6 @@ class PrologAgent(Agent):
 
                 # Process perception.
                 self.processPerception(msg, prolog)
-                prolog.query("verts(X)").next()["X"]
-                prolog.query("edges(X)").next()["X"]
-                #prolog.query("searchNeigh(X)").next()["X"]
                 list(prolog.query("argumentation"))
                 list(prolog.query("planning"))
                 actionList = prolog.query("exec(X)").next()["X"]
