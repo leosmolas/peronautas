@@ -66,6 +66,8 @@ class Agent():
             else:
                 print "@Agent: en area 51"
 
+        
+
 class DummyAgent(Agent):
 
     def __init__(self):
@@ -76,12 +78,12 @@ class DummyAgent(Agent):
 
 class PrologAgent(Agent):
 
-    def processPerception(self, msg, p):
+    def processPerception(self, msg, prologConnection):
         # actualizamos cada uno de los campos individuales del agente
-        for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
+        for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']:
             # cambiamos retract por retractall porque hay problemas al principio
-            p.query("retractall(%s(_))" % x).next() 
-            p.query("assert(%s(%s))" % (x, msg[x])).next()
+            prologConnection.query("retractall(%s(_))" % x).next() 
+            prologConnection.query("assert(%s(%s))" % (x, msg[x])).next()
         print "@Agent: Mi posicion es %s" % msg['position']
         vert = "["
         # actualizamos el estado del mapa con los nodos
@@ -90,14 +92,13 @@ class PrologAgent(Agent):
         vert2 = vert[:-1] + "]"
         print "@PrologAgent: Llamando!\nupdateNodes(%s)" % vert2
         
-        p.query("updateNodes(%s)" % vert2 ).next()
+        prologConnection.query("updateNodes(%s)" % vert2 ).next()
         vert = "["
         # actualizamos el estado del mapa con los arcos
         for x in msg['vis_edges']:
             vert += "edge(%s,%s,unknown)," % (x['node1'],x['node2'])
-        #print "aux",aux
         vert2 = vert[:-1]+"]"
-        list(p.query("updateEdges(%s)" % vert2 ))
+        list(prologConnection.query("updateEdges(%s)" % vert2 ))
         
     def perceive_act_loop(self, prolog_source):
 
