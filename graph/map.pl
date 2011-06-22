@@ -33,17 +33,21 @@ teamsInNeighbors([], TeamsNeighborsCount) :- findall([Owner,Count], neighborOwne
                                              retractall(neighborOwner(_,_)).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
-                                                                  Owner \= no,
-                                                                  neighborOwner(Owner,Count), !,
-                                                                  retract(neighborOwner(Owner,Count)),
-                                                                  Count2 is Count + 1,
-                                                                  assert(neighborOwner(Owner,Count2)),
-                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+                                                                 Owner \= none,
+                                                                 position(Agent,Neighbor),
+                                                                 teamOfAgent(Agent, Owner),
+                                                                 neighborOwner(Owner,Count), !,
+                                                                 retract(neighborOwner(Owner,Count)),
+                                                                 Count2 is Count + 1,
+                                                                 assert(neighborOwner(Owner,Count2)),
+                                                                 teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
-                                                                  Owner \= no, !,                                                                 
-                                                                  assert(neighborOwner(Owner,1)),
-                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+                                                                 Owner \= none, !,                                                                 
+                                                                 position(Agent,Neighbor),
+                                                                 teamOfAgent(Agent, Owner),
+                                                                 assert(neighborOwner(Owner,1)),
+                                                                 teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :- teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
@@ -65,7 +69,7 @@ appears(Element, [_|Tail], CountTeam, CountOtherTeam) :- appears(Element, Tail, 
 %                                    setOwner([Node], Team).
 %checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  teamsInNode(Node, Teams), 
-                              teams([Team1 | [Team2 | []]]),
+                              listOfTeams([Team1 | [Team2 | []]]),
                               appears(Team1, Teams, Team1InNode, Team2InNode), 
                               length(Teams, TeamsInNode), 
                               Majority is floor(TeamsInNode / 2), 
@@ -145,8 +149,8 @@ checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Hea
 
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
-coloringAlgorithm :- nodes(Nodes),
-                     setOwner(Nodes, no),
+coloringAlgorithm :- listOfNodes(ListOfNodes),
+                     setOwner(ListOfNodes, none),
                      step1,
                      step2,
                      step3.
@@ -154,18 +158,16 @@ coloringAlgorithm :- nodes(Nodes),
 
 % step1
 % first step of the coloring algorithm
-step1 :- nodes(Nodes),
-         foreach(nonEmptyNode(Node,Nodes), (checkMajorityInNode(Node))).
+step1 :- findall(Node, nonEmptyNode(Node), ListOfNodes),
+         % convertir ListOfNodes en un conjunto
+         foreach(member(Node2,ListOfNodes), (checkMajorityInNode(Node2))).
 
 
 % step2
 % second step of the coloring algorithm
-step2 :- nodes(Nodes),
-         foreach(emptyNode(Node, Nodes), (checkMajorityInNeighbors(Node))).
+step2 :- foreach(emptyNode(Node), (checkMajorityInNeighbors(Node))).
 
 
 % step3
 % third step of the coloring algorithm
-step3 :- teams(Teams),
-         nodes(Nodes),
-         foreach(member(Team, Teams), (foreach(clearNode(Node,Nodes), (dfs(Node, Team))))).
+step3 :- foreach(team(Team), (foreach(clearNode(Node), (dfs(Node, Team))))).
