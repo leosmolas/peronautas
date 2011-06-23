@@ -73,6 +73,8 @@ class Agent():
                 print "@Agent: en area 51"
                 quit = True
 
+        
+
 class DummyAgent(Agent):
 
     def __init__(self):
@@ -100,8 +102,9 @@ class PrologAgent(Agent):
         for x in dict_msg['vis_verts']:
             aux.append(x['name'])
         vert = "["
-        for x in aux:
-            vert += x + ","
+        # actualizamos el estado del mapa con los nodos
+        for x in msg['vis_verts']:
+            vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
         p.query("actualizarListas(%s, verts)" % vert2 ).next()
 
