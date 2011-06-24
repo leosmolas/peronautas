@@ -98,13 +98,13 @@ teamOfAgent(castels, cacoteam).
 % Team = cacoteam.
 
 % 
-% position(peron,a).
-% position(evita,e).
-% position(menem,g).
-% position(cafiero,d).
-% 
-% position(iorio,h).
-% position(delia,f).
+position(peron,a).
+position(evita,e).
+position(menem,g).
+position(cafiero,d).
+
+position(iorio,h).
+position(delia,f).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT
@@ -130,15 +130,15 @@ teamOfAgent(castels, cacoteam).
 % Node = b,
 % Team = peronismo.
 
-position(peron,a).
-position(evita,a).
-position(menem,g).
-position(cafiero,b).
-
-position(iorio,h).
-position(delia,f).
-position(castels,b).
-position(moyano,b).
+% position(peron,a).
+% position(evita,a).
+% position(menem,g).
+% position(cafiero,b).
+% 
+% position(iorio,h).
+% position(delia,f).
+% position(castels,b).
+% position(moyano,b).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT

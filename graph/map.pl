@@ -150,13 +150,16 @@ checkNeighbors(_Node, [], Visited, _Team, Visited) :- !.
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !,
                                                                   checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team),
-                                                                  Team \=none, !,
+                                                                  Team \= ofNoOne,
+                                                                  Team \= none, !,
                                                                   checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
-checkNeighbors(_Node, [Head|_Tail], _Visited, Team, _ReachedNodes) :- atom(Team), % me aseguro que venga instanciado
-                                                                      checkOwner(Head, OtherTeam),
-                                                                      OtherTeam \= none,
-                                                                      Team \= OtherTeam, !,
-                                                                      fail. %acá va a variar. Debería setear todos los nodos con ofNoOne o algo así, ya que todos los nodos no pueden pertenecer a nadie.
+checkNeighbors(_Node, [Head|_Tail], Visited, Team, _ReachedNodes) :- atom(Team), % me aseguro que venga instanciado
+                                                                     checkOwner(Head, OtherTeam),
+                                                                     OtherTeam \= none,
+                                                                     % OtherTeam \= ofNoOne,
+                                                                     Team \= OtherTeam, !,
+                                                                     setOwner(Visited, ofNoOne),
+                                                                     fail.
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),
                                                                   checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
                                                                   union(ReachedNodes1, ReachedNodes2, ReachedNodes).
