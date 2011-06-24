@@ -45,7 +45,7 @@ nonEmptyNode(Node) :- node(Node, _, _), position(_, Node).
 
 % checkOwner(+Node, ?Team)
 % checks if the owner of the Node is Team. It can also return the actual Team of the node
-checkOwner(Node, Team) :- node(Node, _, Team).
+checkOwner(Node, Team) :- node(Node, _, Team), !.
 
 
 listOfNodes(ListOfNodes) :- findall(Node, node(Node, _, _), ListOfNodes).

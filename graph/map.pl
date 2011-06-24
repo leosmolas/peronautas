@@ -29,7 +29,7 @@ teamsInNode(Node, Teams) :- findall(Team, (position(Agent, Node), teamOfAgent(Ag
 
 % teamsInNeighbors(+Neighbors, -TeamsNeighborsCount)
 % returns in TeamsNeighborsCount a list of pairs (Owner, Count), representing count of neighbor nodes owned by the teams.
-teamsInNeighbors([], TeamsNeighborsCount) :- findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
+teamsInNeighbors([], TeamsNeighborsCount) :- !, findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
                                              retractall(neighborOwner(_,_)).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
@@ -43,13 +43,13 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_
                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
-                                                                 Owner \= none, !,                                                                 
+                                                                 Owner \= none,
                                                                  position(Agent,Neighbor),
-                                                                 teamOfAgent(Agent, Owner),
+                                                                 teamOfAgent(Agent, Owner), !,
                                                                  assert(neighborOwner(Owner,1)),
                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
-teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :- teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :- !, teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
@@ -85,7 +85,7 @@ checkMajorityInNodeAux(_Team1, _Team1Count, Team2, Team2Count, Majority, Team2) 
 
 % maximum(+ListOfPairs, -Team)
 % from a list of pairs (Team, Count) returns the Team that has the highest count and this count is greater than 1.
-maximum([[Team, Count]], Team) :- Count > 1.
+maximum([[Team, Count]], Team) :- Count > 1, !.
 maximum([[Team1, Count1], [_Team2,Count2] | Rest], Team) :- Count1 > Count2,
                                                            maximumAux(Rest, [Team1, Count1], Count2, [Team, Count]),
                                                            Count > 1.
@@ -123,36 +123,46 @@ atLeastOne([_ | Tail], List) :- atLeastOne(Tail, List).
 checkPaths([Head | Tail], ListOfPaths) :- atLeastOne(Head, ListOfPaths), !, checkPaths(Tail, ListOfPaths).
 
 
-% dfs(+Node, +Team)
-% Checks depth first if this node is isolated from the enemy team... and if it is, it sets the owner to the Team.
-dfs(Node, Team) :- depthfirst(Node, [Node], Team, ReachedNodes), !, setOwner(ReachedNodes, Team).
-dfs(_,_).
+% dfs(+Node)
+% dfs calls depthfirst, and sets the Owner of Node, and all the nodes it could reach.
+dfs(Node) :- depthfirst(Node, [Node], Team, ReachedNodes), !, setOwner(ReachedNodes, Team).
+dfs(_).
 
 
-% depthfirst(+Node, +Visited, +Team, -ReachedNodes)
+% depthfirst(+Node, +Visited, -Team, -ReachedNodes)
 % implements the search for neighbors and depth first them.
-depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), checkNeighbors(Node, Neighbors, Visited, Team, ReachedNodes).
+% It returns the Team of ReachedNodes.
+depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), 
+                                                 checkNeighbors(Node, Neighbors, Visited, Team, ReachedNodes).
 
 
 % checkNeighbors(+Node, +Neighbors, +Visited, +Team)
 % checks neighbors of a node following these rules in order.
 %  if there are no more Neighbors to visit, i've gone to the deepest node and found no enemy agents.
 %  if there is an agent of the other team in the Node, then at least one agent of the enemy team can reach the Node, so its not isolated.
-%  if my team is the owner of the Node, won't go deeper, becuase enemies must pass through this node to reach the analized node.
+%  if my team is the owner of the Node, won't go deeper, because enemies must pass through this node to reach the analized node.
 %  if none of above happens i countinue the depth first search from the actual node.
 checkNeighbors(_Node, [], Visited, _Team, Visited).
-checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(Agent, Head), teamOfAgent(Agent, OtherTeam), !, false.
-checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
-checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, 
+                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+checkNeighbors(Node, [_Head|_Tail], _Visited, Team, _ReachedNodes) :- atom(Team), % me aseguro que venga instanciado
+                                                              checkOwner(Node, OtherTeam), 
+                                                              Team \= OtherTeam, !, 
+                                                              fail. %acá va a variar. Debería setear todos los nodos con ofNoOne o algo así, ya que todos los nodos no pueden pertenecer a nadie.
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, 
+                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),
                                                                   checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
                                                                   append(ReachedNodes1, ReachedNodes2, ReachedNodes).
 
 
+cleanColors :- listOfNodes(ListOfNodes),
+               setOwner(ListOfNodes, none).
+
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
-coloringAlgorithm :- listOfNodes(ListOfNodes),
-                     setOwner(ListOfNodes, none),
+coloringAlgorithm :- cleanColors,
                      step1,
                      step2,
                      step3.
@@ -172,4 +182,4 @@ step2 :- foreach(emptyNode(Node), (checkMajorityInNeighbors(Node))).
 
 % step3
 % third step of the coloring algorithm
-step3 :- foreach(team(Team), (foreach(clearNode(Node), (dfs(Node, Team))))).
+step3 :- foreach(clearNode(Node), (dfs(Node))).

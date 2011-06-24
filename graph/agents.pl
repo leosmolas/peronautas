@@ -31,9 +31,9 @@ travel(Agent, Node) :-  energy(Agent, Energy),
 
 % otherTeam(+Team, -OtherTeam).
 % returns in OtherTeam the name of the other Team.
-otherTeam(Team, OtherTeam) :- teams(T), T \= Team, !, OtherTeam = T.
+otherTeam(Team, OtherTeam) :- teams(OtherTeam), OtherTeam \= Team, !.
 
-listOfTeams(Teams) :- findall(Team, teams(Team), Teams).
+listOfTeams(Teams) :- findall(Team, team(Team), Teams).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                              Representation                                 %
