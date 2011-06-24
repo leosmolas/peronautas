@@ -77,6 +77,8 @@ checkMajorityInNode(Node) :-  teamsInNode(Node, Teams),
                               setOwner([Node], Team).
 checkMajorityInNode(_).
 
+% Is majority floor(TeamsInNode / 2)????
+
 
 checkMajorityInNodeAux(Team1, Team1Count, _Team2, _Team2Count, Majority, Team1) :- Team1Count > Majority, !.
 checkMajorityInNodeAux(_Team1, _Team1Count, Team2, Team2Count, Majority, Team2) :- Team2Count > Majority.
@@ -135,8 +137,8 @@ depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors), che
 % checkNeighbors(+Node, +Neighbors, +Visited, +Team)
 % checks neighbors of a node following these rules in order.
 %  if there are no more Neighbors to visit, i've gone to the deepest node and found no enemy agents.
-%  if there is an agent of the other team in the Node, then at least one agent of the enemy team can reach the Node, so its no isolated.
-%  if my team is the owner of the Node, wont go deeper, becuase enemies must pass through this node to reach the analized node.
+%  if there is an agent of the other team in the Node, then at least one agent of the enemy team can reach the Node, so its not isolated.
+%  if my team is the owner of the Node, won't go deeper, becuase enemies must pass through this node to reach the analized node.
 %  if none of above happens i countinue the depth first search from the actual node.
 checkNeighbors(_Node, [], Visited, _Team, Visited).
 checkNeighbors(_Node, [Head|_Tail], Visited, Team, Visited) :- otherTeam(Team, OtherTeam), position(Agent, Head), teamOfAgent(Agent, OtherTeam), !, false.

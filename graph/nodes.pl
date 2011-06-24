@@ -43,8 +43,8 @@ emptyNode(Node) :- node(Node, _, _), not(position(_, Node)).
 nonEmptyNode(Node) :- node(Node, _, _), position(_, Node).
 
 
-% checkOwner(+Node, +Team)
-% checks if the owner of the Node is Team.
+% checkOwner(+Node, ?Team)
+% checks if the owner of the Node is Team. It can also return the actual Team of the node
 checkOwner(Node, Team) :- node(Node, _, Team).
 
 
@@ -57,6 +57,8 @@ listOfNodes(ListOfNodes) :- findall(Node, node(Node, _, _), ListOfNodes).
 
 
 % node(Name, Value, Owner).
+% this block should die when we merge it with the agent.
+% if everyone agrees, this should be named vert (since the server sents vert)
 node(a, 1, none).
 node(b, 2, none).
 node(c, 3, none).
