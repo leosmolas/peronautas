@@ -49,7 +49,7 @@ team(cacoteam).
 %team(cacoteam, [iorio, delia, moyano, castels]).
 
 
-% teamOfAgent(+Agent, -Team)
+% teamOfAgent(?Agent, ?Team)
 % Team of an Agent.
 teamOfAgent(peron, peronismo).
 teamOfAgent(evita, peronismo).
@@ -62,7 +62,74 @@ teamOfAgent(moyano, cacoteam).
 teamOfAgent(castels, cacoteam).
 
 
-% position(+Agent, -Team, -Node).
+% position(?Agent, ?Node).
+% position(peron,a).
+% position(evita,a).
+% position(menem,g).
+% position(cafiero,b).
+% 
+% position(iorio,h).
+% position(delia,f).
+% position(castels,b).
+% position(moyano,b).
+
+%%%%%%%%%%%%%%%%%%
+% CORRECT RESULT
+
+% Node = a,
+% Team = peronismo ;
+% Node = b,
+% Team = cacoteam ;
+% Node = f,
+% Team = cacoteam ;
+% Node = g,
+% Team = peronismo ;
+% Node = h,
+% Team = cacoteam ;
+% Node = c,
+% Team = cacoteam ;
+% Node = d,
+% Team = peronismo ;
+% Node = e,
+% Team = cacoteam ;
+% Node = i,
+% Team = cacoteam ;
+% Node = j,
+% Team = cacoteam.
+
+% 
+% position(peron,a).
+% position(evita,e).
+% position(menem,g).
+% position(cafiero,d).
+% 
+% position(iorio,h).
+% position(delia,f).
+
+%%%%%%%%%%%%%%%%%%
+% CORRECT RESULT
+
+% Node = c,
+% Team = none ;
+% Node = i,
+% Team = none ;
+% Node = j,
+% Team = none ;
+% Node = a,
+% Team = peronismo ;
+% Node = d,
+% Team = peronismo ;
+% Node = e,
+% Team = peronismo ;
+% Node = f,
+% Team = cacoteam ;
+% Node = g,
+% Team = peronismo ;
+% Node = h,
+% Team = cacoteam ;
+% Node = b,
+% Team = peronismo.
+
 position(peron,a).
 position(evita,a).
 position(menem,g).
@@ -72,3 +139,27 @@ position(iorio,h).
 position(delia,f).
 position(castels,b).
 position(moyano,b).
+
+%%%%%%%%%%%%%%%%%%
+% CORRECT RESULT
+
+% Node = a,
+% Team = peronismo ;
+% Node = b,
+% Team = cacoteam ;
+% Node = f,
+% Team = cacoteam ;
+% Node = g,
+% Team = peronismo ;
+% Node = h,
+% Team = cacoteam ;
+% Node = c,
+% Team = cacoteam ;
+% Node = d,
+% Team = peronismo ;
+% Node = e,
+% Team = cacoteam ;
+% Node = i,
+% Team = cacoteam ;
+% Node = j,
+% Team = cacoteam.

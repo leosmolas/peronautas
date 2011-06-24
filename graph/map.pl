@@ -123,6 +123,9 @@ atLeastOne([_ | Tail], List) :- atLeastOne(Tail, List).
 checkPaths([Head | Tail], ListOfPaths) :- atLeastOne(Head, ListOfPaths), !, checkPaths(Tail, ListOfPaths).
 
 
+
+
+
 % dfs(+Node)
 % dfs calls depthfirst, and sets the Owner of Node, and all the nodes it could reach.
 dfs(Node) :- depthfirst(Node, [Node], Team, ReachedNodes), !, setOwner(ReachedNodes, Team).
@@ -142,19 +145,21 @@ depthfirst(Node, Visited, Team, ReachedNodes) :- neighbors(Node, Neighbors),
 %  if there is an agent of the other team in the Node, then at least one agent of the enemy team can reach the Node, so its not isolated.
 %  if my team is the owner of the Node, won't go deeper, because enemies must pass through this node to reach the analized node.
 %  if none of above happens i countinue the depth first search from the actual node.
-checkNeighbors(_Node, [], Visited, _Team, Visited).
-checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team), !, 
-                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
-checkNeighbors(Node, [_Head|_Tail], _Visited, Team, _ReachedNodes) :- atom(Team), % me aseguro que venga instanciado
-                                                              checkOwner(Node, OtherTeam), 
-                                                              Team \= OtherTeam, !, 
-                                                              fail. %acá va a variar. Debería setear todos los nodos con ofNoOne o algo así, ya que todos los nodos no pueden pertenecer a nadie.
-checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !, 
-                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 
+checkNeighbors(_Node, [], Visited, _Team, Visited) :- !.
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- member(Head, Visited), !,
+                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- checkOwner(Head, Team),
+                                                                  Team \=none, !,
+                                                                  checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
+checkNeighbors(_Node, [Head|_Tail], _Visited, Team, _ReachedNodes) :- atom(Team), % me aseguro que venga instanciado
+                                                                      checkOwner(Head, OtherTeam),
+                                                                      OtherTeam \= none,
+                                                                      Team \= OtherTeam, !,
+                                                                      fail. %acá va a variar. Debería setear todos los nodos con ofNoOne o algo así, ya que todos los nodos no pueden pertenecer a nadie.
 checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :- depthfirst(Head, [Head|Visited], Team, ReachedNodes1),
                                                                   checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
-                                                                  append(ReachedNodes1, ReachedNodes2, ReachedNodes).
+                                                                  union(ReachedNodes1, ReachedNodes2, ReachedNodes).
 
 
 cleanColors :- listOfNodes(ListOfNodes),
