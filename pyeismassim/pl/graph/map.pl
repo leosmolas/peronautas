@@ -1,4 +1,4 @@
-:-['edges.pl', 'nodes.pl', 'agents.pl'].
+:-['pl/graph/edges.pl', 'pl/graph/nodes.pl', 'pl/graph/agents.pl'].
 :- dynamic neighborOwner/2.
 
 % paths(+Start, +Finish, -Path)

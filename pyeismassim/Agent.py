@@ -82,8 +82,7 @@ class PrologAgent(Agent):
         # actualizamos cada uno de los campos individuales del agente
         for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']:
             # cambiamos retract por retractall porque hay problemas al principio
-            prologConnection.query("retractall(%s(_))" % x).next() 
-            prologConnection.query("assert(%s(%s))" % (x, msg[x])).next()
+            prologConnection.query("replace_%s(%s)" % (x, msg[x])).next()
         print "@Agent: Mi posicion es %s" % msg['position']
         vert = "["
         # actualizamos el estado del mapa con los nodos
@@ -116,6 +115,7 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         prolog = Prolog()
         prolog.consult(prolog_source)
+        prolog.query('asserta(my_name(' + USER + '))').next()
 
         quit = False
         step = 0

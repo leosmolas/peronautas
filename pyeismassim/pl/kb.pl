@@ -1,4 +1,4 @@
-:- dynamic kposition/1,
+:- dynamic kposition/2,
            energy/1,
            last_action/1,
            last_action_result/1,
@@ -8,24 +8,53 @@
            intention/1,
            max_health/1,
            plan/1,
-           max_energy/1.
+           max_energy/1,
+           my_name/1.
 
+:- ['pl/graph/map.pl'].
 % Beliefs
 last_action(a).
 action(skip).
 kposition(pete).
+hposition(pete).
+
+replace_position(X) :-
+    my_name(A),
+    retractall(hposition(A, _)),
+    retractall(kposition(A, _)),
+    assertz(hposition(A, X)),
+    assertz(kposition(A, X)).
+
+replace_energy(X) :- 
+    retractall(energy(_)),
+    assertz(energy(X)).
+replace_last_action(X) :- 
+    retractall(last_action(_)),
+    assertz(last_action(X)).
+replace_last_action_result(X) :- 
+    retractall(last_action_result(_)),
+    assertz(last_action_result(X)).
+replace_money(X) :- 
+    retractall(money(_)), 
+    assertz(money(X)).
+replace_max_health(X) :- 
+    retractall(max_health(_)),
+    assertz(max_health(X)).
+replace_max_energy(X) :- 
+    retractall(max_energy(_)),
+    assertz(max_energy(X)).
 
 insertEdge(Node1, Node2, Cost) :-
-    assertz(kedge(Node1, Node2, Cost),
-    assertz(kedge(Node2, Node1, Cost),
-    assertz(hedge(Node1, Node2, Cost),
-    assertz(hedge(Node2, Node1, Cost).
+    assertz(kedge(Node1, Node2, Cost)),
+    assertz(kedge(Node2, Node1, Cost)),
+    assertz(hedge(Node1, Node2, Cost)),
+    assertz(hedge(Node2, Node1, Cost)).
 
 deleteEdge(Node1, Node2, Cost) :-
-    retract(kedge(Node1, Node2, Cost),
-    retract(kedge(Node2, Node1, Cost),
-    retract(hedge(Node1, Node2, Cost),
-    retract(hedge(Node2, Node1, Cost).
+    retract(kedge(Node1, Node2, Cost)),
+    retract(kedge(Node2, Node1, Cost)),
+    retract(hedge(Node1, Node2, Cost)),
+    retract(hedge(Node2, Node1, Cost)).
 
 %lista vacia
 updateEdges([]).
@@ -125,8 +154,9 @@ planning :-
     retract( plan(_)          ),
     assert(  plan([recharge]) ).
 
-searchNeigh(N) :- 
-    kposition(Pos),
+searchNeigh(N) :-
+    my_name(A),
+    kposition(A, Pos),
     kedge(Pos, N, _).
 
 % Ejecutar.
