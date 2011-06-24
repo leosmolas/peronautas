@@ -89,8 +89,8 @@ Recibido pedido anterior (X,P):
         - Calculo dónde se tiene que mover (Y) el siguiente adyacente.
         - Llamo con pedido de movilización de la frontera con (Y,P).
         
-Aumento de zona: (estoy afuera de la zona, y si voy a un nodo a distancia máx 2 de la frontera, la aumento)
-    - Estoy afuera de la zona.
+Aumento de zona: (si voy a un nodo a distancia máx 2 de la frontera, la aumento)
+    
     - Consigo los nodos que estén afuera de la zona, a distancia máxima 2 de los robots que estén en la frontera.
     - Para cada nodo X de esos:
         - Genero una instancia nueva de aumento de zona.

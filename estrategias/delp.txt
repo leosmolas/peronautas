@@ -1,0 +1,22 @@
+expand(X) -< estoyEnLaFrontera,
+			 aumentoFrontera(X),
+			 esSeguro(X).
+
+estoyEnLaFrontera <- prolog.
+
+aumentoFrontera -< aumentó la distancia con mis dos vecinos (y no excede distancia 2)
+
+esSeguro(X) -< ¬haySaboteadorEnemigo(X).
+
+explorar(X) -< ¬probeado(X),
+               ~estáLejos(X),
+               estáCercaDeLaZona(X).
+               hayArcosNoSurveyados(X).
+
+probeado(X) <- prolog
+
+estáLejos(X) -< 
+
+
+               
+			   
