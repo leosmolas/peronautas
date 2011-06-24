@@ -1,10 +1,10 @@
-:- dynamic position/1,
+:- dynamic kposition/1,
            energy/1,
            last_action/1,
            last_action_result/1,
            money/1,
-           node/3,
-           edge/3,
+           knode/3,
+           kedge/3,
            intention/1,
            max_health/1,
            plan/1,
@@ -13,52 +13,67 @@
 % Beliefs
 last_action(a).
 action(skip).
-position(pete).
+kposition(pete).
+
+insertEdge(Node1, Node2, Cost) :-
+    assertz(kedge(Node1, Node2, Cost),
+    assertz(kedge(Node2, Node1, Cost),
+    assertz(hedge(Node1, Node2, Cost),
+    assertz(hedge(Node2, Node1, Cost).
+
+deleteEdge(Node1, Node2, Cost) :-
+    retract(kedge(Node1, Node2, Cost),
+    retract(kedge(Node2, Node1, Cost),
+    retract(hedge(Node1, Node2, Cost),
+    retract(hedge(Node2, Node1, Cost).
 
 %lista vacia
 updateEdges([]).
 % si el arco ya estaba en la kb (con costo unknown o el real)
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, Cost),
-    edge(Node1, Node2, Cost), !,
+    X = kedge(Node1, Node2, Cost),
+    kedge(Node1, Node2, Cost), !,
     updateEdges(Xs).
 % si ya estaba en la kb con su costo final
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, unknown),
-    edge(Node1, Node2, Cost),
+    X = kedge(Node1, Node2, unknown),
+    kedge(Node1, Node2, Cost),
     Cost \= unknown, !,
     updateEdges(Xs).
 %si conociamos el arco pero no su valor
 % (es decir, cuando hacemos un survey del arco)
 % en este caso podriamos preguntar si Cost \= unknown.
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, Cost),
-    edge(Node1, Node2, unknown), !,
-    retract(edge(Node1, Node2, unknown)),
-    assertz(X),
+    X = kedge(Node1, Node2, Cost),
+    kedge(Node1, Node2, unknown), !,
+    deleteEdge(Node1, Node2, unknown),
+    insertEdge(Node1, Node2, Cost),
     updateEdges(Xs).  
 % si es la primera vez que vemos el arco
 updateEdges([X|Xs]) :- 
-    assertz(X),
+    X = kedge(Node1, Node2, Cost),
+    insertEdge(Node1, Node2, Cost),
     updateEdges(Xs).
 
-updateValue(node(Name, Value, Team), Value) :-
-    node(Name, unknown, _), !.
-updateValue(node(Name, unknown, Team), NewValue) :-
-    node(Name, NewValue, _).
+updateValue(knode(Name, Value, Team), Value) :-
+    knode(Name, unknown, _), !.
+updateValue(knode(Name, unknown, Team), NewValue) :-
+    knode(Name, NewValue, _).
 
 % Formato de los nodos:
-% node(Name, Team, Value)
+% knode(Name, Team, Value)
 % Value es unknown si no sabemos cuanto vale el nodo
 updateNodes([]).
 % cuando no conocemos el valor de un nodo, simplemente
 % actualizamos su owner
 updateNodes([X|Xs]) :-
-    X = node(Name, Value, CurrentTeam),
-    node(Name, OldValue, OldTeam), !,
+    X = knode(Name, Value, CurrentTeam),
+    knode(Name, OldValue, OldTeam), !,
     updateValue(X, NewValue),
-    retract(node(Name, _, _)),
-    assertz(node(Name, NewValue, CurrentTeam)),
+    retract(knode(Name, _, _)),
+    retract(hnode(Name, _, _)),
+    assertz(knode(Name, NewValue, CurrentTeam)),
+    assertz(hnode(Name, NewValue, CurrentTeam)),
     updateNodes(Xs).
 updateNodes([X|Xs]) :-
     assertz(X),
@@ -111,11 +126,8 @@ planning :-
     assert(  plan([recharge]) ).
 
 searchNeigh(N) :- 
-    position(Pos),
-    edge(Pos, N, _), !.
-searchNeigh(N) :- 
-    position(Pos),
-    edge(N, Pos, _).
+    kposition(Pos),
+    kedge(Pos, N, _).
 
 % Ejecutar.
 

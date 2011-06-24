@@ -7,22 +7,22 @@ paths(Start, Finish, Path) :- path(Start, Finish, [Start], Path).
 
 % path(+Start, +Finish, +Visited, +Path).
 path(Finish, Finish, _, [Finish]).
-path(Start, Finish, Visited, [Start|Path]) :- edge(Start, Next, _), not(member(Next,Visited)), path(Next, Finish, [Next|Visited], Path).
+path(Start, Finish, Visited, [Start|Path]) :- hedge(Start, Next, _), not(member(Next,Visited)), path(Next, Finish, [Next|Visited], Path).
 
 
 % neighbors(+Node, -Neighbors)
 % returns in Neighbors a list of neighbors of node Node.
-neighbors(Node, Neighbors) :- findall(Neigh, edge(Node,Neigh,_), Neighbors).
+neighbors(Node, Neighbors) :- findall(Neigh, hedge(Node,Neigh,_), Neighbors).
 
 
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
-agentsInNode(Node, Agents) :- findall(Agent, position(Agent, Node), Agents).
+agentsInNode(Node, Agents) :- findall(Agent, hposition(Agent, Node), Agents).
 
 
 % teamsInNode(+Node, -Teams)
 % returns in Teams a list of Teams which are present in a Node.
-teamsInNode(Node, Teams) :- findall(Team, (position(Agent, Node), teamOfAgent(Agent, Team)), Teams).
+teamsInNode(Node, Teams) :- findall(Team, (hposition(Agent, Node), teamOfAgent(Agent, Team)), Teams).
 
 % doNotFail(X) :- call(X), !.
 % doNotFail(_).              ._.
@@ -32,9 +32,9 @@ teamsInNode(Node, Teams) :- findall(Team, (position(Agent, Node), teamOfAgent(Ag
 teamsInNeighbors([], TeamsNeighborsCount) :- !, findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
                                              retractall(neighborOwner(_,_)).
 
-teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor,_,Owner),
                                                                  Owner \= none,
-                                                                 position(Agent,Neighbor),
+                                                                 hposition(Agent,Neighbor),
                                                                  teamOfAgent(Agent, Owner),
                                                                  neighborOwner(Owner,Count), !,
                                                                  retract(neighborOwner(Owner,Count)),
@@ -42,9 +42,9 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_
                                                                  assert(neighborOwner(Owner,Count2)),
                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
-teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- node(Neighbor,_,Owner),
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor,_,Owner),
                                                                  Owner \= none,
-                                                                 position(Agent,Neighbor),
+                                                                 hposition(Agent,Neighbor),
                                                                  teamOfAgent(Agent, Owner), !,
                                                                  assert(neighborOwner(Owner,1)),
                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).

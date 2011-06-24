@@ -1,4 +1,4 @@
-:- dynamic position/2.
+:- dynamic hposition/2.
 :- dynamic energy/2.
 
 
@@ -9,18 +9,18 @@
 
 % moveAgent(+Agent, +Node).
 % Moves the agent from his current position to Node.
-moveAgent(Agent, Node) :- node(Node, _, _), retract(position(Agent, _OldNode)), assertz(position(Agent, Node)), !.
+moveAgent(Agent, Node) :- hnode(Node, _, _), retract(hposition(Agent, _OldNode)), assertz(hposition(Agent, Node)), !.
 
 
 % travel(+Agent, +Node).
 % Moves the agent from ActualNode to Node.  There must be and edge between these two nodes and the agent must have the necessary energy to travel.
 travel(Agent, Node) :-  energy(Agent, Energy),                        
-                        position(Agent, ActualNode),
-                        edge(ActualNode, Node, Cost),
+                        hposition(Agent, ActualNode),
+                        hedge(ActualNode, Node, Cost),
                         NewEnergy is Energy - Cost, 
                         NewEnergy >= 0,
-                        retract(position(Agent, ActualNode)), 
-                        assertz(position(Agent, Node)), 
+                        retract(hposition(Agent, ActualNode)), 
+                        assertz(hposition(Agent, Node)), 
                         setEnergy(Agent, NewEnergy), !.
 
 
@@ -62,16 +62,16 @@ teamOfAgent(moyano, cacoteam).
 teamOfAgent(castels, cacoteam).
 
 
-% position(?Agent, ?Node).
-% position(peron,a).
-% position(evita,a).
-% position(menem,g).
-% position(cafiero,b).
+% hposition(?Agent, ?Node).
+% hposition(peron,a).
+% hposition(evita,a).
+% hposition(menem,g).
+% hposition(cafiero,b).
 % 
-% position(iorio,h).
-% position(delia,f).
-% position(castels,b).
-% position(moyano,b).
+% hposition(iorio,h).
+% hposition(delia,f).
+% hposition(castels,b).
+% hposition(moyano,b).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT
@@ -98,13 +98,13 @@ teamOfAgent(castels, cacoteam).
 % Team = cacoteam.
 
 % 
-position(peron,a).
-position(evita,e).
-position(menem,g).
-position(cafiero,d).
+hposition(peron,a).
+hposition(evita,e).
+hposition(menem,g).
+hposition(cafiero,d).
 
-position(iorio,h).
-position(delia,f).
+hposition(iorio,h).
+hposition(delia,f).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT
@@ -130,15 +130,15 @@ position(delia,f).
 % Node = b,
 % Team = peronismo.
 
-% position(peron,a).
-% position(evita,a).
-% position(menem,g).
-% position(cafiero,b).
+% hposition(peron,a).
+% hposition(evita,a).
+% hposition(menem,g).
+% hposition(cafiero,b).
 % 
-% position(iorio,h).
-% position(delia,f).
-% position(castels,b).
-% position(moyano,b).
+% hposition(iorio,h).
+% hposition(delia,f).
+% hposition(castels,b).
+% hposition(moyano,b).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT
