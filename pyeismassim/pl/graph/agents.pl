@@ -98,13 +98,13 @@ teamOfAgent(castels, cacoteam).
 % Team = cacoteam.
 
 % 
-hposition(peron,a).
-hposition(evita,e).
-hposition(menem,g).
-hposition(cafiero,d).
+%hposition(peron,a).
+%hposition(evita,e).
+%hposition(menem,g).
+%hposition(cafiero,d).
 
-hposition(iorio,h).
-hposition(delia,f).
+%hposition(iorio,h).
+%hposition(delia,f).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT

@@ -2,6 +2,7 @@
 
 # TODO:
 # - fix behaviour in case the server dies unexpectedly on the agent, make sure he cleans up and dies gracefully.
+# - i would bet my life that this comment was made by Iñakor... just because of............this ^
 
 import sys
 import time
@@ -95,8 +96,10 @@ class PrologAgent(Agent):
         vert = "["
         # actualizamos el estado del mapa con los arcos
         for x in msg['vis_edges']:
-            vert += "edge(%s,%s,unknown)," % (x['node1'],x['node2'])
+            vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
         vert2 = vert[:-1]+"]"
+        print "@PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
+        
         list(prologConnection.query("updateEdges(%s)" % vert2 ))
         
     def perceive_act_loop(self, prolog_source):

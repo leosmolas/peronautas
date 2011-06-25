@@ -84,9 +84,9 @@ updateEdges([X|Xs]) :-
     insertEdge(Node1, Node2, Cost),
     updateEdges(Xs).
 
-updateValue(knode(Name, Value, Team), Value) :-
+updateValue(knode(Name, Value, _Team), Value) :-
     knode(Name, unknown, _), !.
-updateValue(knode(Name, unknown, Team), NewValue) :-
+updateValue(knode(Name, unknown, _Team), NewValue) :-
     knode(Name, NewValue, _).
 
 % Formato de los nodos:
@@ -96,8 +96,8 @@ updateNodes([]).
 % cuando no conocemos el valor de un nodo, simplemente
 % actualizamos su owner
 updateNodes([X|Xs]) :-
-    X = knode(Name, Value, CurrentTeam),
-    knode(Name, OldValue, OldTeam), !,
+    X = knode(Name, _Value, CurrentTeam),
+    knode(Name, _OldValue, _OldTeam), !,
     updateValue(X, NewValue),
     retract(knode(Name, _, _)),
     retract(hnode(Name, _, _)),
