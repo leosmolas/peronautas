@@ -15,8 +15,18 @@
 % Beliefs
 last_action(a).
 action(skip).
-kposition(pete).
-hposition(pete).
+kposition(pete, etep).
+hposition(pete, etep).
+my_name(jesucristo).
+
+replace_myName(X) :- 
+   retractall(my_name(OldName)),
+   retractall(hposition(OldName, Op1)),
+   retractall(kposition(OldName, Op2)),
+   assertz(hposition(X, Op1)),
+   assertz(kposition(X, Op2)).
+   assertz(my_name(X)).
+
 
 replace_position(X) :-
     my_name(A),
@@ -28,18 +38,23 @@ replace_position(X) :-
 replace_energy(X) :- 
     retractall(energy(_)),
     assertz(energy(X)).
+
 replace_last_action(X) :- 
     retractall(last_action(_)),
     assertz(last_action(X)).
+
 replace_last_action_result(X) :- 
     retractall(last_action_result(_)),
     assertz(last_action_result(X)).
+
 replace_money(X) :- 
     retractall(money(_)), 
     assertz(money(X)).
+
 replace_max_health(X) :- 
     retractall(max_health(_)),
     assertz(max_health(X)).
+
 replace_max_energy(X) :- 
     retractall(max_energy(_)),
     assertz(max_energy(X)).
@@ -77,7 +92,7 @@ updateEdges([X|Xs]) :-
     kedge(Node1, Node2, unknown), !,
     deleteEdge(Node1, Node2, unknown),
     insertEdge(Node1, Node2, Cost),
-    updateEdges(Xs).  
+    updateEdges(Xs).
 % si es la primera vez que vemos el arco
 updateEdges([X|Xs]) :- 
     X = kedge(Node1, Node2, Cost),

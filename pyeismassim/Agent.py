@@ -24,7 +24,7 @@ class Agent():
     def connect(self):
         # Connect and authenticate.
         self.connection = MASSimConnection()
-        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)
+        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)       
 
     def disconnect(self):
         self.log.close()
@@ -81,16 +81,17 @@ class PrologAgent(Agent):
 
     def processPerception(self, msg, prologConnection):
         # actualizamos cada uno de los campos individuales del agente
-        for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']:
+        for x in ['energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']:
             # cambiamos retract por retractall porque hay problemas al principio
             prologConnection.query("replace_%s(%s)" % (x, msg[x])).next()
-        print "@Agent: Mi posicion es %s" % msg['position']
+        print "@Agent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg['position'],msg['position'])
+        prologConnection.query("replace_position(%s)" % msg['position'])
         vert = "["
         # actualizamos el estado del mapa con los nodos
         for x in msg['vis_verts']:
             vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
-        print "@PrologAgent: Llamando!\nupdateNodes(%s)" % vert2
+        print "@PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
         
         prologConnection.query("updateNodes(%s)" % vert2 ).next()
         vert = "["
@@ -118,7 +119,8 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         prolog = Prolog()
         prolog.consult(prolog_source)
-        prolog.query('asserta(my_name(' + USER + '))').next()
+        print "Llamando!\nreplace_myName(" + USER + ")"
+        prolog.query('replace_myName(' + USER + ')').next()
 
         quit = False
         step = 0
