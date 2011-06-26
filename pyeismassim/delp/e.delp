@@ -1,0 +1,11 @@
+fly(X) -< bird(X).
+bird(X) <- chicken(X).
+bird(X) <- penguin(X).
+~fly(X) <- penguin(X).
+~fly(X) -< chicken(X).
+fly(X) -< chicken(X), scared(X).
+
+chicken(coco) <- true.
+scared(coco) <- true.
+penguin(chilly) <- true.
+
