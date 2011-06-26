@@ -75,7 +75,7 @@ PREGUNTAS:
     pregunta: que suposiciones se pueden hacer sobre composicion de equipo?
     pregunta: que pasa si el valor de auxtimeout es distinto para distintos equipos o distintos miembros de un equipo?
 
------------------------------------------------------------------------------------
+
     
 Situación de los branchs en este momento:
 
@@ -99,4 +99,4 @@ dev-agents:
     
 dev-estrategias:
     Branch con estrategias, o documentación. Nada de código.
->>>>>>> master
+
