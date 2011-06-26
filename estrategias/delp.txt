@@ -1,6 +1,8 @@
-expand(X) -< estoyEnLaFrontera,
-			 aumentoFrontera(X),
-			 esSeguro(X).
+@deseo
+#X instanciado con todos los vecinos que no pertenecen a la zona.
+expansión(X) -< estoyEnLaFrontera,
+                aumentoFrontera(X),
+                esSeguro(X).
 
 estoyEnLaFrontera <- prolog.
 
@@ -8,15 +10,33 @@ aumentoFrontera -< aumentó la distancia con mis dos vecinos (y no excede distan
 
 esSeguro(X) -< ¬haySaboteadorEnemigo(X).
 
+@deseo
+#X instanciado con casi todos los nodos :P
 explorar(X) -< ¬probeado(X),
                ~estáLejos(X),
                estáCercaDeLaZona(X).
-               hayArcosNoSurveyados(X).
+               ¬explorado(X).
+               
+explorado(X) <- rangoDeVision = R, 
+                nodoÚltimaPercepción = N,
+                distancia(N) = D, 
+                D < R.
 
 probeado(X) <- prolog
 
-estáLejos(X) -< 
+estáLejos(X,Cota) -< D = distancia(X), D > Cota.
 
+~estáLejos(X,Cota) -< D = distancia(X).
 
+estáCercaDeLaZona(X) -< distancia(X).
+
+~estáCercaDeLaZona(X) -< distancia(X) = D, D <=2.
+
+@deseo
+#X instanciado con todos los nodos a distancia máxima 2 de la zona
+aumento(X) -< ~estáLejos(X, 10), 
+              ¬estoyEnLaFrontera,
+              elPuntajeAumenta(X),
+              esSeguro(X).
                
 			   
