@@ -8,7 +8,7 @@ estoyEnLaFrontera <- prolog.
 
 aumentoFrontera -< aumentó la distancia con mis dos vecinos (y no excede distancia 2)
 
-esSeguro(X) -< ¬haySaboteadorEnemigo(X).
+esSeguro(X) <- ¬haySaboteadorEnemigo(X).
 
 @deseo
 #X instanciado con casi todos los nodos :P
