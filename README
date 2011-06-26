@@ -56,6 +56,7 @@ dev-graph-coloring:
     
     graph-optimization:
         Topic branch del anterior. 
+        Este branch ya dejó de tener sentido...
         
 dev-agents:
     Aquí se encuentra la implementación del servidor central de percepciones, por Aki. A su vez, se encuentra la versión del agente más actualizada (y funcional).
