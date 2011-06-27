@@ -1,99 +1,132 @@
-:- dynamic position/1,
+:- dynamic kposition/2,
            energy/1,
            last_action/1,
            last_action_result/1,
            money/1,
-           node/3,
-           edge/3,
+           knode/3,
+           kedge/3,
            intention/1,
            max_health/1,
            plan/1,
-           max_energy/1.
-<<<<<<< HEAD
+           max_energy/1,
+           my_name/1.
 
-% Percept terms
-% timestamp(T)
-% deadline(D)
-% id(ID)
-% step(S)
-% energy(E)
-% health(H)
-% last_action(LA)
-% last_action_result(LAR)
-% max_energy(ME)
-% max_energy_disabled(MED)
-% max_health(MH)
-% position(P)
-% strength(STR)
-% vis_range(VR)
-% zone_score(ZS)
-% last_step_score(LSS)
-% money(M)
-% score(SCR)
-% achievements(ACH)
-% vis_vert(Name, Team)
-% vis_edge(Node1, Node2)
-% vis_ent(Name, Node, Team)
-% probed_vert(Name, Value)
-% surveyed_edge(Node1, Node2, Weight)
-% inspected_ent(Energy, Health, Max_energy, Max_health, Name, Node, Role, Strength, Team, Vis_range)
-=======
->>>>>>> d3e9e8d75472873fff8de56a996baa879ccd981b
-
+:- ['pl/graph/map.pl'].
 % Beliefs
 last_action(skip).
 action(skip).
+<<<<<<< HEAD
 <<<<<<< HEAD
 position(unknown).
 verts([]).
 edges([]). % Lista de functores de la forma edge(vert1, vert2).
 =======
 position(pete).
+=======
+kposition(pete, etep).
+hposition(pete, etep).
+my_name(jesucristo).
+
+replace_myName(X) :- 
+   retractall(my_name(OldName)),
+   retractall(hposition(OldName, Op1)),
+   retractall(kposition(OldName, Op2)),
+   assertz(hposition(X, Op1)),
+   assertz(kposition(X, Op2)).
+   assertz(my_name(X)).
+
+
+replace_position(X) :-
+    my_name(A),
+    retractall(hposition(A, _)),
+    retractall(kposition(A, _)),
+    assertz(hposition(A, X)),
+    assertz(kposition(A, X)).
+
+replace_energy(X) :- 
+    retractall(energy(_)),
+    assertz(energy(X)).
+
+replace_last_action(X) :- 
+    retractall(last_action(_)),
+    assertz(last_action(X)).
+
+replace_last_action_result(X) :- 
+    retractall(last_action_result(_)),
+    assertz(last_action_result(X)).
+
+replace_money(X) :- 
+    retractall(money(_)), 
+    assertz(money(X)).
+
+replace_max_health(X) :- 
+    retractall(max_health(_)),
+    assertz(max_health(X)).
+
+replace_max_energy(X) :- 
+    retractall(max_energy(_)),
+    assertz(max_energy(X)).
+
+insertEdge(Node1, Node2, Cost) :-
+    assertz(kedge(Node1, Node2, Cost)),
+    assertz(kedge(Node2, Node1, Cost)),
+    assertz(hedge(Node1, Node2, Cost)),
+    assertz(hedge(Node2, Node1, Cost)).
+
+deleteEdge(Node1, Node2, Cost) :-
+    retract(kedge(Node1, Node2, Cost)),
+    retract(kedge(Node2, Node1, Cost)),
+    retract(hedge(Node1, Node2, Cost)),
+    retract(hedge(Node2, Node1, Cost)).
+>>>>>>> 8f3a9ecadd7c71489ba92e7bc5c26d7281afeb7e
 
 %lista vacia
 updateEdges([]).
 % si el arco ya estaba en la kb (con costo unknown o el real)
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, Cost),
-    edge(Node1, Node2, Cost), !,
+    X = kedge(Node1, Node2, Cost),
+    kedge(Node1, Node2, Cost), !,
     updateEdges(Xs).
 % si ya estaba en la kb con su costo final
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, unknown),
-    edge(Node1, Node2, Cost),
+    X = kedge(Node1, Node2, unknown),
+    kedge(Node1, Node2, Cost),
     Cost \= unknown, !,
     updateEdges(Xs).
 %si conociamos el arco pero no su valor
 % (es decir, cuando hacemos un survey del arco)
 % en este caso podriamos preguntar si Cost \= unknown.
 updateEdges([X|Xs]) :-
-    X = edge(Node1, Node2, Cost),
-    edge(Node1, Node2, unknown), !,
-    retract(edge(Node1, Node2, unknown)),
-    assertz(X),
-    updateEdges(Xs).  
+    X = kedge(Node1, Node2, Cost),
+    kedge(Node1, Node2, unknown), !,
+    deleteEdge(Node1, Node2, unknown),
+    insertEdge(Node1, Node2, Cost),
+    updateEdges(Xs).
 % si es la primera vez que vemos el arco
 updateEdges([X|Xs]) :- 
-    assertz(X),
+    X = kedge(Node1, Node2, Cost),
+    insertEdge(Node1, Node2, Cost),
     updateEdges(Xs).
 
-updateValue(node(Name, Value, Team), Value) :-
-    node(Name, unknown, _), !.
-updateValue(node(Name, unknown, Team), NewValue) :-
-    node(Name, NewValue, _).
+updateValue(knode(Name, Value, _Team), Value) :-
+    knode(Name, unknown, _), !.
+updateValue(knode(Name, unknown, _Team), NewValue) :-
+    knode(Name, NewValue, _).
 
 % Formato de los nodos:
-% node(Name, Team, Value)
+% knode(Name, Team, Value)
 % Value es unknown si no sabemos cuanto vale el nodo
 updateNodes([]).
 % cuando no conocemos el valor de un nodo, simplemente
 % actualizamos su owner
 updateNodes([X|Xs]) :-
-    X = node(Name, Value, CurrentTeam),
-    node(Name, OldValue, OldTeam), !,
+    X = knode(Name, _Value, CurrentTeam),
+    knode(Name, _OldValue, _OldTeam), !,
     updateValue(X, NewValue),
-    retract(node(Name, _, _)),
-    assertz(node(Name, NewValue, CurrentTeam)),
+    retract(knode(Name, _, _)),
+    retract(hnode(Name, _, _)),
+    assertz(knode(Name, NewValue, CurrentTeam)),
+    assertz(hnode(Name, NewValue, CurrentTeam)),
     updateNodes(Xs).
 updateNodes([X|Xs]) :-
     assertz(X),
@@ -152,12 +185,10 @@ planning :-
     retract( plan(_)          ),
     assert(  plan([recharge]) ).
 
-searchNeigh(N) :- 
-    position(Pos),
-    edge(Pos, N, _), !.
-searchNeigh(N) :- 
-    position(Pos),
-    edge(N, Pos, _).
+searchNeigh(N) :-
+    my_name(A),
+    kposition(A, Pos),
+    kedge(Pos, N, _).
 
 % Ejecutar.
 

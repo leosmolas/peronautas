@@ -2,6 +2,7 @@
 
 # TODO:
 # - fix behaviour in case the server dies unexpectedly on the agent, make sure he cleans up and dies gracefully.
+# - i would bet my life that this comment was made by Iñakor... just because of............this ^
 
 import sys
 import time
@@ -23,7 +24,7 @@ class Agent():
     def connect(self):
         # Connect and authenticate.
         self.connection = MASSimConnection()
-        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)
+        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)       
 
     def disconnect(self):
         self.log.close()
@@ -85,56 +86,89 @@ class DummyAgent(Agent):
 
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, prolog_source):
-        super(PrologAgent, self).__init__(USER, PASS)
-        # Creo una conexion con SWI.
-        self.prolog = Prolog()
-        self.prolog.consult(prolog_source)
-
-    def process_perception(self, dict_msg, p):
-        # Actualiza la posicion, energia, ultima accion, resultado de la ultima accion, el dinero, la salud maxima y la enegria maxima.
-        for x in ['position', 'energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']: 
-            p.query("retract(%s(_))" % x).next()
-            p.query("assert(%s(%s))" % (x, dict_msg[x])).next()
-
-        # Actualiza la lista de vertices, almacenados en el predicado dinamico verts/1.
-        aux = []
-        for x in dict_msg['vis_verts']:
-            aux.append(x['name'])
+    def processPerception(self, msg, prologConnection):
+        # actualizamos cada uno de los campos individuales del agente
+        for x in ['energy', 'last_action', 'last_action_result', 'money', 'max_health', 'max_energy']:
+            # cambiamos retract por retractall porque hay problemas al principio
+            prologConnection.query("replace_%s(%s)" % (x, msg[x])).next()
+        print "@Agent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg['position'],msg['position'])
+        prologConnection.query("replace_position(%s)" % msg['position'])
         vert = "["
         # actualizamos el estado del mapa con los nodos
         for x in msg['vis_verts']:
             vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
-        p.query("actualizarListas(%s, verts)" % vert2 ).next()
-
-        # Actualiza la lista de arcos, almacenada en el predicado dinamico edges/1.
-        aux = []
-        for x in dict_msg['vis_edges']:
-            aux.append((x['node1'], x['node2']))
-        vert = "["
-        for x in aux:
-            vert += "edge(%s,%s)," % (x[0], x[1])
-        vert2 = vert[:-1] + "]"
-        p.query("actualizarListas(%s,edges)" % vert2 ).next()
+        print "@PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
         
-    def process_action_request(action_id, msg_dict):
-        print "@Agent: received request-action. id:", action_id
+        prologConnection.query("updateNodes(%s)" % vert2 ).next()
+        vert = "["
+        # actualizamos el estado del mapa con los arcos
+        for x in msg['vis_edges']:
+            vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
+        vert2 = vert[:-1]+"]"
+        print "@PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
+        
+        list(prologConnection.query("updateEdges(%s)" % vert2 ))
+        
+    def perceive_act_loop(self, prolog_source):
 
-        # Process perception.
-        self.process_perception(msg_dict, self.prolog)
-        t1 = self.prolog.query("verts(X)").next()["X"]
-        t2 = self.prolog.query("edges(X)").next()["X"]
-        print "t1:", t1, "t2:", t2
-        #prolog.query("searchNeigh(X)").next()["X"]
-        self.prolog.query("argumentation").next()
-        self.prolog.query("planning").next()
-        actionList = prolog.query("exec(X)").next()["X"]
-        if len(actionList) == 2:
-            action_xml = action(action_id, actionList[0], actionList[1])
-        else:
-            action_xml = action(action_id, actionList[0])
-        return action_xml
+        # Receive simulation start notification.
+        print "@Agent: Waiting for simulation start notification."
+        xml = self.connection.receive()
+        #self.log.write(xml)
+        _, _, msg = parse_as_dict(xml)
+
+        print "@Agent: received:"
+        print_dict_message(msg)
+
+        steps = int(msg['steps'])
+
+        # Creo una conexion con SWI.
+        prolog = Prolog()
+        prolog.consult(prolog_source)
+        print "Llamando!\nreplace_myName(" + USER + ")"
+        prolog.query('replace_myName(' + USER + ')').next()
+
+        quit = False
+        step = 0
+        while (not quit):
+            step += 1
+            print "Step:", step
+            xml = self.connection.receive()
+            #self.log.write(xml)
+            msg_type, action_id, msg = parse_as_dict(xml)
+
+            # DEGUG
+            _, _, list_msg = parse_as_list(xml)
+            print_list_message(list_msg)
+            self.log.write("PROLOG PERCEPT:\n")
+            for line in list_msg:
+                self.log.write('   ' + line + '\n')
+
+            time.sleep(1.5)
+            if (msg_type == 'request-action'):
+                print "@Agent: received request-action. id:", action_id
+
+                # Process perception.
+                self.processPerception(msg, prolog)
+                list(prolog.query("argumentation"))
+                list(prolog.query("planning"))
+                actionList = prolog.query("exec(X)").next()["X"]
+                if len(actionList) == 2:
+                    action_xml = action(action_id, actionList[0], actionList[1])
+                else:
+                    action_xml = action(action_id, actionList[0])
+                self.connection.send(action_xml)
+                self.log.write(action_xml)
+            elif (msg_type == 'bye'):
+                print "@Agent: received bye"
+                #quit = True
+            elif (msg_type == 'sim-end'):
+                print "@Agent: received sim-end"
+                #quit = True
+            else:
+                quit = True
+                print "@Agent: en area 51"
 
 if (__name__== "__main__"):
     if (len(sys.argv) == 3):
