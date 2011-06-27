@@ -1,0 +1,93 @@
+muleto -< true.
+
+~muleto -< expansion(_, _).
+
+~muleto -< explorar(_, _).
+
+%~muleto -< aumento(_, _).
+
+~expansion(_, Valor) <- explorar(_, ValorD),
+                        greater(ValorD, Valor).
+                        
+%~expansion(_, Valor) <- aumento(_, ValorD),
+%                        greater(ValorD, Valor).
+                        
+%~aumento(_, Valor) <- explorar(_, ValorD),
+%                      greater(ValorD, Valor).
+                      
+%~aumento(_, Valor) <- expansion(_, ValorD),
+%                      greater(ValorD, Valor).
+                      
+~explorar(_, Valor) <- expansion(_, ValorD),
+                       greater(ValorD, Valor).
+                       
+%~explorar(_, Valor) <- aumento(_, ValorD),
+%                       greater(ValorD, Valor).
+
+% DESIRE expansión(Nodo, Valor)
+expansion(X, Valor) -< posibleExpansion(X),
+                       estoyEnLaFrontera,
+                       esSeguro(X),
+                       aumentoFrontera(X, DifPuntos),
+                       consExpansion(Cons),
+                       mult(DifPuntos, Cons, Valor).
+
+                       
+% DESIRE explorar(Nodo, Valor)
+explorar(X, Valor) -< posibleExplorar(X),
+                      ~estaLejos(X, Dist, 10),
+                      ~explored(X),
+                      estaCercaDeLaZona(X, DistZona),
+                      Valor is DistZona * 10 + (10 - Dist) ** 2.
+                      
+estáCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
+                      
+not estáCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
+                               Dist < 3.
+
+~estaLejos(X, Dist, _) -< distancia(X, Dist).
+
+estaLejos(X, Dist, Cota) <- distancia(X, Dist),
+                            Dist > Cota.
+                            
+consExpansion(10). %ni idea que valor tendrá
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+% hechos asertados
+
+% posibleExplorar(Nodo)
+
+posibleExplorar(a).
+
+posibleExplorar(b).
+
+posibleExplorar(c).
+
+% aumentoFrontera(Nodo, Dif)
+
+aumentoFrontera(a, 5).
+
+aumentoFrontera(b, 3).
+
+aumentoFrontera(c, 8).
+
+% esSeguro(Node)
+
+esSeguro(a).
+
+esSeguro(c).
+
+% estoyEnLaFrontera
+
+estoyEnLaFrontera.
+
+% probed(Node)
+
+probed(a).
+
+% explored(Node)
+
+~explored(X) -< true.
+
+explored(a).
