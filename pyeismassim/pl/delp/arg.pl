@@ -1,4 +1,4 @@
-:- ['delp/delp.pl'].
+:- [delp].
 
 :- consult('arg.delp').
 

@@ -1,1 +1,1 @@
-:-[delp], consult('e.delp'), query(bueno(6,Z),W).
+:-[delp], consult('e.delp'), query(bueno(6,Z),W),tree.

@@ -9,6 +9,13 @@ muleto -< true.
 ~expansion(_, Value) <- explorar(_, ValueD),
                         greater(ValueD, Value).
                         
+expansion(X, Value) -< posibleExpansion(X),
+                       estoyEnLaFrontera,
+                       esSeguro(X),
+                       aumentoFrontera(X, DifPuntos),
+                       consExpansion(Cons),
+                       mult(DifPuntos, Cons, Value).
+                        
 %~expansion(_, Value) <- aumento(_, ValueD),
 %                        greater(ValueD, Value).
                         
@@ -26,12 +33,7 @@ muleto -< true.
 
 
 % DESIRE expansión(Nodo, Value)
-expansion(X, Value) -< posibleExpansion(X),
-                       estoyEnLaFrontera,
-                       esSeguro(X),
-                       aumentoFrontera(X, DifPuntos),
-                       consExpansion(Cons),
-                       mult(DifPuntos, Cons, Value).
+
 
                        
 % DESIRE explorar(Nodo, Value)
@@ -55,7 +57,7 @@ explorar(X, Value) -< posibleExplorar(X),
 estaLejos(X, Dist, Cota) <- distancia(X, Dist),
                             greater(Dist, Cota).
                             
-consExpansion(10). %ni idea que Value tendrá
+consExpansion(10) <- true. %ni idea que Value tendrá
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,58 +65,58 @@ consExpansion(10). %ni idea que Value tendrá
 
 % posibleExplorar(Nodo)
 
-posibleExplorar(a).
+posibleExplorar(a) <- true.
 
-posibleExplorar(b).
+posibleExplorar(b) <- true.
 
-posibleExplorar(c).
+posibleExplorar(c) <- true.
 
 % posibleExpansion(Nodo)
 
-posibleExpansion(b).
+posibleExpansion(b) <- true.
 
-posibleExpansion(d).
+posibleExpansion(d) <- true.
 
 % aumentoFrontera(Nodo, Dif)
 
-aumentoFrontera(a, 5).
+aumentoFrontera(a, 5) <- true.
 
-aumentoFrontera(b, 3).
+aumentoFrontera(b, 3) <- true.
 
-aumentoFrontera(c, 8).
+aumentoFrontera(c, 8) <- true.
 
 % esSeguro(Node)
 
-esSeguro(a).
+esSeguro(a) <- true.
 
-esSeguro(c).
+esSeguro(c) <- true.
 
 % estoyEnLaFrontera
 
-estoyEnLaFrontera.
+estoyEnLaFrontera <- true.
 
 % probed(Node)
 
-probed(a).
+probed(a) <- true.
 
 % explored(Node)
 
 ~explored(_) -< true.
 
-explored(a).
+explored(a) <- true.
 
 % estaCercaDeLaZona(Node, Distance)
 
-estaCercaDeLaZona(a, 1).
+estaCercaDeLaZona(a, 1) <- true.
 
-estaCercaDeLaZona(b, 1).
+estaCercaDeLaZona(b, 1) <- true.
 
-estaCercaDeLaZona(c, 2).
+estaCercaDeLaZona(c, 2) <- true.
 
 % distancia(Node, Dist)
 
-distancia(a, 2).
+distancia(a, 2) <- true.
 
-distancia(b, 3).
+distancia(b, 3) <- true.
 
-distancia(a, 5).
+distancia(a, 5) <- true.
