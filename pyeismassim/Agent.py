@@ -32,12 +32,12 @@ class Agent():
         self.log.close()
         self.connection.disconnect()
 
-    def process_action_request(action_id, msg_dict):
+    def processActionRequest(action_id, msg_dict):
         print "@Agent: received request-action. id:", action_id
         action_xml = action(action_id, "skip")
         return action_xml
 
-    def perceive_act_loop(self):
+    def perceiveActLoop(self):
 
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
@@ -63,7 +63,7 @@ class Agent():
 
             time.sleep(1.5)
             if (msg_type == 'request-action'):
-                action_xml = process_action_request(msg_dict)
+                action_xml = processActionRequest(msg_dict)
                 self.connection.send(action_id, action_xml)
                 self.log.write(action_xml)
             elif (msg_type == 'bye'):
@@ -109,13 +109,13 @@ class PrologAgent(Agent):
         vert2 = vert[:-1]+"]"
         print "@PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
         
-        list(prologConnection.query("updateEdges(%s)" % vert2 ))
+        prologConnection.query("updateEdges(%s)" % vert2 ).next
         
-    def process_action_request(action_id, msg_dict):
+    def processActionRequest(action_id, msg_dict):
         print "@Agent: received request-action. id:", action_id
 
         # Process perception.
-        self.process_perception(msg_dict, self.prolog)
+        self.processPerception(msg_dict, self.prolog)
         self.prolog.query("argumentation").next()
         self.prolog.query("planning").next()
         actionList = prolog.query("exec(X)").next()["X"]
@@ -136,7 +136,7 @@ if (__name__== "__main__"):
 
     agent = PrologAgent(USER, PASS, "pl/kb.pl")
     agent.connect()
-    agent.perceive_act_loop()
+    agent.perceiveActLoop()
     agent.disconnect()
 
     #agent = Agent(USER, PASS)

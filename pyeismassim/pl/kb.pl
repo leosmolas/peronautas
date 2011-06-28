@@ -15,14 +15,6 @@
 % Beliefs
 last_action(skip).
 action(skip).
-<<<<<<< HEAD
-<<<<<<< HEAD
-position(unknown).
-verts([]).
-edges([]). % Lista de functores de la forma edge(vert1, vert2).
-=======
-position(pete).
-=======
 kposition(pete, etep).
 hposition(pete, etep).
 my_name(jesucristo).
@@ -32,7 +24,7 @@ replace_myName(X) :-
    retractall(hposition(OldName, Op1)),
    retractall(kposition(OldName, Op2)),
    assertz(hposition(X, Op1)),
-   assertz(kposition(X, Op2)).
+   assertz(kposition(X, Op2)),
    assertz(my_name(X)).
 
 
@@ -78,7 +70,6 @@ deleteEdge(Node1, Node2, Cost) :-
     retract(kedge(Node2, Node1, Cost)),
     retract(hedge(Node1, Node2, Cost)),
     retract(hedge(Node2, Node1, Cost)).
->>>>>>> 8f3a9ecadd7c71489ba92e7bc5c26d7281afeb7e
 
 %lista vacia
 updateEdges([]).
@@ -131,7 +122,6 @@ updateNodes([X|Xs]) :-
 updateNodes([X|Xs]) :-
     assertz(X),
     updateNodes(Xs).
->>>>>>> d3e9e8d75472873fff8de56a996baa879ccd981b
 
 %member(X, [X | _]).
 %member(X, [Y | Ys]) :- 
