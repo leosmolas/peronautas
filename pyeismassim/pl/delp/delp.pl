@@ -104,8 +104,25 @@ context_ignore([]).
 %%%%%%%%%%%%%%%%%%%%%%%
 :-[intern_config].
 
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%% TREE DRAWER   %%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[tree_drawer_server].
+
 
 :-config_on(save_tree).
+%:-comparison_on(defeater2assumption),comparison_on(more_specific).
+
+
+query(Q,A):- 
+		openTree, 
+		exp(Q,A), 
+		dumpTree,
+		explanation(EXP_PL),
+		tell('explanation.pl'),
+		write(tree_info(EXP_PL)), write('.'), nl,
+		told.
+
 
 
 
@@ -1072,7 +1089,7 @@ priority(d_rule(H1, B1), d_rule(H2, B2)) :-
 %    which there is no def. derivation for h1 from S' U A
 
 more_specific(arg(Ac, MetaA), arg(Bc, MetaB)) :-
-    showOnTraceS('proving that '),
+	showOnTraceS('proving that '),
     showOnTraceS(MetaA),
     showOnTraceS(' is more specific than '),
     showOnTraceS(MetaB), 

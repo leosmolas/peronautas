@@ -329,7 +329,9 @@ tree:-
 	id(ID),
 	load_tree(ID),
 	assertRootAndNodes,
-	tree(ID).
+	tree(ID),
+	retractall(node(_,_)),
+	retractall(root(_,_)).
 
 
 assertRootAndNodes:-
