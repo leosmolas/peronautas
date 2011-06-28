@@ -37,3 +37,28 @@ massim-netbeans: a folder containing a netbeans project with the code for the
         *copy* massim-netbeans/AgentContest/save/* to the generated dist folder, 
         and run the startServer.sh script to run the modified server,
         choosing the my2011-conf1.xml file.
+
+----------------------------------
+
+Situación de los branchs en este momento:
+
+master: 
+    Tiene todas las versiones más viejas de todo. Se actualizará cuando tengamos algo estable (por más ínfimo que sea).
+    
+dev-limpieza:
+    Branch actualmente en desuso. (candidato a volar)
+    
+dev-comunicacion:
+    No sé en que estado está este branch. cc @aki
+    
+dev-graph-coloring:
+    En este branch principalmente hay una implementación del algoritmo de coloreo. Fue hecho principalmente con Fer, con cosas agregadas por Manu y Leo. También hay muchas utilidades que hacen inferencia sobre cosas del mapa.
+    
+    graph-optimization:
+        Topic branch del anterior. 
+        
+dev-agents:
+    Aquí se encuentra la implementación del servidor central de percepciones, por Aki. A su vez, se encuentra la versión del agente más actualizada (y funcional).
+    
+dev-estrategias:
+    Branch con estrategias, o documentación. Nada de código.
