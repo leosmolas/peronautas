@@ -12,14 +12,16 @@ from connection.MessageHandling import *
 from pyswip.prolog import Prolog
 from pyswip.easy import *
 
+####################################################################################################
 class Agent():
     
     def __init__(self, USER, PASS):
+        print "Basic initialization"
         self.HOST = "127.0.0.1"
         self.PORT = 12300
         self.USER = USER
         self.PASS = PASS
-        self.log = open('log-' + USER + '.txt', 'w')
+        self.log  = open('log-' + USER + '.txt', 'w')
 
     def connect(self):
         # Connect and authenticate.
@@ -73,18 +75,16 @@ class Agent():
             else:
                 print "@Agent: en area 51"
                 quit = True
-
         
-
-class DummyAgent(Agent):
-
-    def __init__(self):
-        pass
-
-    def perceive_act_loop(self, actions):
-        pass
-
+####################################################################################################
 class PrologAgent(Agent):
+
+    def __init__(self, USER, PASS, prolog_source):
+        Agent.__init__(self, USER, PASS)
+        print "Prolog initialization"
+        # Creo una conexion con SWI.
+        self.prolog = Prolog()
+        self.prolog.consult(prolog_source)
 
     def processPerception(self, msg, prologConnection):
         # actualizamos cada uno de los campos individuales del agente
@@ -93,6 +93,7 @@ class PrologAgent(Agent):
             prologConnection.query("replace_%s(%s)" % (x, msg[x])).next()
         print "@Agent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg['position'],msg['position'])
         prologConnection.query("replace_position(%s)" % msg['position'])
+
         vert = "["
         # actualizamos el estado del mapa con los nodos
         for x in msg['vis_verts']:
@@ -110,66 +111,21 @@ class PrologAgent(Agent):
         
         list(prologConnection.query("updateEdges(%s)" % vert2 ))
         
-    def perceive_act_loop(self, prolog_source):
+    def process_action_request(action_id, msg_dict):
+        print "@Agent: received request-action. id:", action_id
 
-        # Receive simulation start notification.
-        print "@Agent: Waiting for simulation start notification."
-        xml = self.connection.receive()
-        #self.log.write(xml)
-        _, _, msg = parse_as_dict(xml)
+        # Process perception.
+        self.process_perception(msg_dict, self.prolog)
+        self.prolog.query("argumentation").next()
+        self.prolog.query("planning").next()
+        actionList = prolog.query("exec(X)").next()["X"]
+        if len(actionList) == 2:
+            action_xml = action(action_id, actionList[0], actionList[1])
+        else:
+            action_xml = action(action_id, actionList[0])
+        return action_xml
 
-        print "@Agent: received:"
-        print_dict_message(msg)
-
-        steps = int(msg['steps'])
-
-        # Creo una conexion con SWI.
-        prolog = Prolog()
-        prolog.consult(prolog_source)
-        print "Llamando!\nreplace_myName(" + USER + ")"
-        prolog.query('replace_myName(' + USER + ')').next()
-
-        quit = False
-        step = 0
-        while (not quit):
-            step += 1
-            print "Step:", step
-            xml = self.connection.receive()
-            #self.log.write(xml)
-            msg_type, action_id, msg = parse_as_dict(xml)
-
-            # DEGUG
-            _, _, list_msg = parse_as_list(xml)
-            print_list_message(list_msg)
-            self.log.write("PROLOG PERCEPT:\n")
-            for line in list_msg:
-                self.log.write('   ' + line + '\n')
-
-            time.sleep(1.5)
-            if (msg_type == 'request-action'):
-                print "@Agent: received request-action. id:", action_id
-
-                # Process perception.
-                self.processPerception(msg, prolog)
-                list(prolog.query("argumentation"))
-                list(prolog.query("planning"))
-                actionList = prolog.query("exec(X)").next()["X"]
-                if len(actionList) == 2:
-                    action_xml = action(action_id, actionList[0], actionList[1])
-                else:
-                    action_xml = action(action_id, actionList[0])
-                self.connection.send(action_xml)
-                self.log.write(action_xml)
-            elif (msg_type == 'bye'):
-                print "@Agent: received bye"
-                #quit = True
-            elif (msg_type == 'sim-end'):
-                print "@Agent: received sim-end"
-                #quit = True
-            else:
-                quit = True
-                print "@Agent: en area 51"
-
+####################################################################################################
 if (__name__== "__main__"):
     if (len(sys.argv) == 3):
         USER = sys.argv[1]
