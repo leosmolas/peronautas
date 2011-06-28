@@ -6,51 +6,56 @@ muleto -< true.
 
 %~muleto -< aumento(_, _).
 
-~expansion(_, Valor) <- explorar(_, ValorD),
-                        greater(ValorD, Valor).
+~expansion(_, Value) <- explorar(_, ValueD),
+                        greater(ValueD, Value).
                         
-%~expansion(_, Valor) <- aumento(_, ValorD),
-%                        greater(ValorD, Valor).
+%~expansion(_, Value) <- aumento(_, ValueD),
+%                        greater(ValueD, Value).
                         
-%~aumento(_, Valor) <- explorar(_, ValorD),
-%                      greater(ValorD, Valor).
+%~aumento(_, Value) <- explorar(_, ValueD),
+%                      greater(ValueD, Value).
                       
-%~aumento(_, Valor) <- expansion(_, ValorD),
-%                      greater(ValorD, Valor).
+%~aumento(_, Value) <- expansion(_, ValueD),
+%                      greater(ValueD, Value).
                       
-~explorar(_, Valor) <- expansion(_, ValorD),
-                       greater(ValorD, Valor).
+~explorar(_, Value) <- expansion(_, ValueD),
+                       greater(ValueD, Value).
                        
-%~explorar(_, Valor) <- aumento(_, ValorD),
-%                       greater(ValorD, Valor).
+%~explorar(_, Value) <- aumento(_, ValueD),
+%                       greater(ValueD, Value).
 
-% DESIRE expansión(Nodo, Valor)
-expansion(X, Valor) -< posibleExpansion(X),
+
+% DESIRE expansión(Nodo, Value)
+expansion(X, Value) -< posibleExpansion(X),
                        estoyEnLaFrontera,
                        esSeguro(X),
                        aumentoFrontera(X, DifPuntos),
                        consExpansion(Cons),
-                       mult(DifPuntos, Cons, Valor).
+                       mult(DifPuntos, Cons, Value).
 
                        
-% DESIRE explorar(Nodo, Valor)
-explorar(X, Valor) -< posibleExplorar(X),
+% DESIRE explorar(Nodo, Value)
+explorar(X, Value) -< posibleExplorar(X),
                       ~estaLejos(X, Dist, 10),
                       ~explored(X),
                       estaCercaDeLaZona(X, DistZona),
-                      Valor is DistZona * 10 + (10 - Dist) ** 2.
+                      mult(DistZona, 10, Mult),
+                      sust(10, Dist, Sust),
+                      power(Sust, 2, Pow),
+                      sum(Mult, Pow, Value).
                       
-estáCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
                       
-not estáCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
-                               Dist < 3.
+%estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
+                      
+%~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
+                               %lessEqDist, 2).
 
 ~estaLejos(X, Dist, _) -< distancia(X, Dist).
 
 estaLejos(X, Dist, Cota) <- distancia(X, Dist),
-                            Dist > Cota.
+                            greater(Dist, Cota).
                             
-consExpansion(10). %ni idea que valor tendrá
+consExpansion(10). %ni idea que Value tendrá
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,6 +68,12 @@ posibleExplorar(a).
 posibleExplorar(b).
 
 posibleExplorar(c).
+
+% posibleExpansion(Nodo)
+
+posibleExpansion(b).
+
+posibleExpansion(d).
 
 % aumentoFrontera(Nodo, Dif)
 
@@ -88,6 +99,22 @@ probed(a).
 
 % explored(Node)
 
-~explored(X) -< true.
+~explored(_) -< true.
 
 explored(a).
+
+% estaCercaDeLaZona(Node, Distance)
+
+estaCercaDeLaZona(a, 1).
+
+estaCercaDeLaZona(b, 1).
+
+estaCercaDeLaZona(c, 2).
+
+% distancia(Node, Dist)
+
+distancia(a, 2).
+
+distancia(b, 3).
+
+distancia(a, 5).
