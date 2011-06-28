@@ -32,7 +32,7 @@ class Agent():
         self.log.close()
         self.connection.disconnect()
 
-    def processActionRequest(action_id, msg_dict):
+    def processActionRequest(self, action_id, msg_dict):
         print "@Agent: received request-action. id:", action_id
         action_xml = action(action_id, "skip")
         return action_xml
@@ -63,7 +63,7 @@ class Agent():
 
             time.sleep(1.5)
             if (msg_type == 'request-action'):
-                action_xml = processActionRequest(msg_dict)
+                action_xml = self.processActionRequest(action_id, msg_dict)
                 self.connection.send(action_id, action_xml)
                 self.log.write(action_xml)
             elif (msg_type == 'bye'):
@@ -111,7 +111,7 @@ class PrologAgent(Agent):
         
         prologConnection.query("updateEdges(%s)" % vert2 ).next
         
-    def processActionRequest(action_id, msg_dict):
+    def processActionRequest(self, action_id, msg_dict):
         print "@Agent: received request-action. id:", action_id
 
         # Process perception.
@@ -139,19 +139,3 @@ if (__name__== "__main__"):
     agent.perceiveActLoop()
     agent.disconnect()
 
-    #agent = Agent(USER, PASS)
-    #agent.connect()
-    #agent.perceive_act_loop()
-    #agent.disconnect()
-
-    #if (len(sys.argv) == 3):
-    #    USER = sys.argv[1]
-    #    PASS = sys.argv[2]
-    #else:
-    #    print "Usage: python Agent.py USERNAME PASSWORD"
-    #    sys.exit()
-
-    #agent = Agent(USER, PASS)
-    #agent.connect()
-    #agent.perceive_act_loop()
-    #agent.disconnect()
