@@ -184,7 +184,7 @@ searchNeigh(N) :-
 
 plan([]).
 
-exec(skip) :-
+exec([skip]) :-
     plan([]).
 exec(Action) :- 
     plan([X | Xs]),

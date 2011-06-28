@@ -44,7 +44,7 @@ class MASSimConnection:
             while (bytes_sent < msg_length):
                 sent = self.sock.send(msg[bytes_sent:])
                 bytes_sent += sent
-                print "@Connection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
+                #print "@Connection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
                 if (sent == 0):
                     self.connected = False
                     raise RuntimeError("Server connection lost!")
