@@ -1,1 +1,0 @@
-tree_info([root([ (bueno(6,12)-<multiplicar(6,2,12)),multiplicar(6,2,12)],1),root([ (~bueno(6,12)-<multiplicar(6,2,12),mayor(12,10)),mayor(12,10),multiplicar(6,2,12)],3),node(([ (bueno(6,12)-<multiplicar(6,2,12)),multiplicar(6,2,12)],1), ([ (~bueno(6,12)-<multiplicar(6,2,12),mayor(12,10)),mayor(12,10),multiplicar(6,2,12)],2))]).
