@@ -1,33 +1,24 @@
-meta(expansion(X,Y)) -< expansion(X,Y).
-meta(explorar(X,Y)) -< explorar(X,Y).
+meta(expansion(X)) <- expansion(X).
+meta(explorar(X)) <- explorar(X).
 
-~explorar(X,Y) <- expansion(W,Z).
-~expansion(X,Y) <- explorar(W,Z).
+~explorar(X) <- expansion(W).
+~expansion(X) <- explorar(W).
 
+~expansion(Node) <- expansion(Node2),
+                    notEqual(Node, Node2).
+                    
+~explorar(Node) <- explorar(Node2),
+                   notEqual(Node, Node2).
 
-
-muleto -< true.
-
-~muleto -< expansion(_, _).
-
-~muleto -< explorar(_, _).
-
-%~muleto -< aumento(_, _).
-
-%%Danger!
-~expansion(_, Value) -< explorar(_, ValueD),
-                        greater(ValueD, Value).
-                        
-~expansion(Node, Value) -< expansion(Node2, ValueD),
-                           notEqual(Node, Node2),
-                           greater(ValueD, Value).
-                        
-expansion(X, Value) -< posibleExpansion(X),
+                   
+% DESIRE expansión(Nodo, Value)
+expansion(X) -< posibleExpansion(X),
                        estoyEnLaFrontera,
                        esSeguro(X),
                        aumentoFrontera(X, DifPuntos),
                        consExpansion(Cons),
-                       mult(DifPuntos, Cons, Value).
+                       mult(DifPuntos, Cons, Value),
+                       argValue(Value).
                         
 %~expansion(_, Value) -< aumento(_, ValueD),
 %                        greater(ValueD, Value).
@@ -37,31 +28,21 @@ expansion(X, Value) -< posibleExpansion(X),
                       
 %~aumento(_, Value) -< expansion(_, ValueD),
 %                      greater(ValueD, Value).
-                      
-~explorar(_, Value) -< expansion(_, ValueD),
-                       greater(ValueD, Value).
-                       
-~explorar(Node, Value) -< explorar(Node2, ValueD),
-                          notEqual(Node, Node2),
-                          greater(ValueD, Value).                       
                        
 %~explorar(_, Value) -< aumento(_, ValueD),
 %                       greater(ValueD, Value).
 
-
-% DESIRE expansión(Nodo, Value)
-
-
-                       
+               
 % DESIRE explorar(Nodo, Value)
-explorar(X, Value) -< posibleExplorar(X),
-                      ~estaLejos(X, Dist, 10),
-                      ~explored(X),
-                      estaCercaDeLaZona(X, DistZona),
-                      mult(DistZona, 10, Mult),
-                      sust(10, Dist, Sust),
-                      power(Sust, 2, Pow),
-                      sum(Mult, Pow, Value).
+explorar(X) -< posibleExplorar(X),
+               ~estaLejos(X, Dist, 10),
+               ~explored(X),
+               estaCercaDeLaZona(X, DistZona),
+               mult(DistZona, 10, Mult),
+               sust(10, Dist, Sust),
+               power(Sust, 2, Pow),
+               add(Mult, Pow, Value),
+               argValue(Value).
                       
                       
 %estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
@@ -71,10 +52,12 @@ explorar(X, Value) -< posibleExplorar(X),
 
 ~estaLejos(X, Dist, _) -< distancia(X, Dist).
 
-estaLejos(X, Dist, Cota) -< distancia(X, Dist),
+estaLejos(X, Dist, Cota) <- distancia(X, Dist),
                             greater(Dist, Cota).
                             
 consExpansion(10) <- true. %ni idea que Value tendrá
+
+argValue(_) <- true.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 

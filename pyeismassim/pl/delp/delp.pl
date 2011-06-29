@@ -107,7 +107,7 @@ context_ignore([]).
 %%%%%%%%%%%%%%%%%%%%%%%
 %%%% TREE DRAWER   %%%%
 %%%%%%%%%%%%%%%%%%%%%%%
-%:-[tree_drawer_server].
+:-[tree_drawer_server].
 
 
 :-config_on(save_tree).
