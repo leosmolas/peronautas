@@ -1,8 +1,10 @@
+% la consulta meta(X) te da la mejor meta
 meta(expansion(X)) <- expansion(X).
 meta(explorar(X)) <- explorar(X).
 
-~explorar(X) <- expansion(W).
-~expansion(X) <- explorar(W).
+% con estas reglas, se define que sólo haya una meta sin derrotar
+~explorar(_) <- expansion(_).
+~expansion(_) <- explorar(_).
 
 ~expansion(Node) <- expansion(Node2),
                     notEqual(Node, Node2).
@@ -11,7 +13,7 @@ meta(explorar(X)) <- explorar(X).
                    notEqual(Node, Node2).
 
                    
-% DESIRE expansión(Nodo, Value)
+% DESIRE expansión(Nodo)
 expansion(X) -< posibleExpansion(X),
                        estoyEnLaFrontera,
                        esSeguro(X),
@@ -20,20 +22,20 @@ expansion(X) -< posibleExpansion(X),
                        mult(DifPuntos, Cons, Value),
                        argValue(Value).
                         
-%~expansion(_, Value) -< aumento(_, ValueD),
+% ~expansion(_, Value) -< aumento(_, ValueD),
 %                        greater(ValueD, Value).
                         
-%~aumento(_, Value) -< explorar(_, ValueD),
+% ~aumento(_, Value) -< explorar(_, ValueD),
 %                      greater(ValueD, Value).
                       
-%~aumento(_, Value) -< expansion(_, ValueD),
+% ~aumento(_, Value) -< expansion(_, ValueD),
 %                      greater(ValueD, Value).
                        
-%~explorar(_, Value) -< aumento(_, ValueD),
+% ~explorar(_, Value) -< aumento(_, ValueD),
 %                       greater(ValueD, Value).
 
                
-% DESIRE explorar(Nodo, Value)
+% DESIRE explorar(Nodo)
 explorar(X) -< posibleExplorar(X),
                ~estaLejos(X, Dist, 10),
                ~explored(X),
@@ -44,83 +46,21 @@ explorar(X) -< posibleExplorar(X),
                add(Mult, Pow, Value),
                argValue(Value).
                       
+% estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
                       
-%estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
-                      
-%~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
-                               %lessEqDist, 2).
+% ~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
+                               % lessEqDist, 2).
 
 ~estaLejos(X, Dist, _) -< distancia(X, Dist).
 
 estaLejos(X, Dist, Cota) <- distancia(X, Dist),
                             greater(Dist, Cota).
                             
-consExpansion(10) <- true. %ni idea que Value tendrá
+% Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que estén en la misma escala. La otra es poner los números sueltos, como en explorar. No sé que decisión de diseño tomar.
+consExpansion(10) <- true. % ni idea que Value tendrá
 
+% este argumento sólo sirve para poner el argValue, para que lo busque el criterio de comparación greaterArgValue
 argValue(_) <- true.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% hechos asertados
-
-% posibleExplorar(Nodo)
-
-posibleExplorar(a) <- true.
-
-posibleExplorar(b) <- true.
-
-posibleExplorar(c) <- true.
-
-% posibleExpansion(Nodo)
-
-posibleExpansion(b) <- true.
-
-posibleExpansion(d) <- true.
-
-% aumentoFrontera(Nodo, Dif)
-
-aumentoFrontera(a, 5) <- true.
-
-aumentoFrontera(b, 3) <- true.
-
-aumentoFrontera(c, 8) <- true.
-
-aumentoFrontera(d, 10) <- true.
-
-% esSeguro(Node)
-
-esSeguro(a) <- true.
-
-esSeguro(b) <- true.
-
-esSeguro(c) <- true.
-
-% estoyEnLaFrontera
-
-estoyEnLaFrontera <- true.
-
-% probed(Node)
-
-probed(a) <- true.
-
-% explored(Node)
-
-~explored(_) -< true.
-
-explored(a) <- true.
-
-% estaCercaDeLaZona(Node, Distance)
-
-estaCercaDeLaZona(a, 1) <- true.
-
-estaCercaDeLaZona(b, 1) <- true.
-
-estaCercaDeLaZona(c, 2) <- true.
-
-% distancia(Node, Dist)
-
-distancia(a, 2) <- true.
-
-distancia(b, 3) <- true.
-
-distancia(c, 5) <- true.
