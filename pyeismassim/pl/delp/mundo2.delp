@@ -1,0 +1,66 @@
+% hechos asertados
+
+% posibleExplorar(Nodo)
+
+posibleExplorar(b) <- true.
+posibleExplorar(c) <- true.
+posibleExplorar(d) <- true.
+posibleExplorar(e) <- true.
+posibleExplorar(f) <- true.
+posibleExplorar(h) <- true.
+
+% posibleExpansion(Nodo)
+
+posibleExpansion(b) <- true.
+posibleExpansion(e) <- true.
+posibleExpansion(f) <- true.
+
+% aumentoFrontera(Nodo, Dif)
+
+aumentoFrontera(b, 2) <- true.
+aumentoFrontera(e, 0) <- true.
+aumentoFrontera(f, 0) <- true.
+
+% esSeguro(Node)
+esSeguro(_) -< true. % esta asunción podría estar en arg.delp
+
+% estoyEnLaFrontera
+
+estoyEnLaFrontera <- true.
+
+% probed(Node)
+
+~probed(_) -< true. % esta tmb
+
+probed(a) -< true.
+probed(d) -< true.
+probed(g) -< true.
+
+% explored(Node)
+
+~explored(_) -< true. % y esta
+
+explored(a) <- true.
+explored(g) <- true.
+explored(c) <- true.
+explored(h) <- true.
+explored(d) <- true.
+
+% estaCercaDeLaZona(Node, Distance)
+
+estaCercaDeLaZona(b, 1) <- true.
+estaCercaDeLaZona(c, 1) <- true.
+estaCercaDeLaZona(d, 1) <- true.
+estaCercaDeLaZona(f, 1) <- true.
+estaCercaDeLaZona(h, 2) <- true.
+
+% distancia(Node, Dist)
+
+distancia(a, 0) <- true.
+distancia(b, 1) <- true.
+distancia(c, 1) <- true.
+distancia(d, 1) <- true.
+% distancia(e, ) <- true.
+distancia(f, 1) <- true.
+distancia(g, 3) <- true.
+distancia(h, 2) <- true.

@@ -37,11 +37,11 @@ expansion(X) -< posibleExpansion(X),
                
 % DESIRE explorar(Nodo)
 explorar(X) -< posibleExplorar(X),
-               ~estaLejos(X, Dist, 10),
+               ~estaLejos(X, Dist, 5),
                ~explored(X),
                estaCercaDeLaZona(X, DistZona),
                mult(DistZona, 10, Mult),
-               sust(10, Dist, Sust),
+               sust(5, Dist, Sust),
                power(Sust, 2, Pow),
                add(Mult, Pow, Value),
                argValue(Value).

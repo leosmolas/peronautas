@@ -1,0 +1,19 @@
+% hechos asertados
+
+% posibleExplorar(Nodo)
+
+% posibleExpansion(Nodo)
+
+% aumentoFrontera(Nodo, Dif)
+
+% esSeguro(Node)
+
+% estoyEnLaFrontera
+
+% probed(Node)
+
+% explored(Node)
+
+% estaCercaDeLaZona(Node, Distance)
+
+% distancia(Node, Dist)
