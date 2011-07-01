@@ -2,7 +2,12 @@ import socket
 
 if (__name__ == "__main__"):
 
-    CONNECTIONS = 3
+    if (len(sys.argv) == 2):
+        CONNECTIONS = sys.argv[1]
+    else:
+        print "Usage: python PerceptServer.py CONNECTIONS"
+        sys.exit()
+
     HOST = 'localhost'
     PORT = 10000
     ADDR = (HOST, PORT)
