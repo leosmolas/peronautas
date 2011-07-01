@@ -9,21 +9,21 @@ BUFSIZE = 4096
 if (__name__ == "__main__"):
     if   (sys.argv[1] == '1'):
         percepts = [
-                frozenset(["1", "2", "3"]),
-                frozenset(["4", "5", "6"]),
-                frozenset(["7", "8", "9"])
+                {"1" : "a", "2" : "b", "3" : "c"},
+                {"4" : "d", "5" : "e", "6" : "f"},
+                {"7" : "g", "8" : "h", "9" : "i"}
                 ]
     elif (sys.argv[1] == '2'):
         percepts = [
-                frozenset(["4", "5", "6"]),
-                frozenset(["7", "8", "9"]),
-                frozenset(["1", "2", "3"])
+                {"4" : "d", "5" : "e", "6" : "f"},
+                {"7" : "g", "8" : "h", "9" : "i"},
+                {"1" : "a", "2" : "b", "3" : "c"}
                 ]
     elif (sys.argv[1] == '3'):
         percepts = [
-                frozenset(["7", "8", "9"]),
-                frozenset(["1", "2", "3"]),
-                frozenset(["4", "5", "6"])
+                {"7" : "g", "8" : "h", "9" : "i"},
+                {"1" : "a", "2" : "b", "3" : "c"},
+                {"4" : "d", "5" : "e", "6" : "f"}
                 ]
     else:
         raise Exception
