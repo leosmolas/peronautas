@@ -1,7 +1,7 @@
 :- [delp]. % intérprete
 
 :- consult('arg.delp'), % reglas de argumentación
-   consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
+   consult('mundo3.delp'). % hechos asertados en una situación del mundo particular
 
 % criterios de comparación
 
@@ -39,6 +39,7 @@ notEqual(X,Y)  :- X \= Y.
 
 % posibleMeta(+Meta, -Prioridad)
 % La Meta tendrá una prioridad única, que le dará su orden de importancia
+% Valor más alto => mayor prioridad.
 posibleMeta(explorar(_), 1).
 posibleMeta(expansion(_), 2).
 
@@ -95,7 +96,7 @@ equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
  
 % falta testear!!!
 equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cuál está primero en el orden de prioridad
-    write('hola'),
+    % write('hola'), % Quinto año de la carrera y write 'hola' (diría el vasco :P)
     % HeadA =.. [MetaA | ArgAs],
     % HeadB =.. [MetaB | ArgBs],
     posibleMeta(HeadA, ValueA),

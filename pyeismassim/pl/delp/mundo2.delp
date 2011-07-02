@@ -1,3 +1,6 @@
+% Existen dos metas iguales con el mismo valor final.
+% El criterio debe seleccionar por orden lexicográfico de los argumentos.
+
 % hechos asertados
 
 % posibleExplorar(Nodo)

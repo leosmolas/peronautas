@@ -1,5 +1,5 @@
-﻿% Caso básico: existen dos metas diferentes con distinto valor final.
-% El criterio debe seleccionar la de mayor valor.
+% Existen dos metas diferentes con el mismo valor final.
+% El criterio debe seleccionar la de mayor prioridad preestablecida.
 
 % hechos asertados
 
@@ -21,7 +21,7 @@ posibleExpansion(d) <- true.
 
 aumentoFrontera(a, 5) <- true.
 
-aumentoFrontera(b, 3) <- true.
+aumentoFrontera(b, 2) <- true.
 
 aumentoFrontera(c, 8) <- true.
 
