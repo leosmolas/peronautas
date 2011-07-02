@@ -19,30 +19,20 @@ posibleExpansion(e) <- true.
 posibleExpansion(f) <- true.
 
 % aumentoFrontera(Nodo, Dif)
-
-aumentoFrontera(b, 2) <- true.
-aumentoFrontera(e, 0) <- true.
-aumentoFrontera(f, 0) <- true.
-
-% esSeguro(Node)
-esSeguro(_) -< true. % esta asunción podría estar en arg.delp
+% Diferencia de puntos entre la situación actual y el agente ubicado en Nodo.
+difPuntosZona(b, 2) <- true.
+difPuntosZona(e, 0) <- true.
+difPuntosZona(f, 0) <- true.
 
 % estoyEnLaFrontera
-
 estoyEnLaFrontera <- true.
 
 % probed(Node)
-
-~probed(_) -< true. % esta tmb
-
 probed(a) -< true.
 probed(d) -< true.
 probed(g) -< true.
 
 % explored(Node)
-
-~explored(_) -< true. % y esta
-
 explored(a) <- true.
 explored(g) <- true.
 explored(c) <- true.
@@ -50,7 +40,7 @@ explored(h) <- true.
 explored(d) <- true.
 
 % estaCercaDeLaZona(Node, Distance)
-
+% Distancia en arcos del nodo a la zona.
 estaCercaDeLaZona(b, 1) <- true.
 estaCercaDeLaZona(c, 1) <- true.
 estaCercaDeLaZona(d, 1) <- true.
@@ -58,7 +48,7 @@ estaCercaDeLaZona(f, 1) <- true.
 estaCercaDeLaZona(h, 2) <- true.
 
 % distancia(Node, Dist)
-
+% Distancias desde el nodo del agente al resto de los nodos en cantidad de turnos.
 distancia(a, 0) <- true.
 distancia(b, 1) <- true.
 distancia(c, 1) <- true.
