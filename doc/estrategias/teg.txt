@@ -28,16 +28,30 @@ ESTRATEGIA:
         puede haber un nodo vacio entre dos agentes para que se forme frontera
 
     DEFENSA (equipo)
+        los agentes con capacidad defensiva son: reparador,saboteador,sentinela
+        el explorador y el inspector pueden servir para definir zonas
         tener uno o mas saboteadores de pivot?
 
     ATAQUE (equipo)
         si se identifica un nodo que es punto debil de una zona enemiga, atacarlo
+        el unico agente que hay que considerar para ataque es el saboteador
 
     COMPRA (equipo)
         argumentar dentro de un agente y entre agentes si que se va a comprar y porque
         cuando conviene quedarse con la plata por puntaje o comprar algo?
         cuando conviene que lo compre un agente en lugar de otro?
+        mientras quedan nodos sin probar, la plata deberia ir para la energia para los exploradores
 
+    (explorador)
+        [skip,goto,      survey,buy,recharge,probe]
+    (inspector)
+        [skip,goto,      survey,buy,recharge,inspect]
+    (reparador)
+        [skip,goto,parry,survey,buy,recharge,repair]
+    (saboteador)
+        [skip,goto,parry,survey,buy,recharge,attack]
+    (sentinela)
+        
 ACTIONS
     skip:     0 cost
     recharge: increases energy 20%, result = succesful | failed (if attacked)

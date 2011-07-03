@@ -1,0 +1,31 @@
+Walkthrough
+
+Graph contiene los siguientes archivos
+   * info.txt
+      Si estan leyendo esto es porque ya saben que existe este archivo.
+   * agents.pl
+      Todo lo relacionado a los agentes y los equipos.
+   * nodes.pl
+      Todo lo relacionado a los nodos del grafo
+   * edges.pl
+      Todo lo relacionado a los arcos del grafo.
+   * map.pl
+      Cosas generales sobre el grafo en su completitud.
+
+
+Los archivos agents, nodes y edges estan divididos en 3 partes:
+   * Operations
+      Son basicamente predicados que ejecutan operaciones sobre lo que se
+      conoce. Estas deberian tener un efecto sobre la representacion del
+      mundo.
+   * Consults
+      Consultas sobre el mundo que se tiene representado
+   * Representation
+      Todo lo relacionado a la representacion del mundo.
+
+
+De todas formas la idea es que el codigo este bien comentado, pero aca ire
+poniendo cosas generales sobre el codigo, como que contiene cada archivo y
+como estan conformados.
+
+Tratare de tenerlo lo mas actualizado que pueda.
