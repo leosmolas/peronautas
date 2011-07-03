@@ -1,4 +1,4 @@
-doc: design documentation
+Ôªødoc: design documentation
 pyeismassim: partial implementation in Python of the eismassim library.
 pyswig test: code testing the pyswig python-prolog bridge
 
@@ -40,26 +40,26 @@ massim-netbeans: a folder containing a netbeans project with the code for the
 
 ----------------------------------
 
-SituaciÛn de los branchs en este momento:
+Situaci√≥n de los branchs en este momento:
 
 master: 
-    Tiene todas las versiones m·s viejas de todo. Se actualizar· cuando tengamos algo estable (por m·s Ìnfimo que sea).
+    Tiene todas las versiones m√°s viejas de todo. Se actualizar√° cuando tengamos algo estable (por m√°s √≠nfimo que sea).
     
 dev-limpieza:
     Branch actualmente en desuso. (candidato a volar)
     
 dev-comunicacion:
-    No sÈ en que estado est· este branch. cc @aki
+    No s√© en que estado est√° este branch. cc @aki
     
 dev-graph-coloring:
-    En este branch principalmente hay una implementaciÛn del algoritmo de coloreo. Fue hecho principalmente con Fer, con cosas agregadas por Manu y Leo. TambiÈn hay muchas utilidades que hacen inferencia sobre cosas del mapa.
+    En este branch principalmente hay una implementaci√≥n del algoritmo de coloreo. Fue hecho principalmente con Fer, con cosas agregadas por Manu y Leo. Tambi√©n hay muchas utilidades que hacen inferencia sobre cosas del mapa.
     
     graph-optimization:
         Topic branch del anterior. 
-        Este branch ya dejÛ de tener sentido...
+        Este branch ya dej√≥ de tener sentido...
         
 dev-agents:
-    AquÌ se encuentra la implementaciÛn del servidor central de percepciones, por Aki. A su vez, se encuentra la versiÛn del agente m·s actualizada (y funcional).
+    Aqu√≠ se encuentra la implementaci√≥n del servidor central de percepciones, por Aki. A su vez, se encuentra la versi√≥n del agente m√°s actualizada (y funcional).
     
 dev-estrategias:
-    Branch con estrategias, o documentaciÛn. Nada de cÛdigo.
+    Branch con estrategias, o documentaci√≥n. Nada de c√≥digo.
