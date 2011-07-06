@@ -7,48 +7,49 @@
 import sys
 import time
 import argparse
-from timeit import Timer
-from connection.MASSimConnection import MASSimConnection
-from connection.MessageHandling import *
-from pyswip.prolog import Prolog
-from pyswip.easy import *
+from timeit                         import Timer
+from connection.MASSimConnection    import MASSimConnection
+from connection.MessageHandling     import *
+from perceptServer.PerceptServer    import PerceptConnection, VortexPerceptConnection
+from pyswip.prolog                  import Prolog
+from pyswip.easy                    import *
 
 ####################################################################################################
-class VortexWriter():#clase auxiliar utilizada en caso de que NO se escriba en logs
+class VortexWriter():
+    # Clase auxiliar utilizada en caso de que NO se escriba en logs.
     def write(self, s):
         pass
 
     def close(self):
         pass
+
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, sharedServerPort):
-        print "Basic initialization"
-        self.HOST = "127.0.0.1"
-        self.PORT = 12300
-        self.USER = USER
-        self.PASS = PASS
-        self.SHSERVERPORT = sharedServerPort
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort):
+        print "Basic initialization", 
+        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
+
         if useLog:
             self.log  = open('log-' + USER + '.txt', 'w')
         else:
             self.log = VortexWriter()
-        if sharedServerPort:
-            #inicializar conexion con el server, supongo
-            pass
+        
+        if (perceptServerPort and perceptServerHost):
+            self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:
-            #imagino que deberemos inventar algo en caso de que NO se use, similar al VortexWriter
-            pass
+            self.perceptConnection = VortexPerceptConnection()
+        print "done"
 
     def connect(self):
         # Connect and authenticate.
-        self.connection = MASSimConnection()
-        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)       
+        self.massimConnection.connect()
+        self.perceptConnection.connect()
 
     def disconnect(self):
         self.log.close()
-        self.connection.disconnect()
+        self.massimConnection.disconnect()
+        self.perceptConnection.disconnect()
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "@Agent: received request-action. id:", action_id
@@ -58,7 +59,7 @@ class Agent():
     def perceiveActLoop(self):
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
-        xml = self.connection.receive()
+        xml = self.massimConnection.receive()
         self.log.write(xml)
         _, _, msg_dict, _ = parse_as_dict(xml)
 
@@ -73,7 +74,7 @@ class Agent():
             print "@Agent: step:", step
 
             # Receive action request.
-            xml = self.connection.receive()
+            xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
 
             self.log.write(xml)
@@ -81,7 +82,7 @@ class Agent():
             time.sleep(1.5)
             if (msg_type == 'request-action'):
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
-                self.connection.send(action_xml)
+                self.massimConnection.send(action_xml)
                 self.log.write(action_xml)
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
@@ -96,12 +97,13 @@ class Agent():
 ####################################################################################################
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, prolog_source, log, shServerPort):
-        Agent.__init__(self, USER, PASS, log, shServerPort)
-        print "Prolog initialization"
+    def __init__(self, USER, PASS, log, perceptServerHost, perceptServerPort, prolog_source):
+        Agent.__init__(self, USER, PASS, log, perceptServerHost, perceptServerPort)
+        print "Prolog initialization", 
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
+        print "done"
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
@@ -133,30 +135,37 @@ class PrologAgent(Agent):
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "@PrologAgent: received request-action. id:", action_id
 
+        # Synchronize perceptions with others.
+        self.perceptConnection.send(msg_dict_public)
+        percept_difference = self.perceptConnection.recv()
+
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
         list(self.prolog.query("argumentation"))
         list(self.prolog.query("planning"))
         actionList = self.prolog.query("exec(X)").next()['X']
-        if len(actionList) == 2:
+        if   len(actionList) == 1:
+            action_xml = action(action_id, actionList[0])
+        elif len(actionList) == 2:
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
-            action_xml = action(action_id, actionList[0])
+            print "    @PrologAgent: error in returned action. Sending skip."
+            print "    @PrologAgent: return value:", actionList
+            action_xml = action(action_id, "skip")
         return action_xml
 
 ####################################################################################################
 if (__name__== "__main__"):
     parser = argparse.ArgumentParser(description="Pyeismassim agent initializer")
-    parser.add_argument('user', metavar='USER', help="the agent's username")
-    parser.add_argument('password', metavar='PASSWORD', help="the agent's password")
-    parser.add_argument('-l', help="write-to-log mode.", action='store_const', const=True, dest='log')
-    parser.add_argument('-s', metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port", dest='shServerPort')
+    parser.add_argument('user',     metavar='USER',                      help="the agent's username")
+    parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
+    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
+    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
+    parser.add_argument('-l',                                            help="write-to-log mode.",                             action='store_const', const=True, dest='log')
+    args = parser.parse_args()
+    user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    args=parser.parse_args()
-
-    user, password, log, shServerPort = args.user, args.password, args.log, args.shServerPort
-
-    agent = PrologAgent(user, password, "pl/kb.pl", log, shServerPort)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/kb.pl")
     agent.connect()
     agent.perceiveActLoop()
     agent.disconnect()
