@@ -84,12 +84,11 @@ class PerceptConnection():
 ####################################################################################################
 if (__name__ == "__main__"):
 
-    if (len(sys.argv) == 4):
+    if (len(sys.argv) == 3):
         CONNECTIONS = int(sys.argv[1])
         PORT        = int(sys.argv[2])
-        ITERATIONS  = int(sys.argv[3])
     else:
-        print "Usage: python PerceptServer.py CONNECTIONS PORT ITERATIONS"
+        print "Usage: python PerceptServer.py CONNECTIONS PORT"
         print "Port 10000 is recommended."
         sys.exit()
 
