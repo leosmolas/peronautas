@@ -1,3 +1,5 @@
+:- dynamic mejorMeta/2.
+
 :- [delp]. % intérprete
 
 :- consult('arg.delp'), % reglas de argumentación
@@ -6,11 +8,37 @@
 % criterios de comparación
 
 % greaterArgValue está definido más abajo, y lo que hace es buscar los argValue de los argumentos, si es que existen, para compararlos
-:- comparison_on(greaterArgValue),
+:- % comparison_on(greaterArgValue),
 % defeater2assumption es un criterio que establece derrota cuando uno de los argumentos es una asunción, es derrotado por cualquier otra cosa que tenga algo.
    comparison_on(defeater2assumption),
 % more_specific es la espeficidad de siempre.
    comparison_on(more_specific).
+
+doNotFail(X) :-
+    call(X), !.
+
+doNotFail(_).
+   
+meta(X) :-     
+    assert(mejorMeta(_, -1000)),
+    foreach(posibleExpansion(N), doNotFail(calcMeta(expansion(N)))),
+    foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
+    mejorMeta(X, _),
+    write(X),
+    retract(mejorMeta(_, _)),
+    write(5).
+
+calcMeta(X) :-
+    writeln(X),
+    X =.. [Meta, Nodo | _],
+    Answer =.. [Meta, Value, Nodo],    
+    answer(Answer, yes), !,    
+    writeln(Value),
+    mejorMeta(_, CurrentValue), !,
+    Value > CurrentValue,
+    retract(mejorMeta(_, CurrentValue)),
+    assert(mejorMeta(X, Value)).
+    
 
 % todos los predicados que siguen son operaciones aritméticas y de comparación, para que los use delp.
 is_a_built_in(mult(X,Y,Z)).

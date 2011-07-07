@@ -1,16 +1,16 @@
 % la consulta meta(X) te da la mejor meta
-meta(expansion(X)) <- expansion(X).
-meta(explorar(X)) <- explorar(X).
+% meta(expansion(X)) <- expansion(X).
+% meta(explorar(X)) <- explorar(X).
 
 % con estas reglas, se define que sólo haya una meta sin derrotar
-~explorar(_) <- expansion(_).
-~expansion(_) <- explorar(_).
+% ~explorar(_, _) <- expansion(_, _).
+% ~expansion(_, _) <- explorar(_, _).
 
-~expansion(Node) <- expansion(Node2),
-                    notEqual(Node, Node2).
+% ~expansion(Node, _) <- expansion(Node2, Value),
+                    % notEqual(Node, Node2).
                     
-~explorar(Node) <- explorar(Node2),
-                   notEqual(Node, Node2).
+% ~explorar(Node, _) <- explorar(Node2),
+                   % notEqual(Node, Node2).
                 
 % ~expansion(_, Value) -< aumento(_, ValueD),
 %                        greater(ValueD, Value).
@@ -25,7 +25,7 @@ meta(explorar(X)) <- explorar(X).
 %                       greater(ValueD, Value).
 
 % DESIRE expansión(Nodo)
-expansion(X) -< posibleExpansion(X),
+expansion(Value, X) -< 
                 estoyEnLaFrontera,
                 esSeguro(X),
                 difPuntosZona(X, DifPuntos),
@@ -34,7 +34,7 @@ expansion(X) -< posibleExpansion(X),
                 argValue(Value).
                
 % DESIRE explorar(Nodo)
-explorar(X) -< posibleExplorar(X),
+explorar(Value, X) -< 
                ~estaLejos(X, Dist, 7),
                ~explored(X),
                difPuntosZona(X, DifPuntos), 
@@ -52,7 +52,7 @@ positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
  
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
-aumento(X) -< ~estáLejos(X, Dist, 10), 
+aumento(X, Value) -< ~estáLejos(X, Dist, 10), 
               ~estoyEnLaFrontera,
               esSeguro(X),
               difPuntosZona(X, DifPuntos),

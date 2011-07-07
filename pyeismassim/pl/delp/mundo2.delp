@@ -5,18 +5,22 @@
 
 % posibleExplorar(Nodo)
 
-posibleExplorar(b) <- true.
-posibleExplorar(c) <- true.
-posibleExplorar(d) <- true.
-posibleExplorar(e) <- true.
-posibleExplorar(f) <- true.
-posibleExplorar(h) <- true.
+posibleExplorar(b).
+posibleExplorar(c).
+posibleExplorar(d).
+posibleExplorar(e).
+posibleExplorar(f).
+posibleExplorar(h).
 
 % posibleExpansion(Nodo)
 
-posibleExpansion(b) <- true.
-posibleExpansion(e) <- true.
-posibleExpansion(f) <- true.
+% posibleExpansion(b) <- true.
+% posibleExpansion(e) <- true.
+% posibleExpansion(f) <- true.
+
+posibleExpansion(b).
+posibleExpansion(e).
+posibleExpansion(f).
 
 % aumentoFrontera(Nodo, Dif)
 % Diferencia de puntos entre la situación actual y el agente ubicado en Nodo.
