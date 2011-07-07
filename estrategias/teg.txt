@@ -1,3 +1,40 @@
+¶
+[x] write configuration file for a test match¶
+[x] add role parse to messagehandling¶
+[ ] write code to instantiate the correct type of agent according to role¶
+[ ] java agents to prolog¶
+[ ] get functional team¶
+[x] whole test suit¶
+[ ] new server¶
+[x] percept server¶
+[x]     make the server accept an iterations parameter¶
+[ ]     make the server use non.blocking sockets and timeouts¶
+[ ] what happens with the agent state when the configuration server has several 
+[ ] go through the list of stuff that may appear in a percept and write down wha
+[ ] true dummy agent which follows orders¶
+¶
+¶
+definir orden de las intenciones¶
+orden dentro de los agentes, dentro de los que tienen las mismas intenciones¶
+¶
+agarro la primer accion¶
+se puede ejecutar?¶
+si:¶
+    soy yo? si -> la hago¶
+        no soy yo -> la ejecuto hipoteticamente¶
+        hay un conflicto y soy yo?¶
+            no -> salteo¶
+            si -> pensar una posible intencion que no sea dañina¶
+no:                             :¶
+¶
+
+
+
+
+
+
+
+
 [X] 1 conexion 
 [X] 2 integracion python prolog
 [ ] 3 delirar soluciones al problema
