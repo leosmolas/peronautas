@@ -86,12 +86,15 @@ class Agent():
                 self.log.write(action_xml)
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
+                print_message_dict(msg_dict_private)
                 #quit = True
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
+                print_message_dict(msg_dict_private)
                 #quit = True
             else:
                 print "@Agent: en area 51"
+                print_message_dict(msg_dict_private)
                 quit = True
         
 ####################################################################################################
