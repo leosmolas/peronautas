@@ -56,6 +56,9 @@ class Agent():
         action_xml = action(action_id, "skip")
         return action_xml
 
+    def processSimulationStart(self, msg_dict):
+        pass
+
     def perceiveActLoop(self):
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
@@ -65,33 +68,32 @@ class Agent():
 
         print "@Agent: received simulation start notification."
         print_message_dict(msg_dict)
+        self.processSimulationStart(msg_dict)
 
         quit = False
-        steps = int(msg_dict['steps'])
         step = 0
         while (not quit):
             step += 1
             print "@Agent: step:", step
 
-            # Receive action request.
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
 
             self.log.write(xml)
 
-            time.sleep(1.5)
+            time.sleep(0.5)
             if (msg_type == 'request-action'):
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
                 self.log.write(action_xml)
-            elif (msg_type == 'bye'):
-                print "@Agent: received bye"
-                print_message_dict(msg_dict_private)
-                #quit = True
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
                 print_message_dict(msg_dict_private)
                 #quit = True
+            elif (msg_type == 'bye'):
+                print "@Agent: received bye"
+                print_message_dict(msg_dict_private)
+                quit = True
             else:
                 print "@Agent: en area 51"
                 print_message_dict(msg_dict_private)
@@ -108,6 +110,22 @@ class PrologAgent(Agent):
         self.prolog.consult(prolog_source)
         print "done"
 
+    def processSimulationStart(self, msg_dict):
+        role = msg_dict['role']
+        if   (role == 'Explorer'):
+            self.prolog_role_file = 'pl/explorer.pl'
+        elif (role == 'Repairer'):
+            seld.prolog_role_file = 'pl/repairer.pl'
+        elif (role == 'Sentinel'):
+            self.prolog_role_file = 'pl/sentinel.pl'
+        elif (role == 'Saboteur'):
+            self.prolog_role_file = 'pl/saboteur.pl'
+        elif (role == 'Inspector'):
+            self.prolog_role_file = 'pl/inspector.pl'
+        else:
+            print "    @PrologAgent: error: unknown role"
+        #self.prolog.consult(self.prolog_role_file)
+
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
         self.prolog.query("replace_energy(%s)"              % msg_dict_private['energy']).next()
@@ -117,7 +135,7 @@ class PrologAgent(Agent):
         self.prolog.query("replace_max_health(%s)"          % msg_dict_private['max_health']).next()
         self.prolog.query("replace_max_energy(%s)"          % msg_dict_private['max_energy']).next()
         self.prolog.query("replace_position(%s)"            % msg_dict_public['position']).next()
-        #print "@PrologAgent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg_dict_public['position'], msg_dict_public['position'])
+        #print "    @PrologAgent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg_dict_public['position'], msg_dict_public['position'])
 
         # Actualizamos el estado del mapa con los nodos.
         vert = "["
@@ -125,7 +143,7 @@ class PrologAgent(Agent):
             vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
         self.prolog.query("updateNodes(%s)" % vert2 ).next()
-        #print "@PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
+        #print "    @PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
         
         # Actualizamos el estado del mapa con los arcos.
         vert = "["
@@ -133,10 +151,10 @@ class PrologAgent(Agent):
             vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
         vert2 = vert[:-1]+"]"
         self.prolog.query("updateEdges(%s)" % vert2 ).next()
-        #print "@PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
+        #print "    @PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "@PrologAgent: received request-action. id:", action_id
+        print "    @PrologAgent: received request-action. id:", action_id
 
         # Synchronize perceptions with others.
         self.perceptConnection.send(msg_dict_public)
@@ -149,7 +167,9 @@ class PrologAgent(Agent):
         actionList = self.prolog.query("exec(X)").next()['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
+            print "    @PrologAgent: sending %s" % actionList[0]
         elif len(actionList) == 2:
+            print "    @PrologAgent: sending %s %s" % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
             print "    @PrologAgent: error in returned action. Sending skip."
