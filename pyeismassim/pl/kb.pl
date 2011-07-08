@@ -14,6 +14,7 @@
 :- ['pl/graph/map.pl'].
 % Beliefs
 last_action(skip).
+my_team(d3lp0r).
 kposition(pete, etep).
 hposition(pete, etep).
 my_name(jesucristo).
@@ -109,21 +110,17 @@ updateValue(knode(Name, unknown, _Team), NewValue) :-
 % Formato de los nodos:
 % knode(Name, Team, Value)
 % Value es unknown si no sabemos cuanto vale el nodo
-updateNodes([]).
 % cuando no conocemos el valor de un nodo, simplemente
 % actualizamos su owner
-updateNodes([X|Xs]) :-
-    X = knode(Name, _Value, CurrentTeam),
+updateNode(knode(Name, _Value, CurrentTeam)) :-
     knode(Name, _OldValue, _OldTeam), !,
     updateValue(X, NewValue),
     retractall(knode(Name, _, _)),
     retractall(hnode(Name, _, _)),
     assertz(knode(Name, NewValue, CurrentTeam)),
-    assertz(hnode(Name, NewValue, CurrentTeam)),
-    updateNodes(Xs).
-updateNodes([X|Xs]) :-
-    assertz(X),
-    updateNodes(Xs).
+    assertz(hnode(Name, NewValue, CurrentTeam)).
+updateNode(X) :-
+    assertz(X).
 
 %member(X, [X | _]).
 %member(X, [Y | Ys]) :- 

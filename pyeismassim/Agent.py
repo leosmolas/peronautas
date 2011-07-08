@@ -129,11 +129,8 @@ class PrologAgent(Agent):
             print "    @PrologAgent: error: unknown role"
         self.prolog.consult(self.prolog_role_file)
 
-        # Guardo mi nombre y equipo en la KB.
-        self.prolog.query("assert(my_team(d3lp0r))").next()
+        # Guardo mi nombre en la KB.
         self.prolog.query("replace_myName(%s)" % self.username).next()
-        n = self.prolog.query("my_name(X)").next()['X']
-        print "NAME:",n
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
@@ -146,12 +143,30 @@ class PrologAgent(Agent):
         self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
 
         # Actualizamos el estado del mapa con los nodos.
-        vert = "["
-        for x in msg_dict_public.get('vis_verts'):
-            vert += "knode(%s, unknown, %s)," % (x['name'], x['team'])
-        vert2 = vert[:-1] + "]"
-        self.prolog.query("updateNodes(%s)" % vert2 ).next()
+        #vert = "["
+        #for x in msg_dict_public.get('vis_verts'):
+        #    vert += "knode(%s, unknown, %s)," % (x['name'], x['team'])
+        #vert2 = vert[:-1] + "]"
+        #self.prolog.query("updateNodes(%s)" % vert2 ).next()
         
+        # Obtenemos todos los vertices sondeados.
+        # Despues, para cada vertice visible, nos fijamos si
+        # el vertice esta entre los vertices sondeados
+        # Si lo esta, se actualiza la informacion del verice con su valor, 
+        # sino, se actualiza con el valor unknown.
+        probed_verts = msg_dict_public.get('probed_verts', [])
+        for x in msg_dict_public.get('vis_verts', []):
+            # Esta el vertice entre los vertices sondeados?
+            in_pv = False
+            for pv in probed_verts:
+                if (pv['name'] == x['name']):
+                    in_pv = True
+                    break
+            if (in_pv):
+                self.prolog.query('updateNode(knode(%s,%s,%s))' % (x['name'], pv['value'], x['team'])).next()
+            else:
+                self.prolog.query('updateNode(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
+
         # Actualizamos el estado del mapa con los arcos.
         vert = "["
         for x in msg_dict_public.get('vis_edges'):
