@@ -19,6 +19,9 @@ kposition(pete, etep).
 hposition(pete, etep).
 my_name(jesucristo).
 
+isNotSurveyed(Node) :-
+    findall(Node, kedge(Node, _, unknown), []).
+
 replace_myName(X) :- 
    retractall(my_name(OldName)),
    retractall(hposition(OldName, Op1)),
@@ -152,43 +155,34 @@ actualizarListas([X | Xs], Func) :-
 
 intention(explore). % Intenciones posibles: explore, recharge
 
-argumentation :- 
-    intention(recharge),
-    max_energy(X),
-    energy(X),
-    retract( intention(recharge) ),
-    assert(  intention(explore)  ).
-argumentation :- 
-    last_action_result(failed),
-    retract( intention(_)        ),
-    assert(  intention(recharge) ).
-
-% Planning.
-
-planning :- 
-    intention(explore),
-    searchNeigh(N),
-    retract( plan(_)         ),
-    assert(  plan([goto(N)]) ).
-planning :- 
-    intention(recharge),
-    retract( plan(_)          ),
-    assert(  plan([recharge]) ).
-
+%   argumentation :- 
+%       intention(recharge),
+%       max_energy(X),
+%       energy(X),
+%       retract( intention(recharge) ),
+%       assert(  intention(explore)  ).
+%   
+%   argumentation :- 
+%       last_action_result(failed),
+%       retract( intention(_)        ),
+%       assert(  intention(recharge) ).
+%   
+%   % Planning.
+%   
+%   planning :- 
+%       intention(explore),
+%       searchNeigh(N),
+%       retract( plan(_)         ),
+%       assert(  plan([goto(N)]) ).
+%   planning :- 
+%       intention(recharge),
+%       retract( plan(_)          ),
+%       assert(  plan([recharge]) ).
+   
 searchNeigh(N) :-
     my_name(A),
     kposition(A, Pos),
     kedge(Pos, N, _).
 
 % Ejecutar.
-
-plan([]).
-
-exec([skip]) :-
-    plan([]).
-exec(Action) :- 
-    plan([X | Xs]),
-    X =.. Action,
-    retract( plan(_)  ),
-    assert(  plan(Xs) ).
 

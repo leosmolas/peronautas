@@ -1,10 +1,10 @@
-SERVER_DIR=/home/igaray/projects-code/lidia-massim/massim-2011-1.0/massim/scripts/
+SERVER_DIR=/home/dgm/lidia-massim/massim-2011-1.0/massim/scripts/
 SERVER_CMD='startServer.sh'
-MONITOR_DIR=/home/igaray/projects-code/lidia-massim/massim-2011-1.0/massim/scripts/
+MONITOR_DIR=/home/dgm/lidia-massim/massim-2011-1.0/massim/scripts/
 MONITOR_CMD='startMarsMonitor.sh'
-PERCEPT_DIR=/home/igaray/projects-code/lidia-massim/lidia-massim/pyeismassim/perceptServer/
+PERCEPT_DIR=/home/dgm/lidia-massim/pyeismassim/perceptServer/
 PERCEPT_CMD='PerceptServer.py 1 10000 31'
-PYTHON=python2
+PYTHON=python
 TERM_CMD=urxvtc
 
 WD=$(pwd)

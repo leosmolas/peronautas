@@ -12,7 +12,7 @@
 		<simulation
 				configurationclass="massim.competition2011.GraphSimulationConfiguration"
 				file-simulationlog="./backup/"
-				id="demo1a"
+				id="2011-test-3sims-1"
 				rmixmlobsserverhost="localhost"
 				rmixmlobsserverport="1099"
 				rmixmlobserver="massim.competition2011.GraphSimulationRMIXMLDocumentObserver"
@@ -33,6 +33,7 @@
 					maxNodeWeight="10"
 					minEdgeCost="1"
 					maxEdgeCost="10"
+					nodeWeighting="0"
 			>
 				<actions>
 					<action
@@ -301,7 +302,7 @@
 		<simulation
 				configurationclass="massim.competition2011.GraphSimulationConfiguration"
 				file-simulationlog="./backup/"
-				id="demo1b"
+				id="2011-test-3sims-2"
 				rmixmlobsserverhost="localhost"
 				rmixmlobsserverport="1099"
 				rmixmlobserver="massim.competition2011.GraphSimulationRMIXMLDocumentObserver"
@@ -322,6 +323,7 @@
 					maxNodeWeight="10"
 					minEdgeCost="1"
 					maxEdgeCost="10"
+					nodeWeighting="0"
 			>
 				<actions>
 					<action
@@ -590,7 +592,7 @@
 		<simulation
 				configurationclass="massim.competition2011.GraphSimulationConfiguration"
 				file-simulationlog="./backup/"
-				id="demo1c"
+				id="2011-test-3sims-3"
 				rmixmlobsserverhost="localhost"
 				rmixmlobsserverport="1099"
 				rmixmlobserver="massim.competition2011.GraphSimulationRMIXMLDocumentObserver"
@@ -611,6 +613,7 @@
 					maxNodeWeight="10"
 					minEdgeCost="1"
 					maxEdgeCost="10"
+					nodeWeighting="0"
 			>
 				<actions>
 					<action
