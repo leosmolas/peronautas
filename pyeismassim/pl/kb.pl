@@ -14,7 +14,6 @@
 :- ['pl/graph/map.pl'].
 % Beliefs
 last_action(skip).
-action(skip).
 kposition(pete, etep).
 hposition(pete, etep).
 my_name(jesucristo).
@@ -117,8 +116,8 @@ updateNodes([X|Xs]) :-
     X = knode(Name, _Value, CurrentTeam),
     knode(Name, _OldValue, _OldTeam), !,
     updateValue(X, NewValue),
-    retract(knode(Name, _, _)),
-    retract(hnode(Name, _, _)),
+    retractall(knode(Name, _, _)),
+    retractall(hnode(Name, _, _)),
     assertz(knode(Name, NewValue, CurrentTeam)),
     assertz(hnode(Name, NewValue, CurrentTeam)),
     updateNodes(Xs).

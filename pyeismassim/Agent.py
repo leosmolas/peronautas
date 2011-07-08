@@ -28,6 +28,9 @@ class Agent():
     
     def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort):
         print "Basic initialization", 
+        self.username = USER
+        self.password = PASS
+
         self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
 
         if useLog:
@@ -124,34 +127,37 @@ class PrologAgent(Agent):
             self.prolog_role_file = 'pl/inspector.pl'
         else:
             print "    @PrologAgent: error: unknown role"
-        #self.prolog.consult(self.prolog_role_file)
+        self.prolog.consult(self.prolog_role_file)
+
+        # Guardo mi nombre y equipo en la KB.
+        self.prolog.query("assert(my_team(d3lp0r))").next()
+        self.prolog.query("replace_myName(%s)" % self.username).next()
+        n = self.prolog.query("my_name(X)").next()['X']
+        print "NAME:",n
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
-        self.prolog.query("replace_energy(%s)"              % msg_dict_private['energy']).next()
-        self.prolog.query("replace_last_action(%s)"         % msg_dict_private['last_action']).next()
-        self.prolog.query("replace_last_action_result(%s)"  % msg_dict_private['last_action_result']).next()
-        self.prolog.query("replace_money(%s)"               % msg_dict_private['money']).next()
-        self.prolog.query("replace_max_health(%s)"          % msg_dict_private['max_health']).next()
-        self.prolog.query("replace_max_energy(%s)"          % msg_dict_private['max_energy']).next()
-        self.prolog.query("replace_position(%s)"            % msg_dict_public['position']).next()
-        #print "    @PrologAgent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg_dict_public['position'], msg_dict_public['position'])
+        self.prolog.query("replace_energy(%s)"             % msg_dict_private['energy']).next()
+        self.prolog.query("replace_last_action(%s)"        % msg_dict_private['last_action']).next()
+        self.prolog.query("replace_last_action_result(%s)" % msg_dict_private['last_action_result']).next()
+        self.prolog.query("replace_money(%s)"              % msg_dict_private['money']).next()
+        self.prolog.query("replace_max_health(%s)"         % msg_dict_private['max_health']).next()
+        self.prolog.query("replace_max_energy(%s)"         % msg_dict_private['max_energy']).next()
+        self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
 
         # Actualizamos el estado del mapa con los nodos.
         vert = "["
-        for x in msg_dict_public['vis_verts']:
-            vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
+        for x in msg_dict_public.get('vis_verts'):
+            vert += "knode(%s, unknown, %s)," % (x['name'], x['team'])
         vert2 = vert[:-1] + "]"
         self.prolog.query("updateNodes(%s)" % vert2 ).next()
-        #print "    @PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
         
         # Actualizamos el estado del mapa con los arcos.
         vert = "["
-        for x in msg_dict_public['vis_edges']:
+        for x in msg_dict_public.get('vis_edges'):
             vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
-        vert2 = vert[:-1]+"]"
+        vert2 = vert[:-1] + "]"
         self.prolog.query("updateEdges(%s)" % vert2 ).next()
-        #print "    @PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "    @PrologAgent: received request-action. id:", action_id
@@ -162,9 +168,10 @@ class PrologAgent(Agent):
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        list(self.prolog.query("argumentation"))
-        list(self.prolog.query("planning"))
-        actionList = self.prolog.query("exec(X)").next()['X']
+        #list(self.prolog.query("argumentation"))
+        #list(self.prolog.query("planning"))
+        query_result = self.prolog.query("exec(X)").next()
+        actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
             print "    @PrologAgent: sending %s" % actionList[0]
