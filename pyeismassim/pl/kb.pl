@@ -14,7 +14,7 @@
 :- ['pl/graph/map.pl'].
 % Beliefs
 last_action(skip).
-action(skip).
+my_team(d3lp0r).
 kposition(pete, etep).
 hposition(pete, etep).
 my_name(jesucristo).
