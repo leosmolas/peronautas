@@ -1,8 +1,8 @@
-#! /bin/sh
+#! /bin/bash
 
 # initialize certain values
 date=`date +%Y-%m-%d_%H:%M`
-server=../target/agentcontest-2011-1.0.jar
+server=../target/agentcontest-2011-1.0.1.jar
 webappPath=/home/massim/www/webapps/massim
 webapp=$webappPath/WEB-INF/classes
 hostname=`hostname -f`
@@ -34,7 +34,7 @@ do
   then
     if [ $number -eq $count ]
     then
-      conf+=$i
+      conf=conf/$i
     fi
     count=`expr $count + 1`
   fi
@@ -50,4 +50,9 @@ java -ea -Dcom.sun.management.jmxremote -Xss10000k -Xmx600M  -DentityExpansionLi
 #mv Tournament.html $webappPath/index.html
 
 # make backup of the report
-mv backup/GridSimulation_report.xml backup/$date-$hostname-result.xml
+cd backup
+for i in $( ls *_report.xml)
+do
+	mv $i $date-$hostname-result.xml
+done
+cd ..
