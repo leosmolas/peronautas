@@ -23,16 +23,19 @@ meta(X) :-
     assert(mejorMeta(_, -1000)),
     foreach(posibleExpansion(N), doNotFail(calcMeta(expansion(N)))),
     foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
+    foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
+    foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
     mejorMeta(X, _),
     write(X),
-    retract(mejorMeta(_, _)),
-    write(5).
-
+    retract(mejorMeta(_, _)).
+    
 calcMeta(X) :-
     writeln(X),
     X =.. [Meta, Nodo | _],
-    Answer =.. [Meta, Value, Nodo],    
-    answer(Answer, yes), !,    
+    Query =.. [Meta, Value, Nodo],
+    answer(Query, Answer),
+    writeln(Answer), 
+    Answer = yes, !,
     writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,

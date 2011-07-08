@@ -30,10 +30,10 @@ expansion(Value, X) -<
                 esSeguro(X),
                 difPuntosZona(X, DifPuntos),
                 consExpansion(Cons),
-                mult(DifPuntos, Cons, Value),
-                argValue(Value).
-               
+                mult(DifPuntos, Cons, Value).
+                               
 % DESIRE explorar(Nodo)
+% Conocer todos los arcos que salen del nodo.
 explorar(Value, X) -< 
                ~estaLejos(X, Dist, 7),
                ~explored(X),
@@ -44,23 +44,40 @@ explorar(Value, X) -<
                mult(Pow, 2, Mult),
                add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
                power(Negativo, 2, NegPow),
-               sust(Add, NegPow, Value),
-               argValue(Value).
- 
-%  
-positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
-positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
- 
+               sust(Add, NegPow, Value).
+               
+
+% DESIRE explorar(Nodo)
+probear(Value, X) -< 
+               ~estaLejos(X, Dist, 10),
+               notProbedInZone(X, InZone),
+               difPuntosZona(X, DifPuntos),                
+               positivoONegativo(DifPuntos, Positivo, Negativo),
+               sust(10, Dist, Sust),
+               power(Sust, 2, Pow),
+               mult(Pow, 2, Mult),
+               add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
+               power(Negativo, 2, NegPow),
+               sust(Add, NegPow, Sust2),
+               add(Sust, InZone, Value).               
+
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
-aumento(X, Value) -< ~estáLejos(X, Dist, 10), 
+aumento(Value, X) -< 
+              ~estaLejos(X, Dist, 10), 
               ~estoyEnLaFrontera,
               esSeguro(X),
               difPuntosZona(X, DifPuntos),
-              mult(DistZona, 10, Mult),
-              sust(5, Dist, Sust),
+              greater(DifPuntos, 0),
+              mult(DifPuntos, 10, Mult),
+              sust(10, Dist, Sust),
               power(Sust, 2, Pow),
-              add(Mult, Pow, Value),
-              argValue(Value).
+              add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
+              
+% La diferencia de puntos entre la situación actual y el agente ubicado en Nodo
+% se pesa en la cuenta con 0, o la diferencia.
+positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
+positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
+ 
 % estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
                       
 % ~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
@@ -71,16 +88,20 @@ aumento(X, Value) -< ~estáLejos(X, Dist, 10),
 estaLejos(X, Dist, Cota) <- distancia(X, Dist),
                             greater(Dist, Cota).
 
-~estoyEnLaFrontera(X) -< true.
+~estoyEnLaFrontera -< true.
 ~explored(_) -< true.
 ~probed(_) -< true.
 esSeguro(_) -< true.
-                            
+               
+notProbedInZone(X, 0) -< true.
+notProbedInZone(X, 50) <- inZone(X).
+~notProbedInZone(X, 0) <- notProbedInZone(X, 50).
+               
 % Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que estén en la misma escala. La otra es poner los números sueltos, como en explorar. No sé que decisión de diseño tomar.
 consExpansion(10) <- true. % ni idea que Value tendrá
 
 % este argumento sólo sirve para poner el argValue, para que lo busque el criterio de comparación greaterArgValue
-argValue(_) <- true.
+% argValue(_) <- true.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 

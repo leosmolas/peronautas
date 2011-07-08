@@ -22,14 +22,30 @@ posibleExpansion(b).
 posibleExpansion(e).
 posibleExpansion(f).
 
-% aumentoFrontera(Nodo, Dif)
+posibleProbear(b).
+posibleProbear(c).
+posibleProbear(d).
+
+% Nodo no probeado dentro de una zona.
+inZone(b) <- true.
+inZone(c) <- true.
+~inZone(d) <- true.
+
+posibleAumento(b).
+posibleAumento(c).
+posibleAumento(d).
+    
+% difPuntosZona(Nodo, Dif)
 % Diferencia de puntos entre la situación actual y el agente ubicado en Nodo.
 difPuntosZona(b, 2) <- true.
+difPuntosZona(c, 2) <- true.
+difPuntosZona(d, 2) <- true.
 difPuntosZona(e, 0) <- true.
 difPuntosZona(f, 0) <- true.
+difPuntosZona(h, 2) <- true.
 
 % estoyEnLaFrontera
-estoyEnLaFrontera <- true.
+% estoyEnLaFrontera <- true.
 
 % probed(Node)
 probed(a) -< true.
@@ -37,6 +53,7 @@ probed(d) -< true.
 probed(g) -< true.
 
 % explored(Node)
+% Conozco el valor de cada uno de los arcos que salen del nodo.
 explored(a) <- true.
 explored(g) <- true.
 explored(c) <- true.
@@ -61,3 +78,4 @@ distancia(d, 1) <- true.
 distancia(f, 1) <- true.
 distancia(g, 3) <- true.
 distancia(h, 2) <- true.
+
