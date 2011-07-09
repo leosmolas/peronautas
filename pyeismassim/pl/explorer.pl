@@ -2,12 +2,23 @@ exec(Action) :-
     write(1),nl,
     action(Action).
 
+reachableNode(_Node, []) :-
+    write('RN 1 ',),nl,
+    fail.
+
+reachableNode(Node, [[Node, unknown] | T]) :-
+    write('RN 2 '),write(Node),write(' '),write(unknown),nl,
+    reachableNode(_, T).
+
 reachableNode(Node, [[Node, Cost] | _T]) :-
+    Cost \= unknown,
+    write('RN 3 '),write(Node),write(' '),write(Cost),nl,
     energy(X),
     X >= Cost.
 
-reachableNode(_Node, [ _ | T]) :-
-    reachableNode(T).
+reachableNode(_, [_ | T]) :-
+    write('RN 4 '),nl,
+    reachableNode(_, T).
 
 % si tenemos suficiente energia y no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
@@ -26,19 +37,37 @@ action([probe, Position]) :-
 action([survey, Position]) :-
     write(3),nl,
     energy(X),
+    write(3.1),nl,
     X > 0,
+    write(3.2),nl,
     my_name(Name),
+    write(3.3),nl,
     kposition(Name, Position),
-    isNotSurveyed(Position), !.
+    write(3.4),nl,
+    isNotSurveyed(Position), 
+    write(3.5),nl,
+    !.
 
 action([goto, X]) :-
     write(4),nl,
     my_name(Name),
+    write(4.1),nl,
     kposition(Name, Position),
-    findall([Node, Cost], (kedge(Position, Node, Cost), knode(Node, unknown, _)), L),
-    reachableNode(X, L), !.
+    write(4.2),nl,
+    findall(
+        [Node, Cost], 
+        (
+            kedge(Position, Node, Cost), 
+            knode(Node, unknown, _)
+        ), 
+        L),
+    write(4.3),nl,
+    write('L: '),write(L),nl,
+    reachableNode(X, L), 
+    write(4.4),nl,
+    !.
      
-action([goto ,X]) :-
+action([goto, X]) :-
     write(5),nl,
     my_name(Name),
     write(5.1),nl,
@@ -47,6 +76,7 @@ action([goto ,X]) :-
     energy(E),
     write(5.3),nl,
     kedge(Position, X, Cost),
+    Cost \= unknown,
     write(5.4),nl,
     E >= Cost, 
     write(5.5),nl,

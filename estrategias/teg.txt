@@ -68,13 +68,6 @@ si:¶
 no:
 ¶
 
-
-
-
-
-
-
-
 Cosas interesantes a implementar:
     predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo
     predicado is_bottleneck que identifica cuando un nodo es un cuello de botello

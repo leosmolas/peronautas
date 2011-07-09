@@ -163,8 +163,10 @@ class PrologAgent(Agent):
                     in_pv = True
                     break
             if (in_pv):
+                print "El nodo %s esta entre los nodos sondeados" % x['name']
                 self.prolog.query('updateNode(knode(%s,%s,%s))' % (x['name'], pv['value'], x['team'])).next()
             else:
+                print "El nodo %s no esta entre los nodos sondeados" % x['name']
                 self.prolog.query('updateNode(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
 
         # Actualizamos el estado del mapa con los arcos.
@@ -180,6 +182,11 @@ class PrologAgent(Agent):
         # Synchronize perceptions with others.
         self.perceptConnection.send(msg_dict_public)
         percept_difference = self.perceptConnection.recv()
+
+        print ""
+        print "PERCEPTION:"
+        print_message(msg_dict_public)
+        print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
