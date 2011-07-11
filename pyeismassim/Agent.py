@@ -44,23 +44,33 @@ class Agent():
             self.perceptConnection = VortexPerceptConnection()
         print "done"
 
+
+
     def connect(self):
         # Connect and authenticate.
         self.massimConnection.connect()
         self.perceptConnection.connect()
+
+
 
     def disconnect(self):
         self.log.close()
         self.massimConnection.disconnect()
         self.perceptConnection.disconnect()
 
+
+
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "@Agent: received request-action. id:", action_id
         action_xml = action(action_id, "skip")
         return action_xml
 
+
+
     def processSimulationStart(self, msg_dict):
         pass
+
+
 
     def perceiveActLoop(self):
         # Receive simulation start notification.
@@ -101,7 +111,10 @@ class Agent():
                 print "@Agent: en area 51"
                 print_message_dict(msg_dict_private)
                 quit = True
-        
+        sys.stdin.read()
+
+
+
 ####################################################################################################
 class PrologAgent(Agent):
 
@@ -112,6 +125,8 @@ class PrologAgent(Agent):
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
         print "done"
+
+
 
     def processSimulationStart(self, msg_dict):
         role = msg_dict['role']
@@ -130,7 +145,9 @@ class PrologAgent(Agent):
         self.prolog.consult(self.prolog_role_file)
 
         # Guardo mi nombre en la KB.
-        self.prolog.query("replace_myName(%s)" % self.username).next()
+        self.prolog.query("replace_my_name(%s)" % self.username).next()
+
+
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
@@ -142,13 +159,6 @@ class PrologAgent(Agent):
         self.prolog.query("replace_max_energy(%s)"         % msg_dict_private['max_energy']).next()
         self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
 
-        # Actualizamos el estado del mapa con los nodos.
-        #vert = "["
-        #for x in msg_dict_public.get('vis_verts'):
-        #    vert += "knode(%s, unknown, %s)," % (x['name'], x['team'])
-        #vert2 = vert[:-1] + "]"
-        #self.prolog.query("updateNodes(%s)" % vert2 ).next()
-        
         # Obtenemos todos los vertices sondeados.
         # Despues, para cada vertice visible, nos fijamos si
         # el vertice esta entre los vertices sondeados
@@ -163,18 +173,20 @@ class PrologAgent(Agent):
                     in_pv = True
                     break
             if (in_pv):
-                print "El nodo %s esta entre los nodos sondeados" % x['name']
-                self.prolog.query('updateNode(knode(%s,%s,%s))' % (x['name'], pv['value'], x['team'])).next()
+                #print "El nodo %s esta entre los nodos sondeados" % x['name']
+                self.prolog.query('update_node(knode(%s,%s,%s))' % (x['name'], pv['value'], x['team'])).next()
             else:
-                print "El nodo %s no esta entre los nodos sondeados" % x['name']
-                self.prolog.query('updateNode(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
+                #print "El nodo %s no esta entre los nodos sondeados" % x['name']
+                self.prolog.query('update_node(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
 
         # Actualizamos el estado del mapa con los arcos.
         vert = "["
         for x in msg_dict_public.get('vis_edges'):
             vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
         vert2 = vert[:-1] + "]"
-        self.prolog.query("updateEdges(%s)" % vert2 ).next()
+        self.prolog.query("update_edges(%s)" % vert2 ).next()
+
+
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "    @PrologAgent: received request-action. id:", action_id
@@ -183,15 +195,13 @@ class PrologAgent(Agent):
         self.perceptConnection.send(msg_dict_public)
         percept_difference = self.perceptConnection.recv()
 
-        print ""
-        print "PERCEPTION:"
-        print_message(msg_dict_public)
-        print ""
+        #print ""
+        #print "PERCEPTION:"
+        #print_message(msg_dict_public)
+        #print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        #list(self.prolog.query("argumentation"))
-        #list(self.prolog.query("planning"))
         query_result = self.prolog.query("exec(X)").next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
@@ -205,6 +215,8 @@ class PrologAgent(Agent):
             print "    @PrologAgent: return value:", actionList
             action_xml = action(action_id, "skip")
         return action_xml
+
+
 
 ####################################################################################################
 if (__name__== "__main__"):

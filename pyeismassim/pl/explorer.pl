@@ -1,25 +1,24 @@
+
+%------------------------------------------------------------------------------%
 exec(Action) :- 
     write(1),nl,
     action(Action).
 
-reachableNode(_Node, []) :-
-    write('RN 1 ',),nl,
+%------------------------------------------------------------------------------%
+reachable_node(_Node, []) :-
     fail.
-
-reachableNode(Node, [[Node, unknown] | T]) :-
-    write('RN 2 '),write(Node),write(' '),write(unknown),nl,
-    reachableNode(_, T).
-
-reachableNode(Node, [[Node, Cost] | _T]) :-
+reachable_node(Node, [[Node, unknown] | T]) :-
+    reachable_node(_, T).
+reachable_node(Node, [[Node, Cost] | _T]) :-
     Cost \= unknown,
-    write('RN 3 '),write(Node),write(' '),write(Cost),nl,
     energy(X),
     X >= Cost.
+reachable_node(_, [_ | T]) :-
+    reachable_node(_, T).
 
-reachableNode(_, [_ | T]) :-
-    write('RN 4 '),nl,
-    reachableNode(_, T).
 
+
+%------------------------------------------------------------------------------%
 % si tenemos suficiente energia y no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
     write(2),nl,
@@ -34,6 +33,7 @@ action([probe, Position]) :-
     write(2.1),nl,
     !.
 
+%------------------------------------------------------------------------------%
 action([survey, Position]) :-
     write(3),nl,
     energy(X),
@@ -44,10 +44,11 @@ action([survey, Position]) :-
     write(3.3),nl,
     kposition(Name, Position),
     write(3.4),nl,
-    isNotSurveyed(Position), 
+    is_not_surveyed(Position), 
     write(3.5),nl,
     !.
 
+%------------------------------------------------------------------------------%
 action([goto, X]) :-
     write(4),nl,
     my_name(Name),
@@ -63,10 +64,11 @@ action([goto, X]) :-
         L),
     write(4.3),nl,
     write('L: '),write(L),nl,
-    reachableNode(X, L), 
+    reachable_node(X, L), 
     write(4.4),nl,
     !.
      
+%------------------------------------------------------------------------------%
 action([goto, X]) :-
     write(5),nl,
     my_name(Name),
@@ -82,6 +84,7 @@ action([goto, X]) :-
     write(5.5),nl,
     !.
 
+%------------------------------------------------------------------------------%
 action([recharge]) :-
     write(6),nl.
 
