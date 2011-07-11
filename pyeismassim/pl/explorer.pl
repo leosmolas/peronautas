@@ -23,14 +23,15 @@ reachable_node(_, [_ | T]) :-
 action([probe, Position]) :-
     write(2),nl,
     energy(X),
-    write('energy:'),write(X),nl,
+    write(2.1),write(' energy: '),write(X),nl,
     X > 0,
+    write(2.2),nl,
     my_name(Name),
-    write('name:'),write(Name),nl,
+    write(2.3),write(' name: '),write(Name),nl,
     kposition(Name, Position),
-    write('position:'),write(Position),nl,
+    write(2.4),write(' position: '),write(Position),nl,
     knode(Position, unknown, _), 
-    write(2.1),nl,
+    write(2.5),nl,
     !.
 
 %------------------------------------------------------------------------------%
@@ -63,7 +64,6 @@ action([goto, X]) :-
         ), 
         L),
     write(4.3),nl,
-    write('L: '),write(L),nl,
     reachable_node(X, L), 
     write(4.4),nl,
     !.
