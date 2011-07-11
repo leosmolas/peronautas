@@ -29,7 +29,7 @@ TAREAS INMEDIATAS:
         arc/2.
     [x] mejorar la incorporacion del conocimiento en la percepcion a la kb del agente
         pregunta: hecho unario con una lista, o conjunto de hechos individuales?
-    [ ] hacer que el arco contemple el costo (incorporacion de surveyed edges a la kb)
+    [x] hacer que el arco contemple el costo (incorporacion de surveyed edges a la kb)
     [ ] decidir como se va a guardar o generar la lista de adyacencia
         posibilidad: guardar tanto hechos separados para cada arco, como guardar el grafo como lista de adyacencia
     [ ] adaptar el codigo de dijkstra para generar los caminos mas cortos en python
@@ -43,7 +43,7 @@ TAREAS INMEDIATAS:
     [x] write configuration file for a test match¶
     [x] add role parse to messagehandling¶
     [x] write code to instantiate the correct type of agent according to role¶
-    [x] java agents to prolog¶
+    [ ] java agents to prolog¶
     [ ] get functional team¶
     [x] whole test suit¶
     [x] new server¶
