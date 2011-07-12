@@ -12,7 +12,7 @@
 		<simulation
 				configurationclass="massim.competition2011.GraphSimulationConfiguration"
 				file-simulationlog="./backup/"
-				id="demo1"
+				id="2011-conf1-1"
 				rmixmlobsserverhost="localhost"
 				rmixmlobsserverport="1099"
 				rmixmlobserver="massim.competition2011.GraphSimulationRMIXMLDocumentObserver"
@@ -25,14 +25,15 @@
 					numberOfAgents="20"
 					numberOfTeams="2"
 					agentsPerTeam="1"
-					numberOfNodes="20"
-					gridWidth="5"
-					gridHeight="5"
+					numberOfNodes="2000"
+					gridWidth="60"
+					gridHeight="60"
 					cellWidth="100"
 					minNodeWeight="1"
 					maxNodeWeight="10"
 					minEdgeCost="1"
 					maxEdgeCost="10"
+					nodeWeighting="50"
 			>
 				<actions>
 					<action

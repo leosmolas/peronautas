@@ -1,8 +1,8 @@
 [X] 1 conexion 
 [X] 2 integracion python prolog
-[ ] 3 delirar soluciones al problema
+[X] 3 delirar soluciones al problema
 [X] 4 diseño arquitectonico agentes (bdi)
-[ ] 5 diseño interno
+[X] 5 diseño interno
 [ ] 6 diseño de comunicacion entre agentes
 [ ] 7 implementacion interna
 [ ] 8 hablar de argumentacion uy como usarlo
@@ -15,31 +15,58 @@ Areas de interes segun Diego Martine:
     
 TAREAS INMEDIATAS:
     [ ] escribir el documento a mandar
-    [ ] implementar el compartido de percepciones
+    [x] implementar el compartido de percepciones
         - que pasa cuando tenes dos agentes, y los dos mandan toda su percepcion, y colision e.g. el health de cada uno?
           solo mandamos cosas comunes como la estructura del grafo y agentes enemigos, o interesa saber la energia/salud de los demas?
         - opcion 1: separar el resultado del parseo en una lista de cosas privadas y otras publicas
         - opcion 2: tagear cosas privadas con el nombre del agente
-    [ ] implementar opcion 1
+    [x] implementar opcion 1
     [ ] incorporar la libreria del tucky para comunicacion entre agentes
-    [ ] implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
+    [x] implementar la incorporacion de la informacion en la percepcion a la base de conocimiento
         la estructura del grafo se almacena con hechos
         los datos dinamicos de la percepcion se almacenan en un mapeo asociativo
         vertex/1.
         arc/2.
-    [ ] mejorar la incorporacion de el conocimiento en la percepcion a la kb del agente
+    [x] mejorar la incorporacion del conocimiento en la percepcion a la kb del agente
         pregunta: hecho unario con una lista, o conjunto de hechos individuales?
     [ ] hacer que el arco contemple el costo (incorporacion de surveyed edges a la kb)
     [ ] decidir como se va a guardar o generar la lista de adyacencia
         posibilidad: guardar tanto hechos separados para cada arco, como guardar el grafo como lista de adyacencia
     [ ] adaptar el codigo de dijkstra para generar los caminos mas cortos en python
     [ ] escribir la consulta para obtener desde prolog la lista de adyacencia
-    [ ] decidir como se va a hacer para instanciar un agente de un determinado rol (como separar el codigo para cada rol)
-    [ ] TODO: abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
+    [x] TODO: abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
 
-    - determinar como se mapea la arquitectura propuesta del agente a llamadas, funciones, predicados, etc. (la idea basica esta en el codigo de la clase PrologAgent)
-    - desarrollar estrategias generales de: expansion, defensa, ataque, compra
-    - desarrollar estrategias particulares para los roles de saboteador, reparador, sentinela, inspector
+    [ ] determinar como se mapea la arquitectura propuesta del agente a llamadas, funciones, predicados, etc. (la idea basica esta en el codigo de la clase PrologAgent)
+    [ ] desarrollar estrategias generales de: expansion, defensa, ataque, compra
+    [ ] desarrollar estrategias particulares para los roles de saboteador, reparador, sentinela, inspector
+
+    [x] write configuration file for a test match¶
+    [x] add role parse to messagehandling¶
+    [x] write code to instantiate the correct type of agent according to role¶
+    [x] java agents to prolog¶
+    [ ] get functional team¶
+    [x] whole test suit¶
+    [x] new server¶
+    [x] percept server¶
+    [x]     make the server accept an iterations parameter¶
+    [ ]     make the server use non.blocking sockets and timeouts¶
+    [ ] what happens with the agent state when the configuration server has several simulations/matches ?
+    [ ] go through the list of stuff that may appear in a percept and write down what we can do with each
+    [ ] true dummy agent which follows orders¶
+¶
+definir orden de las intenciones¶
+orden dentro de los agentes, dentro de los que tienen las mismas intenciones¶
+¶
+agarro la primer accion¶
+se puede ejecutar?¶
+si:¶
+    soy yo? si -> la hago¶
+        no soy yo -> la ejecuto hipoteticamente¶
+        hay un conflicto y soy yo?¶
+            no -> salteo¶
+            si -> pensar una posible intencion que no sea dañina¶
+no:
+¶
 
 Cosas interesantes a implementar:
     predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo

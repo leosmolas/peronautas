@@ -7,156 +7,229 @@
 import sys
 import time
 import argparse
-from timeit import Timer
-from connection.MASSimConnection import MASSimConnection
-from connection.MessageHandling import *
-from pyswip.prolog import Prolog
-from pyswip.easy import *
+from timeit                         import Timer
+from connection.MASSimConnection    import MASSimConnection
+from connection.MessageHandling     import *
+from perceptServer.PerceptServer    import PerceptConnection, VortexPerceptConnection
+from pyswip.prolog                  import Prolog
+from pyswip.easy                    import *
 
 ####################################################################################################
-class VortexWriter():#clase auxiliar utilizada en caso de que NO se escriba en logs
+class VortexWriter():
+    # Clase auxiliar utilizada en caso de que NO se escriba en logs.
     def write(self, s):
         pass
 
     def close(self):
         pass
+
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, sharedServerPort):
-        print "Basic initialization"
-        self.HOST = "127.0.0.1"
-        self.PORT = 12300
-        self.USER = USER
-        self.PASS = PASS
-        self.SHSERVERPORT = sharedServerPort
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort):
+        print "Basic initialization", 
+        self.username = USER
+        self.password = PASS
+
+        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
+
         if useLog:
             self.log  = open('log-' + USER + '.txt', 'w')
         else:
             self.log = VortexWriter()
-        if sharedServerPort:
-            #inicializar conexion con el server, supongo
-            pass
+        
+        if (perceptServerPort and perceptServerHost):
+            self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:
-            #imagino que deberemos inventar algo en caso de que NO se use, similar al VortexWriter
-            pass
+            self.perceptConnection = VortexPerceptConnection()
+        print "done"
+
+
 
     def connect(self):
         # Connect and authenticate.
-        self.connection = MASSimConnection()
-        self.connection.connect(self.HOST, self.PORT, self.USER, self.PASS)       
+        self.massimConnection.connect()
+        self.perceptConnection.connect()
+
+
 
     def disconnect(self):
         self.log.close()
-        self.connection.disconnect()
+        self.massimConnection.disconnect()
+        self.perceptConnection.disconnect()
+
+
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "@Agent: received request-action. id:", action_id
         action_xml = action(action_id, "skip")
         return action_xml
 
+
+
+    def processSimulationStart(self, msg_dict):
+        pass
+
+
+
     def perceiveActLoop(self):
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
-        xml = self.connection.receive()
+        xml = self.massimConnection.receive()
         self.log.write(xml)
         _, _, msg_dict, _ = parse_as_dict(xml)
 
         print "@Agent: received simulation start notification."
         print_message_dict(msg_dict)
+        self.processSimulationStart(msg_dict)
 
         quit = False
-        steps = int(msg_dict['steps'])
         step = 0
         while (not quit):
             step += 1
             print "@Agent: step:", step
 
-            # Receive action request.
-            xml = self.connection.receive()
+            xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
 
             self.log.write(xml)
 
-            time.sleep(1.5)
+            time.sleep(0.5)
             if (msg_type == 'request-action'):
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
-                self.connection.send(action_xml)
+                self.massimConnection.send(action_xml)
                 self.log.write(action_xml)
-            elif (msg_type == 'bye'):
-                print "@Agent: received bye"
-                #quit = True
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
+                print_message_dict(msg_dict_private)
                 #quit = True
+            elif (msg_type == 'bye'):
+                print "@Agent: received bye"
+                print_message_dict(msg_dict_private)
+                quit = True
             else:
                 print "@Agent: en area 51"
+                print_message_dict(msg_dict_private)
                 quit = True
-        
+        sys.stdin.read()
+
+
+
 ####################################################################################################
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, prolog_source, log, shServerPort):
-        Agent.__init__(self, USER, PASS, log, shServerPort)
-        print "Prolog initialization"
+    def __init__(self, USER, PASS, log, perceptServerHost, perceptServerPort, prolog_source):
+        Agent.__init__(self, USER, PASS, log, perceptServerHost, perceptServerPort)
+        print "Prolog initialization", 
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
+        print "done"
+
+
+
+    def processSimulationStart(self, msg_dict):
+        role = msg_dict['role']
+        if   (role == 'Explorer'):
+            self.prolog_role_file = 'pl/explorer.pl'
+        elif (role == 'Repairer'):
+            seld.prolog_role_file = 'pl/repairer.pl'
+        elif (role == 'Sentinel'):
+            self.prolog_role_file = 'pl/sentinel.pl'
+        elif (role == 'Saboteur'):
+            self.prolog_role_file = 'pl/saboteur.pl'
+        elif (role == 'Inspector'):
+            self.prolog_role_file = 'pl/inspector.pl'
+        else:
+            print "    @PrologAgent: error: unknown role"
+        self.prolog.consult(self.prolog_role_file)
+
+        # Guardo mi nombre en la KB.
+        self.prolog.query("replace_my_name(%s)" % self.username).next()
+
+
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
-        self.prolog.query("replace_energy(%s)"              % msg_dict_private['energy']).next()
-        self.prolog.query("replace_last_action(%s)"         % msg_dict_private['last_action']).next()
-        self.prolog.query("replace_last_action_result(%s)"  % msg_dict_private['last_action_result']).next()
-        self.prolog.query("replace_money(%s)"               % msg_dict_private['money']).next()
-        self.prolog.query("replace_max_health(%s)"          % msg_dict_private['max_health']).next()
-        self.prolog.query("replace_max_energy(%s)"          % msg_dict_private['max_energy']).next()
-        self.prolog.query("replace_position(%s)"            % msg_dict_public['position']).next()
-        #print "@PrologAgent: Mi posicion es %s. Llamando!\nreplace_position(%s)" % (msg_dict_public['position'], msg_dict_public['position'])
+        self.prolog.query("replace_energy(%s)"             % msg_dict_private['energy']).next()
+        self.prolog.query("replace_last_action(%s)"        % msg_dict_private['last_action']).next()
+        self.prolog.query("replace_last_action_result(%s)" % msg_dict_private['last_action_result']).next()
+        self.prolog.query("replace_money(%s)"              % msg_dict_private['money']).next()
+        self.prolog.query("replace_max_health(%s)"         % msg_dict_private['max_health']).next()
+        self.prolog.query("replace_max_energy(%s)"         % msg_dict_private['max_energy']).next()
+        self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
 
-        # Actualizamos el estado del mapa con los nodos.
-        vert = "["
-        for x in msg_dict_public['vis_verts']:
-            vert += "node(%s, unknown, %s)," % (x['name'], x['team'])
-        vert2 = vert[:-1] + "]"
-        self.prolog.query("updateNodes(%s)" % vert2 ).next()
-        #print "@PrologAgent %s: Llamando!\nupdateNodes(%s)" % (self.USER, vert2)
-        
+        # Obtenemos todos los vertices sondeados.
+        # Despues, para cada vertice visible, nos fijamos si
+        # el vertice esta entre los vertices sondeados
+        # Si lo esta, se actualiza la informacion del verice con su valor, 
+        # sino, se actualiza con el valor unknown.
+        probed_verts = msg_dict_public.get('probed_verts', [])
+        for x in msg_dict_public.get('vis_verts', []):
+            # Esta el vertice entre los vertices sondeados?
+            in_pv = False
+            for pv in probed_verts:
+                if (pv['name'] == x['name']):
+                    in_pv = True
+                    break
+            if (in_pv):
+                #print "El nodo %s esta entre los nodos sondeados" % x['name']
+                self.prolog.query('update_node(knode(%s,%s,%s))' % (x['name'], pv['value'], x['team'])).next()
+            else:
+                #print "El nodo %s no esta entre los nodos sondeados" % x['name']
+                self.prolog.query('update_node(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
+
         # Actualizamos el estado del mapa con los arcos.
         vert = "["
-        for x in msg_dict_public['vis_edges']:
+        for x in msg_dict_public.get('vis_edges'):
             vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
-        vert2 = vert[:-1]+"]"
-        self.prolog.query("updateEdges(%s)" % vert2 ).next()
-        #print "@PrologAgent: Llamando!\nupdateEdges(%s)" % vert2
+        vert2 = vert[:-1] + "]"
+        self.prolog.query("update_edges(%s)" % vert2 ).next()
+
+
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "@PrologAgent: received request-action. id:", action_id
+        print "    @PrologAgent: received request-action. id:", action_id
+
+        # Synchronize perceptions with others.
+        self.perceptConnection.send(msg_dict_public)
+        percept_difference = self.perceptConnection.recv()
+
+        #print ""
+        #print "PERCEPTION:"
+        #print_message(msg_dict_public)
+        #print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        list(self.prolog.query("argumentation"))
-        list(self.prolog.query("planning"))
-        actionList = self.prolog.query("exec(X)").next()['X']
-        if len(actionList) == 2:
+        query_result = self.prolog.query("exec(X)").next()
+        actionList   = query_result['X']
+        if   len(actionList) == 1:
+            action_xml = action(action_id, actionList[0])
+            print "    @PrologAgent: sending %s" % actionList[0]
+        elif len(actionList) == 2:
+            print "    @PrologAgent: sending %s %s" % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
-            action_xml = action(action_id, actionList[0])
+            print "    @PrologAgent: error in returned action. Sending skip."
+            print "    @PrologAgent: return value:", actionList
+            action_xml = action(action_id, "skip")
         return action_xml
+
+
 
 ####################################################################################################
 if (__name__== "__main__"):
     parser = argparse.ArgumentParser(description="Pyeismassim agent initializer")
-    parser.add_argument('user', metavar='USER', help="the agent's username")
-    parser.add_argument('password', metavar='PASSWORD', help="the agent's password")
-    parser.add_argument('-l', help="write-to-log mode.", action='store_const', const=True, dest='log')
-    parser.add_argument('-s', metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port", dest='shServerPort')
+    parser.add_argument('user',     metavar='USER',                      help="the agent's username")
+    parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
+    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
+    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
+    parser.add_argument('-l',                                            help="write-to-log mode.",                             action='store_const', const=True, dest='log')
+    args = parser.parse_args()
+    user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    args=parser.parse_args()
-
-    user, password, log, shServerPort = args.user, args.password, args.log, args.shServerPort
-
-    agent = PrologAgent(user, password, "pl/kb.pl", log, shServerPort)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/kb.pl")
     agent.connect()
     agent.perceiveActLoop()
     agent.disconnect()

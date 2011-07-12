@@ -8,23 +8,23 @@ MAX_CONNECTION_TRIES = 10
 
 class MASSimConnection:
 
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    def connect(self, host, port, username, password):
+    def __init__(self, host, port, username, password):
         self.host     = host
         self.port     = port
         self.username = username
         self.password = password
-        print "@Connection: connecting to " + host + ":" + str(port)
-        code = self.sock.connect_ex((host, port))
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def connect(self):
+        print "@Connection: connecting to " + self.host + ":" + str(self.port)
+        code = self.sock.connect_ex((self.host, self.port))
         if (code == 0):
             self.connected = True
         else:
             self.connected = False
             print "@Connection: failed. error:", code
         #time.sleep(2)
-        self.authenticate(username, password)
+        self.authenticate(self.username, self.password)
 
     def disconnect(self):
         self.sock.shutdown(socket.SHUT_RDWR)

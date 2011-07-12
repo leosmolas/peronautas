@@ -1,12 +1,12 @@
 import socket
 import sys
+import PerceptServer
  
-HOST = 'localhost'
-PORT = 10000
-ADDR = (HOST,PORT)
-BUFSIZE = 4096
-  
 if (__name__ == "__main__"):
+    HOST = 'localhost'
+    PORT = 10000
+    ADDR = (HOST,PORT)
+      
     if   (sys.argv[1] == '1'):
         percepts = [
                 {"1" : "a", "2" : "b", "3" : "c"},
@@ -29,20 +29,21 @@ if (__name__ == "__main__"):
         raise Exception
 
     # open the connection to the server
-    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    clientsocket.connect((ADDR))
+    connection = PerceptServer.PerceptConnection(HOST, PORT)
+    connection.connect()
 
     for i in range(3):
         print "Iteration:", i
+
         # send data
-        # careful: the clients must send the server frozensets made from lists of strings, not lists of strings
-        clientsocket.send(repr(percepts[i]))
+        connection.send(percepts[i])
 
         # receive data
-        percept_difference = clientsocket.recv(BUFSIZE)
+        percept_difference = connection.recv()
+
         print "Client had:", percepts[i]
         print "Client received:", percept_difference
 
     # close socket
-    clientsocket.close()
+    connection.disconnect()
 

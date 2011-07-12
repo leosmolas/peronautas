@@ -77,6 +77,7 @@ def parse_sim_start(xml, output = 'dict'):
             'edges'     : simulation_tag['edges']    ,
             'id'        : simulation_tag['id']       ,
             'steps'     : simulation_tag['steps']    ,
+            'role'      : simulation_tag['role']     ,
             'vertices'  : simulation_tag['vertices'] }
     elif (output == "prolog"):
         result = [
@@ -85,6 +86,7 @@ def parse_sim_start(xml, output = 'dict'):
             'edges(%s)'     % simulation_tag['edges']    ,
             'id(%s)'        % simulation_tag['id']       ,
             'steps(%s)'     % simulation_tag['steps']    ,
+            'role(%s)'      % simulation_tag['role']     ,
             'vertices(%s)'  % simulation_tag['vertices'] ]
     else:
         raise Exception
