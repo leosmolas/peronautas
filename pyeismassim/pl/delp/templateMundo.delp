@@ -8,23 +8,23 @@ posibleExpansion(Nodo)
 posibleExplorar(Nodo)
 % Nodos no probeados.
 posibleProbear(Nodo)
-% Nodos a distancia m·xima 2 de la zona.
+% Nodos a distancia m√°xima 2 de la zona.
 posibleAumento(Nodo)
 
 % El nodo esta en la zona actual.
 % inZone(Node)
 
 
-% Diferencia de puntos entre la situaciÛn actual y el agente ubicado en Nodo.
+% Diferencia de puntos entre la situaci√≥n actual y el agente ubicado en Nodo.
 % difPuntosZona(Nodo, Dif)
 
 % Se aserta si hay un saboteador enemigo
 % ~esSeguro(Node)
 
-% Se aserta si el agente est· en la frontera
+% Se aserta si el agente est√° en la frontera
 % estoyEnLaFrontera
 
-% Se aserta si el nodo est· probeado
+% Se aserta si el nodo est√° probeado
 % probed(Node)
 
 % explored(Node)
