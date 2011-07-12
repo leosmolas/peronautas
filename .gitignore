@@ -1,4 +1,8 @@
 *.pyc
 *.bak
+*.BAK
 *.db
 *.BAK
+massim/scripts/.tmp_serverconfig.xml
+pyeismassim/run.sh
+*~

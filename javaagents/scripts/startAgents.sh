@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 conf=conf/
 
@@ -33,4 +33,4 @@ echo "Starting agents: $conf"
 #java -ea -Dcom.sun.management.jmxremote -Xss10000k -Xmx600M  -#DentityExpansionLimit=1000000 -DelementAttributeLimit=1000000 -#Djava.rmi.server.hostname=$hostname -jar $server --conf $conf | tee #backup/$date-$hostname.log
 
 cd $conf
-java -ea -jar ../../../target/javaagents-1.0.jar
+java -ea -jar ../../../target/javaagents-1.0.1.jar

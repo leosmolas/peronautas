@@ -2,29 +2,29 @@ import socket
 import sys
 import time
 from MessageHandling import auth_request
-from MessageHandling import parse
+from MessageHandling import parse_as_dict
 
 MAX_CONNECTION_TRIES = 10
 
 class MASSimConnection:
 
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    def connect(self, host, port, username, password):
+    def __init__(self, host, port, username, password):
         self.host     = host
         self.port     = port
         self.username = username
         self.password = password
-        print "@Connection: connecting to " + host + ":" + str(port)
-        code = self.sock.connect_ex((host, port))
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def connect(self):
+        print "@Connection: connecting to " + self.host + ":" + str(self.port)
+        code = self.sock.connect_ex((self.host, self.port))
         if (code == 0):
             self.connected = True
         else:
             self.connected = False
             print "@Connection: failed. error:", code
         #time.sleep(2)
-        self.authenticate(username, password)
+        self.authenticate(self.username, self.password)
 
     def disconnect(self):
         self.sock.shutdown(socket.SHUT_RDWR)
@@ -44,7 +44,7 @@ class MASSimConnection:
             while (bytes_sent < msg_length):
                 sent = self.sock.send(msg[bytes_sent:])
                 bytes_sent += sent
-                print "@Connection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
+                #print "@Connection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
                 if (sent == 0):
                     self.connected = False
                     raise RuntimeError("Server connection lost!")
@@ -90,7 +90,7 @@ class MASSimConnection:
             self.send(auth_request(username, password))
             print "@Connection: waiting for reply."
             auth_reply = self.receive()
-            result = parse(auth_reply)
+            _, _, result, _ = parse_as_dict(auth_reply)
             if (result['result'] != 'ok'):
                 raise RuntimeError("Authentication failed.")
             else:
