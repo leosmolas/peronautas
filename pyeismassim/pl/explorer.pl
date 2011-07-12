@@ -1,20 +1,19 @@
 
-%------------------------------------------------------------------------------%
 exec(Action) :- 
     write(1),nl,
     action(Action).
 
 %------------------------------------------------------------------------------%
-reachable_node(_Node, []) :-
-    fail.
-reachable_node(Node, [[Node, unknown] | T]) :-
-    reachable_node(_, T).
+reachable_node(Node, [[_, unknown] | T]) :-
+    reachable_node(Node, T),
+    !.
 reachable_node(Node, [[Node, Cost] | _T]) :-
     Cost \= unknown,
     energy(X),
-    X >= Cost.
-reachable_node(_, [_ | T]) :-
-    reachable_node(_, T).
+    X >= Cost,
+    !.
+reachable_node(Node, [_ | T]) :-
+    reachable_node(Node, T).
 
 
 
@@ -45,7 +44,7 @@ action([survey, Position]) :-
     write(3.3),nl,
     kposition(Name, Position),
     write(3.4),nl,
-    is_not_surveyed(Position), 
+    hasAtLeastOneUnsurveyedEdge(Position), 
     write(3.5),nl,
     !.
 

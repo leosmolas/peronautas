@@ -166,7 +166,7 @@ def parse_request_action(xml, output = 'dict'):
             'score'               : team_tag['score']            
             }
         result_public = {
-            'position'            : self_tag['position']
+                'position'        : self_tag['position']
             }
 
         if (achievements_tag != None):

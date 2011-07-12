@@ -72,6 +72,11 @@ class Agent():
 
 
 
+    def processBye(self, msg_dict):
+        pass
+
+
+
     def perceiveActLoop(self):
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
@@ -106,12 +111,12 @@ class Agent():
             elif (msg_type == 'bye'):
                 print "@Agent: received bye"
                 print_message_dict(msg_dict_private)
+                self.processBye(msg_dict_private)
                 quit = True
             else:
                 print "@Agent: en area 51"
                 print_message_dict(msg_dict_private)
                 quit = True
-        sys.stdin.read()
 
 
 
@@ -149,23 +154,14 @@ class PrologAgent(Agent):
 
 
 
-    def processPerception(self, msg_dict_private, msg_dict_public):
-        # Actualizamos cada uno de los campos individuales del agente.
-        self.prolog.query("replace_energy(%s)"             % msg_dict_private['energy']).next()
-        self.prolog.query("replace_last_action(%s)"        % msg_dict_private['last_action']).next()
-        self.prolog.query("replace_last_action_result(%s)" % msg_dict_private['last_action_result']).next()
-        self.prolog.query("replace_money(%s)"              % msg_dict_private['money']).next()
-        self.prolog.query("replace_max_health(%s)"         % msg_dict_private['max_health']).next()
-        self.prolog.query("replace_max_energy(%s)"         % msg_dict_private['max_energy']).next()
-        self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
-
+    def processNodes(self, msg_dict):
         # Obtenemos todos los vertices sondeados.
         # Despues, para cada vertice visible, nos fijamos si
         # el vertice esta entre los vertices sondeados
         # Si lo esta, se actualiza la informacion del verice con su valor, 
         # sino, se actualiza con el valor unknown.
-        probed_verts = msg_dict_public.get('probed_verts', [])
-        for x in msg_dict_public.get('vis_verts', []):
+        probed_verts = msg_dict.get('probed_verts', [])
+        for x in msg_dict.get('vis_verts', []):
             # Esta el vertice entre los vertices sondeados?
             in_pv = False
             for pv in probed_verts:
@@ -179,12 +175,44 @@ class PrologAgent(Agent):
                 #print "El nodo %s no esta entre los nodos sondeados" % x['name']
                 self.prolog.query('update_node(knode(%s,unknown,%s))' % (x['name'], x['team'])).next()
 
+
+
+    def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
-        vert = "["
-        for x in msg_dict_public.get('vis_edges'):
-            vert += "kedge(%s,%s,unknown)," % (x['node1'],x['node2'])
-        vert2 = vert[:-1] + "]"
-        self.prolog.query("update_edges(%s)" % vert2 ).next()
+        for e in msg_dict.get('vis_edges', []):
+            self.prolog.query("updateEdge(kedge(%s,%s,unknown))" % (e['node1'], e['node2'])).next()
+
+        for e in msg_dict.get('surveyed_edges', []):
+            self.prolog.query("updateEdge(kedge(%s,%s,%s))" % (e['node1'], e['node2'], e['weight'])).next()
+
+
+
+    def processEntities(self, msg_dict):
+        self.prolog.query("retractall(kposition(_, _))").next()
+        self.prolog.query("retractall(hposition(_, _))").next()
+        for e in msg_dict.get('vis_ents'):
+            if (e['name'] == ''):
+                self.prolog.query("updateEntityPosition(unknown,%s)" % (e['node'])).next()
+                self.prolog.query("updateEntityTeam(unknown,%s)" % (e['team'])).next()
+            else:
+                self.prolog.query("updateEntityPosition(%s,%s)" % (e['name'], e['node'])).next()
+                self.prolog.query("updateEntityTeam(%s,%s)" % (e['name'], e['team'])).next()
+
+
+
+    def processPerception(self, msg_dict_private, msg_dict_public):
+        self.processEntities(msg_dict_public)
+        self.processNodes(msg_dict_public)
+        self.processEdges(msg_dict_public)
+        
+        # Actualizamos cada uno de los campos individuales del agente.
+        self.prolog.query("replace_energy(%s)"             % msg_dict_private['energy']).next()
+        self.prolog.query("replace_last_action(%s)"        % msg_dict_private['last_action']).next()
+        self.prolog.query("replace_last_action_result(%s)" % msg_dict_private['last_action_result']).next()
+        self.prolog.query("replace_money(%s)"              % msg_dict_private['money']).next()
+        self.prolog.query("replace_max_health(%s)"         % msg_dict_private['max_health']).next()
+        self.prolog.query("replace_max_energy(%s)"         % msg_dict_private['max_energy']).next()
+        self.prolog.query("replace_position(%s)"           % msg_dict_public['position']).next()
 
 
 
@@ -195,10 +223,10 @@ class PrologAgent(Agent):
         self.perceptConnection.send(msg_dict_public)
         percept_difference = self.perceptConnection.recv()
 
-        #print ""
-        #print "PERCEPTION:"
-        #print_message(msg_dict_public)
-        #print ""
+        print ""
+        print "PERCEPTION:"
+        print_message(msg_dict_public)
+        print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
@@ -217,6 +245,9 @@ class PrologAgent(Agent):
         return action_xml
 
 
+
+    def processBye(self, msg_dict):
+        self.prolog.query("dumpKB").next()
 
 ####################################################################################################
 if (__name__== "__main__"):

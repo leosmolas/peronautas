@@ -9,7 +9,8 @@
            max_health/1,
            plan/1,
            max_energy/1,
-           my_name/1.
+           my_name/1,
+           agentTeam/2.
 
 :- ['pl/graph/map.pl'].
 
@@ -34,9 +35,10 @@ my_team(d3lp0r).
 % last_action/1
 %   1st argument is a term representing the agent's last action.
 
+% Indicates the known position of an agent.
 % kposition/2
-%   1st argument is...
-%   2nd argument is...
+%   1st argument is the name of the agent that is located at that position.
+%   2nd argument is the vertex name.
 
 % hposition/2
 %   1st argument is...
@@ -55,8 +57,15 @@ my_team(d3lp0r).
 
 %------------------------------------------------------------------------------%
 % Succeeds when Node has not been surveyed. 
-is_not_surveyed(Node) :-
-    findall(Node, kedge(Node, _, unknown), []).
+% Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
+% nodo, del cual no conoces el costo.
+hasAtLeastOneUnsurveyedEdge(Node1) :-
+    findall(
+        Node2, 
+        kedge(Node1, Node2, unknown), 
+        L),
+    write('hasAtLeastOneUnsurveyedEdge: '), write(Node1),write(' '),write(L),nl,
+    L \= [].
 
 
 
@@ -142,34 +151,26 @@ delete_edge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
-update_edges([]).
-update_edges([X | Xs]) :-
+% Succeeds if the edge must be updated.
+updateEdge(kedge(Node1, Node2, Cost)) :-
     % Si el arco ya estaba en la kb (con costo unknown o el real).
-    X = kedge(Node1, Node2, Cost),
     kedge(Node1, Node2, Cost), 
-    !,
-    update_edges(Xs).
-update_edges([X | Xs]) :-
+    !.
+updateEdge(kedge(Node1, Node2, unknown)) :-
     % Si ya estaba en la kb con su costo final.
-    X = kedge(Node1, Node2, unknown),
     kedge(Node1, Node2, Cost),
     Cost \= unknown, 
-    !,
-    update_edges(Xs).
-update_edges([X | Xs]) :-
+    !.
+updateEdge(kedge(Node1, Node2, Cost)) :-
     % Si conociamos el arco pero no su valor (es decir, cuando hacemos un survey del arco).
     % En este caso podriamos preguntar si Cost \= unknown.
-    X = kedge(Node1, Node2, Cost),
-    kedge(Node1, Node2, unknown), 
+    kedge(Node1, Node2, unknown),
     !,
     delete_edge(Node1, Node2, unknown),
-    insert_edge(Node1, Node2, Cost),
-    update_edges(Xs).
-update_edges([X|Xs]) :- 
+    insert_edge(Node1, Node2, Cost).
+updateEdge(kedge(Node1, Node2, Cost)) :- 
     % Si es la primera vez que vemos el arco.
-    X = kedge(Node1, Node2, Cost),
-    insert_edge(Node1, Node2, Cost),
-    update_edges(Xs).
+    insert_edge(Node1, Node2, Cost).
 
 
 
@@ -195,28 +196,17 @@ update_node(X) :-
 
 
 %------------------------------------------------------------------------------%
-update_lists([],_).
-update_lists([X | Xs], Func) :- 
-    % genera la consulta ?- Func(V)
-    F =.. [Func, V], 
-    F,
-    % es X miembro de Func(V) ?
-    member(X, V),
-    % si lo es, lo salteamos
-    update_lists(Xs, Func).
-update_lists([X | Xs], Func) :- 
-    F =.. [Func, V],
-    F,
-    % si X no es miembro de Func(V)
-    not(member(X, V)),
-    % entonces lo retracto para asegurar que lo reemplazo
-    retract( F ),
-    F2 =.. [Func, [X | V]], % -> Func([X, ... miembros de V... ])
-    % y lo aserto
-    assert(F2),
-    update_lists(Xs, Func).
+updateEntityPosition(Name, Position) :-
+    assertz(kposition(Name, Position)),
+    assertz(hposition(Name, Position)).
 
 
+
+%------------------------------------------------------------------------------%
+updateEntityTeam(Name, Team) :-
+    agentTeam(Name, Team).
+updateEntityTeam(Name, Team) :-
+    assertz(agentTeam(Name, Team)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -263,3 +253,34 @@ searchNeigh(N) :-
     kposition(A, Pos),
     kedge(Pos, N, _).
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  Auxiliary                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+dumpKB :-
+    findall(
+        knode(N1, T, C),
+        (
+            knode(N1, T, C)
+        ),
+        Nodes
+    ),
+    findall(
+        kedge(N1, N2, C),
+        (
+            kedge(N1, N2, C)
+        ),
+        Edges
+    ),
+    write('KNOWN NODES:'),nl,
+    write_list(Nodes),nl,
+    write('KNOWN EDGES:'),nl,
+    write_list(Edges),nl.
+
+
+write_list([]).
+write_list([X | Xs]) :-
+    write('    '),write(X),write(','),nl,
+    write_list(Xs).
