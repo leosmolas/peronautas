@@ -26,9 +26,9 @@
 
 % DESIRE expansión(Nodo)
 expansion(Value, X) -< 
-                estoyEnLaFrontera,
+                % estoyEnLaFrontera,
                 esSeguro(X),
-                difPuntosZona(X, DifPuntos),
+                b(difPuntosZona(X, DifPuntos)),
                 consExpansion(Cons),
                 mult(DifPuntos, Cons, Value).
                                

@@ -5,13 +5,27 @@
 % RandomSeed = 1
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
-knode(vertex0 , d3lp0r, 10). knode(vertex9 , none, 10).
-knode(vertex1 , d3lp0r,  5). knode(vertex11, none,  5).
-knode(vertex3 , none,  5). knode(vertex7 , none,  5).
-knode(vertex4 , none,  4). knode(vertex2 , none,  4).
-knode(vertex8 , none,  3). knode(vertex6 , none,  3).
-knode(vertex10, none,  4). knode(vertex5 , d3lp0r,  4).
-knode(vertex12, none,  2). knode(vertex13, d3lp0r,  2).
+myName(evita).
+% kposition(vasco, vertex0).
+
+my_team(peronismo).
+
+kposition(peron, vertex8).
+kposition(evita, vertex13).
+kposition(menem, vertex7).
+kposition(cafiero, vertex0).
+
+kposition(iorio, vertex9).
+
+
+
+knode(vertex0 , peronismo, 10). knode(vertex9 , none, 10).
+knode(vertex1 , peronismo,  5). knode(vertex11, none,  5).
+knode(vertex3 , none,  5). knode(vertex7 , peronismo,  5).
+knode(vertex4 , none,  4). knode(vertex2 , peronismo,  4).
+knode(vertex8 , peronismo,  3). knode(vertex6 , none,  3).
+knode(vertex10, none,  4). knode(vertex5 , peronismo,  4).
+knode(vertex12, none,  2). knode(vertex13, peronismo,  2).
 
 
 kedge(vertex5, vertex8,  4). kedge(vertex6, vertex10, 4).

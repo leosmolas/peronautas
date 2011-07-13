@@ -2,8 +2,8 @@
 
 :- [delp]. % intérprete
 
-:- consult('arg.delp'), % reglas de argumentación
-   consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
+:- consult('arg.delp'). % reglas de argumentación
+   % consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
 
 % criterios de comparación
 
@@ -21,10 +21,10 @@ doNotFail(_).
    
 meta(X) :-     
     assert(mejorMeta(_, -1000)),
-    foreach(posibleExpansion(N), doNotFail(calcMeta(expansion(N)))),
-    foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
-    foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
-    foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
+    foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
+    % foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
+    % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
+    % foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
     mejorMeta(X, _),
     write(X),
     retract(mejorMeta(_, _)).
