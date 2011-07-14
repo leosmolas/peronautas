@@ -296,3 +296,16 @@ searchNeigh(N) :-
 %                                  Auxiliary                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+redirect_output(Filename) :-
+    write('Prolog redirecting output to: '),write(Filename),nl,
+    open(Filename, write, S),
+    set_output(S).
+
+dumpKB :-
+    listing(k),
+    listing(kposition),
+    listing(h).
+
+close_output :-
+    current_output(S),
+    close(S).

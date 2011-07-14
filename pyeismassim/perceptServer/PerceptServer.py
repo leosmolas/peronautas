@@ -120,6 +120,7 @@ if (__name__ == "__main__"):
         globalPercept = frozenset([])
         percepts      = range(CONNECTIONS)
 
+        print "Reception phase."
         for i in range(CONNECTIONS):
             percept  = clientSocket[i].recv(BUFSIZE)
             if (percept == 'EOF'):
@@ -127,16 +128,20 @@ if (__name__ == "__main__"):
                 clientSocket[i].close()
                 clientSocketConnected[i] = False
             else:
-                #print "PERCEPT:", percept
+                print "CONNECTION:", i
+                print "PERCEPT:", percept
                 percepts[i]   = eval(percept)
                 globalPercept = globalPercept.union(percepts[i])
 
+        print "Sending phase."
         for i in range(CONNECTIONS):
             # for each socket, calculate the difference between the accumulator
             # and the original percept and send the difference.
             if (clientSocketConnected[i]):
                 percept    = percepts[i]
                 difference = globalPercept.difference(percept)
+                print "CONNECTION:", i
+                print "DIFFERENCE:", difference
                 clientSocket[i].send(repr(difference))
 
         j += 1

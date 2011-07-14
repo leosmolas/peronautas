@@ -42,6 +42,8 @@ class Agent():
 
     def disconnect(self):
         self.log.close()
+        self.log = sys.__stdout__
+        sys.stdout = sys.__stdout__
         self.massimConnection.disconnect()
         self.perceptConnection.disconnect()
 
@@ -118,23 +120,17 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
+        self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
         print "done"
 
 
 
     def disconnect(self):
-        Agent.disconnect(self)
         if self.useLog:
             print "PROLOG DATABASE DUMP:"
-            #open('kb.txt', write, Stream),
-            #set_output(Stream),
-            #listing,
-            #close(Stream)
-            self.prolog.query("open('" + self.username + "-kb.txt', write, S), set_output(S)").next()
-            self.prolog.query("listing(k)").next()
-            self.prolog.query("listing(h)").next()
-            self.prolog.query("listing(kposition)").next()
-            self.prolog.query("current_output(S), close(S)").next()
+            self.prolog.query("dumpKB").next()
+            self.prolog.query("close_output").next()
+        Agent.disconnect(self)
 
 
 
