@@ -1,4 +1,4 @@
-:- dynamic kposition/2,
+﻿:- dynamic kposition/2,
            energy/1,
            maxHealth/1,
            maxEnergy/1,

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 # TODO:
 # - fix behaviour in case the server dies unexpectedly on the agent, make sure he cleans up and dies gracefully.

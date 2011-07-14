@@ -1,4 +1,4 @@
-SERVER_DIR=/home/igaray/projects-code/lidia-massim/massim-2011-1.0.1/massim/scripts/
+﻿SERVER_DIR=/home/igaray/projects-code/lidia-massim/massim-2011-1.0.1/massim/scripts/
 SERVER_CMD='startServer.sh'
 MONITOR_DIR=/home/igaray/projects-code/lidia-massim/massim-2011-1.0.1/massim/scripts/
 MONITOR_CMD='startMarsMonitor.sh'
