@@ -1,15 +1,16 @@
 :- dynamic kposition/2,
            energy/1,
-           last_action/1,
-           last_action_result/1,
+           maxHealth/1,
+           maxEnergy/1,
+           lastAction/1,
+           lastActionResult/1,
            money/1,
            knode/3,
            kedge/3,
            intention/1,
-           max_health/1,
            plan/1,
-           max_energy/1,
-           my_name/1,
+           myName/1,
+           myTeam/1,
            agentTeam/2.
 
 :- ['pl/graph/map.pl'].
@@ -30,9 +31,9 @@
 %                                    Beliefs                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-my_team(d3lp0r).
+myTeam(d3lp0r).
 
-% last_action/1
+% lastAction/1
 %   1st argument is a term representing the agent's last action.
 
 % Indicates the known position of an agent.
@@ -44,7 +45,7 @@ my_team(d3lp0r).
 %   1st argument is...
 %   2nd argument is...
 
-% my_name/1
+% myName/1
 %   1st argument is an atom representing the agent's name.
 
 
@@ -64,89 +65,88 @@ hasAtLeastOneUnsurveyedEdge(Node1) :-
         Node2, 
         kedge(Node1, Node2, unknown), 
         L),
-    write('hasAtLeastOneUnsurveyedEdge: '), write(Node1),write(' '),write(L),nl,
     L \= [].
 
 
 
 %------------------------------------------------------------------------------%
-replace_my_name(X) :- 
-   retractall(my_name(OldName)),
-   retractall(hposition(OldName, Op1)),
-   retractall(kposition(OldName, Op2)),
-   assertz(hposition(X, Op1)),
-   assertz(kposition(X, Op2)),
-   assertz(my_name(X)).
+updateMyName(X) :- 
+   retractall( myName(OldName)         ),
+   retractall( hposition(OldName, Op1) ),
+   retractall( kposition(OldName, Op2) ),
+   assertz(    hposition(X, Op1)       ),
+   assertz(    kposition(X, Op2)       ),
+   assertz(    myName(X)               ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_position(X) :-
-    my_name(A),
-    retractall(hposition(A, _)),
-    retractall(kposition(A, _)),
-    assertz(hposition(A, X)),
-    assertz(kposition(A, X)).
+updatePosition(X) :-
+    myName(A),
+    retractall( hposition(A, _) ),
+    retractall( kposition(A, _) ),
+    assertz(    hposition(A, X) ),
+    assertz(    kposition(A, X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_energy(X) :- 
-    retractall(energy(_)),
-    assertz(energy(X)).
+updateEnergy(X) :- 
+    retractall( energy(_) ),
+    assertz(    energy(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_last_action(X) :- 
-    retractall(last_action(_)),
-    assertz(last_action(X)).
+updateLastAction(X) :- 
+    retractall( lastAction(_) ),
+    assertz(    lastAction(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_last_action_result(X) :- 
-    retractall(last_action_result(_)),
-    assertz(last_action_result(X)).
+updateLastActionResult(X) :- 
+    retractall( lastActionResult(_) ),
+    assertz(    lastActionResult(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_money(X) :- 
-    retractall(money(_)), 
-    assertz(money(X)).
+updateMoney(X) :- 
+    retractall( money(_) ), 
+    assertz(    money(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_max_health(X) :- 
-    retractall(max_health(_)),
-    assertz(max_health(X)).
+updateMaxHealth(X) :- 
+    retractall( maxHealth(_) ),
+    assertz(    maxHealth(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-replace_max_energy(X) :- 
-    retractall(max_energy(_)),
-    assertz(max_energy(X)).
+updateMaxEnergy(X) :- 
+    retractall( maxEnergy(_) ),
+    assertz(    maxEnergy(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-insert_edge(Node1, Node2, Cost) :-
-    assertz(kedge(Node1, Node2, Cost)),
-    assertz(kedge(Node2, Node1, Cost)),
-    assertz(hedge(Node1, Node2, Cost)),
-    assertz(hedge(Node2, Node1, Cost)).
+insertEdge(Node1, Node2, Cost) :-
+    assertz( kedge(Node1, Node2, Cost) ),
+    assertz( kedge(Node2, Node1, Cost) ),
+    assertz( hedge(Node1, Node2, Cost) ),
+    assertz( hedge(Node2, Node1, Cost) ).
 
 
 
 %------------------------------------------------------------------------------%
-delete_edge(Node1, Node2, Cost) :-
-    retract(kedge(Node1, Node2, Cost)),
-    retract(kedge(Node2, Node1, Cost)),
-    retract(hedge(Node1, Node2, Cost)),
-    retract(hedge(Node2, Node1, Cost)).
+deleteEdge(Node1, Node2, Cost) :-
+    retract( kedge(Node1, Node2, Cost) ),
+    retract( kedge(Node2, Node1, Cost) ),
+    retract( hedge(Node1, Node2, Cost) ),
+    retract( hedge(Node2, Node1, Cost) ).
 
 
 
@@ -166,39 +166,40 @@ updateEdge(kedge(Node1, Node2, Cost)) :-
     % En este caso podriamos preguntar si Cost \= unknown.
     kedge(Node1, Node2, unknown),
     !,
-    delete_edge(Node1, Node2, unknown),
-    insert_edge(Node1, Node2, Cost).
+    deleteEdge(Node1, Node2, unknown),
+    insertEdge(Node1, Node2, Cost).
 updateEdge(kedge(Node1, Node2, Cost)) :- 
     % Si es la primera vez que vemos el arco.
-    insert_edge(Node1, Node2, Cost).
+    insertEdge(Node1, Node2, Cost).
 
 
 
 %------------------------------------------------------------------------------%
-update_value(knode(Name, Value, _Team), Value) :-
-    knode(Name, unknown, _), !.
-update_value(knode(Name, unknown, _Team), NewValue) :-
+updateNodeValue(knode(Name, Value, _Team), Value) :-
+    knode(Name, unknown, _), 
+    !.
+updateNodeValue(knode(Name, unknown, _Team), NewValue) :-
     knode(Name, NewValue, _).
 
 
 
 %------------------------------------------------------------------------------%
-update_node(knode(Name, Value, CurrentTeam)) :-
+updateNode(knode(Name, Value, CurrentTeam)) :-
     knode(Name, _OldValue, _OldTeam), !,
-    update_value(knode(Name, Value, CurrentTeam), NewValue),
-    retractall(knode(Name, _, _)),
-    retractall(hnode(Name, _, _)),
-    assertz(knode(Name, NewValue, CurrentTeam)),
-    assertz(hnode(Name, NewValue, CurrentTeam)).
-update_node(X) :-
-    assertz(X).
+    updateNodeValue(knode(Name, Value, CurrentTeam), NewValue),
+    retractall( knode(Name, _,        _)           ),
+    retractall( hnode(Name, _,        _)           ),
+    assertz(    knode(Name, NewValue, CurrentTeam) ),
+    assertz(    hnode(Name, NewValue, CurrentTeam) ).
+updateNode(X) :-
+    assertz( X ).
 
 
 
 %------------------------------------------------------------------------------%
 updateEntityPosition(Name, Position) :-
-    assertz(kposition(Name, Position)),
-    assertz(hposition(Name, Position)).
+    assertz( kposition(Name, Position) ),
+    assertz( hposition(Name, Position) ).
 
 
 
@@ -206,7 +207,7 @@ updateEntityPosition(Name, Position) :-
 updateEntityTeam(Name, Team) :-
     agentTeam(Name, Team).
 updateEntityTeam(Name, Team) :-
-    assertz(agentTeam(Name, Team)).
+    assertz( agentTeam(Name, Team) ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -249,7 +250,7 @@ intention(explore).
 
 
 searchNeigh(N) :-
-    my_name(A),
+    myName(A),
     kposition(A, Pos),
     kedge(Pos, N, _).
 
@@ -259,28 +260,32 @@ searchNeigh(N) :-
 %                                  Auxiliary                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-dumpKB :-
-    findall(
-        knode(N1, T, C),
-        (
-            knode(N1, T, C)
-        ),
-        Nodes
-    ),
-    findall(
-        kedge(N1, N2, C),
-        (
-            kedge(N1, N2, C)
-        ),
-        Edges
-    ),
-    write('KNOWN NODES:'),nl,
-    write_list(Nodes),nl,
-    write('KNOWN EDGES:'),nl,
-    write_list(Edges),nl.
-
-
-write_list([]).
-write_list([X | Xs]) :-
-    write('    '),write(X),write(','),nl,
-    write_list(Xs).
+%dumpKB :-
+%    %findall(
+%    %    knode(N1, T, C),
+%    %    (
+%    %        knode(N1, T, C)
+%    %    ),
+%    %    Nodes
+%    %),
+%    %findall(
+%    %    kedge(N1, N2, C),
+%    %    (
+%    %        kedge(N1, N2, C)
+%    %    ),
+%    %    Edges
+%    %),
+%    %write('KNOWN NODES:'),nl,
+%    %write_list(Nodes),nl,
+%    %write('KNOWN EDGES:'),nl,
+%    %write_list(Edges),nl.
+%    tell('kb.txt'),
+%    write('hello'),nl,
+%    listing(knode),
+%    listing(kedge),
+%    told.
+%
+%write_list([]).
+%write_list([X | Xs]) :-
+%    write('    '),write(X),write(','),nl,
+%    write_list(Xs).

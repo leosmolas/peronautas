@@ -4,16 +4,16 @@ exec(Action) :-
     action(Action).
 
 %------------------------------------------------------------------------------%
-reachable_node(Node, [[_, unknown] | T]) :-
-    reachable_node(Node, T),
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
     !.
-reachable_node(Node, [[Node, Cost] | _T]) :-
+reachableNode(Node, [[Node, Cost] | _T]) :-
     Cost \= unknown,
     energy(X),
     X >= Cost,
     !.
-reachable_node(Node, [_ | T]) :-
-    reachable_node(Node, T).
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
 
 
 
@@ -25,7 +25,7 @@ action([probe, Position]) :-
     write(2.1),write(' energy: '),write(X),nl,
     X > 0,
     write(2.2),nl,
-    my_name(Name),
+    myName(Name),
     write(2.3),write(' name: '),write(Name),nl,
     kposition(Name, Position),
     write(2.4),write(' position: '),write(Position),nl,
@@ -40,7 +40,7 @@ action([survey, Position]) :-
     write(3.1),nl,
     X > 0,
     write(3.2),nl,
-    my_name(Name),
+    myName(Name),
     write(3.3),nl,
     kposition(Name, Position),
     write(3.4),nl,
@@ -51,7 +51,7 @@ action([survey, Position]) :-
 %------------------------------------------------------------------------------%
 action([goto, X]) :-
     write(4),nl,
-    my_name(Name),
+    myName(Name),
     write(4.1),nl,
     kposition(Name, Position),
     write(4.2),nl,
@@ -63,14 +63,14 @@ action([goto, X]) :-
         ), 
         L),
     write(4.3),nl,
-    reachable_node(X, L), 
+    reachableNode(X, L), 
     write(4.4),nl,
     !.
      
 %------------------------------------------------------------------------------%
 action([goto, X]) :-
     write(5),nl,
-    my_name(Name),
+    myName(Name),
     write(5.1),nl,
     kposition(Name, Position),
     write(5.2),nl,
