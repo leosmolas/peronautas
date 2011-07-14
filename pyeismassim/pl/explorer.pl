@@ -29,7 +29,7 @@ action([probe, Position]) :-
     write(2.3),write(' name: '),write(Name),nl,
     kposition(Name, Position),
     write(2.4),write(' position: '),write(Position),nl,
-    knode(Position, unknown, _), 
+    k(node(Position, unknown, _)), 
     write(2.5),nl,
     !.
 
@@ -58,8 +58,8 @@ action([goto, X]) :-
     findall(
         [Node, Cost], 
         (
-            kedge(Position, Node, Cost), 
-            knode(Node, unknown, _)
+            k(edge(Position, Node, Cost)), 
+            k(node(Node, unknown, _))
         ), 
         L),
     write(4.3),nl,
@@ -76,7 +76,7 @@ action([goto, X]) :-
     write(5.2),nl,
     energy(E),
     write(5.3),nl,
-    kedge(Position, X, Cost),
+    k(edge(Position, X, Cost)),
     Cost \= unknown,
     write(5.4),nl,
     E >= Cost, 

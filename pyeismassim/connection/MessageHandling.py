@@ -166,14 +166,14 @@ def parse_request_action(xml, output = 'dict'):
             'score'               : team_tag['score']            
             }
         result_public = {
-                'position'        : self_tag['position']
+            'position'            : self_tag['position']
             }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
             achievements_list = []
             for i in range(len(achievements_tag.contents)):
-                if (achievements_tag.contents[i].__class__.__name__ == "Tag"): #Leo: @Iñaki: podés hacer en vez de esto isinstance(achievements_tag.contents[i], Tag)
+                if (achievements_tag.contents[i].__class__.__name__ == "Tag"):
                     # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
                     # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                     achievements_list.append(achievements_tag.contents[i]['name'])

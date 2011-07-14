@@ -1,17 +1,25 @@
-﻿:- dynamic kposition/2,
-           energy/1,
-           maxHealth/1,
-           maxEnergy/1,
-           lastAction/1,
-           lastActionResult/1,
-           money/1,
-           knode/3,
-           kedge/3,
-           intention/1,
-           plan/1,
-           myName/1,
-           myTeam/1,
-           agentTeam/2.
+﻿:- dynamic 
+           kposition/2,        %
+           currentStep/1,      %
+           % Private
+           myName/1,           %
+           myTeam/1,           %
+           energy/1,           %
+           maxEnergy/1,        %
+           health/1,           %
+           maxHealth/1,        %
+           lastAction/1,       %
+           lastActionResult/1, %
+           strength/1,         %
+           visRange/1,         %
+           zoneScore/1,        %
+           lastStepScore/1,    %
+           money/1,            %
+           score/1,            %
+           % Public
+           h/1,                %
+           k/1,                %
+           agentTeam/2.        %
 
 :- ['pl/graph/map.pl'].
 
@@ -23,9 +31,19 @@
 %   node names, integers, etc.
 
 % Representation of nodes:
-%   knode(Name, Team, Value)
-%   Value es 'unknown' si no sabemos cuanto vale el nodo. 
-%   Cuando no conocemos el valor de un nodo, simplemente actualizamos su owner.
+%
+% Known Information:
+%   k(nodeValue(Name, Value))
+%       Value es 'unknown' si no sabemos cuanto vale el nodo. 
+%       Cuando no conocemos el valor de un nodo, simplemente actualizamos su owner.
+%   k(nodeTeam(Name, Team))
+%   k(edge(Node1, Node2, Cost))
+
+% Hypothetical Information:
+%   h(nodeTeam(Name, Team))
+
+% Beliefs:
+%   b(...)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Beliefs                                   %
@@ -63,7 +81,7 @@ myTeam(d3lp0r).
 hasAtLeastOneUnsurveyedEdge(Node1) :-
     findall(
         Node2, 
-        kedge(Node1, Node2, unknown), 
+        k(edge(Node1, Node2, unknown)), 
         L),
     L \= [].
 
@@ -74,19 +92,16 @@ updateMyName(X) :-
    retractall( myName(OldName)         ),
    retractall( hposition(OldName, Op1) ),
    retractall( kposition(OldName, Op2) ),
+   assertz(    myName(X)               ),
    assertz(    hposition(X, Op1)       ),
-   assertz(    kposition(X, Op2)       ),
-   assertz(    myName(X)               ).
+   assertz(    kposition(X, Op2)       ).
 
 
 
 %------------------------------------------------------------------------------%
-updatePosition(X) :-
-    myName(A),
-    retractall( hposition(A, _) ),
-    retractall( kposition(A, _) ),
-    assertz(    hposition(A, X) ),
-    assertz(    kposition(A, X) ).
+updateStep(S) :-
+    retractall( currentStep(_) ),
+    assertz(    currentStep(S) ).
 
 
 
@@ -94,6 +109,27 @@ updatePosition(X) :-
 updateEnergy(X) :- 
     retractall( energy(_) ),
     assertz(    energy(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateMaxEnergy(X) :- 
+    retractall( maxEnergy(_) ),
+    assertz(    maxEnergy(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateHealth(H) :- 
+    retractall( myHealth(_) ),
+    assertz(    myHealth(H) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateMaxHealth(X) :- 
+    retractall( maxHealth(_) ),
+    assertz(    maxHealth(X) ).
 
 
 
@@ -119,80 +155,78 @@ updateMoney(X) :-
 
 
 %------------------------------------------------------------------------------%
-updateMaxHealth(X) :- 
-    retractall( maxHealth(_) ),
-    assertz(    maxHealth(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateMaxEnergy(X) :- 
-    retractall( maxEnergy(_) ),
-    assertz(    maxEnergy(X) ).
+% The position should keep track of which turn the agent was seen.
+updatePosition(X) :-
+    myName(A),
+    retractall( hposition(A, _) ),
+    retractall( kposition(A, _) ),
+    assertz(    hposition(A, X) ),
+    assertz(    kposition(A, X) ).
 
 
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
-    assertz( kedge(Node1, Node2, Cost) ),
-    assertz( kedge(Node2, Node1, Cost) ),
-    assertz( hedge(Node1, Node2, Cost) ),
-    assertz( hedge(Node2, Node1, Cost) ).
+    assertz( k(edge(Node1, Node2, Cost)) ),
+    assertz( k(edge(Node2, Node1, Cost)) ).
 
 
 
 %------------------------------------------------------------------------------%
 deleteEdge(Node1, Node2, Cost) :-
-    retract( kedge(Node1, Node2, Cost) ),
-    retract( kedge(Node2, Node1, Cost) ),
-    retract( hedge(Node1, Node2, Cost) ),
-    retract( hedge(Node2, Node1, Cost) ).
+    retract( k(edge(Node1, Node2, Cost)) ),
+    retract( k(edge(Node2, Node1, Cost)) ).
 
 
 
 %------------------------------------------------------------------------------%
 % Succeeds if the edge must be updated.
-updateEdge(kedge(Node1, Node2, Cost)) :-
+updateEdge(k(edge(Node1, Node2, Cost))) :-
     % Si el arco ya estaba en la kb (con costo unknown o el real).
-    kedge(Node1, Node2, Cost), 
+    k(edge(Node1, Node2, Cost)), 
     !.
-updateEdge(kedge(Node1, Node2, unknown)) :-
+updateEdge(k(edge(Node1, Node2, unknown))) :-
     % Si ya estaba en la kb con su costo final.
-    kedge(Node1, Node2, Cost),
+    k(edge(Node1, Node2, Cost)),
     Cost \= unknown, 
     !.
-updateEdge(kedge(Node1, Node2, Cost)) :-
+updateEdge(k(edge(Node1, Node2, Cost))) :-
     % Si conociamos el arco pero no su valor (es decir, cuando hacemos un survey del arco).
     % En este caso podriamos preguntar si Cost \= unknown.
-    kedge(Node1, Node2, unknown),
+    k(edge(Node1, Node2, unknown)),
     !,
     deleteEdge(Node1, Node2, unknown),
     insertEdge(Node1, Node2, Cost).
-updateEdge(kedge(Node1, Node2, Cost)) :- 
+updateEdge(k(edge(Node1, Node2, Cost))) :- 
     % Si es la primera vez que vemos el arco.
     insertEdge(Node1, Node2, Cost).
 
 
 
 %------------------------------------------------------------------------------%
-updateNodeValue(knode(Name, Value, _Team), Value) :-
-    knode(Name, unknown, _), 
+updateNodeValue(k(nodeValue(Name, unknown))) :-
+    % El valor en la percepcion es unknown, y el nodo ya es conocido, luego no
+    % hay que hacer nada. 
+    k(nodeValue(Name, _)), 
     !.
-updateNodeValue(knode(Name, unknown, _Team), NewValue) :-
-    knode(Name, NewValue, _).
+updateNodeValue(k(nodeValue(Name, Value))) :-
+    % El valor en la percepcion es distinto de unknown, luego se aserta
+    % independientemente si es conocido o no.
+    Value \= unknown,
+    !,
+    retractall( k(nodeValue(Name,     _)) ),
+    assertz(    k(nodeValue(Name, Value)) ).
+updateNodeValue(X) :-
+    % El nodo es desconocido.
+    assertz( X ).
 
 
 
 %------------------------------------------------------------------------------%
-updateNode(knode(Name, Value, CurrentTeam)) :-
-    knode(Name, _OldValue, _OldTeam), !,
-    updateNodeValue(knode(Name, Value, CurrentTeam), NewValue),
-    retractall( knode(Name, _,        _)           ),
-    retractall( hnode(Name, _,        _)           ),
-    assertz(    knode(Name, NewValue, CurrentTeam) ),
-    assertz(    hnode(Name, NewValue, CurrentTeam) ).
-updateNode(X) :-
-    assertz( X ).
+updateNodeTeam(k(nodeTeam(Name, CurrentTeam))) :-
+    currentStep(Step),
+    retractall( k(nodeTeam(Name,           _,    _)) ),
+    assertz(    k(nodeTeam(Name, CurrentTeam, Step)) ).
 
 
 
@@ -208,6 +242,8 @@ updateEntityTeam(Name, Team) :-
     agentTeam(Name, Team).
 updateEntityTeam(Name, Team) :-
     assertz( agentTeam(Name, Team) ).
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -252,7 +288,7 @@ intention(explore).
 searchNeigh(N) :-
     myName(A),
     kposition(A, Pos),
-    kedge(Pos, N, _).
+    k(edge(Pos, N, _)).
 
 
 
@@ -260,32 +296,3 @@ searchNeigh(N) :-
 %                                  Auxiliary                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%dumpKB :-
-%    %findall(
-%    %    knode(N1, T, C),
-%    %    (
-%    %        knode(N1, T, C)
-%    %    ),
-%    %    Nodes
-%    %),
-%    %findall(
-%    %    kedge(N1, N2, C),
-%    %    (
-%    %        kedge(N1, N2, C)
-%    %    ),
-%    %    Edges
-%    %),
-%    %write('KNOWN NODES:'),nl,
-%    %write_list(Nodes),nl,
-%    %write('KNOWN EDGES:'),nl,
-%    %write_list(Edges),nl.
-%    tell('kb.txt'),
-%    write('hello'),nl,
-%    listing(knode),
-%    listing(kedge),
-%    told.
-%
-%write_list([]).
-%write_list([X | Xs]) :-
-%    write('    '),write(X),write(','),nl,
-%    write_list(Xs).
