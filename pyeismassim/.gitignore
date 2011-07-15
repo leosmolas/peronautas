@@ -3,3 +3,4 @@ out.txt
 connection/testdata/*
 run.sh
 runw.sh
+pl/*.pl~
