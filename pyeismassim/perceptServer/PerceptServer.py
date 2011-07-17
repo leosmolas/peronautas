@@ -10,7 +10,7 @@ class VortexPerceptConnection():
     def disconnect(self):
         pass
 
-    def send(self, data):
+    def send(self, user, data):
         pass
 
     def recv(self):
@@ -35,27 +35,57 @@ class PerceptConnection():
         self.socket.send('EOF')
         self.socket.close()
 
-    def send(self, dictionary):
+    def send(self, username, dictionary):
 
-        def dict2list(dictionary):
-            result = []
-            position  = dictionary.get('position',  [])
-            vis_verts = dictionary.get('vis_verts', [])
-            vis_edges = dictionary.get('vis_edges', [])
-            vis_ents  = dictionary.get('vis_ents',  [])
-
-            result += ("position", position)
-            for v in vis_verts:
-                result += ('vis_vert', v['name'],  v['team'] )
-            for v in vis_edges:
-                result += ('vis_edge', v['node1'], v['node2'] )
-            for v in vis_ents:
-                result += ('vis_ent',  v['node'],  v['name'], v['team'] )
-            
+        def dict2list(username, dictionary):
+            result = [    (0, 
+                            username, 
+                            dictionary.get('position', 'unknown')
+                          )
+                     ]
+            for v in dictionary.get('vis_verts', []):
+                result.append((1, 
+                            v['name'],
+                            v['team']
+                          ))
+            for v in dictionary.get('vis_edges', []):
+                result.append((2, 
+                            v['node1'],
+                            v['node2']
+                          ))
+            for v in dictionary.get('vis_ents',  []):
+                result.append((3,
+                            v['node'],
+                            v['name'],
+                            v['team']
+                          ))
+            for v in dictionary.get('probed_verts', []):
+                result.append((4, 
+                            v['name'], 
+                            v['value']
+                          ))
+            for v in dictionary.get('surveyed_edges', []):
+                result.append((5, 
+                            v['node1'], 
+                            v['node2'], 
+                            v['weight']
+                          ))
+            for v in dictionary.get('inspected_ents', []):
+                result.append((6, 
+                            v['energy'], 
+                            v['health'], 
+                            v['max_energy'], 
+                            v['max_health'], 
+                            v['name'], 
+                            v['node'], 
+                            v['role'], 
+                            v['strength'], 
+                            v['team'], 
+                            v['vis_range']
+                          ))
             return result
 
-        lst    = dict2list(dictionary)
-        #lst    = dictionary.items()
+        lst    = dict2list(username, dictionary)
         fset   = frozenset(lst)
         string = repr(fset)
         self.socket.send(string)
@@ -63,18 +93,55 @@ class PerceptConnection():
     def recv(self):
 
         def list2dict(stringlist):
-            result = { 'vis_verts' : [], 'vis_edges' : [], 'vis_ents' :[] }
+            result = { 'position'       : [],
+                       'vis_verts'      : [],
+                       'vis_edges'      : [],
+                       'vis_ents'       : [],
+                       'probed_verts'   : [],
+                       'surveyed_edges' : [],
+                       'inspected_ents' : [] 
+                       }
             for p in stringlist:
-                if (p[0] == 'position'):
-                    result['position'] = p[1]
-                elif(p[0] == 'vis_vert'):
-                    result['vis_verts'] += { 'name'  : p[1], 'team'  : p[2] }
-                elif (p[0] == 'vis_edge'):
-                    result['vis_edges'] += { 'node1' : p[1], 'node2' : p[2] }
-                elif (p[0] == 'vis_ent'):
-                    result['vis_ents']  += { 'node'  : p[1], 'name'  : p[2], 'team' : p[3]}
+                if   (p[0] == 0):
+                    result['position']       += { 'agent' : p[1],
+                                                  'node'  : p[2] 
+                                                }
+                elif (p[0] == 1):
+                    result['vis_verts']      += { 'name' : p[1],
+                                                  'team' : p[2] 
+                                                }
+                elif (p[0] == 2):
+                    result['vis_edges']      += { 'node1' : p[1],
+                                                  'node2' : p[2] 
+                                                }
+                elif (p[0] == 3):
+                    result['vis_ents']       += { 'node' : p[1],
+                                                  'name' : p[2],
+                                                  'team' : p[3] 
+                                                }
+                elif (p[0] == 4):
+                    result['probed_verts']   += { 'name'  : p[1],
+                                                  'value' : p[2] 
+                                                }
+                elif (p[0] == 5):
+                    result['surveyed_edges'] += { 'node1'  : p[1],
+                                                  'node2'  : p[2],
+                                                  'weight' : p[3] 
+                                                }
+                elif (p[0] == 6):
+                    result['inspected_ents'] += { 'energy'     : p[1],
+                                                  'health'     : p[2],
+                                                  'max_energy' : p[3],
+                                                  'max_health' : p[4],
+                                                  'name'       : p[5],
+                                                  'node'       : p[6],
+                                                  'role'       : p[7],
+                                                  'strength'   : p[8],
+                                                  'team'       : p[9],
+                                                  'vis_range'  : p[10]
+                                                }
                 else:
-                    pass
+                    print "@PerceptServerConnection: decode error: ", p
             return result
 
         string = self.socket.recv(self.bufsize)
@@ -128,8 +195,8 @@ if (__name__ == "__main__"):
                 clientSocket[i].close()
                 clientSocketConnected[i] = False
             else:
-                print "CONNECTION:", i
-                print "PERCEPT:", percept
+                #print "CONNECTION:", i
+                #print "PERCEPT:", percept
                 percepts[i]   = eval(percept)
                 globalPercept = globalPercept.union(percepts[i])
 

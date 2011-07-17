@@ -190,8 +190,8 @@ class PrologAgent(Agent):
 
 
     def processEntities(self, msg_dict):
-        self.prolog.query("retractall(kposition(_, _))").next()
-        self.prolog.query("retractall(hposition(_, _))").next()
+        self.prolog.query("retractall(k(position(_, _)))").next()
+        self.prolog.query("retractall(h(position(_, _)))").next()
         for e in msg_dict.get('vis_ents'):
             if (e['name'] == ''):
                 self.prolog.query("updateEntityPosition(unknown,%s)" % (e['node'])).next()
@@ -215,7 +215,7 @@ class PrologAgent(Agent):
         self.processEntities(msg_dict_public)
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
-        self.prolog.query("updatePosition(%s)"         % msg_dict_public['position']).next()
+        #self.prolog.query("updatePosition(%s)"         % msg_dict_public['position']).next()
 
 
 
@@ -223,7 +223,7 @@ class PrologAgent(Agent):
         print "    @PrologAgent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
-        self.perceptConnection.send(msg_dict_public)
+        self.perceptConnection.send(self.username, msg_dict_public)
         percept_difference = self.perceptConnection.recv()
 
         print "\n    @PrologAgent: PERCEPTION:"
@@ -259,7 +259,7 @@ if (__name__== "__main__"):
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/kb.pl")
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/agent.pl")
     agent.connect()
     agent.perceiveActLoop()
     agent.disconnect()

@@ -43,13 +43,13 @@ action([attack, Enemy]):-
     myName(Name),
     %obtengo mi posicion
     write(2.2),nl,
-    kposition(Name, Position),
+    k(position(Name, Position)),
     %obtengo cual es mi equipo
     write(2.3),nl,
     agentTeam(Name, Team),
     %obtengo el nombre de un agente que se encuentra en mi posicion
     write(2.4),nl,
-    kposition(Enemy, Position),
+    k(position(Enemy, Position)),
     Enemy \= Name,
     %veo que sea del otro equipo
     write(2.5),nl,
@@ -68,7 +68,7 @@ action([survey, Position]) :-
     write(3.2),nl,
     myName(Name),
     write(3.3),nl,
-    kposition(Name, Position),
+    k(position(Name, Position)),
     write(3.4),nl,
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(3.5),nl,
@@ -84,7 +84,7 @@ action([goto, NeighborNode]) :-
     myName(Name),
     agentTeam(Name, Team),
     write(4.1),nl,
-    kposition(Name, Position),
+    k(position(Name, Position)),
     energy(E),
     %veo si las posiciones perimetrales existen agentes y son enemigos
     write(4.2),
@@ -92,7 +92,7 @@ action([goto, NeighborNode]) :-
     Cost \= unknown, 
     Cost<E, write(' energy: '),write(E),nl,
     write(4.3),nl,
-    kposition(EnemyAgent, NeighborNode),
+    k(position(EnemyAgent, NeighborNode)),
     agentTeam(EnemyAgent, EnemyTeam),
     EnemyTeam \=Team,
     write(4.4), write(' enemy: '),write(EnemyAgent),nl,
@@ -105,7 +105,7 @@ action([goto, X]) :-
     write(5),nl,
     myName(Name),
     write(5.1),nl,
-    kposition(Name, Position),
+    k(position(Name, Position)),
     write(5.2),nl,
     energy(E),
     write(5.3),nl,

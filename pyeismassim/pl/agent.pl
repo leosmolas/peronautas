@@ -1,6 +1,4 @@
 ﻿:- dynamic 
-           kposition/2,        %
-           currentStep/1,      %
            % Private
            myName/1,           %
            myTeam/1,           %
@@ -17,54 +15,58 @@
            money/1,            %
            score/1,            %
            % Public
+           currentStep/1,      %
            h/1,                %
            k/1,                %
            agentTeam/2.        %
 
-:- ['pl/graph/map.pl'].
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                             Knowledge and Beliefs                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Representation of actions:
+% Action representation:
 %   Actions are represented by lists. 
 %   The 1st element of the list is an atom representing the type of action.
-%   This may be one of: 
-%   The following elements are terms representing the action parameters, such as
-%   node names, integers, etc.
+%   The rest of the list elements are terms representing the action parameters, 
+%   such as node names, integers, etc.
+%       [parry]
+%       [probe]
+%       [survey]
+%       [inspect]
+%       [recharge]
+%       [skip]
+%       [goto,   Vertex]
+%       [attack, Agent]
+%       [repair, Agent]
+%       [buy,    Item]
 
-% Representation of nodes:
+% Known information, coming from the percepts, is represented as arguments to
+% the predicte k/1.
+
+% Hypothetical information, used for planning, is represented as arguments to
+% the predicate h/1.
+
+% Beliefs are represented as arguments to the predicate b/1.
+
+% Possible arguments to k/1, h/1, and b/1 :
 %
-% Known Information:
-%   k(nodeValue(Name, Value))
-%       Value es 'unknown' si no sabemos cuanto vale el nodo. 
-%       Cuando no conocemos el valor de un nodo, simplemente actualizamos su owner.
-%   k(nodeTeam(Name, Team))
-%   k(edge(Node1, Node2, Cost))
+% nodeValue(Name, Value)
+%     Name is the vertex name.
+%     Value is 'unknown' if the node value is unknown, otherwise an integer
+%     representing its value.
 
-% Hypothetical Information:
-%   h(nodeTeam(Name, Team))
+% nodeTeam(Name, Team)
+%     Name is the vertex name.
+%     Team is the owning team, or the atom 'none'.
 
-% Beliefs:
-%   b(...)
+% edge(Node1, Node2, Cost)
+%     Node1 and Node2 are the vertex names.
+%     Cost is the edge cost, and if unsurveyed will be unknown.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                    Beliefs                                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% position(Turn, Agent, Node)
+% 
 
 myTeam(d3lp0r).
-
-% lastAction/1
-%   1st argument is a term representing the agent's last action.
-
-% Indicates the known position of an agent.
-% kposition/2
-%   1st argument is the name of the agent that is located at that position.
-%   2nd argument is the vertex name.
-
-% hposition/2
-%   1st argument is...
-%   2nd argument is...
-
-% myName/1
-%   1st argument is an atom representing the agent's name.
 
 
 
@@ -89,12 +91,12 @@ hasAtLeastOneUnsurveyedEdge(Node1) :-
 
 %------------------------------------------------------------------------------%
 updateMyName(X) :- 
-   retractall( myName(OldName)         ),
-   retractall( hposition(OldName, Op1) ),
-   retractall( kposition(OldName, Op2) ),
-   assertz(    myName(X)               ),
-   assertz(    hposition(X, Op1)       ),
-   assertz(    kposition(X, Op2)       ).
+   retractall( myName(OldName)           ),
+   retractall( h(position(OldName, Op1)) ),
+   retractall( k(position(OldName, Op2)) ),
+   assertz(    myName(X)                 ),
+   assertz(    h(position(X, Op1))       ),
+   assertz(    k(position(X, Op2))       ).
 
 
 
@@ -158,10 +160,10 @@ updateMoney(X) :-
 % The position should keep track of which turn the agent was seen.
 updatePosition(X) :-
     myName(A),
-    retractall( hposition(A, _) ),
-    retractall( kposition(A, _) ),
-    assertz(    hposition(A, X) ),
-    assertz(    kposition(A, X) ).
+    retractall( h(position(A, _)) ),
+    retractall( k(position(A, _)) ),
+    assertz(    h(position(A, X)) ),
+    assertz(    k(position(A, X)) ).
 
 
 
@@ -232,8 +234,8 @@ updateNodeTeam(k(nodeTeam(Name, CurrentTeam))) :-
 
 %------------------------------------------------------------------------------%
 updateEntityPosition(Name, Position) :-
-    assertz( kposition(Name, Position) ),
-    assertz( hposition(Name, Position) ).
+    assertz( k(position(Name, Position) )),
+    assertz( h(position(Name, Position) )).
 
 
 
@@ -287,7 +289,7 @@ intention(explore).
 
 searchNeigh(N) :-
     myName(A),
-    kposition(A, Pos),
+    k(position(A, Pos)),
     k(edge(Pos, N, _)).
 
 
@@ -303,7 +305,6 @@ redirect_output(Filename) :-
 
 dumpKB :-
     listing(k),
-    listing(kposition),
     listing(h).
 
 close_output :-

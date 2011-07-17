@@ -5,8 +5,8 @@ action(inspect(Agent)) :-
     energy(X),
     X > 1,
     my_name(Name),
-    kposition(Name, Position),
-    kposition(Agent, Position),
+    k(position(Name,  Position)),
+    k(position(Agent, Position)),
     teamOfAgent(Agent, Team),
     Team \= d3lp0r, !.
 
