@@ -34,6 +34,7 @@ reachableNode(Node, [_ | T]) :-
 % si tenemos suficiente energia y 
 % no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
+    currentStep(Step),
     write(2),nl,
     energy(X),
     write(2.1),write(' energy: '),write(X),nl,
@@ -41,15 +42,16 @@ action([probe, Position]) :-
     write(2.2),nl,
     myName(Name),
     write(2.3),write(' name: '),write(Name),nl,
-    k(position(Name, Position)),
+    k(position(Step, Name, Position)),
     write(2.4),write(' position: '),write(Position),nl,
-    k(node(Position, unknown, _)), 
+    k(nodeValue(Position, unknown)), 
     write(2.5),nl,
     !.
 
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    currentStep(Step),
     write(3),nl,
     energy(X),
     write(3.1),nl,
@@ -57,7 +59,7 @@ action([survey, Position]) :-
     write(3.2),nl,
     myName(Name),
     write(3.3),nl,
-    k(position(Name, Position)),
+    k(position(Step, Name, Position)),
     write(3.4),nl,
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(3.5),nl,
@@ -66,16 +68,17 @@ action([survey, Position]) :-
 %-------------------------------  Goto  ---------------------------------%
 
 action([goto, X]) :-
+    currentStep(Step),
     write(4),nl,
     myName(Name),
     write(4.1),nl,
-    k(position(Name, Position)),
+    k(position(Step, Name, Position)),
     write(4.2),nl,
     findall(
         [Node, Cost], 
         (
             k(edge(Position, Node, Cost)), 
-            k(node(Node, unknown, _))
+            k(nodeValue(Node, unknown))
         ), 
         L),
     write(4.3),nl,
@@ -86,10 +89,11 @@ action([goto, X]) :-
 %-------------------------------  Goto  ---------------------------------%
 
 action([goto, X]) :-
+    currentStep(Step),
     write(5),nl,
     myName(Name),
     write(5.1),nl,
-    k(position(Name, Position)),
+    k(position(Step, Name, Position)),
     write(5.2),nl,
     energy(E),
     write(5.3),nl,

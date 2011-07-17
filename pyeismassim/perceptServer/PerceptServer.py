@@ -14,7 +14,7 @@ class VortexPerceptConnection():
         pass
 
     def recv(self):
-        return {}
+        return { 'fake' : 'dict' }
 
 ####################################################################################################
 class PerceptConnection():
@@ -38,9 +38,10 @@ class PerceptConnection():
     def send(self, username, dictionary):
 
         def dict2list(username, dictionary):
-            result = [    (0, 
-                            username, 
-                            dictionary.get('position', 'unknown')
+            pos = dictionary.get('position')[0].get('node')
+            result = [    (0,
+                            username,
+                            pos
                           )
                      ]
             for v in dictionary.get('vis_verts', []):
@@ -72,15 +73,15 @@ class PerceptConnection():
                           ))
             for v in dictionary.get('inspected_ents', []):
                 result.append((6, 
-                            v['energy'], 
-                            v['health'], 
-                            v['max_energy'], 
-                            v['max_health'], 
                             v['name'], 
+                            v['team'], 
                             v['node'], 
                             v['role'], 
+                            v['energy'], 
+                            v['max_energy'], 
+                            v['health'], 
+                            v['max_health'], 
                             v['strength'], 
-                            v['team'], 
                             v['vis_range']
                           ))
             return result
@@ -103,8 +104,8 @@ class PerceptConnection():
                        }
             for p in stringlist:
                 if   (p[0] == 0):
-                    result['position']       += { 'agent' : p[1],
-                                                  'node'  : p[2] 
+                    result['position']       += { 'name' : p[1],
+                                                  'node' : p[2] 
                                                 }
                 elif (p[0] == 1):
                     result['vis_verts']      += { 'name' : p[1],
@@ -129,15 +130,16 @@ class PerceptConnection():
                                                   'weight' : p[3] 
                                                 }
                 elif (p[0] == 6):
-                    result['inspected_ents'] += { 'energy'     : p[1],
-                                                  'health'     : p[2],
-                                                  'max_energy' : p[3],
-                                                  'max_health' : p[4],
-                                                  'name'       : p[5],
-                                                  'node'       : p[6],
-                                                  'role'       : p[7],
-                                                  'strength'   : p[8],
-                                                  'team'       : p[9],
+                    result['inspected_ents'] += { 
+                                                  'name'       : p[1],
+                                                  'team'       : p[2],
+                                                  'node'       : p[3],
+                                                  'role'       : p[4],
+                                                  'energy'     : p[5],
+                                                  'max_energy' : p[6],
+                                                  'health'     : p[7],
+                                                  'max_health' : p[8],
+                                                  'strength'   : p[9],
                                                   'vis_range'  : p[10]
                                                 }
                 else:

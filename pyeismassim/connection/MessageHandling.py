@@ -165,9 +165,7 @@ def parse_request_action(xml, output = 'dict'):
             'money'               : team_tag['money']            ,
             'score'               : team_tag['score']            
             }
-        result_public = {
-            'position'            : self_tag['position']
-            }
+        result_public = { 'position' : [{ 'name' : 'self', 'node' : self_tag['position'] }] }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
@@ -178,6 +176,8 @@ def parse_request_action(xml, output = 'dict'):
                     # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                     achievements_list.append(achievements_tag.contents[i]['name'])
             result_private['achievements'] = achievements_list
+        else:
+            result_private['achievements'] = []
         
         if (vis_verts_tag != None):
             vis_verts_list = []
@@ -187,6 +187,8 @@ def parse_request_action(xml, output = 'dict'):
                         'name' : vis_verts_tag.contents[i]['name']         ,
                         'team' : vis_verts_tag.contents[i]['team'].lower() })
             result_public['vis_verts'] = vis_verts_list
+        else:
+            result_public['vis_verts'] = []
 
         if (vis_edges_tag != None):
             vis_edges_list = []
@@ -196,6 +198,8 @@ def parse_request_action(xml, output = 'dict'):
                         'node1' : vis_edges_tag.contents[i]['node1'] ,
                         'node2' : vis_edges_tag.contents[i]['node2'] })
             result_public['vis_edges'] = vis_edges_list
+        else:
+            result_public['vis_edges'] = []
 
         if (vis_ents_tag != None):
             vis_ents_list = []
@@ -206,6 +210,8 @@ def parse_request_action(xml, output = 'dict'):
                         'node' : vis_ents_tag.contents[i]['node']         ,
                         'team' : vis_ents_tag.contents[i]['team'].lower() })
             result_public['vis_ents'] = vis_ents_list
+        else:
+            result_public['vis_ents'] = []
 
         if (probed_verts_tag != None):
             probed_verts_list = []
@@ -215,6 +221,8 @@ def parse_request_action(xml, output = 'dict'):
                         'name'  : probed_verts_tag.contents[i]['name']  ,
                         'value' : probed_verts_tag.contents[i]['value'] })
             result_public['probed_verts'] = probed_verts_list
+        else:
+            result_public['probed_verts'] = []
 
         if (surveyed_edges_tag != None):
             surveyed_edges_list = []
@@ -225,6 +233,8 @@ def parse_request_action(xml, output = 'dict'):
                         'node2'  : surveyed_edges_tag.contents[i]['node2']  ,
                         'weight' : surveyed_edges_tag.contents[i]['weight'] })
             result_public['surveyed_edges'] = surveyed_edges_list
+        else:
+            result_public['surveyed_edges'] = []
 
         if (inspected_ents_tag != None):
             inspected_ents_list = []
@@ -242,6 +252,8 @@ def parse_request_action(xml, output = 'dict'):
                         'team'       : inspected_ents_tag.contents[i]['team'].lower() ,
                         'vis_range'  : inspected_ents_tag.contents[i]['vis_range']    })
             result_public['inspected_ents'] = inspected_ents_list
+        else:
+            result_public['inspected_ents'] = []
             
     elif (output == "prolog"):
         result_private = [

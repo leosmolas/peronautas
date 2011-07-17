@@ -64,9 +64,6 @@
 %     Cost is the edge cost, and if unsurveyed will be unknown.
 
 % position(Turn, Agent, Node)
-% 
-
-myTeam(d3lp0r).
 
 
 
@@ -77,33 +74,24 @@ myTeam(d3lp0r).
 
 
 %------------------------------------------------------------------------------%
-% Succeeds when Node has not been surveyed. 
-% Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
-% nodo, del cual no conoces el costo.
-hasAtLeastOneUnsurveyedEdge(Node1) :-
-    findall(
-        Node2, 
-        k(edge(Node1, Node2, unknown)), 
-        L),
-    L \= [].
-
-
-
-%------------------------------------------------------------------------------%
 updateMyName(X) :- 
-   retractall( myName(OldName)           ),
-   retractall( h(position(OldName, Op1)) ),
-   retractall( k(position(OldName, Op2)) ),
-   assertz(    myName(X)                 ),
-   assertz(    h(position(X, Op1))       ),
-   assertz(    k(position(X, Op2))       ).
+   retractall( myName(_) ),
+   assertz(    myName(X) ).
 
 
 
 %------------------------------------------------------------------------------%
-updateStep(S) :-
+myTeam(d3lp0r).
+updateMyTeam(X) :-
+    retractall( myTeam(_) ),
+    assertz(    myTeam(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateStep(X) :-
     retractall( currentStep(_) ),
-    assertz(    currentStep(S) ).
+    assertz(    currentStep(X) ).
 
 
 
@@ -122,9 +110,16 @@ updateMaxEnergy(X) :-
 
 
 %------------------------------------------------------------------------------%
+updateMaxEnergyDisabled(X) :- 
+    retractall( maxEnergyDisabled(_) ),
+    assertz(    maxEnergyDisabled(X) ).
+
+
+
+%------------------------------------------------------------------------------%
 updateHealth(H) :- 
-    retractall( myHealth(_) ),
-    assertz(    myHealth(H) ).
+    retractall( health(_) ),
+    assertz(    health(H) ).
 
 
 
@@ -132,6 +127,20 @@ updateHealth(H) :-
 updateMaxHealth(X) :- 
     retractall( maxHealth(_) ),
     assertz(    maxHealth(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateStrength(X) :- 
+    retractall( strength(_) ),
+    assertz(    strength(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateVisualRange(X) :- 
+    retractall( visualRange(_) ),
+    assertz(    visualRange(X) ).
 
 
 
@@ -157,13 +166,46 @@ updateMoney(X) :-
 
 
 %------------------------------------------------------------------------------%
-% The position should keep track of which turn the agent was seen.
-updatePosition(X) :-
-    myName(A),
-    retractall( h(position(A, _)) ),
-    retractall( k(position(A, _)) ),
-    assertz(    h(position(A, X)) ),
-    assertz(    k(position(A, X)) ).
+updateScore(X) :- 
+    retractall( score(_) ), 
+    assertz(    score(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateZoneScore(X) :- 
+    retractall( zoneScore(_) ), 
+    assertz(    zoneScore(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateLastStepScore(X) :- 
+    retractall( lastStepScore(_) ), 
+    assertz(    lastStepScore(X) ).
+
+
+
+%------------------------------------------------------------------------------%
+updatePosition(Agent, Node) :-
+    currentStep(Step),
+    assertz(    h(position(Step, Agent, Node)) ),
+    assertz(    k(position(Step, Agent, Node)) ).
+
+
+
+%------------------------------------------------------------------------------%
+% TODO:
+% Asi como esta, no esta bueno, porque depende de que desde python se actualize
+% primero la informacion menos valiosa (las entidades visibles) antes que la
+% informacion mas valiosa (las entidades inspeccionadas).
+% El uso de currentStep/1 tambien implica que se espera que se actualize el
+% valor del turno actual antes de actualizar cualquier otra cosa, solo por
+% ahorrar un parametro.
+updateEntity(N, T, D, R, E, ME, H, MH, S, V) :-
+    currentStep(Step),
+    retractall( k(agent(Step, N, _, _, _, _,  _, _,  _, _, _)) ),
+    assertz(    k(agent(Step, N, T, D, R, E, ME, H, MH, S, V)) ).
 
 
 
@@ -232,21 +274,6 @@ updateNodeTeam(k(nodeTeam(Name, CurrentTeam))) :-
 
 
 
-%------------------------------------------------------------------------------%
-updateEntityPosition(Name, Position) :-
-    assertz( k(position(Name, Position) )),
-    assertz( h(position(Name, Position) )).
-
-
-
-%------------------------------------------------------------------------------%
-updateEntityTeam(Name, Team) :-
-    agentTeam(Name, Team).
-updateEntityTeam(Name, Team) :-
-    assertz( agentTeam(Name, Team) ).
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -298,15 +325,66 @@ searchNeigh(N) :-
 %                                  Auxiliary                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%------------------------------------------------------------------------------%
+% Succeeds when Node has not been surveyed. 
+% Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
+% nodo, del cual no conoces el costo.
+hasAtLeastOneUnsurveyedEdge(Node1) :-
+    findall(
+        Node2, 
+        k(edge(Node1, Node2, unknown)), 
+        L),
+    L \= [].
+
+
+
+%------------------------------------------------------------------------------%
 redirect_output(Filename) :-
     write('Prolog redirecting output to: '),write(Filename),nl,
     open(Filename, write, S),
     set_output(S).
 
-dumpKB :-
-    listing(k),
-    listing(h).
 
+
+%------------------------------------------------------------------------------%
+printList([]).
+printList([H | T]) :-
+    write('    '),write(H),nl,
+    printList(T).
+
+
+
+%------------------------------------------------------------------------------%
+
+printFindAll(Title, WhatToFind) :-
+    findall(WhatToFind, WhatToFind, L),
+    sort(L, SL),
+    write(Title),
+    nl,
+    printList(SL).
+
+
+
+%------------------------------------------------------------------------------%
+dumpKB :-
+    nl, 
+    write('KB DUMP:'), 
+    nl, 
+    nl,
+    
+    printFindAll('NODE VALUES:', k(nodeValue(X1, X2))),
+    printFindAll('NODE TEAMS:',  k(nodeTeam(X1, X2, X3))),
+    printFindAll('EDGES:',       k(edge(X1, X2, X3))),
+    printFindAll('POSITIONS:',   k(position(X1, X2, X3))),
+    printFindAll('AGENTS:',      k(agent(X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11))), 
+    true.
+    %listing(k).
+
+
+
+%------------------------------------------------------------------------------%
 close_output :-
     current_output(S),
     close(S).

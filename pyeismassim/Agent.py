@@ -120,16 +120,15 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
-        self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
+        if (log):
+            self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
         print "done"
 
 
 
     def disconnect(self):
-        if self.useLog:
-            print "PROLOG DATABASE DUMP:"
-            self.prolog.query("dumpKB").next()
-            self.prolog.query("close_output").next()
+        self.prolog.query("dumpKB").next()
+        self.prolog.query("close_output").next()
         Agent.disconnect(self)
 
 
@@ -152,6 +151,17 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
+
+
+
+    def merge_percepts(self, msg_dict_public, msg_dict_difference):
+        msg_dict_public['position'].extend(       msg_dict_difference.get('position',       []))
+        msg_dict_public['vis_verts'].extend(      msg_dict_difference.get('vis_verts',      []))
+        msg_dict_public['vis_edges'].extend(      msg_dict_difference.get('vis_edges',      []))
+        msg_dict_public['vis_ents'].extend(       msg_dict_difference.get('vis_ents',       []))
+        msg_dict_public['probed_verts'].extend(   msg_dict_difference.get('probed_verts',   []))
+        msg_dict_public['surveyed_edges'].extend( msg_dict_difference.get('surveyed_edges', []))
+        msg_dict_public['inspected_ents'].extend( msg_dict_difference.get('inspected_ents', []))
 
 
 
@@ -190,32 +200,45 @@ class PrologAgent(Agent):
 
 
     def processEntities(self, msg_dict):
-        self.prolog.query("retractall(k(position(_, _)))").next()
-        self.prolog.query("retractall(h(position(_, _)))").next()
-        for e in msg_dict.get('vis_ents'):
-            if (e['name'] == ''):
-                self.prolog.query("updateEntityPosition(unknown,%s)" % (e['node'])).next()
-                self.prolog.query("updateEntityTeam(unknown,%s)" % (e['team'])).next()
-            else:
-                self.prolog.query("updateEntityPosition(%s,%s)" % (e['name'], e['node'])).next()
-                self.prolog.query("updateEntityTeam(%s,%s)" % (e['name'], e['team'])).next()
+        
+        for p in msg_dict.get('position', []):
+            if (p['name'] == 'self'):
+                p['name'] = self.username
+            self.prolog.query("updatePosition(%s,%s)" % (p['name'], p['node'])).next()
 
+        for e in msg_dict.get('vis_ents'):
+            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], e['team'], e['node'])).next()
+            #if (e['name'] == ''):
+            #    print "WARNING! line 197"
+            #    self.prolog.query("updateEntityPosition(unknown,%s)" % (e['node'])).next()
+            #    self.prolog.query("updateEntityTeam(unknown,%s)"     % (e['team'])).next()
+            #else:
+            #    self.prolog.query("updateEntityPosition(%s,%s)"      % (e['name'], e['node'])).next()
+            #    self.prolog.query("updateEntityTeam(%s,%s)"          % (e['name'], e['team'])).next()
+
+        for e in msg_dict.get('inspected_ents', []):
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], e['team'], e['node'], e['role'], e['energy'], e['max_energy'], e['health'], e['max_health'], e['strength'], e['vis_range'])).next()
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
-        self.prolog.query("updateStep(%s)"             % msg_dict_private['step']).next()
-        self.prolog.query("updateEnergy(%s)"           % msg_dict_private['energy']).next()
-        self.prolog.query("updateMaxEnergy(%s)"        % msg_dict_private['max_energy']).next()
-        self.prolog.query("updateHealth(%s)"           % msg_dict_private['health']).next()
-        self.prolog.query("updateMaxHealth(%s)"        % msg_dict_private['max_health']).next()
-        self.prolog.query("updateLastAction(%s)"       % msg_dict_private['last_action']).next()
-        self.prolog.query("updateLastActionResult(%s)" % msg_dict_private['last_action_result']).next()
-        self.prolog.query("updateMoney(%s)"            % msg_dict_private['money']).next()
-        self.processEntities(msg_dict_public)
+        self.prolog.query("updateStep(%s)"              % msg_dict_private['step']).next()
+        self.prolog.query("updateEnergy(%s)"            % msg_dict_private['energy']).next()
+        self.prolog.query("updateMaxEnergy(%s)"         % msg_dict_private['max_energy']).next()
+        self.prolog.query("updateMaxEnergyDisabled(%s)" % msg_dict_private['max_energy_disabled']).next()
+        self.prolog.query("updateHealth(%s)"            % msg_dict_private['health']).next()
+        self.prolog.query("updateMaxHealth(%s)"         % msg_dict_private['max_health']).next()
+        self.prolog.query("updateStrength(%s)"          % msg_dict_private['strength']).next()
+        self.prolog.query("updateVisualRange(%s)"       % msg_dict_private['vis_range']).next()
+        self.prolog.query("updateLastAction(%s)"        % msg_dict_private['last_action']).next()
+        self.prolog.query("updateLastActionResult(%s)"  % msg_dict_private['last_action_result']).next()
+        self.prolog.query("updateMoney(%s)"             % msg_dict_private['money']).next()
+        self.prolog.query("updateScore(%s)"             % msg_dict_private['score']).next()
+        self.prolog.query("updateZoneScore(%s)"         % msg_dict_private['zone_score']).next()
+        self.prolog.query("updateLastStepScore(%s)"     % msg_dict_private['last_step_score']).next()
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
-        #self.prolog.query("updatePosition(%s)"         % msg_dict_public['position']).next()
+        self.processEntities(msg_dict_public)
 
 
 
@@ -224,11 +247,12 @@ class PrologAgent(Agent):
 
         # Synchronize perceptions with others.
         self.perceptConnection.send(self.username, msg_dict_public)
-        percept_difference = self.perceptConnection.recv()
+        msg_dict_difference = self.perceptConnection.recv()
+        self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        print "\n    @PrologAgent: PERCEPTION:"
-        print_message(msg_dict_public)
-        print ""
+        #print "\n    @PrologAgent: PERCEPTION:"
+        #print_message(msg_dict_public)
+        #print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
