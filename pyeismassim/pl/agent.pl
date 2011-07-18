@@ -55,7 +55,7 @@
 %     Value is 'unknown' if the node value is unknown, otherwise an integer
 %     representing its value.
 
-% nodeTeam(Name, Team)
+% nodeTeam(Step, Name, Team)
 %     Name is the vertex name.
 %     Team is the owning team, or the atom 'none'.
 
@@ -63,7 +63,9 @@
 %     Node1 and Node2 are the vertex names.
 %     Cost is the edge cost, and if unsurveyed will be unknown.
 
-% position(Turn, Agent, Node)
+% position(Step, Agent, Node)
+
+% agent(Step, Name, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 
 
 
@@ -189,8 +191,8 @@ updateLastStepScore(X) :-
 %------------------------------------------------------------------------------%
 updatePosition(Agent, Node) :-
     currentStep(Step),
-    assertz(    h(position(Step, Agent, Node)) ),
-    assertz(    k(position(Step, Agent, Node)) ).
+    assertz( h(position(Step, Agent, Node)) ),
+    assertz( k(position(Step, Agent, Node)) ).
 
 
 
@@ -210,6 +212,32 @@ updateEntity(N, T, D, R, E, ME, H, MH, S, V) :-
 
 
 %------------------------------------------------------------------------------%
+updateNodeValue(Name, unknown) :-
+    % El valor en la percepcion es unknown, y el nodo ya es conocido, luego no
+    % hay que hacer nada. 
+    k(nodeValue(Name, _)), 
+    !.
+updateNodeValue(Name, Value) :-
+    % El valor en la percepcion es distinto de unknown, luego se aserta
+    % independientemente si es conocido o no.
+    Value \= unknown,
+    !,
+    retractall( k(nodeValue(Name,     _)) ),
+    assertz(    k(nodeValue(Name, Value)) ).
+updateNodeValue(Name, Value) :-
+    % El nodo es desconocido.
+    assertz( k(nodeValue(Name, Value)) ).
+
+
+
+%------------------------------------------------------------------------------%
+updateNodeTeam(Name, CurrentTeam) :-
+    currentStep(Step),
+    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
+
+
+
+%------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
     assertz( k(edge(Node1, Node2, Cost)) ),
     assertz( k(edge(Node2, Node1, Cost)) ).
@@ -225,52 +253,25 @@ deleteEdge(Node1, Node2, Cost) :-
 
 %------------------------------------------------------------------------------%
 % Succeeds if the edge must be updated.
-updateEdge(k(edge(Node1, Node2, Cost))) :-
+updateEdge(Node1, Node2, Cost) :-
     % Si el arco ya estaba en la kb (con costo unknown o el real).
     k(edge(Node1, Node2, Cost)), 
     !.
-updateEdge(k(edge(Node1, Node2, unknown))) :-
+updateEdge(Node1, Node2, unknown) :-
     % Si ya estaba en la kb con su costo final.
     k(edge(Node1, Node2, Cost)),
     Cost \= unknown, 
     !.
-updateEdge(k(edge(Node1, Node2, Cost))) :-
+updateEdge(Node1, Node2, Cost) :-
     % Si conociamos el arco pero no su valor (es decir, cuando hacemos un survey del arco).
     % En este caso podriamos preguntar si Cost \= unknown.
     k(edge(Node1, Node2, unknown)),
     !,
     deleteEdge(Node1, Node2, unknown),
     insertEdge(Node1, Node2, Cost).
-updateEdge(k(edge(Node1, Node2, Cost))) :- 
+updateEdge(Node1, Node2, Cost) :- 
     % Si es la primera vez que vemos el arco.
     insertEdge(Node1, Node2, Cost).
-
-
-
-%------------------------------------------------------------------------------%
-updateNodeValue(k(nodeValue(Name, unknown))) :-
-    % El valor en la percepcion es unknown, y el nodo ya es conocido, luego no
-    % hay que hacer nada. 
-    k(nodeValue(Name, _)), 
-    !.
-updateNodeValue(k(nodeValue(Name, Value))) :-
-    % El valor en la percepcion es distinto de unknown, luego se aserta
-    % independientemente si es conocido o no.
-    Value \= unknown,
-    !,
-    retractall( k(nodeValue(Name,     _)) ),
-    assertz(    k(nodeValue(Name, Value)) ).
-updateNodeValue(X) :-
-    % El nodo es desconocido.
-    assertz( X ).
-
-
-
-%------------------------------------------------------------------------------%
-updateNodeTeam(k(nodeTeam(Name, CurrentTeam))) :-
-    currentStep(Step),
-    retractall( k(nodeTeam(Name,           _,    _)) ),
-    assertz(    k(nodeTeam(Name, CurrentTeam, Step)) ).
 
 
 

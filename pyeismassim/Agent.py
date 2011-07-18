@@ -181,21 +181,21 @@ class PrologAgent(Agent):
                     break
             if (in_pv):
                 #print "El nodo %s esta entre los nodos sondeados" % x['name']
-                self.prolog.query('updateNodeValue(k(nodeValue(%s,%s)))' % (x['name'], pv['value'])).next()
+                self.prolog.query('updateNodeValue(%s,%s)' % (x['name'], pv['value'])).next()
             else:
                 #print "El nodo %s no esta entre los nodos sondeados" % x['name']
-                self.prolog.query('updateNodeValue(k(nodeValue(%s,unknown)))' % (x['name'])).next()
-            self.prolog.query('updateNodeTeam(k(nodeTeam(%s,%s)))' % (x['name'], x['team'])).next()
+                self.prolog.query('updateNodeValue(%s,unknown)' % (x['name'])).next()
+            self.prolog.query('updateNodeTeam(%s,%s)' % (x['name'], x['team'])).next()
 
 
 
     def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
         for e in msg_dict.get('vis_edges', []):
-            self.prolog.query("updateEdge(k(edge(%s,%s,unknown)))" % (e['node1'], e['node2'])).next()
+            self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
 
         for e in msg_dict.get('surveyed_edges', []):
-            self.prolog.query("updateEdge(k(edge(%s,%s,%s)))" % (e['node1'], e['node2'], e['weight'])).next()
+            self.prolog.query("updateEdge(%s,%s,%s)" % (e['node1'], e['node2'], e['weight'])).next()
 
 
 
