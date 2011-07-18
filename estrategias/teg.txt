@@ -51,7 +51,7 @@ TAREAS INMEDIATAS:
     [x]     make the server accept an iterations parameter¶
     [ ]     make the server use non.blocking sockets and timeouts¶
     [ ] what happens with the agent state when the configuration server has several simulations/matches ?
-    [ ] go through the list of stuff that may appear in a percept and write down what we can do with each
+    [x] go through the list of stuff that may appear in a percept and write down what we can do with each
     [ ] true dummy agent which follows orders¶
 ¶
 definir orden de las intenciones¶

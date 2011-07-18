@@ -200,7 +200,6 @@ class PrologAgent(Agent):
 
 
     def processEntities(self, msg_dict):
-        
         for p in msg_dict.get('position', []):
             if (p['name'] == 'self'):
                 p['name'] = self.username
@@ -208,13 +207,6 @@ class PrologAgent(Agent):
 
         for e in msg_dict.get('vis_ents'):
             self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], e['team'], e['node'])).next()
-            #if (e['name'] == ''):
-            #    print "WARNING! line 197"
-            #    self.prolog.query("updateEntityPosition(unknown,%s)" % (e['node'])).next()
-            #    self.prolog.query("updateEntityTeam(unknown,%s)"     % (e['team'])).next()
-            #else:
-            #    self.prolog.query("updateEntityPosition(%s,%s)"      % (e['name'], e['node'])).next()
-            #    self.prolog.query("updateEntityTeam(%s,%s)"          % (e['name'], e['team'])).next()
 
         for e in msg_dict.get('inspected_ents', []):
             self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], e['team'], e['node'], e['role'], e['energy'], e['max_energy'], e['health'], e['max_health'], e['strength'], e['vis_range'])).next()

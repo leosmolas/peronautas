@@ -255,6 +255,7 @@ def parse_request_action(xml, output = 'dict'):
         else:
             result_public['inspected_ents'] = []
             
+    # Cruft.
     elif (output == "prolog"):
         result_private = [
             'type(request_action)'                                    ,
