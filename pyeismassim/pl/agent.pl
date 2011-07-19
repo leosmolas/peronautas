@@ -204,6 +204,16 @@ updatePosition(Agent, Node) :-
 % El uso de currentStep/1 tambien implica que se espera que se actualize el
 % valor del turno actual antes de actualizar cualquier otra cosa, solo por
 % ahorrar un parametro.
+% Name
+% Team
+% Node
+% Role
+% Energy
+% MaxEnergy
+% Health
+% MaxHealth
+% Strength
+% VisualRange
 updateEntity(N, T, D, R, E, ME, H, MH, S, V) :-
     currentStep(Step),
     retractall( k(agent(Step, N, _, _, _, _,  _, _,  _, _, _)) ),
@@ -216,6 +226,7 @@ updateNodeValue(Name, unknown) :-
     % El valor en la percepcion es unknown, y el nodo ya es conocido, luego no
     % hay que hacer nada. 
     k(nodeValue(Name, _)), 
+    h(nodeValue(Name, _)), 
     !.
 updateNodeValue(Name, Value) :-
     % El valor en la percepcion es distinto de unknown, luego se aserta
@@ -223,10 +234,13 @@ updateNodeValue(Name, Value) :-
     Value \= unknown,
     !,
     retractall( k(nodeValue(Name,     _)) ),
+    retractall( h(nodeValue(Name,     _)) ),
     assertz(    k(nodeValue(Name, Value)) ).
+    assertz(    h(nodeValue(Name, Value)) ).
 updateNodeValue(Name, Value) :-
     % El nodo es desconocido.
     assertz( k(nodeValue(Name, Value)) ).
+    assertz( h(nodeValue(Name, Value)) ).
 
 
 
@@ -234,6 +248,7 @@ updateNodeValue(Name, Value) :-
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
     assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    
 
 
 

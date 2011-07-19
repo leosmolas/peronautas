@@ -1,6 +1,7 @@
 :- ['pl/graph/edges.pl', 
     'pl/graph/nodes.pl', 
-    'pl/graph/agents.pl'
+    'pl/graph/agents.pl',
+    'pl/kmap.pl'
    ].
 
 :- dynamic neighborOwner/2.
@@ -17,7 +18,7 @@ paths(Start, Finish, Path) :-
 % path(+Start, +Finish, +Visited, +Path).
 path(Finish, Finish, _, [Finish]).
 path(Start, Finish, Visited, [Start|Path]) :- 
-    hedge(Start, Next, _), 
+    h(edge(Start, Next, _)), 
     not(member(Next, Visited)), 
     path(Next, Finish, [Next | Visited], Path).
 
@@ -28,7 +29,7 @@ path(Start, Finish, Visited, [Start|Path]) :-
 neighbors(Node, Neighbors) :- 
     findall(
         Neigh, 
-        hedge(Node,Neigh,_), 
+        h(edge(Node,Neigh,_)), 
         Neighbors
     ).
 
@@ -37,9 +38,10 @@ neighbors(Node, Neighbors) :-
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
 agentsInNode(Node, Agents) :- 
+    currentStep(Step),
     findall(
-        Agent, 
-        hposition(Agent, Node), 
+        Agent,         
+        h(position(Step, Agent, Node)), 
         Agents
     ).
 
@@ -48,10 +50,11 @@ agentsInNode(Node, Agents) :-
 % teamsInNode(+Node, -Teams)
 % returns in Teams a list of Teams which are present in a Node.
 teamsInNode(Node, Teams) :- 
+    currentStep(Step),
     findall(
         Team, 
         (
-            hposition(Agent, Node), 
+            h(position(Step, Agent, Node)), 
             teamOfAgent(Agent, Team)
         ), 
         Teams
@@ -73,9 +76,10 @@ teamsInNeighbors([], TeamsNeighborsCount) :-
     ),
     retractall( neighborOwner(_, _) ).
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    hnode(Neighbor, _, Owner),
+    h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
-    hposition(Agent, Neighbor),
+    currentStep(Step),
+    h(position(Step, Agent, Neighbor)),
     teamOfAgent(Agent, Owner),
     neighborOwner(Owner, Count), 
     !,
@@ -84,9 +88,10 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
     assert(neighborOwner(Owner, Count2)),
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    hnode(Neighbor,_,Owner),
+    h(nodeTeam(Neighbor, Owner),
     Owner \= none,
-    hposition(Agent,Neighbor),
+    currentStep(Step),
+    h(position(Step, Agent, Neighbor)),
     teamOfAgent(Agent, Owner), !,
     assert(neighborOwner(Owner,1)),
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).

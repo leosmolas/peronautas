@@ -58,7 +58,6 @@ listOfTeams(Teams) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
 % teams(-ListofTeams).
 team(peronismo).
 team(cacoteam).

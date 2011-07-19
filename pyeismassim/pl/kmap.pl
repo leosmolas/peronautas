@@ -5,34 +5,154 @@
 % RandomSeed = 1
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
-knode(vertex0,  unknown, 10). knode(vertex9,  unknown, 10).
-knode(vertex1,  unknown,  5). knode(vertex11, unknown,  5).
-knode(vertex3,  unknown,  5). knode(vertex7,  unknown,  5).
-knode(vertex4,  unknown,  4). knode(vertex2,  unknown,  4).
-knode(vertex8,  unknown,  3). knode(vertex6,  unknown,  3).
-knode(vertex10, unknown,  4). knode(vertex5,  unknown,  4).
-knode(vertex12, unknown,  2). knode(vertex13, unknown,  2).
+k(nodeTeam(vertex0,  unknown)). 
+k(nodeTeam(vertex1,  unknown)). 
+k(nodeTeam(vertex3,  unknown)). 
+k(nodeTeam(vertex4,  unknown)). 
+k(nodeTeam(vertex8,  unknown)). 
+k(nodeTeam(vertex10, unknown)). 
+k(nodeTeam(vertex12, unknown)). 
+k(nodeTeam(vertex9,  unknown)).
+k(nodeTeam(vertex11, unknown)).
+k(nodeTeam(vertex7,  unknown)).
+k(nodeTeam(vertex2,  unknown)).
+k(nodeTeam(vertex6,  unknown)).
+k(nodeTeam(vertex5,  unknown)).
+k(nodeTeam(vertex13, unknown)).
 
-kedge(vertex5,  vertex8,  4). kedge(vertex6,  vertex10, 4).
-kedge(vertex8,  vertex7,  1). kedge(vertex3,  vertex6,  1).
-kedge(vertex2,  vertex5,  9). kedge(vertex4,  vertex10, 9).
-kedge(vertex2,  vertex8,  9). kedge(vertex6,  vertex4,  9).
-kedge(vertex5,  vertex7,  9). kedge(vertex3,  vertex10, 9).
-kedge(vertex2,  vertex7,  6). kedge(vertex3,  vertex4,  6).
-
-kedge(vertex5,  vertex1,  9). kedge(vertex10, vertex11, 9).
-kedge(vertex5,  vertex0,  5). kedge(vertex9,  vertex10, 5).
-kedge(vertex0,  vertex7,  2). kedge(vertex3,  vertex9,  2).
-kedge(vertex1,  vertex0,  7). kedge(vertex9,  vertex11, 7).
-kedge(vertex1,  vertex13, 6). kedge(vertex12, vertex11, 6).
-kedge(vertex13, vertex0,  6). kedge(vertex9,  vertex12, 6).
-
-kedge(vertex8,  vertex6,  8).
-kedge(vertex7,  vertex3,  1).
-kedge(vertex0,  vertex9,  4).
-kedge(vertex13, vertex12, 2).
+k(nodeValue(vertex0,  10)). 
+k(nodeValue(vertex1,   5)). 
+k(nodeValue(vertex3,   5)). 
+k(nodeValue(vertex4,   4)). 
+k(nodeValue(vertex8,   3)). 
+k(nodeValue(vertex10,  4)). 
+k(nodeValue(vertex12,  2)). 
+k(nodeValue(vertex9,  10)).
+k(nodeValue(vertex11,  5)).
+k(nodeValue(vertex7,   5)).
+k(nodeValue(vertex2,   4)).
+k(nodeValue(vertex6,   3)).
+k(nodeValue(vertex5,   4)).
+k(nodeValue(vertex13,  2)).
 
 
+h(nodeTeam(vertex0,  unknown)). 
+h(nodeTeam(vertex1,  unknown)). 
+h(nodeTeam(vertex3,  unknown)). 
+h(nodeTeam(vertex4,  unknown)). 
+h(nodeTeam(vertex8,  unknown)). 
+h(nodeTeam(vertex10, unknown)). 
+h(nodeTeam(vertex12, unknown)). 
+h(nodeTeam(vertex9,  unknown)).
+h(nodeTeam(vertex11, unknown)).
+h(nodeTeam(vertex7,  unknown)).
+h(nodeTeam(vertex2,  unknown)).
+h(nodeTeam(vertex6,  unknown)).
+h(nodeTeam(vertex5,  unknown)).
+h(nodeTeam(vertex13, unknown)).
+
+h(nodeValue(vertex0,  10)). 
+h(nodeValue(vertex1,   5)). 
+h(nodeValue(vertex3,   5)). 
+h(nodeValue(vertex4,   4)). 
+h(nodeValue(vertex8,   3)). 
+h(nodeValue(vertex10,  4)). 
+h(nodeValue(vertex12,  2)). 
+h(nodeValue(vertex9,  10)).
+h(nodeValue(vertex11,  5)).
+h(nodeValue(vertex7,   5)).
+h(nodeValue(vertex2,   4)).
+h(nodeValue(vertex6,   3)).
+h(nodeValue(vertex5,   4)).
+h(nodeValue(vertex13,  2)).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                      Edges                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+k(edge(vertex5,  vertex8,  4)). 
+k(edge(vertex8,  vertex7,  1)). 
+k(edge(vertex2,  vertex5,  9)). 
+k(edge(vertex2,  vertex8,  9)). 
+k(edge(vertex5,  vertex7,  9)). 
+k(edge(vertex2,  vertex7,  6)). 
+
+k(edge(vertex6,  vertex10, 4)).
+k(edge(vertex3,  vertex6,  1)).
+k(edge(vertex4,  vertex10, 9)).
+k(edge(vertex6,  vertex4,  9)).
+k(edge(vertex3,  vertex10, 9)).
+k(edge(vertex3,  vertex4,  6)).
+
+k(edge(vertex5,  vertex1,  9)). 
+k(edge(vertex5,  vertex0,  5)). 
+k(edge(vertex0,  vertex7,  2)). 
+k(edge(vertex1,  vertex0,  7)). 
+k(edge(vertex1,  vertex13, 6)). 
+k(edge(vertex13, vertex0,  6)). 
+
+k(edge(vertex10, vertex11, 9)).
+k(edge(vertex9,  vertex10, 5)).
+k(edge(vertex3,  vertex9,  2)).
+k(edge(vertex9,  vertex11, 7)).
+k(edge(vertex12, vertex11, 6)).
+k(edge(vertex9,  vertex12, 6)).
+
+k(edge(vertex8,  vertex6,  8)).
+k(edge(vertex7,  vertex3,  1)).
+k(edge(vertex0,  vertex9,  4)).
+k(edge(vertex13, vertex12, 2)).
+
+
+h(edge(vertex5,  vertex8,  4)). 
+h(edge(vertex8,  vertex7,  1)). 
+h(edge(vertex2,  vertex5,  9)). 
+h(edge(vertex2,  vertex8,  9)). 
+h(edge(vertex5,  vertex7,  9)). 
+h(edge(vertex2,  vertex7,  6)). 
+
+h(edge(vertex6,  vertex10, 4)).
+h(edge(vertex3,  vertex6,  1)).
+h(edge(vertex4,  vertex10, 9)).
+h(edge(vertex6,  vertex4,  9)).
+h(edge(vertex3,  vertex10, 9)).
+h(edge(vertex3,  vertex4,  6)).
+
+h(edge(vertex5,  vertex1,  9)). 
+h(edge(vertex5,  vertex0,  5)). 
+h(edge(vertex0,  vertex7,  2)). 
+h(edge(vertex1,  vertex0,  7)). 
+h(edge(vertex1,  vertex13, 6)). 
+h(edge(vertex13, vertex0,  6)). 
+
+h(edge(vertex10, vertex11, 9)).
+h(edge(vertex9,  vertex10, 5)).
+h(edge(vertex3,  vertex9,  2)).
+h(edge(vertex9,  vertex11, 7)).
+h(edge(vertex12, vertex11, 6)).
+h(edge(vertex9,  vertex12, 6)).
+
+h(edge(vertex8,  vertex6,  8)).
+h(edge(vertex7,  vertex3,  1)).
+h(edge(vertex0,  vertex9,  4)).
+h(edge(vertex13, vertex12, 2)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                    Position                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+h(position(0, peron, vertex3)).
+h(position(0, evita, vertex12)).
+h(position(0, machinea, vertex10)).
+h(position(0, cavallo, vertex6)).
+
+
+h(position(0, iorio, vertex8)).
+h(position(0, moyano, vertex5)).
+h(position(0, castels, vertex2)).
+h(position(0, delia, vertex7)).
+
+
+k(agent(0, peron, peronismo, ,,,,,,,)).
