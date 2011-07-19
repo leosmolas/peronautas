@@ -14,6 +14,11 @@ path(Start, Finish, Visited, [Start|Path]) :- hedge(Start, Next, _), not(member(
 % returns in Neighbors a list of neighbors of node Node.
 neighbors(Node, Neighbors) :- findall(Neigh, hedge(Node,Neigh,_), Neighbors).
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% neighbors(+Node, -Neighbors)
+% returns in Neighbors a list of neighbors of node Node.
+kneighbors(Node, Neighbors) :- findall(Neigh, k(edge(Node,Neigh,_)), Neighbors).
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
