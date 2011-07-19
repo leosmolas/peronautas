@@ -28,40 +28,46 @@ setOwner([Node | Nodes], Owner) :-
 % nodesOfTeam(+Team, -NodesOfTeam)
 % returns in NodesOfTeam a list of nodes that are owned by the Team
 nodesOfTeam(Team, NodesOfTeam) :- 
-    findall(Node, h(nodeTeam(Node, Team)), NodesOfTeam).
+    currentStep(Step),
+    findall(Node, h(nodeTeam(Step, Node, Team)), NodesOfTeam).
 
 
 % clearNode(-Node)
 clearNode(Node) :- 
-    h(node(Node, none)), 
-    not(h(position(_, Node))).
+    currentStep(Step),
+    h(nodeTeam(Step, Node, none)), 
+    not(position(Step, _, Node)).
 
 
 
 % emptyNode(-Node)
 emptyNode(Node) :- 
-    h(nodeValue(Node, _))), 
-    not(h(position(_, Node))).
+    currentStep(Step),
+    k(nodeValue(Node, _)), 
+    not(position(Step, _, Node)).
 
 
 
 % nonEmptyNode(-Node)
 nonEmptyNode(Node) :- 
-    h(nodeValue(Node, _)), 
-    h(position(_, Node)).
+    currentStep(Step),
+    k(nodeValue(Node, _)), 
+    position(Step, _, Node).
 
 
 
 % checkOwner(+Node, ?Team)
 % checks if the owner of the Node is Team. It can also return the actual Team of the node
 checkOwner(Node, Team) :- 
-    h(nodeTeam(Node, Team)), 
+    currentStep(Step),
+    h(nodeTeam(Step, Node, Team)), 
     !.
 
 
 
 listOfNodes(ListOfNodes) :- 
-    findall(Node, h(nodeValue(Node, _)), ListOfNodes).
+    currentStep(Step),
+    findall(Node, h(nodeValue(Step, Node, _)), ListOfNodes).
 
 
 

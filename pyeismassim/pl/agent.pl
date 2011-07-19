@@ -20,6 +20,7 @@
            k/1,                %
            agentTeam/2.        %
 
+:- ['pl/graph/map.pl'].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,7 +227,6 @@ updateNodeValue(Name, unknown) :-
     % El valor en la percepcion es unknown, y el nodo ya es conocido, luego no
     % hay que hacer nada. 
     k(nodeValue(Name, _)), 
-    h(nodeValue(Name, _)), 
     !.
 updateNodeValue(Name, Value) :-
     % El valor en la percepcion es distinto de unknown, luego se aserta
@@ -234,13 +234,10 @@ updateNodeValue(Name, Value) :-
     Value \= unknown,
     !,
     retractall( k(nodeValue(Name,     _)) ),
-    retractall( h(nodeValue(Name,     _)) ),
     assertz(    k(nodeValue(Name, Value)) ).
-    assertz(    h(nodeValue(Name, Value)) ).
 updateNodeValue(Name, Value) :-
     % El nodo es desconocido.
     assertz( k(nodeValue(Name, Value)) ).
-    assertz( h(nodeValue(Name, Value)) ).
 
 
 
@@ -248,9 +245,6 @@ updateNodeValue(Name, Value) :-
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
     assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
-    
-
-
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-

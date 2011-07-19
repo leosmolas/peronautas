@@ -18,7 +18,7 @@ paths(Start, Finish, Path) :-
 % path(+Start, +Finish, +Visited, +Path).
 path(Finish, Finish, _, [Finish]).
 path(Start, Finish, Visited, [Start|Path]) :- 
-    h(edge(Start, Next, _)), 
+    k(edge(Start, Next, _)), 
     not(member(Next, Visited)), 
     path(Next, Finish, [Next | Visited], Path).
 
@@ -29,7 +29,7 @@ path(Start, Finish, Visited, [Start|Path]) :-
 neighbors(Node, Neighbors) :- 
     findall(
         Neigh, 
-        h(edge(Node,Neigh,_)), 
+        k(edge(Node,Neigh,_)), 
         Neighbors
     ).
 
@@ -41,7 +41,7 @@ agentsInNode(Node, Agents) :-
     currentStep(Step),
     findall(
         Agent,         
-        h(position(Step, Agent, Node)), 
+        position(Step, Agent, _Node), 
         Agents
     ).
 
@@ -54,8 +54,8 @@ teamsInNode(Node, Teams) :-
     findall(
         Team, 
         (
-            h(position(Step, Agent, Node)), 
-            teamOfAgent(Agent, Team)
+            position(Step, Agent, Node), 
+            team(Agent, Team)
         ), 
         Teams
     ).
@@ -71,35 +71,37 @@ teamsInNeighbors([], TeamsNeighborsCount) :-
     !, 
     findall(
         [Owner,Count], 
-        neighborOwner(Owner,Count), 
+        neighborOwner(Owner, Count), 
         TeamsNeighborsCount
     ),
     retractall( neighborOwner(_, _) ).
+
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    h(nodeTeam(Neighbor, Owner)),
-    Owner \= none,
     currentStep(Step),
-    h(position(Step, Agent, Neighbor)),
-    teamOfAgent(Agent, Owner),
+    h(nodeTeam(Step, Neighbor, Owner)),
+    Owner \= none,
+    position(Step, Agent, Neighbor),
+    team(Agent, Owner),
     neighborOwner(Owner, Count), 
     !,
     retract( neighborOwner(Owner, Count) ),
     Count2 is Count + 1,
     assert(neighborOwner(Owner, Count2)),
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    h(nodeTeam(Neighbor, Owner),
-    Owner \= none,
     currentStep(Step),
-    h(position(Step, Agent, Neighbor)),
-    teamOfAgent(Agent, Owner), !,
+    h(nodeTeam(Step, Neighbor, Owner)),
+    Owner \= none,
+    position(Step, Agent, Neighbor),
+    team(Agent, Owner),
+    !,
     assert(neighborOwner(Owner,1)),
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
+
 teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :- 
     !, 
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
-
-
 
 
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
@@ -299,7 +301,7 @@ step2 :-
 % third step of the coloring algorithm
 step3 :- 
     foreach(
-        learNode(Node), 
+        clearNode(Node), 
         (
             dfs(Node)
         )

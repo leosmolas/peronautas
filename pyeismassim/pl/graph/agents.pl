@@ -2,38 +2,6 @@
 :- dynamic energy/2.
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                Operations                                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-% moveAgent(+Agent, +Node).
-% Moves the agent from his current position to Node.
-moveAgent(Agent, Node) :- 
-    hnode(Node, _, _), 
-    retract( hposition(Agent, _OldNode) ), 
-    assertz( hposition(Agent, Node)     ), 
-    !.
-
-
-
-% travel(+Agent, +Node).
-% Moves the agent from ActualNode to Node.  There must be and edge between these two nodes and the agent must have the necessary energy to travel.
-travel(Agent, Node) :-  
-    energy(Agent, Energy),                        
-    hposition(Agent, ActualNode),
-    hedge(ActualNode, Node, Cost),
-    NewEnergy is Energy - Cost, 
-    NewEnergy >= 0,
-    retract(hposition(Agent, ActualNode)), 
-    assertz(hposition(Agent, Node)), 
-    setEnergy(Agent, NewEnergy), 
-    !.
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Consults                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,8 +27,8 @@ listOfTeams(Teams) :-
 
 
 % teams(-ListofTeams).
-team(peronismo).
-team(cacoteam).
+%team(peronismo).
+%team(cacoteam).
 
 
 
@@ -72,14 +40,14 @@ team(cacoteam).
 
 % teamOfAgent(?Agent, ?Team)
 % Team of an Agent.
-teamOfAgent(peron,   peronismo).
-teamOfAgent(evita,   peronismo).
-teamOfAgent(cafiero, peronismo).
-teamOfAgent(menem,   peronismo).
-teamOfAgent(iorio,   cacoteam).
-teamOfAgent(delia,   cacoteam).
-teamOfAgent(moyano,  cacoteam).
-teamOfAgent(castels, cacoteam).
+%teamOfAgent(peron,   peronismo).
+%teamOfAgent(evita,   peronismo).
+%teamOfAgent(cafiero, peronismo).
+%teamOfAgent(menem,   peronismo).
+%teamOfAgent(iorio,   cacoteam).
+%teamOfAgent(delia,   cacoteam).
+%teamOfAgent(moyano,  cacoteam).
+%teamOfAgent(castels, cacoteam).
 
 
 
