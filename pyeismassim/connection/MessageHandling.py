@@ -206,9 +206,10 @@ def parse_request_action(xml, output = 'dict'):
             for i in range(len(vis_ents_tag.contents)):
                 if (vis_ents_tag.contents[i].__class__.__name__ == "Tag"):
                     vis_ents_list.append({ 
-                        'name' : vis_ents_tag.contents[i]['name']         ,
-                        'node' : vis_ents_tag.contents[i]['node']         ,
-                        'team' : vis_ents_tag.contents[i]['team'].lower() })
+                        'name'   : vis_ents_tag.contents[i]['name']        ,
+                        'node'   : vis_ents_tag.contents[i]['node']        ,
+                        'team'   : vis_ents_tag.contents[i]['team'].lower(),
+                        'status' : vis_ents_tag.contents[i]['status']      }) # normal | disabled
             result_public['vis_ents'] = vis_ents_list
         else:
             result_public['vis_ents'] = []
