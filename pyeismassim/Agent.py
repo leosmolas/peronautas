@@ -203,12 +203,17 @@ class PrologAgent(Agent):
         for p in msg_dict.get('position', []):
             if (p['name'] == 'self'):
                 p['name'] = self.username
-            self.prolog.query("updatePosition(%s,%s)" % (p['name'], p['node'])).next()
+            team = 'd3lp0r'
+            for e in msg_dict['vis_ents']:
+                if (p['name'] == e['name']):
+                   team = e['team']
+                   break
+            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (p['name'], team, p['node'])).next()
 
-        for e in msg_dict.get('vis_ents'):
+        for e in msg_dict['vis_ents']:
             self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], e['team'], e['node'])).next()
 
-        for e in msg_dict.get('inspected_ents', []):
+        for e in msg_dict['inspected_ents']:
             self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], e['team'], e['node'], e['role'], e['energy'], e['max_energy'], e['health'], e['max_health'], e['strength'], e['vis_range'])).next()
 
 
@@ -242,9 +247,9 @@ class PrologAgent(Agent):
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        #print "\n    @PrologAgent: PERCEPTION:"
-        #print_message(msg_dict_public)
-        #print ""
+        print "\n    @PrologAgent: PERCEPTION:"
+        print_message(msg_dict_public)
+        print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
