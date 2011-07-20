@@ -45,8 +45,8 @@ team(peronismo).
 team(cacoteam).
 
 % team(+Name, +ListofAgents).
-%team(peronismo, [peron, evita, menem, cafiero]).
-%team(cacoteam, [iorio, delia, moyano, castels]).
+% team(peronismo, [peron, evita, menem, cafiero]).
+% team(cacoteam, [iorio, delia, moyano, castels]).
 
 
 % teamOfAgent(?Agent, ?Team)
@@ -67,7 +67,7 @@ teamOfAgent(castels, cacoteam).
 % hposition(evita,a).
 % hposition(menem,g).
 % hposition(cafiero,b).
-% 
+
 % hposition(iorio,h).
 % hposition(delia,f).
 % hposition(castels,b).
@@ -98,13 +98,13 @@ teamOfAgent(castels, cacoteam).
 % Team = cacoteam.
 
 % 
-%hposition(peron,a).
-%hposition(evita,e).
-%hposition(menem,g).
-%hposition(cafiero,d).
+% hposition(peron,a).
+% hposition(evita,e).
+% hposition(menem,g).
+% hposition(cafiero,d).
 
-%hposition(iorio,h).
-%hposition(delia,f).
+% hposition(iorio,h).
+% hposition(delia,f).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT

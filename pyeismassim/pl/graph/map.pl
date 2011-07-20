@@ -1,4 +1,4 @@
-:-['pl/graph/edges.pl', 'pl/graph/nodes.pl', 'pl/graph/agents.pl'].
+% :-['edges.pl', 'nodes.pl', 'agents.pl'].
 :- dynamic neighborOwner/2.
 
 % paths(+Start, +Finish, -Path)
@@ -14,6 +14,11 @@ path(Start, Finish, Visited, [Start|Path]) :- hedge(Start, Next, _), not(member(
 % returns in Neighbors a list of neighbors of node Node.
 neighbors(Node, Neighbors) :- findall(Neigh, hedge(Node,Neigh,_), Neighbors).
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% neighbors(+Node, -Neighbors)
+% returns in Neighbors a list of neighbors of node Node.
+kneighbors(Node, Neighbors) :- findall(Neigh, k(edge(Node,Neigh,_)), Neighbors).
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
@@ -29,10 +34,11 @@ teamsInNode(Node, Teams) :- findall(Team, (hposition(Agent, Node), teamOfAgent(A
 
 % teamsInNeighbors(+Neighbors, -TeamsNeighborsCount)
 % returns in TeamsNeighborsCount a list of pairs (Owner, Count), representing count of neighbor nodes owned by the teams.
-teamsInNeighbors([], TeamsNeighborsCount) :- !, findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
-                                             retractall(neighborOwner(_,_)).
+teamsInNeighbors([], TeamsNeighborsCount) :- 
+    !, findall([Owner,Count], neighborOwner(Owner,Count), TeamsNeighborsCount),
+    retractall(neighborOwner(_,_)).
 
-teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor,_,Owner),
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor, Owner, _),
                                                                  Owner \= none,
                                                                  hposition(Agent,Neighbor),
                                                                  teamOfAgent(Agent, Owner),
@@ -42,7 +48,7 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor,
                                                                  assert(neighborOwner(Owner,Count2)),
                                                                  teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
-teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor,_,Owner),
+teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- hnode(Neighbor, Owner, _),
                                                                  Owner \= none,
                                                                  hposition(Agent,Neighbor),
                                                                  teamOfAgent(Agent, Owner), !,
@@ -170,7 +176,7 @@ cleanColors :- listOfNodes(ListOfNodes),
 
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
-coloringAlgorithm :- cleanColors,
+coloringAlgorithm :- % cleanColors,
                      step1,
                      step2,
                      step3.
@@ -191,3 +197,48 @@ step2 :- foreach(emptyNode(Node), (checkMajorityInNeighbors(Node))).
 % step3
 % third step of the coloring algorithm
 step3 :- foreach(clearNode(Node), (dfs(Node))).
+
+% Aserto hechos de la kb como hipotéticos.
+assertHMap :- 
+    foreach(knode(X, Y, Z), assert(hnode(X, none, Z))),
+    foreach(kedge(X, Y, Z), assert(hedge(X, Y, Z))),
+    foreach(kposition(X, Y), assert(hposition(X, Y))).
+    
+    
+% Algoritmo para calcular los puntos de un equipo a partir de hnodes.
+teamHPoints(Team, Points) :-
+    findall(hnode(X, Team, Z), hnode(X, Team, Z), ListOfNodes),
+    calcHPoints(ListOfNodes, 0, Points).
+    
+calcHPoints([], Points, Points).
+
+calcHPoints([hnode(Node, Team, Value) | Nodes], Points1, Points3):-
+    checkHNeighbors(Node, Team), !,
+    Points2 is Points1 + Value,
+    calcHPoints(Nodes, Points2, Points3).
+    
+calcHPoints([_ | Nodes], Points1, Points2):-
+    calcHPoints(Nodes, Points1, Points2).
+    
+checkHNeighbors(Node, Team) :-
+    hedge(Node, X, _),
+    hnode(X, Team, _V), !.
+    
+% Algoritmo para calcular los puntos de un equipo a partir de knodes.
+teamPoints(Team, Points) :-
+    findall(knode(X, Team, Z), knode(X, Team, Z), ListOfNodes),
+    calcPoints(ListOfNodes, 0, Points).
+    
+calcPoints([], Points, Points).
+
+calcPoints([knode(Node, Team, Value) | Nodes], Points1, Points3):-
+    checkNeighbors(Node, Team), !,
+    Points2 is Points1 + Value,
+    calcPoints(Nodes, Points2, Points3).
+    
+calcPoints([_ | Nodes], Points1, Points2):-
+    calcPoints(Nodes, Points1, Points2).
+    
+checkNeighbors(Node, Team) :-
+    kedge(Node, X, _),
+    knode(X, Team, _V), !.

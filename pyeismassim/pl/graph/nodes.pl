@@ -9,12 +9,16 @@
 % setOwner(+Nodes, +Owner)
 % sets the owner of the node Nodes to Owner.
 setOwner([], _).
-setOwner([Node | Nodes], Owner) :- retract(hnode(Node, Value, _)), assertz(hnode(Node, Value, Owner)), setOwner(Nodes, Owner).
-
+setOwner([Node | Nodes], Owner) :- 
+    retract(hnode(Node, _, Value)), 
+    assertz(hnode(Node, Owner, Value)), 
+    setOwner(Nodes, Owner).
 
 % changeValue(+Node, +Value).
 % changes the value of the node to a new value
-changeValue(Node, Value) :- retract(hnode(Node,_,Owner)), assertz(hnode(Node, Value, Owner)).
+changeValue(Node, Value) :- 
+    retract(hnode(Node, Owner, _)), 
+    assertz(hnode(Node, Owner, Value)).
 
 
 
@@ -25,12 +29,12 @@ changeValue(Node, Value) :- retract(hnode(Node,_,Owner)), assertz(hnode(Node, Va
 
 % nodesOfTeam(+Team, -NodesOfTeam)
 % returns in NodesOfTeam a list of nodes that are owned by the Team
-nodesOfTeam(Team, NodesOfTeam) :- findall(Node, hnode(Node, _, Team), NodesOfTeam).
+nodesOfTeam(Team, NodesOfTeam) :- findall(Node, hnode(Node, Team, _), NodesOfTeam).
 
 
 % clearNode(-Node)
 %
-clearNode(Node) :- hnode(Node, _, none), not(hposition(_, Node)).
+clearNode(Node) :- hnode(Node, none, _), not(hposition(_, Node)).
 
 
 % emptyNode(-Node)
@@ -45,7 +49,7 @@ nonEmptyNode(Node) :- hnode(Node, _, _), hposition(_, Node).
 
 % checkOwner(+Node, ?Team)
 % checks if the owner of the Node is Team. It can also return the actual Team of the node
-checkOwner(Node, Team) :- hnode(Node, _, Team), !.
+checkOwner(Node, Team) :- hnode(Node, Team, _), !.
 
 
 listOfNodes(ListOfNodes) :- findall(Node, hnode(Node, _, _), ListOfNodes).
@@ -56,16 +60,16 @@ listOfNodes(ListOfNodes) :- findall(Node, hnode(Node, _, _), ListOfNodes).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% hnode(Name, Value, Owner).
+% hnode(Name, Owner, Value).
 % this block should die when we merge it with the agent.
 % if everyone agrees, this should be named vert (since the server sents vert)
-hnode(a, 1, none).
-hnode(b, 2, none).
-hnode(c, 3, none).
-hnode(d, 1, none).
-hnode(e, 1, none).
-hnode(f, 1, none).
-hnode(g, 5, none).
-hnode(h, 4, none).
-hnode(i, 1, none).
-hnode(j, 2, none).
+% hnode(a, none, 1).
+% hnode(b, none, 2).
+% hnode(c, none, 3).
+% hnode(d, none, 1).
+% hnode(e, none, 1).
+% hnode(f, none, 1).
+% hnode(g, none, 5).
+% hnode(h, none, 4).
+% hnode(i, none, 1).
+% hnode(j, none, 2).

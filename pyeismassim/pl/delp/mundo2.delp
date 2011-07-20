@@ -1,45 +1,59 @@
+% Existen dos metas iguales con el mismo valor final.
+% El criterio debe seleccionar por orden lexicográfico de los argumentos.
+
 % hechos asertados
 
 % posibleExplorar(Nodo)
 
-posibleExplorar(b) <- true.
-posibleExplorar(c) <- true.
-posibleExplorar(d) <- true.
-posibleExplorar(e) <- true.
-posibleExplorar(f) <- true.
-posibleExplorar(h) <- true.
+posibleExplorar(b).
+posibleExplorar(c).
+posibleExplorar(d).
+posibleExplorar(e).
+posibleExplorar(f).
+posibleExplorar(h).
 
 % posibleExpansion(Nodo)
 
-posibleExpansion(b) <- true.
-posibleExpansion(e) <- true.
-posibleExpansion(f) <- true.
+% posibleExpansion(b) <- true.
+% posibleExpansion(e) <- true.
+% posibleExpansion(f) <- true.
 
-% aumentoFrontera(Nodo, Dif)
+posibleExpansion(b).
+posibleExpansion(e).
+posibleExpansion(f).
 
-aumentoFrontera(b, 2) <- true.
-aumentoFrontera(e, 0) <- true.
-aumentoFrontera(f, 0) <- true.
+posibleProbear(b).
+posibleProbear(c).
+posibleProbear(d).
 
-% esSeguro(Node)
-esSeguro(_) -< true. % esta asunción podría estar en arg.delp
+% Nodo no probeado dentro de una zona.
+inZone(b) <- true.
+inZone(c) <- true.
+~inZone(d) <- true.
+
+posibleAumento(b).
+posibleAumento(c).
+posibleAumento(d).
+    
+% difPuntosZona(Nodo, Dif)
+% Diferencia de puntos entre la situación actual y el agente ubicado en Nodo.
+difPuntosZona(b, 2) <- true.
+difPuntosZona(c, 2) <- true.
+difPuntosZona(d, 2) <- true.
+difPuntosZona(e, 0) <- true.
+difPuntosZona(f, 0) <- true.
+difPuntosZona(h, 2) <- true.
 
 % estoyEnLaFrontera
-
-estoyEnLaFrontera <- true.
+% estoyEnLaFrontera <- true.
 
 % probed(Node)
-
-~probed(_) -< true. % esta tmb
-
 probed(a) -< true.
 probed(d) -< true.
 probed(g) -< true.
 
 % explored(Node)
-
-~explored(_) -< true. % y esta
-
+% Conozco el valor de cada uno de los arcos que salen del nodo.
 explored(a) <- true.
 explored(g) <- true.
 explored(c) <- true.
@@ -47,7 +61,7 @@ explored(h) <- true.
 explored(d) <- true.
 
 % estaCercaDeLaZona(Node, Distance)
-
+% Distancia en arcos del nodo a la zona.
 estaCercaDeLaZona(b, 1) <- true.
 estaCercaDeLaZona(c, 1) <- true.
 estaCercaDeLaZona(d, 1) <- true.
@@ -55,7 +69,7 @@ estaCercaDeLaZona(f, 1) <- true.
 estaCercaDeLaZona(h, 2) <- true.
 
 % distancia(Node, Dist)
-
+% Distancias desde el nodo del agente al resto de los nodos en cantidad de turnos.
 distancia(a, 0) <- true.
 distancia(b, 1) <- true.
 distancia(c, 1) <- true.
@@ -64,3 +78,4 @@ distancia(d, 1) <- true.
 distancia(f, 1) <- true.
 distancia(g, 3) <- true.
 distancia(h, 2) <- true.
+

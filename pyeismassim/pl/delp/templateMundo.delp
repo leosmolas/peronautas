@@ -1,19 +1,37 @@
 % hechos asertados
 
-% posibleExplorar(Nodo)
+% Nodos para los cuales tiene sentido evaluar cada meta.
 
-% posibleExpansion(Nodo)
+% Nodos vecinos que no son parte de la zona (el agente esta en la frontera).
+posibleExpansion(Nodo)
+% Nodos no explorados (Nodo explorado: se conocen todos los arcos que salen del nodo).
+posibleExplorar(Nodo)
+% Nodos no probeados.
+posibleProbear(Nodo)
+% Nodos a distancia máxima 2 de la zona.
+posibleAumento(Nodo)
 
-% aumentoFrontera(Nodo, Dif)
+% El nodo esta en la zona actual.
+% inZone(Node)
 
-% esSeguro(Node)
 
+% Diferencia de puntos entre la situación actual y el agente ubicado en Nodo.
+% difPuntosZona(Nodo, Dif)
+
+% Se aserta si hay un saboteador enemigo
+% ~esSeguro(Node)
+
+% Se aserta si el agente está en la frontera
 % estoyEnLaFrontera
 
+% Se aserta si el nodo está probeado
 % probed(Node)
 
 % explored(Node)
+% Conozco el valor de cada uno de los arcos que salen del nodo.
 
 % estaCercaDeLaZona(Node, Distance)
+% Distancia en arcos del nodo a la zona. Por ahora solo se instancia con nodos a distancia maxima dos
 
 % distancia(Node, Dist)
+% Distancias desde el nodo del agente al resto de los nodos en cantidad de turnos.

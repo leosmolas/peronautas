@@ -1,16 +1,47 @@
+:- dynamic mejorMeta/2.
+
 :- [delp]. % intérprete
 
-:- consult('arg.delp'), % reglas de argumentación
-   consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
+:- consult('arg.delp'). % reglas de argumentación
+   % consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
 
 % criterios de comparación
 
 % greaterArgValue está definido más abajo, y lo que hace es buscar los argValue de los argumentos, si es que existen, para compararlos
-:- comparison_on(greaterArgValue),
+:- % comparison_on(greaterArgValue),
 % defeater2assumption es un criterio que establece derrota cuando uno de los argumentos es una asunción, es derrotado por cualquier otra cosa que tenga algo.
    comparison_on(defeater2assumption),
 % more_specific es la espeficidad de siempre.
    comparison_on(more_specific).
+
+doNotFail(X) :-
+    call(X), !.
+
+doNotFail(_).
+   
+meta(X) :-     
+    assert(mejorMeta(_, -1000)),
+    foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
+    % foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
+    % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
+    % foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
+    mejorMeta(X, _),
+    write(X),
+    retract(mejorMeta(_, _)).
+    
+calcMeta(X) :-
+    writeln(X),
+    X =.. [Meta, Nodo | _],
+    Query =.. [Meta, Value, Nodo],
+    answer(Query, Answer),
+    writeln(Answer), 
+    Answer = yes, !,
+    writeln(Value),
+    mejorMeta(_, CurrentValue), !,
+    Value > CurrentValue,
+    retract(mejorMeta(_, CurrentValue)),
+    assert(mejorMeta(X, Value)).
+    
 
 % todos los predicados que siguen son operaciones aritméticas y de comparación, para que los use delp.
 is_a_built_in(mult(X,Y,Z)).
@@ -39,8 +70,9 @@ notEqual(X,Y)  :- X \= Y.
 
 % posibleMeta(+Meta, -Prioridad)
 % La Meta tendrá una prioridad única, que le dará su orden de importancia
-posibleMeta(explorar(_), 1).
-posibleMeta(expansion(_), 2).
+% Valor más alto => mayor prioridad.
+posibleMeta(explorar(_), 2).
+posibleMeta(expansion(_), 1).
 
 % posibleMetaNeg(+Meta)
 % Chequea que el parámetro ingresado sea una meta, así esté negada.
@@ -95,7 +127,7 @@ equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
  
 % falta testear!!!
 equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cuál está primero en el orden de prioridad
-    write('hola'),
+    % write('hola'), % Quinto año de la carrera y write 'hola' (diría el vasco :P)
     % HeadA =.. [MetaA | ArgAs],
     % HeadB =.. [MetaB | ArgBs],
     posibleMeta(HeadA, ValueA),
