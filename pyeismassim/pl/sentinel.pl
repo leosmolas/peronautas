@@ -10,6 +10,10 @@
 %                   -rechage
 %                   -skip   (no implemented)
 
+exec(Action) :- 
+    write(1),nl,
+    action(Action).
+
 %-----------------------------------------------------------------------%
 
 reachableNode(Node, [[_, unknown] | T]) :-

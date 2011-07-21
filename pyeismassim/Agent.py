@@ -92,7 +92,7 @@ class Agent():
             #print xml
             #print ""
 
-            time.sleep(0.5)
+            time.sleep(1.5)
             if (msg_type == 'request-action'):
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
@@ -108,6 +108,7 @@ class Agent():
                 print "@Agent: en area 51"
                 print_message(msg_dict_private)
                 quit = True
+        raw_input("Finished. Press ENTER to continue...")
 
 
 
@@ -134,16 +135,16 @@ class PrologAgent(Agent):
 
 
     def processSimulationStart(self, msg_dict):
-        role = msg_dict['role']
-        if   (role == 'Explorer'):
+        self.role = msg_dict['role'].lower()
+        if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
-        elif (role == 'Repairer'):
-            seld.prolog_role_file = 'pl/repairer.pl'
-        elif (role == 'Sentinel'):
+        elif (self.role == 'repairer'):
+            self.prolog_role_file = 'pl/repairer.pl'
+        elif (self.role == 'sentinel'):
             self.prolog_role_file = 'pl/sentinel.pl'
-        elif (role == 'Saboteur'):
+        elif (self.role == 'saboteur'):
             self.prolog_role_file = 'pl/saboteur.pl'
-        elif (role == 'Inspector'):
+        elif (self.role == 'inspector'):
             self.prolog_role_file = 'pl/inspector.pl'
         else:
             print "    @PrologAgent: error: unknown role"
@@ -184,7 +185,7 @@ class PrologAgent(Agent):
                 self.prolog.query('updateNodeValue(%s,%s)' % (x['name'], pv['value'])).next()
             else:
                 #print "El nodo %s no esta entre los nodos sondeados" % x['name']
-                self.prolog.query('updateNodeValue(%s,unknown)' % (x['name'])).next()
+                self.prolog.query('updateNodeValue(%s,unknown)' % x['name']).next()
             self.prolog.query('updateNodeTeam(%s,%s)' % (x['name'], x['team'])).next()
 
 
@@ -199,43 +200,75 @@ class PrologAgent(Agent):
 
 
 
-    def processEntities(self, msg_dict):
-        for p in msg_dict.get('position', []):
-            if (p['name'] == 'self'):
-                p['name'] = self.username
+    def processEntities(self, msg_dict_private, msg_dict_public):
+        # Proceso el resto de las entidades visibles.
+        for e in msg_dict_public['vis_ents']:
+            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], 
+                                                                                                                  e['team'], 
+                                                                                                                  e['node'])).next()
+
+        # Proceso las entidades en la percepcion compartida.
+        # Si o si son de tu equipo, luego el team se fija a el propio.
+        for p in msg_dict_public.get('position', []):
+            # Find the team name.
             team = 'd3lp0r'
-            for e in msg_dict['vis_ents']:
-                if (p['name'] == e['name']):
-                   team = e['team']
-                   break
-            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (p['name'], team, p['node'])).next()
+            for e in msg_dict_public['vis_ents']:
+                if (unicode(self.username) == e['name']):
+                    team = e['team']
 
-        for e in msg_dict['vis_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], e['team'], e['node'])).next()
+            # Caso especial: cuando soy yo mismo.
+            if (p['name'] == 'self'):
+                energy     = msg_dict_private['energy']
+                max_energy = msg_dict_private['max_energy']
+                health     = msg_dict_private['health']
+                max_health = msg_dict_private['max_health']
+                strength   = msg_dict_private['strength']
+                vis_range  = msg_dict_private['vis_range']
+                self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (self.username, 
+                                                                                   team, 
+                                                                                   p['node'],
+                                                                                   self.role,
+                                                                                   energy,
+                                                                                   max_energy,
+                                                                                   health,
+                                                                                   max_health,
+                                                                                   strength,
+                                                                                   vis_range)).next()
+            else:
+                self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (p['name'], 
+                                                                                                                      team, 
+                                                                                                                      p['node'])).next()
 
-        for e in msg_dict['inspected_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], e['team'], e['node'], e['role'], e['energy'], e['max_energy'], e['health'], e['max_health'], e['strength'], e['vis_range'])).next()
+        # Proceso las entidades inspeccionadas.
+        for e in msg_dict_public['inspected_ents']:
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
+                                                                               e['team'], 
+                                                                               e['node'], 
+                                                                               e['role'], 
+                                                                               e['energy'], 
+                                                                               e['max_energy'], 
+                                                                               e['health'], 
+                                                                               e['max_health'], 
+                                                                               e['strength'], 
+                                                                               e['vis_range'])).next()
+
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
         self.prolog.query("updateStep(%s)"              % msg_dict_private['step']).next()
-        self.prolog.query("updateEnergy(%s)"            % msg_dict_private['energy']).next()
-        self.prolog.query("updateMaxEnergy(%s)"         % msg_dict_private['max_energy']).next()
+
         self.prolog.query("updateMaxEnergyDisabled(%s)" % msg_dict_private['max_energy_disabled']).next()
-        self.prolog.query("updateHealth(%s)"            % msg_dict_private['health']).next()
-        self.prolog.query("updateMaxHealth(%s)"         % msg_dict_private['max_health']).next()
-        self.prolog.query("updateStrength(%s)"          % msg_dict_private['strength']).next()
-        self.prolog.query("updateVisualRange(%s)"       % msg_dict_private['vis_range']).next()
         self.prolog.query("updateLastAction(%s)"        % msg_dict_private['last_action']).next()
         self.prolog.query("updateLastActionResult(%s)"  % msg_dict_private['last_action_result']).next()
         self.prolog.query("updateMoney(%s)"             % msg_dict_private['money']).next()
         self.prolog.query("updateScore(%s)"             % msg_dict_private['score']).next()
         self.prolog.query("updateZoneScore(%s)"         % msg_dict_private['zone_score']).next()
         self.prolog.query("updateLastStepScore(%s)"     % msg_dict_private['last_step_score']).next()
+
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
-        self.processEntities(msg_dict_public)
+        self.processEntities(msg_dict_private, msg_dict_public)
 
 
 
@@ -248,7 +281,8 @@ class PrologAgent(Agent):
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
         print "\n    @PrologAgent: PERCEPTION:"
-        print_message(msg_dict_public)
+        print msg_dict_public
+        #print_message(msg_dict_public)
         print ""
 
         # Process perception.

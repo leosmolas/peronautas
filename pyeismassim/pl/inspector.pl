@@ -36,27 +36,26 @@ reachableNode(Node, [_ | T]) :-
 %------------------------------  Attack  --------------------------------%
 
 action([inspect, Enemy]):-
-    currentStep(Step),
-    %obtengo mi nombre
-    myName(Name),
     write(2),nl,
-    %obtengo mi energia
-    energy(Step, Name, Energy),
-    %chequeo si puedo realizar la accion de ataque { cost(attack)=2 }
-    write(2.1),write(' energy: '),write(X),nl,
-    Energy > 1,
-    %obtengo mi posicion
+    currentStep(Step),
+    write(2.1),nl,
+    myName(Name),
     write(2.2),nl,
+    energy(Step, Name, Energy),
+    write(2.3),write(' energy: '),write(X),nl,
+    %chequeo si puedo realizar la accion de ataque { cost(attack)=2 }
+    Energy > 1,
+    write(2.4),nl,
     position(Step, Name, Position),
     %obtengo cual es mi equipo
-    write(2.3),nl,
+    write(2.5),nl,
     team(Step, Name, Team),
     %obtengo el nombre de un agente que se encuentra en mi posicion
-    write(2.4),nl,
+    write(2.6),nl,
     position(Step, Enemy, Position),
     Enemy \= Name,
     %veo que sea del otro equipo
-    write(2.5),nl,
+    write(2.7),nl,
     team(Step, Enemy, EnemyTeam),
     EnemyTeam \= Team,
     %le saco la peluca

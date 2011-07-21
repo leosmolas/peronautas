@@ -40,7 +40,7 @@ reachableNode(Node, [_ | T]) :-
 action([probe, Position]) :-
     currentStep(Step),
     myName(Name),
-    write(2),nl,
+    write(2),write(' name: '),write(Name),nl,
     energy(Step, Name, Energy),
     write(2.1),write(' energy: '),write(Energy),nl,
     Energy > 0,
@@ -79,6 +79,11 @@ action([goto, X]) :-
     write(4.1),nl,
     position(Step, Name, Position),
     write(4.2),nl,
+    k(nodeValue(Name, Cost)),
+    write(4.3),nl,
+    energy(Step, Name, Energy),
+    write(4.5),nl,
+    Energy >= Cost,
     findall(
         [Node, Cost], 
         (
@@ -86,11 +91,10 @@ action([goto, X]) :-
             k(nodeValue(Node, unknown))
         ), 
         L),
-    energy(Step, Name, Energy),
-    Energy >= Cost,
-    write(4.3),nl,
-    reachableNode(X, L), 
     write(4.4),nl,
+    write(4.6),nl,
+    reachableNode(X, L), 
+    write(4.7),nl,
     !.
      
 %-- First Node Goto --%

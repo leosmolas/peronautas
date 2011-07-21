@@ -91,7 +91,7 @@ action([goto, X]) :-
     write(5.1),nl,
     position(Step, Name, Position),
     write(5.2),nl,
-    energy(Energy),
+    energy(Step, Name, Energy),
     write(5.3),nl,
     k(edge(Position, X, Cost)),
     Cost \= unknown,

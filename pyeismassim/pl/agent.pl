@@ -2,10 +2,10 @@
            % Private
            myName/1,           %
            myTeam/1,           %
-           energy/1,           %
-           maxEnergy/1,        %
-           health/1,           %
-           maxHealth/1,        %
+           energy/3,           %
+           maxEnergy/3,        %
+           health/3,           %
+           maxHealth/3,        %
            lastAction/1,       %
            lastActionResult/1, %
            strength/1,         %
@@ -81,14 +81,6 @@ updateMyName(X) :-
 
 
 %------------------------------------------------------------------------------%
-myTeam(d3lp0r).
-updateMyTeam(X) :-
-    retractall( myTeam(_) ),
-    assertz(    myTeam(X) ).
-
-
-
-%------------------------------------------------------------------------------%
 updateStep(X) :-
     retractall( currentStep(_) ),
     assertz(    currentStep(X) ).
@@ -96,51 +88,9 @@ updateStep(X) :-
 
 
 %------------------------------------------------------------------------------%
-updateEnergy(X) :- 
-    retractall( energy(_) ),
-    assertz(    energy(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateMaxEnergy(X) :- 
-    retractall( maxEnergy(_) ),
-    assertz(    maxEnergy(X) ).
-
-
-
-%------------------------------------------------------------------------------%
 updateMaxEnergyDisabled(X) :- 
     retractall( maxEnergyDisabled(_) ),
     assertz(    maxEnergyDisabled(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateHealth(H) :- 
-    retractall( health(_) ),
-    assertz(    health(H) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateMaxHealth(X) :- 
-    retractall( maxHealth(_) ),
-    assertz(    maxHealth(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateStrength(X) :- 
-    retractall( strength(_) ),
-    assertz(    strength(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateVisualRange(X) :- 
-    retractall( visualRange(_) ),
-    assertz(    visualRange(X) ).
 
 
 

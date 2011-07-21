@@ -20,7 +20,7 @@ echo Starting MASSIM server.
 cd $SERVER_DIR
 $TERM_CMD -title 'MASSIM' -e $SERVER_CMD
 cd $WD
-sleep 5
+sleep 3
 
 # Run monitor
 #echo Starting monitor.
@@ -40,6 +40,24 @@ sleep 5
 echo Starting agents.
 cd $AGENT_DIR
 #$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a1 1 -sh localhost -sp 10000
-$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a1 1 
-$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b1 1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a1  1 
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a2  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a3  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a4  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a5  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a6  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a7  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a8  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a9  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py a10 1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b1  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b2  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b3  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b4  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b5  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b6  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b7  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b8  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b9  1
+$TERM_CMD -title 'AGENT' -e $PYTHON Agent.py b10 1
 
