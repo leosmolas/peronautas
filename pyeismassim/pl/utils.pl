@@ -1,4 +1,5 @@
 :- [graph/map], [kmap].
+:- dynamic isGoal/1.
 
 % ucs(-Frontier, -Visited, +Path, +Actions, +Path_Cost)
 % Frontier: frontera del recorrido.
@@ -29,7 +30,9 @@ addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited
      addToFrontier(Neighbors, NewFrontier, Frontier, NewVisited, Visited).
         
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
-    insert_pq(Neighbor, OldFrontier, NewFrontier),
+    % not(member(ucsNode(Neighbor, _, _, _, _), OldVisited)),
+	foreach(member(ucsNode(N, _, _, _, _), OldVisited), Neighbor \= N),
+	insert_pq(Neighbor, OldFrontier, NewFrontier),
     addToFrontier(Neighbors, NewFrontier, Frontier, OldVisited, Visited).
     
 % check/5
@@ -125,4 +128,19 @@ calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEner
 
 rechargeEnergy(2).
 maxEnergy(10).
-isGoal(vertex8).
+isGoal(vertex9).
+
+testUcs(P, A, C) :-
+	ucs([ucsNode(vertex11, 5, [], [], 0)], [], P, A, C).
+	
+	
+bfs(Node, _, Path, Path, Cost, Cost) :- isGoal(Node, Cost).
+bfs(Node, Visited, OldPath, NewPath, OldCost, NewCost) :-
+	k(edge(Node, Neighbor, _)),
+	not(member(Neighbor, Visited)),
+	Cost is OldCost + 1,
+	bfs(Neighbor, [Neighbor | Visited], [Neighbor | OldPath], NewPath, Cost, NewCost).
+	
+
+testBfs(P, C):-
+	bfs(vertex11, [vertex11], [vertex11], P, 0, C).

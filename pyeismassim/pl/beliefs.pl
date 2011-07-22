@@ -2,10 +2,10 @@
 
 % estoyEnLaFrontera
 
-:- [kmap], [graph/map], [graph/nodes], [graph/edges], [graph/agents], [delp/arg].
+:- [utils], [kmap], [graph/map], [graph/nodes], [graph/edges], [graph/agents], [delp/arg].
 :- dynamic b/1.
 
-
+% Expansion
 
 setEstoyEnLaFrontera :-
     myName(A),
@@ -17,10 +17,12 @@ setEstoyEnLaFrontera :-
     assert(b(estoyEnLaFrontera)).
 
 chequearFrontera(Neigh, T) :-
+	currentStep(Step),
     member(X, Neigh),
-    knode(X, T, _), !,
+    k(nodeTeam(Step, X, T)), !,
     member(Y, Neigh),
-    knode(Y, none, _), !.
+    k(nodeTeam(Step, Y, Other)), 
+	Other \= T, !.
 
 setPosibleExpansion :-
     b(estoyEnLaFrontera),
@@ -48,6 +50,20 @@ setDifPuntos :-
             retractall(hedge(_, _, _)),
             retractall(hposition(_, _))
         )
+    ),
+	foreach(
+        b(posibleProbear(Node)),
+        (
+            assertHMap,
+            moveAgent(A, Node),
+            coloringAlgorithm,
+            teamHPoints(T, Points),
+            DifPuntos is Points - ActualPoints,
+            assert(b(difPuntosZona(Node, DifPuntos)) <- true),
+            retractall(hnode(_, _, _)),
+            retractall(hedge(_, _, _)),
+            retractall(hposition(_, _))
+        )
     ).
     
 test :-
@@ -55,4 +71,25 @@ test :-
     setPosibleExpansion,
     setDifPuntos.
    
-    
+% Probear
+
+probed(vertex0).
+probed(vertex1).
+probed(vertex3).
+
+setPosibleProbear :- 
+	foreach((k(nodeValue(Node, _Value)), not(probed(Node))), assert(b(posibleProbear(Node)))).
+	
+setInZone :-
+	myTeam(MyTeam),
+	foreach(k(nodeTeam(_Step, Node, MyTeam)), assert(inZone(Node) <- true)).
+	
+% Aumento
+
+setPosibleAumento :-
+	myTeam(MyTeam),
+	currentStep(Step),
+	assert(isGoal(_Node, Cost):- Cost < 3),
+	findall(Node, (k(nodeTeam(Step, Node, MyTeam)), kneighbors(Node, Neighbors), chequearFrontera(Neighbors, MyTeam)), FrontierNodes),
+	foreach((member(Node, FrontierNodes), bfs(Node, [Node], [Node], [First | Path], 0, _Cost)), assert(b(posibleAumento(First)))),
+	retract(isGoal(_Node, Cost):- Cost < 3).

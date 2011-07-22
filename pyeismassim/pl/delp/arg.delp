@@ -46,7 +46,7 @@ explorar(Value, X) -<
                power(Negativo, 2, NegPow),
                sust(Add, NegPow, Value).
                
-
+% se instancia con lo que no esta probeado
 % DESIRE explorar(Nodo)
 probear(Value, X) -< 
                ~estaLejos(X, Dist, 10),
