@@ -1,15 +1,15 @@
-:- dynamic mejorMeta/2.
+Ôªø:- dynamic mejorMeta/2.
 
-:- [delp]. % intÈrprete
+:- [delp]. % interprete
 
-:- consult('arg.delp'). % reglas de argumentaciÛn
-   % consult('mundo2.delp'). % hechos asertados en una situaciÛn del mundo particular
+:- consult('arg.delp'). % reglas de argumentaci√≥n
+   % consult('mundo2.delp'). % hechos asertados en una situaci√≥n del mundo particular
 
-% criterios de comparaciÛn
+% criterios de comparaci√≥n
 
-% greaterArgValue est· definido m·s abajo, y lo que hace es buscar los argValue de los argumentos, si es que existen, para compararlos
+% greaterArgValue est√° definido m√°s abajo, y lo que hace es buscar los argValue de los argumentos, si es que existen, para compararlos
 :- % comparison_on(greaterArgValue),
-% defeater2assumption es un criterio que establece derrota cuando uno de los argumentos es una asunciÛn, es derrotado por cualquier otra cosa que tenga algo.
+% defeater2assumption es un criterio que establece derrota cuando uno de los argumentos es una asunci√≥n, es derrotado por cualquier otra cosa que tenga algo.
    comparison_on(defeater2assumption),
 % more_specific es la espeficidad de siempre.
    comparison_on(more_specific).
@@ -19,14 +19,19 @@ doNotFail(X) :-
 
 doNotFail(_).
    
+% PREDICADO IMPORTANTE
+% meta(+Meta)
+% Calcula la mejor meta con el mundo actual.
+% Realiza todo el ciclo de argumentaci√≥n, teniendo previamente todo lo que necesita asertado.
+   
 meta(X) :-     
-    assert(mejorMeta(_, -1000)),
+    assert(mejorMeta(_, -1000)), % meta con "menos infinito"
     foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
     % foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
     % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     % foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
     mejorMeta(X, _),
-    write(X),
+    % write(X),
     retract(mejorMeta(_, _)).
     
 calcMeta(X) :-
@@ -43,7 +48,7 @@ calcMeta(X) :-
     assert(mejorMeta(X, Value)).
     
 
-% todos los predicados que siguen son operaciones aritmÈticas y de comparaciÛn, para que los use delp.
+% todos los predicados que siguen son operaciones aritm√©ticas y de comparaci√≥n, para que los use delp.
 is_a_built_in(mult(X,Y,Z)).
 is_a_built_in(add(X,Y,Z)).
 is_a_built_in(sust(X,Y,Z)).
@@ -55,7 +60,7 @@ is_a_built_in(lessEq(X,Y)).
 is_a_built_in(equal(X,Y)).
 is_a_built_in(notEqual(X,Y)).
 
-% Operaciones aritmÈticas
+% Operaciones aritm√©ticas
 mult(X,Y,Z)    :- Z is X * Y.
 add(X,Y,Z)     :- Z is X + Y.
 sust(X,Y,Z)    :- Z is X - Y.
@@ -64,24 +69,24 @@ greater(X,Y)   :- X > Y.
 less(X,Y)      :- X < Y.
 greaterEq(X,Y) :- X >= Y.
 lessEq(X,Y)    :- X =< Y.
-equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sÛlo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
+equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, s√≥lo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
 notEqual(X,Y)  :- X \= Y.
 
 
 % posibleMeta(+Meta, -Prioridad)
-% La Meta tendr· una prioridad ˙nica, que le dar· su orden de importancia
-% Valor m·s alto => mayor prioridad.
+% La Meta tendr√° una prioridad √∫nica, que le dar√° su orden de importancia
+% Valor m√°s alto => mayor prioridad.
 posibleMeta(explorar(_), 2).
 posibleMeta(expansion(_), 1).
 
 % posibleMetaNeg(+Meta)
-% Chequea que el par·metro ingresado sea una meta, asÌ estÈ negada.
+% Chequea que el par√°metro ingresado sea una meta, as√≠ est√© negada.
 posibleMetaNeg(explorar(_)).
 posibleMetaNeg(expansion(_)).
 posibleMetaNeg(~explorar(_)).
 posibleMetaNeg(~expansion(_)).
 
-% criterio de comparaciÛn greaterArgValue
+% criterio de comparaci√≥n greaterArgValue
 greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-
     (
         Ac = s_rule(HeadA, _)
@@ -97,7 +102,7 @@ greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-
     % member(HeadA, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]),
     % member(HeadB, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]), 
     
-    posibleMetaNeg(HeadB), % con esto checkeo que sÛlo entren las posibles metas
+    posibleMetaNeg(HeadB), % con esto checkeo que s√≥lo entren las posibles metas
     % writeln([Ac | Acs]),
     % writeln([Bc | Bcs]),
     member(s_rule(argValue(ValA),true), Acs), !,
@@ -123,11 +128,11 @@ resolveConflict(Val, Val, Ac, Bc) :- % este predicado toma las metas y con eso l
 equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
     HeadA =.. [Meta | ArgAs],
     HeadB =.. [Meta | ArgBs],
-    ArgAs @<ArgBs. % esta es la comparaciÛn de tÈrminos.
+    ArgAs @< ArgBs. % esta es la comparaci√≥n de t√©rminos.
  
 % falta testear!!!
-equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cu·l est· primero en el orden de prioridad
-    % write('hola'), % Quinto aÒo de la carrera y write 'hola' (dirÌa el vasco :P)
+equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cu√°l est√° primero en el orden de prioridad
+    % write('hola'), % Quinto a√±o de la carrera y write 'hola' (dir√≠a el vasco :P)
     % HeadA =.. [MetaA | ArgAs],
     % HeadB =.. [MetaB | ArgBs],
     posibleMeta(HeadA, ValueA),
