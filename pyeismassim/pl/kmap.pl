@@ -6,8 +6,8 @@
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
 k(nodeTeam(0, vertex0,  peronismo)). 
-k(nodeTeam(0, vertex1,  peronismo)). 
-k(nodeTeam(0, vertex3,  none)). 
+k(nodeTeam(0, vertex1,  none)). 
+k(nodeTeam(0, vertex3,  cacoteam)). 
 k(nodeTeam(0, vertex4,  none)). 
 k(nodeTeam(0, vertex8,  peronismo)). 
 k(nodeTeam(0, vertex10, none)). 
@@ -15,9 +15,9 @@ k(nodeTeam(0, vertex12, none)).
 k(nodeTeam(0, vertex9,  none)).
 k(nodeTeam(0, vertex11, none)).
 k(nodeTeam(0, vertex7,  peronismo)).
-k(nodeTeam(0, vertex2,  peronismo)).
-k(nodeTeam(0, vertex6,  none)).
-k(nodeTeam(0, vertex5,  peronismo)).
+k(nodeTeam(0, vertex2,  none)).
+k(nodeTeam(0, vertex6,  cacoteam)).
+k(nodeTeam(0, vertex5,  none)).
 k(nodeTeam(0, vertex13, peronismo)).
 
 k(nodeValue(vertex0,  10)). 
@@ -166,6 +166,7 @@ team(moyano, cacoteam).
 team(castels, cacoteam).
 team(delia, cacoteam).
 
-listOfTeams([peronismo, cacoteam]).
 team(peronismo).
 team(cacoteam).
+
+myTeam(peronismo).
