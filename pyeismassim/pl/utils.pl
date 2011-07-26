@@ -133,14 +133,86 @@ isGoal(vertex9).
 testUcs(P, A, C) :-
 	ucs([ucsNode(vertex11, 5, [], [], 0)], [], P, A, C).
 	
-	
+/*	
 bfs(Node, _, Path, Path, Cost, Cost) :- isGoal(Node, Cost).
 bfs(Node, Visited, OldPath, NewPath, OldCost, NewCost) :-
 	k(edge(Node, Neighbor, _)),
 	not(member(Neighbor, Visited)),
 	Cost is OldCost + 1,
 	bfs(Neighbor, [Neighbor | Visited], [Neighbor | OldPath], NewPath, Cost, NewCost).
-	
+
 
 testBfs(P, C):-
 	bfs(vertex11, [vertex11], [vertex11], P, 0, C).
+*/	
+	
+% path([], _).
+
+bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, bfsNode(Node, Path, Cost)) :- 
+    % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, _RestOfFrontier),
+    isGoal(Node, Cost).
+    
+bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :- 
+    % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, RestOfFrontier),
+    %(bagof(Child, moves(Next_record, Open, Closed, Child), Children);Children = []),
+	kneighbors(Node, Neighbors),
+	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
+    add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
+    add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
+    bfs(NewFrontier, NewVisited, Result), !.
+
+filter(Nodes, Frontier, Visited, FilteredNodes) :-
+	findall(Node, (
+		member(Node, Nodes), 
+		not(member(bfsNode(Node, _P, _C), Frontier)), 
+		not(member(bfsNode(Node, _P2, _C2), Visited))),
+	FilteredNodes).
+	
+/*	
+moves(State_record, Open, Closed, Child_record) :-
+    state_record(State, _, State_record),
+    mov(State, Next),
+    % not (unsafe(Next)),
+    state_record(Next, _, Test),
+    not(member_queue(Test, Open)),
+    not(member_set(Test, Closed)),
+    state_record(Next, State, Child_record).
+*/
+
+add_list_to_queue([], _Path, _Cost, Queue, Queue).
+add_list_to_queue([H|T], Path, Cost, Queue, NewQueue) :-
+	NewCost is Cost + 1,
+    add_to_queue(bfsNode(H, [H | Path], NewCost), Queue, TempQueue),
+    add_list_to_queue(T, Path, Cost, TempQueue, NewQueue).
+
+add_to_queue(E, [], [E]).
+add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
+
+remove_from_queue(E, [E|T], T).
+
+append_queue(First, Second, Concatenation) :- 
+    append(First, Second, Concatenation).
+	
+add_to_set(X, S, S) :- member(X, S), !.
+add_to_set(X, S, [X|S]).	
+
+isGoal(_Node, Cost) :- Cost < 3.
+	
+testBfs(R) :-
+	bfs([bfsNode(vertex11, [vertex11], 0)], [], R).
+	
+% lastKnownPosition(-Step, +Agent, -Position)
+lastKnownPosition(Step, Agent, Position) :-
+	currentStep(currentStep),
+	lastKnownPosition(currentStep, Step, Agent, Position).
+
+% Condicion de corte, exito.
+lastKnownPosition(Step, Step, Agent, Position) :-
+	k(agent(Step, Agent, Position)).
+
+% Condicion de corte, sin exito.
+lastKnownPosition(0, 0, Agent, unknown).
+
+lastKnownPosition(CurrentStep, Step, Agent, Position) :-
+	PreviousStep is CurrentStep - 1,
+	lastKnownPosition(PreviousStep, Step, Agent, Position).

@@ -9,10 +9,11 @@
 
 setEstoyEnLaFrontera :-
     myName(A),
-    kposition(A, X),
-    my_team(T),
-    knode(X, T, _V),
-    findall(Neigh, kedge(X,Neigh,_), Neighbors),
+	currentStep(CurrentStep),
+    lastKnownPosition(CurrentStep, A, X),
+    my_team(T),	
+    k(nodeTeam(_S2, X, T)),
+    findall(Neigh, k(edge(X, Neigh, _V), Neighbors),
     chequearFrontera(Neighbors, T),
     assert(b(estoyEnLaFrontera)).
 
@@ -27,10 +28,11 @@ chequearFrontera(Neigh, T) :-
 setPosibleExpansion :-
     b(estoyEnLaFrontera),
     myName(A),
-    kposition(A, X),
-    my_team(T),
-    knode(X, T, _V),
-    foreach((kedge(X,Neigh,_), knode(Neigh, none, _V2)), assert(b(posibleExpansion(Neigh)))).
+	currentStep(CurrentStep),
+    position(CurrentStep, A, X),
+    my_team(T),	
+    k(nodeTeam(_S2, X, T)),
+    foreach((k(edge(X, Neigh, _)), k(nodeTeam(CurrentStep, Neigh, none))), assert(b(posibleExpansion(Neigh)))).
     
 setDifPuntos :-
     myName(A),
