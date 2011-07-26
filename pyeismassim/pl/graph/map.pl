@@ -41,7 +41,7 @@ agentsInNode(Node, Agents) :-
     currentStep(Step),
     findall(
         Agent,         
-        position(Step, Agent, _Node), 
+        h(position(Step, Agent, _Node)), 
         Agents
     ).
 
@@ -54,7 +54,7 @@ teamsInNode(Node, Teams) :-
     findall(
         Team, 
         (
-            position(Step, Agent, Node), 
+            h(position(Step, Agent, Node)), 
             team(Agent, Team)
         ), 
         Teams
@@ -80,7 +80,7 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
     currentStep(Step),
     h(nodeTeam(Step, Neighbor, Owner)),
     Owner \= none,
-    position(Step, Agent, Neighbor),
+    h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
     neighborOwner(Owner, Count), 
     !,
@@ -93,7 +93,7 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
     currentStep(Step),
     h(nodeTeam(Step, Neighbor, Owner)),
     Owner \= none,
-    position(Step, Agent, Neighbor),
+    h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
     !,
     assert(neighborOwner(Owner,1)),

@@ -36,7 +36,7 @@ nodesOfTeam(Team, NodesOfTeam) :-
 clearNode(Node) :- 
     currentStep(Step),
     h(nodeTeam(Step, Node, none)), 
-    not(position(Step, _, Node)).
+    not(h(position(Step, _, Node))).
 
 
 
@@ -44,7 +44,7 @@ clearNode(Node) :-
 emptyNode(Node) :- 
     currentStep(Step),
     k(nodeValue(Node, _)), 
-    not(position(Step, _, Node)).
+    not(h(position(Step, _, Node))).
 
 
 
@@ -52,7 +52,7 @@ emptyNode(Node) :-
 nonEmptyNode(Node) :- 
     currentStep(Step),
     k(nodeValue(Node, _)), 
-    position(Step, _, Node).
+    h(position(Step, _, Node)).
 
 
 
