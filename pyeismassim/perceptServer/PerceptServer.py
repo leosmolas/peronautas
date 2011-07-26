@@ -14,7 +14,8 @@ class VortexPerceptConnection():
         pass
 
     def recv(self):
-        return { 'fake' : 'dict' }
+        #return { 'fake' : 'dict' }
+        return dict([])
 
 ####################################################################################################
 class PerceptConnection():
@@ -32,16 +33,18 @@ class PerceptConnection():
         self.socket.connect((self.host, self.port))
 
     def disconnect(self):
-        self.socket.send('EOF')
+        self.socket.send('EOF\0')
         self.socket.close()
 
     def send(self, username, dictionary):
 
         def dict2list(username, dictionary):
-            pos = dictionary.get('position')[0].get('node')
+            position_list = dictionary.get('position')
+            position      = position_list[0]
+            node          = position.get('node')
             result = [    (0,
                             username,
-                            pos
+                            node
                           )
                      ]
             for v in dictionary.get('vis_verts', []):
@@ -90,6 +93,7 @@ class PerceptConnection():
         fset   = frozenset(lst)
         string = repr(fset)
         self.socket.send(string)
+        self.socket.send('\0')
 
     def recv(self):
 
@@ -104,50 +108,58 @@ class PerceptConnection():
                        }
             for p in stringlist:
                 if   (p[0] == 0):
-                    result['position']       += { 'name' : p[1],
-                                                  'node' : p[2] 
-                                                }
+                    result['position'].append(      { 'name' : p[1],
+                                                      'node' : p[2] 
+                                                    })
                 elif (p[0] == 1):
-                    result['vis_verts']      += { 'name' : p[1],
-                                                  'team' : p[2] 
-                                                }
+                    result['vis_verts'].append(     { 'name' : p[1],
+                                                      'team' : p[2] 
+                                                    })
                 elif (p[0] == 2):
-                    result['vis_edges']      += { 'node1' : p[1],
-                                                  'node2' : p[2] 
-                                                }
+                    result['vis_edges'].append(     { 'node1' : p[1],
+                                                      'node2' : p[2] 
+                                                    })
                 elif (p[0] == 3):
-                    result['vis_ents']       += { 'node' : p[1],
-                                                  'name' : p[2],
-                                                  'team' : p[3] 
-                                                }
+                    result['vis_ents'].append(      { 'node' : p[1],
+                                                      'name' : p[2],
+                                                      'team' : p[3] 
+                                                    })
                 elif (p[0] == 4):
-                    result['probed_verts']   += { 'name'  : p[1],
-                                                  'value' : p[2] 
-                                                }
+                    result['probed_verts'].append(  { 'name'  : p[1],
+                                                      'value' : p[2] 
+                                                    })
                 elif (p[0] == 5):
-                    result['surveyed_edges'] += { 'node1'  : p[1],
-                                                  'node2'  : p[2],
-                                                  'weight' : p[3] 
-                                                }
+                    result['surveyed_edges'].append({ 'node1'  : p[1],
+                                                      'node2'  : p[2],
+                                                      'weight' : p[3] 
+                                                    })
                 elif (p[0] == 6):
-                    result['inspected_ents'] += { 
-                                                  'name'       : p[1],
-                                                  'team'       : p[2],
-                                                  'node'       : p[3],
-                                                  'role'       : p[4],
-                                                  'energy'     : p[5],
-                                                  'max_energy' : p[6],
-                                                  'health'     : p[7],
-                                                  'max_health' : p[8],
-                                                  'strength'   : p[9],
-                                                  'vis_range'  : p[10]
-                                                }
+                    result['inspected_ents'].append({ 'name'       : p[1],
+                                                      'team'       : p[2],
+                                                      'node'       : p[3],
+                                                      'role'       : p[4],
+                                                      'energy'     : p[5],
+                                                      'max_energy' : p[6],
+                                                      'health'     : p[7],
+                                                      'max_health' : p[8],
+                                                      'strength'   : p[9],
+                                                      'vis_range'  : p[10]
+                                                    })
                 else:
                     print "@PerceptServerConnection: decode error: ", p
             return result
 
-        string = self.socket.recv(self.bufsize)
-        lst    = eval(string)
+        stop = False
+        msg  = ''
+        while (not stop):
+            msg += self.socket.recv(self.bufsize)
+            if (len(msg) > 0):
+                stop = (msg[-1] == '\0')
+            else:
+                print "@PerceptConnection: the message received was empty!"
+                stop = True
+
+        lst = eval(msg[:-1])
         return list2dict(lst)
 
 ####################################################################################################
@@ -191,8 +203,19 @@ if (__name__ == "__main__"):
 
         print "Reception phase."
         for i in range(CONNECTIONS):
-            percept  = clientSocket[i].recv(BUFSIZE)
-            if (percept == 'EOF'):
+
+            stop = False
+            msg  = ''
+            while (not stop):
+                msg += clientSocket[i].recv(BUFSIZE)
+                if (len(msg) > 0):
+                    stop = (msg[-1] == '\0')
+                else:
+                    print "The message received was empty!"
+                    stop = True
+            percept = msg[:-1]
+            
+            if (percept[:3] == 'EOF'):
                 print "Client sent EOF, closing its socket."
                 clientSocket[i].close()
                 clientSocketConnected[i] = False
@@ -212,6 +235,7 @@ if (__name__ == "__main__"):
                 print "CONNECTION:", i
                 print "DIFFERENCE:", difference
                 clientSocket[i].send(repr(difference))
+                clientSocket[i].send('\0')
 
         j += 1
         connectedClients = len([0 for y in clientSocketConnected if y])

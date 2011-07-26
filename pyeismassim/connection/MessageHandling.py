@@ -165,7 +165,7 @@ def parse_request_action(xml, output = 'dict'):
             'money'               : team_tag['money']            ,
             'score'               : team_tag['score']            
             }
-        result_public = { 'position' : [{ 'name' : 'self', 'node' : self_tag['position'] }] }
+        result_public = { 'position' : [{ u'name' : u'self', u'node' : self_tag['position'] }] }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
@@ -206,9 +206,10 @@ def parse_request_action(xml, output = 'dict'):
             for i in range(len(vis_ents_tag.contents)):
                 if (vis_ents_tag.contents[i].__class__.__name__ == "Tag"):
                     vis_ents_list.append({ 
-                        'name' : vis_ents_tag.contents[i]['name']         ,
-                        'node' : vis_ents_tag.contents[i]['node']         ,
-                        'team' : vis_ents_tag.contents[i]['team'].lower() })
+                        'name'   : vis_ents_tag.contents[i]['name']        ,
+                        'node'   : vis_ents_tag.contents[i]['node']        ,
+                        'team'   : vis_ents_tag.contents[i]['team'].lower(),
+                        'status' : vis_ents_tag.contents[i]['status']      }) # normal | disabled
             result_public['vis_ents'] = vis_ents_list
         else:
             result_public['vis_ents'] = []
@@ -243,14 +244,14 @@ def parse_request_action(xml, output = 'dict'):
                     inspected_ents_list.append({ 
                         'energy'     : inspected_ents_tag.contents[i]['energy']       ,
                         'health'     : inspected_ents_tag.contents[i]['health']       ,
-                        'max_energy' : inspected_ents_tag.contents[i]['max_energy']   ,
-                        'max_health' : inspected_ents_tag.contents[i]['max_health']   ,
+                        'max_energy' : inspected_ents_tag.contents[i]['maxenergy']   ,
+                        'max_health' : inspected_ents_tag.contents[i]['maxhealth']   ,
                         'name'       : inspected_ents_tag.contents[i]['name']         ,
                         'node'       : inspected_ents_tag.contents[i]['node']         ,
                         'role'       : inspected_ents_tag.contents[i]['role']         ,
                         'strength'   : inspected_ents_tag.contents[i]['strength']     ,
                         'team'       : inspected_ents_tag.contents[i]['team'].lower() ,
-                        'vis_range'  : inspected_ents_tag.contents[i]['vis_range']    })
+                        'vis_range'  : inspected_ents_tag.contents[i]['visrange']    })
             result_public['inspected_ents'] = inspected_ents_list
         else:
             result_public['inspected_ents'] = []
@@ -339,14 +340,14 @@ def parse_request_action(xml, output = 'dict'):
                 if (inspected_ents_tag.contents[i].__class__.__name__ == "Tag"):
                     inspected_ents_list.append('inspected_ent(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)' % (inspected_ents_tag.contents[i]['energy'], 
                                                                                                  inspected_ents_tag.contents[i]['health'], 
-                                                                                                 inspected_ents_tag.contents[i]['max_energy'], 
-                                                                                                 inspected_ents_tag.contents[i]['max_health'], 
+                                                                                                 inspected_ents_tag.contents[i]['maxenergy'], 
+                                                                                                 inspected_ents_tag.contents[i]['maxhealth'], 
                                                                                                  inspected_ents_tag.contents[i]['name'], 
                                                                                                  inspected_ents_tag.contents[i]['node'], 
                                                                                                  inspected_ents_tag.contents[i]['role'], 
                                                                                                  inspected_ents_tag.contents[i]['strength'], 
                                                                                                  inspected_ents_tag.contents[i]['team'].lower(), 
-                                                                                                 inspected_ents_tag.contents[i]['vis_range']))
+                                                                                                 inspected_ents_tag.contents[i]['visrange']))
             result_public += inspected_ents_list
     else:
         raise Exception

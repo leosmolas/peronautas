@@ -34,7 +34,7 @@ TAREAS INMEDIATAS:
         posibilidad: guardar tanto hechos separados para cada arco, como guardar el grafo como lista de adyacencia
     [ ] adaptar el codigo de dijkstra para generar los caminos mas cortos en python
     [ ] escribir la consulta para obtener desde prolog la lista de adyacencia
-    [x] TODO: abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
+    [x] abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
 
     [ ] determinar como se mapea la arquitectura propuesta del agente a llamadas, funciones, predicados, etc. (la idea basica esta en el codigo de la clase PrologAgent)
     [ ] desarrollar estrategias generales de: expansion, defensa, ataque, compra
@@ -43,12 +43,13 @@ TAREAS INMEDIATAS:
     [x] write configuration file for a test match¶
     [x] add role parse to messagehandling¶
     [x] write code to instantiate the correct type of agent according to role¶
-    [ ] java agents to prolog¶
-    [ ] get functional team¶
+    [x] java agents to prolog¶
+    [x] get functional team¶
     [x] whole test suit¶
     [x] new server¶
     [x] percept server¶
     [x]     make the server accept an iterations parameter¶
+    [x]     make the server use a loop to receive instead of a fixed-sized buffer
     [ ]     make the server use non.blocking sockets and timeouts¶
     [ ] what happens with the agent state when the configuration server has several simulations/matches ?
     [x] go through the list of stuff that may appear in a percept and write down what we can do with each

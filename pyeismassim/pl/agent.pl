@@ -2,10 +2,10 @@
            % Private
            myName/1,           %
            myTeam/1,           %
-           energy/1,           %
-           maxEnergy/1,        %
-           health/1,           %
-           maxHealth/1,        %
+           energy/3,           %
+           maxEnergy/3,        %
+           health/3,           %
+           maxHealth/3,        %
            lastAction/1,       %
            lastActionResult/1, %
            strength/1,         %
@@ -64,8 +64,6 @@
 %     Node1 and Node2 are the vertex names.
 %     Cost is the edge cost, and if unsurveyed will be unknown.
 
-% position(Step, Agent, Node)
-
 % agent(Step, Name, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 
 
@@ -84,14 +82,6 @@ updateMyName(X) :-
 
 
 %------------------------------------------------------------------------------%
-myTeam(d3lp0r).
-updateMyTeam(X) :-
-    retractall( myTeam(_) ),
-    assertz(    myTeam(X) ).
-
-
-
-%------------------------------------------------------------------------------%
 updateStep(X) :-
     retractall( currentStep(_) ),
     assertz(    currentStep(X) ).
@@ -99,51 +89,9 @@ updateStep(X) :-
 
 
 %------------------------------------------------------------------------------%
-updateEnergy(X) :- 
-    retractall( energy(_) ),
-    assertz(    energy(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateMaxEnergy(X) :- 
-    retractall( maxEnergy(_) ),
-    assertz(    maxEnergy(X) ).
-
-
-
-%------------------------------------------------------------------------------%
 updateMaxEnergyDisabled(X) :- 
     retractall( maxEnergyDisabled(_) ),
     assertz(    maxEnergyDisabled(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateHealth(H) :- 
-    retractall( health(_) ),
-    assertz(    health(H) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateMaxHealth(X) :- 
-    retractall( maxHealth(_) ),
-    assertz(    maxHealth(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateStrength(X) :- 
-    retractall( strength(_) ),
-    assertz(    strength(X) ).
-
-
-
-%------------------------------------------------------------------------------%
-updateVisualRange(X) :- 
-    retractall( visualRange(_) ),
-    assertz(    visualRange(X) ).
 
 
 
@@ -190,14 +138,7 @@ updateLastStepScore(X) :-
 
 
 %------------------------------------------------------------------------------%
-updatePosition(Agent, Node) :-
-    currentStep(Step),
-    assertz( h(position(Step, Agent, Node)) ),
-    assertz( k(position(Step, Agent, Node)) ).
-
-
-
-%------------------------------------------------------------------------------%
+% agent(Step, Name, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 % TODO:
 % Asi como esta, no esta bueno, porque depende de que desde python se actualize
 % primero la informacion menos valiosa (las entidades visibles) antes que la
@@ -217,8 +158,8 @@ updatePosition(Agent, Node) :-
 % VisualRange
 updateEntity(N, T, D, R, E, ME, H, MH, S, V) :-
     currentStep(Step),
-    retractall( k(agent(Step, N, _, _, _, _,  _, _,  _, _, _)) ),
-    assertz(    k(agent(Step, N, T, D, R, E, ME, H, MH, S, V)) ).
+    retractall( k(agent(Step, A, _, _, _, _,  _, _,  _, _, _)) ),
+    assertz(    k(agent(Step, A, T, N, R, E, ME, H, MH, S, V)) ).
 
 
 
@@ -283,6 +224,30 @@ updateEdge(Node1, Node2, Cost) :-
     insertEdge(Node1, Node2, Cost).
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                     Acceso                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
+team(Step, Agent, Team) :-
+    k(agent(Step, Agent, Team,    _,    _,      _,         _,      _,         _,        _,           _)).
+position(Step, Agent, Node) :-
+    k(agent(Step, Agent,    _, Node,    _,      _,         _,      _,         _,        _,           _)).
+role(Step, Agent, Role) :-
+    k(agent(Step, Agent,    _,    _, Role,      _,         _,      _,         _,        _,           _)).
+energy(Step, Agent, Energy) :-
+    k(agent(Step, Agent,    _,    _,    _, Energy,         _,      _,         _,        _,           _)).
+maxEnergy(Step, Agent, MaxEnergy) :-
+    k(agent(Step, Agent,    _,    _,    _,      _, MaxEnergy,      _,         _,        _,           _)).
+health(Step, Agent, Health) :- 
+    k(agent(Step, Agent,    _,    _,    _,      _,         _, Health,         _,        _,           _)).
+maxHealth(Step, Agent, MaxHealth) :-
+    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _, MaxHealth,        _,           _)).
+strength(Step, Agent, Strength) :-
+    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _,         _, Strength,           _)).
+visualRange(Step, Agent, VisualRange) :-
+    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _,         _,        _, VisualRange)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
