@@ -165,15 +165,15 @@ class PerceptConnection():
 ####################################################################################################
 if (__name__ == "__main__"):
 
-    if (len(sys.argv) == 3):
+    if (len(sys.argv) == 4):
         CONNECTIONS = int(sys.argv[1])
-        PORT        = int(sys.argv[2])
+        HOST        =     sys.argv[2]
+        PORT        = int(sys.argv[3])
     else:
-        print "Usage: python PerceptServer.py CONNECTIONS PORT"
+        print "Usage: python PerceptServer.py CONNECTIONS HOST PORT"
         print "Port 10000 is recommended."
         sys.exit()
 
-    HOST = 'localhost'
     ADDR = (HOST, PORT)
     BUFSIZE = 4096
 
@@ -186,6 +186,7 @@ if (__name__ == "__main__"):
     serverSocket.listen(CONNECTIONS)
 
     print "Percept server started."
+    print "Listening on: %s : %s" % (HOST, PORT) 
 
     for i in range(CONNECTIONS):
         socket, address = serverSocket.accept()

@@ -77,63 +77,63 @@
 %------------------------------------------------------------------------------%
 updateMyName(X) :- 
    retractall( myName(_) ),
-   assertz(    myName(X) ).
+   asserta(    myName(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateStep(X) :-
     retractall( currentStep(_) ),
-    assertz(    currentStep(X) ).
+    asserta(    currentStep(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateMaxEnergyDisabled(X) :- 
     retractall( maxEnergyDisabled(_) ),
-    assertz(    maxEnergyDisabled(X) ).
+    asserta(    maxEnergyDisabled(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateLastAction(X) :- 
     retractall( lastAction(_) ),
-    assertz(    lastAction(X) ).
+    asserta(    lastAction(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateLastActionResult(X) :- 
     retractall( lastActionResult(_) ),
-    assertz(    lastActionResult(X) ).
+    asserta(    lastActionResult(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateMoney(X) :- 
     retractall( money(_) ), 
-    assertz(    money(X) ).
+    asserta(    money(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateScore(X) :- 
     retractall( score(_) ), 
-    assertz(    score(X) ).
+    asserta(    score(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateZoneScore(X) :- 
     retractall( zoneScore(_) ), 
-    assertz(    zoneScore(X) ).
+    asserta(    zoneScore(X) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateLastStepScore(X) :- 
     retractall( lastStepScore(_) ), 
-    assertz(    lastStepScore(X) ).
+    asserta(    lastStepScore(X) ).
 
 
 
@@ -159,7 +159,7 @@ updateLastStepScore(X) :-
 updateEntity(A, T, N, R, E, ME, H, MH, S, V) :-
     currentStep(Step),
     retractall( k(agent(Step, A, _, _, _, _,  _, _,  _, _, _)) ),
-    assertz(    k(agent(Step, A, T, N, R, E, ME, H, MH, S, V)) ).
+    asserta(    k(agent(Step, A, T, N, R, E, ME, H, MH, S, V)) ).
 
 
 
@@ -175,22 +175,22 @@ updateNodeValue(Name, Value) :-
     Value \= unknown,
     !,
     retractall( k(nodeValue(Name,     _)) ),
-    assertz(    k(nodeValue(Name, Value)) ).
+    asserta(    k(nodeValue(Name, Value)) ).
 updateNodeValue(Name, Value) :-
     % El nodo es desconocido.
-    assertz( k(nodeValue(Name, Value)) ).
+    asserta( k(nodeValue(Name, Value)) ).
 
 
 
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
-    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    asserta( k(nodeTeam(Step, Name, CurrentTeam)) ).
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
-    assertz( k(edge(Node1, Node2, Cost)) ),
-    assertz( k(edge(Node2, Node1, Cost)) ).
+    asserta( k(edge(Node1, Node2, Cost)) ),
+    asserta( k(edge(Node2, Node1, Cost)) ).
 
 
 
@@ -248,6 +248,21 @@ strength(Step, Agent, Strength) :-
     k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth,  Strength, _VisualRange)).
 visualRange(Step, Agent, VisualRange) :-
     k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength,  VisualRange)).
+
+%lastKnownInfo(-Step, +Agent, -Position) :-
+%    currentStep(InitialStep),
+%    lastKnownPosition(InitialStep, Step, Agent, Position).
+%
+%% Condicion de corte, exito.
+%lastKnownInfo(Step, Step, Agent, Position) :-
+%    k(agent(Step, Agent, )).
+%
+%% Condicion de corte, sin exito.
+%lastKnownInfo(0, 0, Agent, unknown).
+%
+%lastKnownInfo(CurrentStep, Step, Agent, Position) :-
+%    NextStep is CurrentStep - 1,
+%    lastKnownInfo(NextStep, Step, Agent, Position).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -349,10 +364,10 @@ dumpKB :-
     nl, 
     nl,
     
-    printFindAll('NODE VALUES:', k(nodeValue(_X1, X2))),
-    printFindAll('NODE TEAMS:',  k(nodeTeam(_X1, _X2, _X3))),
-    printFindAll('EDGES:',       k(edge(_X1, _X2, _X3))),
-    printFindAll('POSITIONS:',   k(position(_X1, _X2, _X3))),
+    printFindAll('NODE VALUES:', k(nodeValue(X1, X2))),
+    printFindAll('NODE TEAMS:',  k(nodeTeam(X1, X2, X3))),
+    printFindAll('EDGES:',       k(edge(X1, X2, X3))),
+    printFindAll('POSITIONS:',   k(position(X1, X2, X3))),
     printFindAll('AGENTS:',      k(agent(_X1, _X2, _X3, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
 
 
