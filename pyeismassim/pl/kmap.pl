@@ -180,7 +180,7 @@ k(edge(vertex12, vertex13, 2)).
 
 currentStep(0).
 
-position(0, peron, vertex3).
+position(0, peron, vertex0).
 position(0, evita, vertex12).
 position(0, machinea, vertex10).
 position(0, cavallo, vertex6).
@@ -205,3 +205,4 @@ team(peronismo).
 team(cacoteam).
 
 myTeam(peronismo).
+myName(peron).
