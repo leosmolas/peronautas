@@ -58,7 +58,7 @@ check(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFront
     delete(OldVisited, ucsNode(Position, _, _, _, Path_Cost2), NewVisited),
     insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier).
     
-
+% Insercion ordenada
 insert_pq(State, [], [State]) :- !.
 insert_pq(State, [H | T], [State, H | T]) :-
     precedes(State, H), !.

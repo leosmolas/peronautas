@@ -1,5 +1,3 @@
-:- style_check(-discontiguous).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                          MAPA DE JUGUETE                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -7,20 +5,20 @@
 % RandomSeed = 1
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
-k(nodeTeam(0, vertex0,  none)). 
+k(nodeTeam(0, vertex0,  peronismo)). 
 k(nodeTeam(0, vertex1,  none)). 
-k(nodeTeam(0, vertex3,  none)). 
+k(nodeTeam(0, vertex3,  cacoteam)). 
 k(nodeTeam(0, vertex4,  none)). 
-k(nodeTeam(0, vertex8,  none)). 
+k(nodeTeam(0, vertex8,  peronismo)). 
 k(nodeTeam(0, vertex10, none)). 
 k(nodeTeam(0, vertex12, none)). 
 k(nodeTeam(0, vertex9,  none)).
 k(nodeTeam(0, vertex11, none)).
-k(nodeTeam(0, vertex7,  none)).
+k(nodeTeam(0, vertex7,  peronismo)).
 k(nodeTeam(0, vertex2,  none)).
-k(nodeTeam(0, vertex6,  none)).
+k(nodeTeam(0, vertex6,  cacoteam)).
 k(nodeTeam(0, vertex5,  none)).
-k(nodeTeam(0, vertex13, none)).
+k(nodeTeam(0, vertex13, peronismo)).
 
 k(nodeValue(vertex0,  10)). 
 k(nodeValue(vertex1,   5)). 
@@ -106,38 +104,7 @@ k(edge(vertex7,  vertex3,  1)).
 k(edge(vertex0,  vertex9,  4)).
 k(edge(vertex13, vertex12, 2)).
 
-k(edge(vertex8, vertex5, 4)).
-k(edge(vertex7, vertex8, 1)).
-k(edge(vertex5, vertex2, 9)).
-k(edge(vertex8, vertex2, 9)).
-k(edge(vertex7, vertex5, 9)).
-k(edge(vertex7, vertex2, 6)).
 
-k(edge(vertex10, vertex6, 4)).
-k(edge(vertex6, vertex3, 1)).
-k(edge(vertex10, vertex4, 9)).
-k(edge(vertex4, vertex6, 9)).
-k(edge(vertex10, vertex3, 9)).
-k(edge(vertex4, vertex3, 6)).
-
-k(edge(vertex1, vertex5, 9)).
-k(edge(vertex0, vertex5, 5)).
-k(edge(vertex7, vertex0, 2)).
-k(edge(vertex0, vertex1, 7)).
-k(edge(vertex13, vertex1, 6)).
-k(edge(vertex0, vertex13, 6)).
-
-k(edge(vertex11, vertex10, 9)).
-k(edge(vertex10, vertex9, 5)).
-k(edge(vertex9, vertex3, 2)).
-k(edge(vertex11, vertex9, 7)).
-k(edge(vertex11, vertex12, 6)).
-k(edge(vertex12, vertex9, 6)).
-
-k(edge(vertex6, vertex8, 8)).
-k(edge(vertex3, vertex7, 1)).
-k(edge(vertex9, vertex0, 4)).
-k(edge(vertex12, vertex13, 2)).
 %h(edge(vertex5,  vertex8,  4)). 
 %h(edge(vertex8,  vertex7,  1)). 
 %h(edge(vertex2,  vertex5,  9)). 
@@ -177,20 +144,17 @@ k(edge(vertex12, vertex13, 2)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 currentStep(0).
-myName(peron).
-position(0, peron, vertex0).
-myVisionRange(2).
 
-h(position(0, peron, vertex0)).
-h(position(0, evita, vertex13)).
-h(position(0, machinea, vertex7)).
-h(position(0, cavallo, vertex8)).
+position(0, peron, vertex3).
+position(0, evita, vertex12).
+position(0, machinea, vertex10).
+position(0, cavallo, vertex6).
 
 
-h(position(0, iorio, vertex5)).
-h(position(0, moyano, vertex5)).
-h(position(0, castels, vertex2)).
-h(position(0, delia, vertex2)).
+position(0, iorio, vertex8).
+position(0, moyano, vertex5).
+position(0, castels, vertex2).
+position(0, delia, vertex7).
 
 team(peron, peronismo).
 team(evita, peronismo).
@@ -204,3 +168,5 @@ team(delia, cacoteam).
 
 team(peronismo).
 team(cacoteam).
+
+myTeam(peronismo).
