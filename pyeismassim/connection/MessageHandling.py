@@ -2,6 +2,7 @@
 
 from BeautifulSoup import BeautifulStoneSoup
 from string import replace, lower
+import pprint
 
 # Author: Iñaki Garay
 #
@@ -396,37 +397,9 @@ def print_message(result, input = 'dict'):
     """
     Use this function to pretty-print a parsed message.
     """
-
     if (input == 'dict'):
-        # This is a list comprehension; the part inside max() creates a list with the len function applied to every element in result.keys()
-        max_key_length = max([len(k) for k in result.keys()])
-        for key, value in sorted(result.iteritems()):
-            # For every key,value pair in the dictionary:
-            print "   ", key.ljust(max_key_length), ":",
-            # If the value is a list with more than one element, it is most likely a list of dicts, and they all have the same set of keys. 
-            # Except for the achievements, which is a list of strings. 
-            # So recover one set of keys, calculate the length for each key, and use that as the column width for that key.
-            if (value.__class__.__name__ == 'list' and (len(value) > 0)):
-                if (value[0].__class__.__name__ == 'dict'):
-                    print
-                    # Esto es como dos for anidades que recorre primero todos los valores v1 en value, 
-                    # y luego cada clave k2 dentro de cada valor v1, y para cada clave k2 calcula la longitud de la clave, 
-                    # y se queda con el maximo entre todos.
-                    # Luego hace lo mismo para los valores en los valores de value.
-                    # Esto es para que todo quede alineado bonito y para que mi OCD me deje dormir de noche.
-                    key_column_width = max( [ max([ len(k2) for k2 in v1.keys()   ]) for v1 in value] )
-                    val_column_width = max( [ max([ len(v2) for v2 in v1.values() ]) for v1 in value] )
-                    for i in value:
-                        print "       ", 
-                        for k2, v2  in i.iteritems():
-                            print k2.rjust(key_column_width), ":", v2.ljust(val_column_width), "|", 
-                        print
-                else:
-                    # It is a list of something else
-                    # TODO: pretty print list of something else
-                    print value
-            else:
-                print value
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(result)
     elif (input == 'prolog'):
         for predicate in result:
             print predicate

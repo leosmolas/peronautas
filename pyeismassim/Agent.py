@@ -281,8 +281,7 @@ class PrologAgent(Agent):
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
         print "\n    @PrologAgent: PERCEPTION:"
-        print msg_dict_public
-        #print_message(msg_dict_public)
+        print_message(msg_dict_public)
         print ""
 
         # Process perception.
