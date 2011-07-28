@@ -1,4 +1,4 @@
-:- [graph/map], [kmap].
+:- [graph/map].
 :- dynamic isGoal/1.
 
 % ucs(-Frontier, -Visited, +Path, +Actions, +Path_Cost)
@@ -215,20 +215,3 @@ lastKnownPosition(CurrentStep, Step, Agent, Position) :-
 	PreviousStep is CurrentStep - 1,
 	lastKnownPosition(PreviousStep, Step, Agent, Position).
 
-markExploredNodes :-
-    currentStep(Step),
-    write('MARCA, CRISTO '), nl,
-    myName(Name),
-    write('MARCA2, CRISTO '), nl,
-    position(Step, Name, CurrentPosition),
-    write('MARCA3, CRISTO '), nl,
-    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
-    write(' Marking... '), nl,
-    foreach(
-                bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
-                (
-                    write(' Marking node as explored: '),
-                    write(Node),nl, 
-                    assert(explored(Node))
-                )
-           ).

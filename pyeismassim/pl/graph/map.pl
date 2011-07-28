@@ -1,8 +1,8 @@
-% :- ['pl/graph/edges.pl', 
-    % 'pl/graph/nodes.pl', 
-    % 'pl/graph/agents.pl',
+:- ['pl/graph/edges.pl', 
+     'pl/graph/nodes.pl', 
+     'pl/graph/agents.pl'
     % 'pl/kmap.pl'
-   % ].
+    ].
 
 :- dynamic neighborOwner/2.
 
@@ -259,15 +259,51 @@ cleanColors :-
     listOfNodes(ListOfNodes),
     setOwner(ListOfNodes, none).
 
-
-
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
+% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
+% y como b(visibleNode(Node)) a los nodos a los que marque como explorados ESTE TURNO.
 coloringAlgorithm :- 
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, CurrentPosition),
+    assert((isGoal(Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
+    foreach(
+            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], bfsNode(Node, _, _)),
+            (
+                write(' Marking node as explored: '),write(Node),nl,
+                retractall(notExplored(Node)),
+                % assertOnce(exploredNode(Node)),
+                retract(notVisible(Node)),
+                assert(visibleNode(Node))
+            )
+           ),
+    write(' k(nodeTeam):'), nl,
+    foreach(
+            k(nodeTeam(Step, Node5, Team5)),
+            (write(Node5), write(' : '), write(Team5), nl)
+           ),
     cleanColors,
+    write(' Primer h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Step, Node4, Team4)),
+            (write(Node4), write(' : '), write(Team4), nl)
+           ),
     step1,
     step2,
-    step3.
+    step3,
+    foreach(
+            visibleNode(N),
+            (
+                retract(visibleNode(N)),
+                assert(notVisible(N))
+            )
+           ),
+    write(' Segundo h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Step, Node3, Team2)),
+            (write(Node3), write(' : '), write(Team2), nl)
+           ).
 
 
 
@@ -299,7 +335,13 @@ step2 :-
 
 % step3
 % third step of the coloring algorithm
-step3 :- 
+step3 :-    
+    findall(N1, notExplored(N1), ListOfNotExplored),
+    findall(N2, notVisible(N2), ListOfNotVisible),
+    setOwner(ListOfNotExplored, ofNoOne),
+    write('List of not explored '), write(ListOfNotExplored), nl,
+    write('List of not visible' ), write(ListOfNotVisible), nl,
+    setOwner(ListOfNotVisible, ofNoOne),
     foreach(
         clearNode(Node), 
         (

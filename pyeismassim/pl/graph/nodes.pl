@@ -67,7 +67,7 @@ checkOwner(Node, Team) :-
 
 listOfNodes(ListOfNodes) :- 
     currentStep(Step),
-    findall(Node, h(nodeValue(Step, Node, _)), ListOfNodes).
+    findall(Node, k(nodeValue(Step, Node, _)), ListOfNodes).
 
 
 

@@ -18,7 +18,12 @@
            currentStep/1,      %
            h/1,                %
            k/1,                %
+           b/1,
            agentTeam/2,        %
+           exploredNode/1,
+           visibleNode/1,
+           notVisible/1,
+           notExplored/1,
            myVisionRange/1.
 
 
@@ -180,6 +185,8 @@ updateNodeValue(Name, Value) :-
     assertz(    k(nodeValue(Name, Value)) ).
 updateNodeValue(Name, Value) :-
     % El nodo es desconocido.
+    assertz( notExplored(Name) ),
+    assertz( notVisible(Name) ),
     assertz( k(nodeValue(Name, Value)) ).
 
 
@@ -187,7 +194,8 @@ updateNodeValue(Name, Value) :-
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
-    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ),
+    assertz( h(nodeTeam(Step, Name, CurrentTeam)) ).
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
@@ -225,21 +233,6 @@ updateEdge(Node1, Node2, Cost) :-
     % Si es la primera vez que vemos el arco.
     insertEdge(Node1, Node2, Cost).
 
-markExploredNodes :-
-    currentStep(Step),
-    write('MARCA, CRISTO '), nl,
-    myName(Name),
-    write('MARCA2, CRISTO '), nl,
-    position(Step, Name, CurrentPosition),
-    write('MARCA3, CRISTO '), nl,
-    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
-    write(' Marking... '), nl,
-    foreach(
-            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
-            (write(' Marking node as explored: '),write(Node),nl, assert(explored(Node)))
-           ).
-
-    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     Acceso                                   %
@@ -370,7 +363,6 @@ dumpKB :-
     printFindAll('EDGES:',       k(edge(_X1, _X2, _X3))),
     printFindAll('POSITIONS:',   k(position(_X1, _X2, _X3))),
     printFindAll('AGENTS:',      k(agent(_X1, _X2, _X3, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
-
 
 
 %------------------------------------------------------------------------------%

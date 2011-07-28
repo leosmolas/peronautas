@@ -160,6 +160,7 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
+        print "@PrologAgent: Guardando el rango de vision de %s: %s"% (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
 
 
@@ -263,9 +264,6 @@ class PrologAgent(Agent):
                                                                                e['vis_range'])).next()
 
 
-    def markExploredNodes(self, msg_dict_public):
-        self.prolog.query("markExploredNodes").next()
-
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
         self.prolog.query("updateStep(%s)"              % msg_dict_private['step']).next()
@@ -281,9 +279,7 @@ class PrologAgent(Agent):
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
-        self.markExploredNodes(msg_dict_public)
-
-
+        self.prolog.query("coloringAlgorithm").next()
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "    @PrologAgent: received request-action. id: %s" % action_id
