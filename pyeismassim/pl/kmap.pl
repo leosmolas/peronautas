@@ -206,3 +206,5 @@ team(cacoteam).
 
 myTeam(peronismo).
 myName(peron).
+
+myVisionRange(3).

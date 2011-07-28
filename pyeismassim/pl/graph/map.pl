@@ -1,8 +1,8 @@
-:- ['pl/graph/edges.pl', 
-    'pl/graph/nodes.pl', 
-    'pl/graph/agents.pl',
-    'pl/kmap.pl'
-   ].
+% :- ['pl/graph/edges.pl', 
+    % 'pl/graph/nodes.pl', 
+    % 'pl/graph/agents.pl',
+    % 'pl/kmap.pl'
+   % ].
 
 :- dynamic neighborOwner/2.
 

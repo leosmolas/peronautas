@@ -158,7 +158,7 @@ bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :-
 	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
-    bfs(NewFrontier, NewVisited, Result), !.
+    bfs(NewFrontier, NewVisited, Result).
 
 filter(Nodes, Frontier, Visited, FilteredNodes) :-
 	findall(Node, (
@@ -196,7 +196,7 @@ add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
 
 testBfs(R) :-
-    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
+    assert((isGoal(Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
 	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
 	
 % lastKnownPosition(-Step, +Agent, -Position)
@@ -225,6 +225,10 @@ markExploredNodes :-
     assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
     write(' Marking... '), nl,
     foreach(
-            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
-            (write(' Marking node as explored: '),write(Node),nl, assert(explored(Node)))
+                bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
+                (
+                    write(' Marking node as explored: '),
+                    write(Node),nl, 
+                    assert(explored(Node))
+                )
            ).
