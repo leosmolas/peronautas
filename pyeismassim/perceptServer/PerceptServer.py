@@ -1,4 +1,5 @@
 import socket
+import signal
 import sys
 
 ####################################################################################################
@@ -163,6 +164,16 @@ class PerceptConnection():
         return list2dict(lst)
 
 ####################################################################################################
+
+def signal_handler(signal, frame):
+        print ''
+        print 'You pressed Ctrl+C!'
+        serverSocket.close()
+        print 'Socket closed successfully'
+        print "Percept server shutdown."
+        sys.exit(0)
+
+####################################################################################################
 if (__name__ == "__main__"):
 
     if (len(sys.argv) == 4):
@@ -170,8 +181,13 @@ if (__name__ == "__main__"):
         HOST        =     sys.argv[2]
         PORT        = int(sys.argv[3])
     else:
-        print "Usage: python PerceptServer.py CONNECTIONS HOST PORT"
-        print "Port 10000 is recommended."
+        print ""
+        print ""
+        print "         Usage: python PerceptServer.py NUMBER_CONNECTIONS HOST_IP PORT_NUMBER"
+        print "                                 Port 10000 is recommended."
+        print ""
+        print "                 Example: python PerceptServer.py 10 192.168.0.10 10000"
+        print ""
         sys.exit()
 
     ADDR = (HOST, PORT)
@@ -185,8 +201,13 @@ if (__name__ == "__main__"):
     serverSocket.bind((ADDR))
     serverSocket.listen(CONNECTIONS)
 
+    signal.signal(signal.SIGINT, signal_handler)
+
+    print ""
     print "Percept server started."
-    print "Listening on: %s : %s" % (HOST, PORT) 
+    print "Listening on: %s : %s" % (HOST, PORT)
+    print "The Computer Name is: %s" % socket.gethostname()
+    print ""
 
     for i in range(CONNECTIONS):
         socket, address = serverSocket.accept()
