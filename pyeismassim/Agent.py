@@ -17,14 +17,14 @@ class Agent():
         self.username = USER
         self.password = PASS
         self.useLog   = useLog
-        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
         if useLog:
             sys.stdout = open(USER + '-log.txt', 'w')
         else:
             pass
         self.log = sys.stdout
 
-        print "Basic initialization ",
+        print "Basic initialization",
+        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
         if (perceptServerPort and perceptServerHost):
             self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:
@@ -49,15 +49,25 @@ class Agent():
 
 
 
-    def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "@Agent: received request-action. id: %s" % action_id
-        action_xml = action(action_id, "skip")
-        return action_xml
+    def initializationHook():
+        pass
+
+
+
+    def finalizationHook():
+        pass
 
 
 
     def processSimulationStart(self, msg_dict):
         pass
+
+
+
+    def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
+        print "@Agent: received request-action. id: %s" % action_id
+        action_xml = action(action_id, "skip")
+        return action_xml
 
 
 
@@ -69,68 +79,73 @@ class Agent():
     def perceiveActLoop(self):
         # Receive simulation start notification.
         print "@Agent: waiting for simulation start notification."
+
         xml = self.massimConnection.receive()
-        _, _, msg_dict, _ = parse_as_dict(xml)
+        msg_type, _, msg_dict, _ = parse_as_dict(xml)
 
-        print "@Agent: received simulation start notification."
-        print_message(msg_dict)
-        #print "\nXML:"
-        #print xml
-        #print ""
-        self.processSimulationStart(msg_dict)
+        if (msg_type == 'sim-start'):
+            print "\n\n===== NEW SIMULATION =====\n\n"
+            print "@Agent: received simulation start notification."
+            print_message(msg_dict)
+            self.processSimulationStart(msg_dict)
+            quitPerceiveActLoop = False
+        elif (msg_type == 'bye'):
+            print "@Agent: received bye"
+            print_message(msg_dict)
+            self.processBye(msg_dict)
+            self.quit = True
+            quitPerceiveActLoop = True
 
-        quit = False
-        step = 0
-        while (not quit):
-            step += 1
-            print "@Agent: step: %s" % step
-
+        while (not quitPerceiveActLoop):
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
-
-            #print "\nXML:"
-            #print xml
-            #print ""
-
-            time.sleep(1.5)
+            time.sleep(0.5)
             if (msg_type == 'request-action'):
+                print "\n"
+                print "@Agent: step: %s" % msg_dict_private['step']
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
                 print_message(msg_dict_private)
-            elif (msg_type == 'bye'):
-                print "@Agent: received bye"
-                print_message(msg_dict_private)
-                self.processBye(msg_dict_private)
-                quit = True
+                quitPerceiveActLoop = True
             else:
                 print "@Agent: en area 51"
                 print_message(msg_dict_private)
-                quit = True
+                self.quit = True
+
+
+
+    def mainLoop(self):
+        self.quit = False
+        agent.connect()
+        while (not self.quit):
+            self.initializationHook()
+            self.perceiveActLoop()
+            self.finalizationHook()
         raw_input("Finished. Press ENTER to continue...")
+        agent.disconnect()
 
 
 
 ####################################################################################################
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, log, perceptServerHost, perceptServerPort, prolog_source):
-        Agent.__init__(self, USER, PASS, log, perceptServerHost, perceptServerPort)
+    def initializationHook(self):
         print "Prolog initialization",
         # Creo una conexion con SWI.
         self.prolog = Prolog()
-        self.prolog.consult(prolog_source)
+        self.prolog.consult("pl/agent.pl")
         if (log):
             self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
         print "done"
 
 
 
-    def disconnect(self):
+    def finalizationHook(self):
         self.prolog.query("dumpKB").next()
         self.prolog.query("close_output").next()
-        Agent.disconnect(self)
+        self.prolog = None
 
 
 
@@ -147,7 +162,7 @@ class PrologAgent(Agent):
         elif (self.role == 'inspector'):
             self.prolog_role_file = 'pl/inspector.pl'
         else:
-            print "    @PrologAgent: error: unknown role"
+            print "@PrologAgent: error: unknown role"
         self.prolog.consult(self.prolog_role_file)
 
         # Guardo mi nombre en la KB.
@@ -273,16 +288,16 @@ class PrologAgent(Agent):
 
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "    @PrologAgent: received request-action. id: %s" % action_id
+        print "@PrologAgent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
         self.perceptConnection.send(self.username, msg_dict_public)
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        print "\n    @PrologAgent: PERCEPTION:"
-        print_message(msg_dict_public)
-        print ""
+        #print "\n@PrologAgent: PERCEPTION:"
+        #print_message(msg_dict_public)
+        #print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
@@ -290,13 +305,13 @@ class PrologAgent(Agent):
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
-            print "    @PrologAgent: sending %s" % actionList[0]
+            print "@PrologAgent: sending %s" % actionList[0]
         elif len(actionList) == 2:
-            print "    @PrologAgent: sending %s %s" % (actionList[0], actionList[1])
+            print "@PrologAgent: sending %s %s" % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
-            print "    @PrologAgent: error in returned action."
-            print "    @PrologAgent: return value: %s" % actionList
+            print "@PrologAgent: error in returned action."
+            print "@PrologAgent: return value: %s" % actionList
             action_xml = action(action_id, "skip")
         return action_xml
 
@@ -313,8 +328,6 @@ if (__name__== "__main__"):
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/agent.pl")
-    agent.connect()
-    agent.perceiveActLoop()
-    agent.disconnect()
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort)
+    agent.mainLoop()
 
