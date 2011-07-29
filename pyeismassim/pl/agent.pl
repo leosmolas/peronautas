@@ -158,7 +158,7 @@ updateLastStepScore(X) :-
 % MaxHealth
 % Strength
 % VisualRange
-updateEntity(N, T, D, R, E, ME, H, MH, S, V) :-
+updateEntity(A, T, N, R, E, ME, H, MH, S, V) :-
     currentStep(Step),
     retractall( k(agent(Step, A, _, _, _, _,  _, _,  _, _, _)) ),
     assertz(    k(agent(Step, A, T, N, R, E, ME, H, MH, S, V)) ).
@@ -247,23 +247,23 @@ markExploredNodes :-
 
 % agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 team(Step, Agent, Team) :-
-    k(agent(Step, Agent, Team,    _,    _,      _,         _,      _,         _,        _,           _)).
+    k(agent(Step, Agent,  Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 position(Step, Agent, Node) :-
-    k(agent(Step, Agent,    _, Node,    _,      _,         _,      _,         _,        _,           _)).
+    k(agent(Step, Agent, _Team,  Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 role(Step, Agent, Role) :-
-    k(agent(Step, Agent,    _,    _, Role,      _,         _,      _,         _,        _,           _)).
+    k(agent(Step, Agent, _Team, _Node,  Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 energy(Step, Agent, Energy) :-
-    k(agent(Step, Agent,    _,    _,    _, Energy,         _,      _,         _,        _,           _)).
+    k(agent(Step, Agent, _Team, _Node, _Role,  Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 maxEnergy(Step, Agent, MaxEnergy) :-
-    k(agent(Step, Agent,    _,    _,    _,      _, MaxEnergy,      _,         _,        _,           _)).
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 health(Step, Agent, Health) :- 
-    k(agent(Step, Agent,    _,    _,    _,      _,         _, Health,         _,        _,           _)).
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy,  Health, _MaxHealth, _Strength, _VisualRange)).
 maxHealth(Step, Agent, MaxHealth) :-
-    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _, MaxHealth,        _,           _)).
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy, _Health,  MaxHealth, _Strength, _VisualRange)).
 strength(Step, Agent, Strength) :-
-    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _,         _, Strength,           _)).
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth,  Strength, _VisualRange)).
 visualRange(Step, Agent, VisualRange) :-
-    k(agent(Step, Agent,    _,    _,    _,      _,         _,      _,         _,        _, VisualRange)).
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength,  VisualRange)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -365,13 +365,11 @@ dumpKB :-
     nl, 
     nl,
     
-    printFindAll('NODE VALUES:', k(nodeValue(X1, X2))),
-    printFindAll('NODE TEAMS:',  k(nodeTeam(X1, X2, X3))),
-    printFindAll('EDGES:',       k(edge(X1, X2, X3))),
-    printFindAll('POSITIONS:',   k(position(X1, X2, X3))),
-    printFindAll('AGENTS:',      k(agent(X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11))), 
-    true.
-    %listing(k).
+    printFindAll('NODE VALUES:', k(nodeValue(_X1, X2))),
+    printFindAll('NODE TEAMS:',  k(nodeTeam(_X1, _X2, _X3))),
+    printFindAll('EDGES:',       k(edge(_X1, _X2, _X3))),
+    printFindAll('POSITIONS:',   k(position(_X1, _X2, _X3))),
+    printFindAll('AGENTS:',      k(agent(_X1, _X2, _X3, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
 
 
 

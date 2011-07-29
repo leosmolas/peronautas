@@ -1,3 +1,5 @@
+:- style_check(-discontiguous).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                          MAPA DE JUGUETE                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,6 +199,5 @@ team(moyano, cacoteam).
 team(castels, cacoteam).
 team(delia, cacoteam).
 
-listOfTeams([peronismo, cacoteam]).
 team(peronismo).
 team(cacoteam).

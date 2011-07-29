@@ -41,7 +41,7 @@ agentsInNode(Node, Agents) :-
     currentStep(Step),
     findall(
         Agent,         
-        h(position(Step, Agent, _Node)), 
+        h(position(Step, Agent, Node)), 
         Agents
     ).
 
