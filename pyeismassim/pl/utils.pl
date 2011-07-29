@@ -9,7 +9,7 @@
 % Actions: lista de acciones necesarias para llegar al nodo.
 % Path_Cost: costo del camino encontrado.
 ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost) :-
-    ucsSelect(Frontier, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
+    ucsSelect(Frontier, ucsNode(Position, _Energy, Path, Actions, Path_Cost), _Frontier1),
     isGoal(Position).
 
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost) :-
@@ -144,7 +144,7 @@ testBfs(P, C):-
 	
 % path([], _).
 
-bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, bfsNode(Node, Path, Cost)) :- 
+bfs([bfsNode(Node, Path, Cost) | _RestOfFrontier], _Visited, bfsNode(Node, Path, Cost)) :- 
     % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, _RestOfFrontier),
     isGoal(Node, Cost).
     
@@ -209,7 +209,7 @@ lastKnownPosition(Step, Step, Agent, Position) :-
 	k(agent(Step, Agent, Position)).
 
 % Condicion de corte, sin exito.
-lastKnownPosition(0, 0, Agent, unknown).
+lastKnownPosition(0, 0, _Agent, unknown).
 
 lastKnownPosition(CurrentStep, Step, Agent, Position) :-
 	PreviousStep is CurrentStep - 1,

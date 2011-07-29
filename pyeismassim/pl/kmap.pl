@@ -36,20 +36,20 @@ k(nodeValue(vertex5,   4)).
 k(nodeValue(vertex13,  2)).
 
 
-h(nodeTeam(0, vertex0,  none)). 
-h(nodeTeam(0, vertex1,  none)). 
-h(nodeTeam(0, vertex3,  none)). 
-h(nodeTeam(0, vertex4,  none)). 
-h(nodeTeam(0, vertex8,  none)). 
-h(nodeTeam(0, vertex10, none)). 
-h(nodeTeam(0, vertex12, none)). 
-h(nodeTeam(0, vertex9,  none)).
-h(nodeTeam(0, vertex11, none)).
-h(nodeTeam(0, vertex7,  none)).
-h(nodeTeam(0, vertex2,  none)).
-h(nodeTeam(0, vertex6,  none)).
-h(nodeTeam(0, vertex5,  none)).
-h(nodeTeam(0, vertex13, none)).
+h(nodeTeam(vertex0,  none)). 
+h(nodeTeam(vertex1,  none)). 
+h(nodeTeam(vertex3,  none)). 
+h(nodeTeam(vertex4,  none)). 
+h(nodeTeam(vertex8,  none)). 
+h(nodeTeam(vertex10, none)). 
+h(nodeTeam(vertex12, none)). 
+h(nodeTeam(vertex9,  none)).
+h(nodeTeam(vertex11, none)).
+h(nodeTeam(vertex7,  none)).
+h(nodeTeam(vertex2,  none)).
+h(nodeTeam(vertex6,  none)).
+h(nodeTeam(vertex5,  none)).
+h(nodeTeam(vertex13, none)).
 
 %h(nodeValue(vertex0,  10)). 
 %h(nodeValue(vertex1,   5)). 

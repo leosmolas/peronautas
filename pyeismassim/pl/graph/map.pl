@@ -77,10 +77,9 @@ teamsInNeighbors([], TeamsNeighborsCount) :-
     retractall( neighborOwner(_, _) ).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    currentStep(Step),
-    h(nodeTeam(Step, Neighbor, Owner)),
+    h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
-    h(position(Step, Agent, Neighbor)),
+    h(position(Agent, Neighbor)),
     team(Agent, Owner),
     neighborOwner(Owner, Count), 
     !,
@@ -90,10 +89,9 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
-    currentStep(Step),
-    h(nodeTeam(Step, Neighbor, Owner)),
+    h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
-    h(position(Step, Agent, Neighbor)),
+    h(position(Agent, Neighbor)),
     team(Agent, Owner),
     !,
     assert(neighborOwner(Owner,1)),
@@ -266,8 +264,10 @@ cleanColors :-
 coloringAlgorithm :- 
     myName(Name),
     currentStep(Step),
+    % myTeam(T),
+    % write(T),nl,
     position(Step, Name, CurrentPosition),
-    assert((isGoal(Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
+    assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
     foreach(
             bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], bfsNode(Node, _, _)),
             (
@@ -286,12 +286,27 @@ coloringAlgorithm :-
     cleanColors,
     write(' Primer h(nodeTeam):'), nl,
     foreach(
-            h(nodeTeam(Step, Node4, Team4)),
+            h(nodeTeam(Node4, Team4)),
             (write(Node4), write(' : '), write(Team4), nl)
            ),
     step1,
+        write(' 2 Primer h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Node6, Team6)),
+            (write(Node6), write(' : '), write(Team6), nl)
+           ),
     step2,
+        write(' 3 Primer h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Node7, Team7)),
+            (write(Node7), write(' : '), write(Team7), nl)
+           ),
     step3,
+        write(' 4 Primer h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Node8, Team8)),
+            (write(Node8), write(' : '), write(Team8), nl)
+           ),
     foreach(
             visibleNode(N),
             (
@@ -301,7 +316,7 @@ coloringAlgorithm :-
            ),
     write(' Segundo h(nodeTeam):'), nl,
     foreach(
-            h(nodeTeam(Step, Node3, Team2)),
+            h(nodeTeam(Node3, Team2)),
             (write(Node3), write(' : '), write(Team2), nl)
            ).
 
@@ -336,9 +351,8 @@ step2 :-
 % step3
 % third step of the coloring algorithm
 step3 :-    
-    currentStep(S),
-    findall(N1, (notExplored(N1), h(nodeTeam(S, N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
-    findall(N2, (notVisible(N2), h(nodeTeam(S, N2, none))), ListOfNotVisible),
+    findall(N1, (notExplored(N1), h(nodeTeam(N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
+    findall(N2, (notVisible(N2), h(nodeTeam(N2, none))), ListOfNotVisible),
     setOwner(ListOfNotExplored, ofNoOne),
     write('List of not explored '), write(ListOfNotExplored), nl,
     write('List of not visible' ), write(ListOfNotVisible), nl,

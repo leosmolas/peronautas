@@ -74,6 +74,10 @@
 % agent(Step, Name, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%% LALALA
+myTeam(a).
+team(a).
+team(b).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Percept Processing                               %
@@ -189,13 +193,14 @@ updateNodeValue(Name, Value) :-
     assertz( notVisible(Name) ),
     assertz( k(nodeValue(Name, Value)) ).
 
-
+assertOnce(X) :- X, !.
+assertOnce(X) :- assert(X).
 
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
     assertz( k(nodeTeam(Step, Name, CurrentTeam)) ),
-    assertz( h(nodeTeam(Step, Name, CurrentTeam)) ).
+    assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
@@ -239,9 +244,13 @@ updateEdge(Node1, Node2, Cost) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
+team(Agent, Team) :-
+    currentStep(Step),
+    k(agent(Step, Agent,  Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
+
 team(Step, Agent, Team) :-
     k(agent(Step, Agent,  Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
-position(Step, Agent, Node) :-
+position(Step, Agent, Node) :-
     k(agent(Step, Agent, _Team,  Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 role(Step, Agent, Role) :-
     k(agent(Step, Agent, _Team, _Node,  Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
@@ -358,11 +367,11 @@ dumpKB :-
     nl, 
     nl,
     
-    printFindAll('NODE VALUES:', k(nodeValue(_X1, X2))),
-    printFindAll('NODE TEAMS:',  k(nodeTeam(_X1, _X2, _X3))),
-    printFindAll('EDGES:',       k(edge(_X1, _X2, _X3))),
-    printFindAll('POSITIONS:',   k(position(_X1, _X2, _X3))),
-    printFindAll('AGENTS:',      k(agent(_X1, _X2, _X3, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
+    printFindAll('NODE VALUES:', k(nodeValue(_X1, _X2))),
+    printFindAll('NODE TEAMS:',  k(nodeTeam(_X10, _X20, _X3))),
+    printFindAll('EDGES:',       k(edge(_X11, _X21, _X31))),
+    printFindAll('POSITIONS:',   k(position(_X12, _X22, _X32))),
+    printFindAll('AGENTS:',      k(agent(_X13, _X23, _X33, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
 
 
 %------------------------------------------------------------------------------%

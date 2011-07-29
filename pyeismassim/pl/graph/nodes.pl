@@ -12,9 +12,8 @@
 % sets the owner of the node Nodes to Owner.
 setOwner([], _).
 setOwner([Node | Nodes], Owner) :-
-    retractall( h(nodeTeam(_, Node, _))), 
-    currentStep(Step),
-    assertz( h(nodeTeam(Step, Node, Owner))), 
+    retractall( h(nodeTeam(Node, _))), 
+    assertz( h(nodeTeam(Node, Owner))), 
     setOwner(Nodes, Owner).
 
 
@@ -28,20 +27,19 @@ setOwner([Node | Nodes], Owner) :-
 % nodesOfTeam(+Team, -NodesOfTeam)
 % returns in NodesOfTeam a list of nodes that are owned by the Team
 nodesOfTeam(Team, NodesOfTeam) :- 
-    currentStep(Step),
-    findall(Node, h(nodeTeam(Step, Node, Team)), NodesOfTeam).
+    findall(Node, h(nodeTeam(Node, Team)), NodesOfTeam).
 
 
 % clearNode(-Node)
 clearNode(Node) :- 
-    currentStep(Step),
-    h(nodeTeam(Step, Node, none)), 
-    not(h(position(Step, _, Node))).
+    h(nodeTeam(Node, none)). 
+    % not(h(position(Step, _, Node))). % (??)
 
 
 
 % emptyNode(-Node)
 emptyNode(Node) :- 
+    
     currentStep(Step),
     k(nodeValue(Node, _)), 
     not(h(position(Step, _, Node))).
@@ -59,9 +57,7 @@ nonEmptyNode(Node) :-
 % checkOwner(+Node, ?Team)
 % checks if the owner of the Node is Team. It can also return the actual Team of the node
 checkOwner(Node, Team) :- 
-    currentStep(Step),
-    h(nodeTeam(Step, Node, Team)), 
-    !.
+    h(nodeTeam(Node, Team)), !.
 
 
 
