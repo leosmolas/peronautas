@@ -135,6 +135,14 @@ class PrologAgent(Agent):
 
 
     def processSimulationStart(self, msg_dict):
+        defaultVisionRange = {
+                                'explorer' : 2,
+                                'repairer' : 1,
+                                'saboteur' : 1,
+                                'sentinel' : 3,
+                                'inspector': 1
+                            }
+
         self.role = msg_dict['role'].lower()
         if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
@@ -152,6 +160,7 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
+        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
 
 
 
@@ -193,6 +202,7 @@ class PrologAgent(Agent):
     def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
         for e in msg_dict.get('vis_edges', []):
+            print "@Agent: visible edge: %s" % e
             self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
 
         for e in msg_dict.get('surveyed_edges', []):
@@ -253,6 +263,8 @@ class PrologAgent(Agent):
                                                                                e['vis_range'])).next()
 
 
+    def markExploredNodes(self, msg_dict_public):
+        self.prolog.query("markExploredNodes").next()
 
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
@@ -269,6 +281,7 @@ class PrologAgent(Agent):
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
+        self.markExploredNodes(msg_dict_public)
 
 
 

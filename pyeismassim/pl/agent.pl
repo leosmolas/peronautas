@@ -18,9 +18,11 @@
            currentStep/1,      %
            h/1,                %
            k/1,                %
-           agentTeam/2.        %
+           agentTeam/2,        %
+           myVisionRange/1.
 
-:- ['pl/graph/map.pl'].
+
+:- ['pl/graph/map.pl', 'pl/utils.pl'].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,7 +225,21 @@ updateEdge(Node1, Node2, Cost) :-
     % Si es la primera vez que vemos el arco.
     insertEdge(Node1, Node2, Cost).
 
+markExploredNodes :-
+    currentStep(Step),
+    write('MARCA, CRISTO '), nl,
+    myName(Name),
+    write('MARCA2, CRISTO '), nl,
+    position(Step, Name, CurrentPosition),
+    write('MARCA3, CRISTO '), nl,
+    assert(isGoal(_, Cost) :- myVisionRange(Range), Cost < Range),
+    write(' Marking... '), nl,
+    foreach(
+            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
+            (write(' Marking node as explored: '),write(Node),nl, assert(explored(Node)))
+           ).
 
+    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                     Acceso                                   %
