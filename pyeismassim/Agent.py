@@ -183,8 +183,10 @@ class PrologAgent(Agent):
         # Si lo esta, se actualiza la informacion del verice con su valor, 
         # sino, se actualiza con el valor unknown.
         probed_verts = msg_dict.get('probed_verts', [])
+        self.prolog.query("retractall(inRange(_))").next()
         for x in msg_dict.get('vis_verts', []):
             # Esta el vertice entre los vertices sondeados?
+            self.prolog.query("asserta(inRange(%s))" % x['name']).next()
             in_pv = False
             for pv in probed_verts:
                 if (pv['name'] == x['name']):

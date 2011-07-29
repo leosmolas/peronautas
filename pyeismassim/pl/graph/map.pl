@@ -77,9 +77,10 @@ teamsInNeighbors([], TeamsNeighborsCount) :-
     retractall( neighborOwner(_, _) ).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
+    currentStep(Step),
     h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
-    h(position(Agent, Neighbor)),
+    h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
     neighborOwner(Owner, Count), 
     !,
@@ -89,9 +90,10 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
     teamsInNeighbors(Neighbors, TeamsNeighborsCount).
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
+    currentStep(Step),
     h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
-    h(position(Agent, Neighbor)),
+    h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
     !,
     assert(neighborOwner(Owner,1)),
@@ -257,11 +259,42 @@ cleanColors :-
     listOfNodes(ListOfNodes),
     setOwner(ListOfNodes, none).
 
+printHNodeTeams(Title) :-
+    write(Title), nl,
+    foreach(
+            h(nodeTeam(Node, Team)),
+            (write('Node: '), write(Node), write(' : '), write(Team), nl)
+           ),nl.
+
+printAgentPositions :-
+    currentStep(Step),
+    foreach(h(position(Step, T, A)),
+            (write('Agent: '), write(T), write(' at '), write(A), nl)
+        ).
+
+setHypotheticalPositions :-
+    currentStep(Step),
+    retractall(h(position(Step, _, _))),
+    foreach(position(Step, A, N),
+            assert(h(position(Step, A, N)))
+           ).
+
+visibleNode(N) :-
+    explored(N),
+    inRange(N),
+    foreach(k(edge(N, N1, _)),
+            inRange(N1)),
+    !,
+    retract(notVisible(N)),
+    asserta(visibleNode(N)).
+    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
 % y como b(visibleNode(Node)) a los nodos a los que marque como explorados ESTE TURNO.
 coloringAlgorithm :- 
+    setHypotheticalPositions,
+    printAgentPositions,
     myName(Name),
     currentStep(Step),
     % myTeam(T),
@@ -273,9 +306,9 @@ coloringAlgorithm :-
             (
                 write(' Marking node as explored: '),write(Node),nl,
                 retractall(notExplored(Node)),
-                % assertOnce(exploredNode(Node)),
+                assertOnce(explored(Node)),
                 retract(notVisible(Node)),
-                assert(visibleNode(Node))
+                asserta(visibleNode(Node))
             )
            ),
     write(' k(nodeTeam):'), nl,
@@ -283,30 +316,15 @@ coloringAlgorithm :-
             k(nodeTeam(Step, Node5, Team5)),
             (write(Node5), write(' : '), write(Team5), nl)
            ),
+    printHNodeTeams('Before  cleanColors'),
     cleanColors,
-    write(' Primer h(nodeTeam):'), nl,
-    foreach(
-            h(nodeTeam(Node4, Team4)),
-            (write(Node4), write(' : '), write(Team4), nl)
-           ),
+    printHNodeTeams('After cleanColors'),
     step1,
-        write(' 2 Primer h(nodeTeam):'), nl,
-    foreach(
-            h(nodeTeam(Node6, Team6)),
-            (write(Node6), write(' : '), write(Team6), nl)
-           ),
+    printHNodeTeams('After step 1'),
     step2,
-        write(' 3 Primer h(nodeTeam):'), nl,
-    foreach(
-            h(nodeTeam(Node7, Team7)),
-            (write(Node7), write(' : '), write(Team7), nl)
-           ),
+    printHNodeTeams('After step 2'),
     step3,
-        write(' 4 Primer h(nodeTeam):'), nl,
-    foreach(
-            h(nodeTeam(Node8, Team8)),
-            (write(Node8), write(' : '), write(Team8), nl)
-           ),
+    printHNodeTeams('After step 3'),
     foreach(
             visibleNode(N),
             (
@@ -314,11 +332,7 @@ coloringAlgorithm :-
                 assert(notVisible(N))
             )
            ),
-    write(' Segundo h(nodeTeam):'), nl,
-    foreach(
-            h(nodeTeam(Node3, Team2)),
-            (write(Node3), write(' : '), write(Team2), nl)
-           ).
+    printHNodeTeams('After toggling visible nodes').
 
 
 
@@ -340,7 +354,10 @@ step1 :-
 % second step of the coloring algorithm
 step2 :- 
     foreach(
-        emptyNode(Node), 
+        (
+            emptyNode(Node),
+            visibleNode(Node)
+        ),
         (
             checkMajorityInNeighbors(Node)
         )
@@ -354,9 +371,14 @@ step3 :-
     findall(N1, (notExplored(N1), h(nodeTeam(N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
     findall(N2, (notVisible(N2), h(nodeTeam(N2, none))), ListOfNotVisible),
     setOwner(ListOfNotExplored, ofNoOne),
-    write('List of not explored '), write(ListOfNotExplored), nl,
-    write('List of not visible' ), write(ListOfNotVisible), nl,
+    write('List of empty and not explored '), write(ListOfNotExplored), nl,
+    write('List of empty and not visible' ), write(ListOfNotVisible), nl,
     setOwner(ListOfNotVisible, ofNoOne),
+    write(' @Step3 de coloreo... h(nodeTeam):'), nl,
+    foreach(
+            h(nodeTeam(Node3, Team2)),
+            (write(Node3), write(' : '), write(Team2), nl)
+           ),
     foreach(
         clearNode(Node), 
         (

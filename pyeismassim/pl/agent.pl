@@ -24,6 +24,7 @@
            visibleNode/1,
            notVisible/1,
            notExplored/1,
+           explored/1,
            myVisionRange/1.
 
 
@@ -194,13 +195,13 @@ updateNodeValue(Name, Value) :-
     assertz( k(nodeValue(Name, Value)) ).
 
 assertOnce(X) :- X, !.
-assertOnce(X) :- assert(X).
+assertOnce(X) :- asserta(X).
 
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
-    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ),
-    assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
+    assertz( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    % assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
@@ -243,6 +244,13 @@ updateEdge(Node1, Node2, Cost) :-
 %                                     Acceso                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+printK :-
+    currentStep(Step),
+    foreach(
+        k(nodeTeam(Step, V, T)),
+        (write('Node: '), write(V), write(', Team: '), write(T), nl)
+    ).
+
 % agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 team(Agent, Team) :-
     currentStep(Step),
@@ -250,7 +258,7 @@ team(Agent, Team) :-
 
 team(Step, Agent, Team) :-
     k(agent(Step, Agent,  Team, _Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
-position(Step, Agent, Node) :-
+position(Step, Agent, Node) :-
     k(agent(Step, Agent, _Team,  Node, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
 role(Step, Agent, Role) :-
     k(agent(Step, Agent, _Team, _Node,  Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)).
