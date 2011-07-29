@@ -151,7 +151,10 @@ bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, bfsNode(Node, Path, C
 bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :- 
     % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, RestOfFrontier),
     %(bagof(Child, moves(Next_record, Open, Closed, Child), Children);Children = []),
-	kneighbors(Node, Neighbors),
+	%kneighbors(Node, Neighbors),
+    findall(Neighbor,
+            k(edge(Node, Neighbor, _)),
+            Neighbors),
 	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
@@ -193,7 +196,8 @@ add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
 
 testBfs(R) :-
-	bfs([bfsNode(vertex11, [vertex11], 0)], [], R).
+    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
+	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
 	
 % lastKnownPosition(-Step, +Agent, -Position)
 lastKnownPosition(Step, Agent, Position) :-
@@ -210,3 +214,17 @@ lastKnownPosition(0, 0, Agent, unknown).
 lastKnownPosition(CurrentStep, Step, Agent, Position) :-
 	PreviousStep is CurrentStep - 1,
 	lastKnownPosition(PreviousStep, Step, Agent, Position).
+
+markExploredNodes :-
+    currentStep(Step),
+    write('MARCA, CRISTO '), nl,
+    myName(Name),
+    write('MARCA2, CRISTO '), nl,
+    position(Step, Name, CurrentPosition),
+    write('MARCA3, CRISTO '), nl,
+    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
+    write(' Marking... '), nl,
+    foreach(
+            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),
+            (write(' Marking node as explored: '),write(Node),nl, assert(explored(Node)))
+           ).

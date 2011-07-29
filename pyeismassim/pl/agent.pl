@@ -232,7 +232,7 @@ markExploredNodes :-
     write('MARCA2, CRISTO '), nl,
     position(Step, Name, CurrentPosition),
     write('MARCA3, CRISTO '), nl,
-    assert(isGoal(_, Cost) :- myVisionRange(Range), Cost < Range),
+    assert((isGoal(Node2, Cost) :- myVisionRange(Range), Cost < Range)),
     write(' Marking... '), nl,
     foreach(
             bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], Node),

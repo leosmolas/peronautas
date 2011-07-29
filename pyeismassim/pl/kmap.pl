@@ -177,6 +177,9 @@ k(edge(vertex12, vertex13, 2)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 currentStep(0).
+myName(peron).
+position(0, peron, vertex0).
+myVisionRange(2).
 
 h(position(0, peron, vertex0)).
 h(position(0, evita, vertex13)).
