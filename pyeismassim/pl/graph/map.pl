@@ -336,8 +336,9 @@ step2 :-
 % step3
 % third step of the coloring algorithm
 step3 :-    
-    findall(N1, notExplored(N1), ListOfNotExplored),
-    findall(N2, notVisible(N2), ListOfNotVisible),
+    currentStep(S),
+    findall(N1, (notExplored(N1), h(nodeTeam(S, N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
+    findall(N2, (notVisible(N2), h(nodeTeam(S, N2, none))), ListOfNotVisible),
     setOwner(ListOfNotExplored, ofNoOne),
     write('List of not explored '), write(ListOfNotExplored), nl,
     write('List of not visible' ), write(ListOfNotVisible), nl,
