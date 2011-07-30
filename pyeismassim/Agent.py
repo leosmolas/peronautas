@@ -162,6 +162,7 @@ class PrologAgent(Agent):
         self.prolog.query("updateMyName(%s)" % self.username).next()
         print "@PrologAgent: Guardando el rango de vision de %s: %s"% (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        
 
 
 
@@ -248,9 +249,10 @@ class PrologAgent(Agent):
                                                                                    strength,
                                                                                    vis_range)).next()
             else:
-                self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (p['name'], 
-                                                                                                                      team, 
-                                                                                                                      p['node'])).next()
+                self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,%s)" % (p['name'], 
+                                                                                                                team, 
+                                                                                                                p['node'],
+                                                                                                                p['vis_range'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:

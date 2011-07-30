@@ -289,6 +289,19 @@ visibleNode(N) :-
     retract(notVisible(N)),
     asserta(visibleNode(N)).
     
+    
+% toogleOnVisibleNode(+Node)
+% si el nodo ya está marcado como visible, no hace nada
+% sino, hace el toogle
+toogleOnVisibleNode(Node) :-
+    visibleNode(Node), !.
+    
+toogleOnVisibleNode(Node) :-
+    retractall(notVisible(Node)),
+    write('1.3 retract '),write(Agent),nl,
+    asserta(visibleNode(Node)),
+    write('1.4 asserta '),write(Agent),nl.
+    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
@@ -296,37 +309,48 @@ visibleNode(N) :-
 coloringAlgorithm :- 
     setHypotheticalPositions,
     printAgentPositions,
-    myName(Name),
+    % myName(Name),
     currentStep(Step),
-    position(Step, Name, CurrentPosition),
+    % position(Step, Name, CurrentPosition),
     
     myTeam(MyTeam),
+    % nl,write(' bfsing agent: '),nl,
+    % foreach(
+        % visualRange(Step, Agent2, Range2),
+        % (write(Agent2), nl, write(Range2),nl)
+    % ),
     foreach(
+        (
+            team(Step, Agent, MyTeam),
+            visualRange(Step, Agent, Range),
+            position(Step, Agent, Position),
+            Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se debería tener
+        ),
+        (
+            write('1 agent '),write(Agent),nl,
+            % printFindAll('AGENTS:',      k(agent(_X13, _X23, _X33, _X4, _X5, _X6, _X7, _X8, _X9, _X101, _X111))),
+            
+            % write(position(Step, Agent, Position)),nl,
+            % k(agent(Step, Agent, _Team,  Position, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
+            % write('2position '),write(Position),nl,
+            assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+            nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
+            foreach(
+                breadthFirst(Position, Node, _Path, _Cost),
                 (
-                    team(Step, Agent, MyTeam),
-                    visualRange(Step, Agent, Range),
-                    Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañerp es un dato que se debería tener
-                ),
-                (
-                    position(Step, Agent, Position),
-                    
-                    assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-                    nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
-                    % trace,
-                    foreach(
-                                breadthFirst(Position, Node, _Path, _Cost),
-                                (
-                                    write(' Marking node as explored: '),write(Node),nl,
-                                    retractall(notExplored(Node)),
-                                    assertOnce(explored(Node)),
-                                    retract(notVisible(Node)),
-                                    asserta(visibleNode(Node))
-                                )
-                            ),
-                    % notrace,
-                    retractall(isGoal(_, _))
+                    write(' Marking node as explored: '),write(Node),nl,
+                    retractall(notExplored(Node)),
+                    write('1.1 retractall '),write(Agent),nl,
+                    assertOnce(explored(Node)),
+                    write('1.2 assertOnce '),write(Agent),nl,
+                    toogleOnVisibleNode(Node)
                 )
-           ),
+            ),
+            write('termine agente '),write(Agent),nl,
+            retractall(isGoal(_, _))        
+            % write('termine agente '),write(Agent),nl
+        )
+    ),
     write(' k(nodeTeam):'), nl,
     foreach(
             k(nodeTeam(Step, Node5, Team5)),

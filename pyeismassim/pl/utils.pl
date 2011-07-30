@@ -201,7 +201,7 @@ add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
 
 testBfs(R) :-
-    assert((isGoal(Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
+    assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
 	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
 	
 % lastKnownPosition(-Step, +Agent, -Position)

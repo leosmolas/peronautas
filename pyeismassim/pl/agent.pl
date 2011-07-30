@@ -379,7 +379,7 @@ dumpKB :-
     printFindAll('NODE TEAMS:',  k(nodeTeam(_X10, _X20, _X3))),
     printFindAll('EDGES:',       k(edge(_X11, _X21, _X31))),
     printFindAll('POSITIONS:',   k(position(_X12, _X22, _X32))),
-    printFindAll('AGENTS:',      k(agent(_X13, _X23, _X33, _X4, _X5, _X6, _X7, _X8, _X9, _X10, _X11))).
+    printFindAll('AGENTS:',      k(agent(_X13, _X23, _X33, _X4, _X5, _X6, _X7, _X8, _X9, _X101, _X111))).
 
 
 %------------------------------------------------------------------------------%

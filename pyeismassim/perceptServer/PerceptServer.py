@@ -42,9 +42,11 @@ class PerceptConnection():
             position_list = dictionary.get('position')
             position      = position_list[0]
             node          = position.get('node')
+            vis_range     = position.get('vis_range')
             result = [    (0,
                             username,
-                            node
+                            node,
+                            vis_range
                           )
                      ]
             for v in dictionary.get('vis_verts', []):
@@ -109,7 +111,8 @@ class PerceptConnection():
             for p in stringlist:
                 if   (p[0] == 0):
                     result['position'].append(      { 'name' : p[1],
-                                                      'node' : p[2] 
+                                                      'node' : p[2],
+                                                      'vis_range' : p[3]
                                                     })
                 elif (p[0] == 1):
                     result['vis_verts'].append(     { 'name' : p[1],

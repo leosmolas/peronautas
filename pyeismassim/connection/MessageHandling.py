@@ -166,7 +166,14 @@ def parse_request_action(xml, output = 'dict'):
             'money'               : team_tag['money']            ,
             'score'               : team_tag['score']            
             }
-        result_public = { 'position' : [{ u'name' : u'self', u'node' : self_tag['position'] }] }
+        result_public = { 
+            'position'  : [{ 
+                u'name'     : u'self'             , 
+                u'node'     : self_tag['position'],
+                'vis_range' : self_tag['visrange']
+                }],
+            
+            }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
@@ -273,14 +280,15 @@ def parse_request_action(xml, output = 'dict'):
             'max_energy_disabled(%s)' % self_tag['maxenergydisabled'] ,
             'max_health(%s)'          % self_tag['maxhealth']         ,
             'strength(%s)'            % self_tag['strength']          ,
-            'vis_range(%s)'           % self_tag['visrange']          ,
+            
             'zone_score(%s)'          % self_tag['zonescore']         ,
             'last_step_score(%s)'     % team_tag['laststepscore']     ,
             'money(%s)'               % team_tag['money']             ,
             'score(%s)'               % team_tag['score']             
             ]
         result_public = [
-            'position(%s)'            % self_tag['position']
+            'position(%s)'            % self_tag['position'],
+            'vis_range(%s)'           % self_tag['visrange']
             ]
 
         if (achievements_tag != None):
