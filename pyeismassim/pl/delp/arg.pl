@@ -49,16 +49,16 @@ calcMeta(X) :-
     
 
 % todos los predicados que siguen son operaciones aritméticas y de comparación, para que los use delp.
-is_a_built_in(mult(X,Y,Z)).
-is_a_built_in(add(X,Y,Z)).
-is_a_built_in(sust(X,Y,Z)).
-is_a_built_in(power(X,Y,Z)).
-is_a_built_in(greater(X,Y)).
-is_a_built_in(less(X,Y)).
-is_a_built_in(greaterEq(X,Y)).
-is_a_built_in(lessEq(X,Y)).
-is_a_built_in(equal(X,Y)).
-is_a_built_in(notEqual(X,Y)).
+is_a_built_in(mult(_X,_Y,_Z)).
+is_a_built_in(add(_X,_Y,_Z)).
+is_a_built_in(sust(_X,_Y,_Z)).
+is_a_built_in(power(_X,_Y,_Z)).
+is_a_built_in(greater(_X,_Y)).
+is_a_built_in(less(_X,_Y)).
+is_a_built_in(greaterEq(_X,_Y)).
+is_a_built_in(lessEq(_X,_Y)).
+is_a_built_in(equal(_X,_Y)).
+is_a_built_in(notEqual(_X,_Y)).
 
 % Operaciones aritméticas
 mult(X,Y,Z)    :- Z is X * Y.
@@ -87,55 +87,55 @@ posibleMetaNeg(~explorar(_)).
 posibleMetaNeg(~expansion(_)).
 
 % criterio de comparación greaterArgValue
-greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-
-    (
-        Ac = s_rule(HeadA, _)
-        ;
-        Ac = d_rule(HeadA, _)
-    ), !,
-    posibleMetaNeg(HeadA), 
-    (
-        Bc = s_rule(HeadB, _)
-        ;
-        Bc = d_rule(HeadB, _)
-    ), !,
-    % member(HeadA, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]),
-    % member(HeadB, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]), 
+% greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-
+    % (
+        % Ac = s_rule(HeadA, _)
+        % ;
+        % Ac = d_rule(HeadA, _)
+    % ), !,
+    % posibleMetaNeg(HeadA), 
+    % (
+        % Bc = s_rule(HeadB, _)
+        % ;
+        % Bc = d_rule(HeadB, _)
+    % ), !,
+    % % member(HeadA, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]),
+    % % member(HeadB, [explorar(_), expansion(_), ~explorar(_), ~expansion(_)]), 
     
-    posibleMetaNeg(HeadB), % con esto checkeo que sólo entren las posibles metas
-    % writeln([Ac | Acs]),
-    % writeln([Bc | Bcs]),
-    member(s_rule(argValue(ValA),true), Acs), !,
-    % writeln(ValA),
-    member(s_rule(argValue(ValB),true), Bcs), !,
-    % writeln(ValB),
-    % writeln('greater'),
-    resolveConflict(ValA, ValB, [Ac | Acs], [Bc | Bcs]).
+    % posibleMetaNeg(HeadB), % con esto checkeo que sólo entren las posibles metas
+    % % writeln([Ac | Acs]),
+    % % writeln([Bc | Bcs]),
+    % member(s_rule(argValue(ValA),true), Acs), !,
+    % % writeln(ValA),
+    % member(s_rule(argValue(ValB),true), Bcs), !,
+    % % writeln(ValB),
+    % % writeln('greater'),
+    % resolveConflict(ValA, ValB, [Ac | Acs], [Bc | Bcs]).
     
-% resolveConflict(+ValA, +ValB, +Ac, +Bc)
-% Los Vals son los argValues de los argumentos.
-% Los otros son las secuencias argumentativas
-resolveConflict(ValA, ValB, _, _) :-
-    ValA > ValB, !.
+% % resolveConflict(+ValA, +ValB, +Ac, +Bc)
+% % Los Vals son los argValues de los argumentos.
+% % Los otros son las secuencias argumentativas
+% resolveConflict(ValA, ValB, _, _) :-
+    % ValA > ValB, !.
     
-resolveConflict(Val, Val, Ac, Bc) :- % este predicado toma las metas y con eso llama a equalArgValues
-    member(d_rule(HeadA, _), Ac),
-    posibleMeta(HeadA, _), !,
-    member(d_rule(HeadB, _), Bc),
-    posibleMeta(HeadB, _), !,
-    equalArgValues(HeadA, HeadB).
+% resolveConflict(Val, Val, Ac, Bc) :- % este predicado toma las metas y con eso llama a equalArgValues
+    % member(d_rule(HeadA, _), Ac),
+    % posibleMeta(HeadA, _), !,
+    % member(d_rule(HeadB, _), Bc),
+    % posibleMeta(HeadB, _), !,
+    % equalArgValues(HeadA, HeadB).
      
-equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
-    HeadA =.. [Meta | ArgAs],
-    HeadB =.. [Meta | ArgBs],
-    ArgAs @< ArgBs. % esta es la comparación de términos.
+% equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
+    % HeadA =.. [Meta | ArgAs],
+    % HeadB =.. [Meta | ArgBs],
+    % ArgAs @< ArgBs. % esta es la comparación de términos.
  
-% falta testear!!!
-equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cuál está primero en el orden de prioridad
-    % write('hola'), % Quinto año de la carrera y write 'hola' (diría el vasco :P)
-    % HeadA =.. [MetaA | ArgAs],
-    % HeadB =.. [MetaB | ArgBs],
-    posibleMeta(HeadA, ValueA),
-    posibleMeta(HeadB, ValueB),
+
+% equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cuál está primero en el orden de prioridad
+    % % write('hola'), % Quinto año de la carrera y write 'hola' (diría el vasco :P)
+    % % HeadA =.. [MetaA | ArgAs],
+    % % HeadB =.. [MetaB | ArgBs],
+    % posibleMeta(HeadA, ValueA),
+    % posibleMeta(HeadB, ValueB),
     
-    ValueA > ValueB.
+    % ValueA > ValueB.

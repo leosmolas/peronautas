@@ -73,7 +73,8 @@ precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Positi
 % Energy: energia actual.
 % Neighbors: lista con un ucsNodes por cada vecino.
 ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
-    kneighbors(Position, Neigh),
+    % kneighbors(Position, Neigh),
+    findall(Node, k(edge(Position, Node, _V)), Neigh),
     calcActions(Position, Energy, Neigh, ListOfActions),
     calcUcsNodes(Position, Path, Actions, Path_Cost, ListOfActions, Neighbors).
 
@@ -155,18 +156,22 @@ bfs([bfsNode(Node, Path, Cost) | _RestOfFrontier], _Visited, bfsNode(Node, Path,
 bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :- 
     % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, RestOfFrontier),
     %(bagof(Child, moves(Next_record, Open, Closed, Child), Children);Children = []),
-	kneighbors(Node, Neighbors),
+	% kneighbors(Node, Neighbors),
+    findall(Node1, k(edge(Node, Node1, _V)), Neighbors),
 	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
     bfs(NewFrontier, NewVisited, Result).
 
 filter(Nodes, Frontier, Visited, FilteredNodes) :-
-	findall(Node, (
-		member(Node, Nodes), 
-		not(member(bfsNode(Node, _P, _C), Frontier)), 
-		not(member(bfsNode(Node, _P2, _C2), Visited))),
-	FilteredNodes).
+	findall(
+        Node, 
+        (
+            member(Node, Nodes), 
+            not(member(bfsNode(Node, _P, _C), Frontier)), 
+            not(member(bfsNode(Node, _P2, _C2), Visited))
+        ),
+        FilteredNodes).
 	
 /*	
 moves(State_record, Open, Closed, Child_record) :-
@@ -196,19 +201,19 @@ append_queue(First, Second, Concatenation) :-
 add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
 
-isGoal(_Node, Cost) :- Cost < 3.
+% isGoal(_Node, Cost) :- Cost < 3.
 	
 testBfs(R) :-
 	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
 	
 % lastKnownPosition(-Step, +Agent, -Position)
 lastKnownPosition(Step, Agent, Position) :-
-	currentStep(currentStep),
-	lastKnownPosition(currentStep, Step, Agent, Position).
+	currentStep(CurrentStep),
+	lastKnownPosition(CurrentStep, Step, Agent, Position).
 
 % Condicion de corte, exito.
 lastKnownPosition(Step, Step, Agent, Position) :-
-	k(agent(Step, Agent, Position)).
+	position(Step, Agent, Position), !.
 
 % Condicion de corte, sin exito.
 lastKnownPosition(0, 0, _Agent, unknown).

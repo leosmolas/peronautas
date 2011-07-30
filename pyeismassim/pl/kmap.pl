@@ -7,18 +7,18 @@
 
 k(nodeTeam(0, vertex0,  peronismo)). 
 k(nodeTeam(0, vertex1,  none)). 
-k(nodeTeam(0, vertex3,  cacoteam)). 
-k(nodeTeam(0, vertex4,  none)). 
-k(nodeTeam(0, vertex8,  peronismo)). 
-k(nodeTeam(0, vertex10, none)). 
-k(nodeTeam(0, vertex12, none)). 
-k(nodeTeam(0, vertex9,  none)).
-k(nodeTeam(0, vertex11, none)).
-k(nodeTeam(0, vertex7,  peronismo)).
-k(nodeTeam(0, vertex2,  none)).
-k(nodeTeam(0, vertex6,  cacoteam)).
-k(nodeTeam(0, vertex5,  none)).
-k(nodeTeam(0, vertex13, peronismo)).
+k(nodeTeam(0, vertex3,  peronismo)). 
+k(nodeTeam(0, vertex4,  peronismo)). 
+k(nodeTeam(0, vertex8,  cacoteam)). 
+k(nodeTeam(0, vertex10, peronismo)). 
+k(nodeTeam(0, vertex12, peronismo)). 
+k(nodeTeam(0, vertex9,  peronismo)).
+k(nodeTeam(0, vertex11, peronismo)).
+k(nodeTeam(0, vertex7,  cacoteam)).
+k(nodeTeam(0, vertex2,  cacoteam)).
+k(nodeTeam(0, vertex6,  peronismo)).
+k(nodeTeam(0, vertex5,  cacoteam)).
+k(nodeTeam(0, vertex13, none)).
 
 k(nodeValue(vertex0,  10)). 
 k(nodeValue(vertex1,   5)). 

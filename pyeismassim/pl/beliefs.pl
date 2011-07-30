@@ -2,19 +2,22 @@
 
 % estoyEnLaFrontera
 
-:- [utils], [kmap], [graph/map], [graph/nodes], [graph/edges], [graph/agents], [delp/arg].
+:- [utils], [kmap], [graph/map], [delp/arg].
 :- dynamic b/1.
 
 % Expansion
 
 setEstoyEnLaFrontera :-
     myName(A),
-	currentStep(CurrentStep),
-    lastKnownPosition(CurrentStep, A, X),
-    my_team(T),	
+    % writeln('1'),nl,
+    lastKnownPosition(_Step, A, X),
+    myTeam(T),	
+    % writeln('2'),nl,
     k(nodeTeam(_S2, X, T)),
-    findall(Neigh, k(edge(X, Neigh, _V), Neighbors),
+    findall(Neigh, k(edge(X, Neigh, _V)), Neighbors),
+    % writeln('3'),nl,
     chequearFrontera(Neighbors, T),
+    % writeln('4'),nl,
     assert(b(estoyEnLaFrontera)).
 
 chequearFrontera(Neigh, T) :-
@@ -30,14 +33,14 @@ setPosibleExpansion :-
     myName(A),
 	currentStep(CurrentStep),
     position(CurrentStep, A, X),
-    my_team(T),	
+    myTeam(T),	
     k(nodeTeam(_S2, X, T)),
     foreach((k(edge(X, Neigh, _)), k(nodeTeam(CurrentStep, Neigh, none))), assert(b(posibleExpansion(Neigh)))).
     
 setDifPuntos :-
     myName(A),
     % kposition(A, X),
-    my_team(T),
+    myTeam(T),
     teamPoints(T, ActualPoints),
     foreach(
         b(posibleExpansion(Node)),
@@ -53,25 +56,26 @@ setDifPuntos :-
             retractall(hposition(_, _))
         )
     ),
-	foreach(
-        b(posibleProbear(Node)),
-        (
-            assertHMap,
-            moveAgent(A, Node),
-            coloringAlgorithm,
-            teamHPoints(T, Points),
-            DifPuntos is Points - ActualPoints,
-            assert(b(difPuntosZona(Node, DifPuntos)) <- true),
-            retractall(hnode(_, _, _)),
-            retractall(hedge(_, _, _)),
-            retractall(hposition(_, _))
-        )
+	% foreach(
+        % b(posibleProbear(Node)),
+        % (
+            % assertHMap,
+            % moveAgent(A, Node),
+            % coloringAlgorithm,
+            % teamHPoints(T, Points),
+            % DifPuntos is Points - ActualPoints,
+            % assert(b(difPuntosZona(Node, DifPuntos)) <- true),
+            % retractall(hnode(_, _, _)),
+            % retractall(hedge(_, _, _)),
+            % retractall(hposition(_, _))
+        % )
     ).
     
 test :-
     setEstoyEnLaFrontera,
     setPosibleExpansion,
-    setDifPuntos.
+    % setDifPuntos.
+    setPosibleAumento.
    
 % Probear
 
@@ -91,7 +95,15 @@ setInZone :-
 setPosibleAumento :-
 	myTeam(MyTeam),
 	currentStep(Step),
-	assert(isGoal(_Node, Cost):- Cost < 3),
-	findall(Node, (k(nodeTeam(Step, Node, MyTeam)), kneighbors(Node, Neighbors), chequearFrontera(Neighbors, MyTeam)), FrontierNodes),
-	foreach((member(Node, FrontierNodes), bfs(Node, [Node], [Node], [First | Path], 0, _Cost)), assert(b(posibleAumento(First)))),
-	retract(isGoal(_Node, Cost):- Cost < 3).
+	assert((isGoal(_Node, Cost) :- !, Cost < 3)),
+	findall(
+        Node, 
+        (
+            k(nodeTeam(Step, Node, MyTeam)), 
+            % kneighbors(Node, Neighbors), 
+            findall(Node2, k(edge(Node, Node2, _V)), Neighbors),
+            chequearFrontera(Neighbors, MyTeam)
+        ), 
+        FrontierNodes),
+	foreach((member(Node, FrontierNodes), bfs(Node, [Node], [Node], [First | _Path], 0, _Cost)), assert(b(posibleAumento(First)))),
+	retract(isGoal(_Node2, Cost):- !, Cost < 3).
