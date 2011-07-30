@@ -140,38 +140,38 @@ k(edge(vertex9, vertex0, 4)).
 k(edge(vertex12, vertex13, 2)).
 
 
-%h(edge(vertex5,  vertex8,  4)). 
-%h(edge(vertex8,  vertex7,  1)). 
-%h(edge(vertex2,  vertex5,  9)). 
-%h(edge(vertex2,  vertex8,  9)). 
-%h(edge(vertex5,  vertex7,  9)). 
-%h(edge(vertex2,  vertex7,  6)). 
-%
-%h(edge(vertex6,  vertex10, 4)).
-%h(edge(vertex3,  vertex6,  1)).
-%h(edge(vertex4,  vertex10, 9)).
-%h(edge(vertex6,  vertex4,  9)).
-%h(edge(vertex3,  vertex10, 9)).
-%h(edge(vertex3,  vertex4,  6)).
-%
-%h(edge(vertex5,  vertex1,  9)). 
-%h(edge(vertex5,  vertex0,  5)). 
-%h(edge(vertex0,  vertex7,  2)). 
-%h(edge(vertex1,  vertex0,  7)). 
-%h(edge(vertex1,  vertex13, 6)). 
-%h(edge(vertex13, vertex0,  6)). 
-%
-%h(edge(vertex10, vertex11, 9)).
-%h(edge(vertex9,  vertex10, 5)).
-%h(edge(vertex3,  vertex9,  2)).
-%h(edge(vertex9,  vertex11, 7)).
-%h(edge(vertex12, vertex11, 6)).
-%h(edge(vertex9,  vertex12, 6)).
-%
-%h(edge(vertex8,  vertex6,  8)).
-%h(edge(vertex7,  vertex3,  1)).
-%h(edge(vertex0,  vertex9,  4)).
-%h(edge(vertex13, vertex12, 2)).
+% h(edge(vertex5,  vertex8,  4)). 
+% h(edge(vertex8,  vertex7,  1)). 
+% h(edge(vertex2,  vertex5,  9)). 
+% h(edge(vertex2,  vertex8,  9)). 
+% h(edge(vertex5,  vertex7,  9)). 
+% h(edge(vertex2,  vertex7,  6)). 
+
+% h(edge(vertex6,  vertex10, 4)).
+% h(edge(vertex3,  vertex6,  1)).
+% h(edge(vertex4,  vertex10, 9)).
+% h(edge(vertex6,  vertex4,  9)).
+% h(edge(vertex3,  vertex10, 9)).
+% h(edge(vertex3,  vertex4,  6)).
+
+% h(edge(vertex5,  vertex1,  9)). 
+% h(edge(vertex5,  vertex0,  5)). 
+% h(edge(vertex0,  vertex7,  2)). 
+% h(edge(vertex1,  vertex0,  7)). 
+% h(edge(vertex1,  vertex13, 6)). 
+% h(edge(vertex13, vertex0,  6)). 
+
+% h(edge(vertex10, vertex11, 9)).
+% h(edge(vertex9,  vertex10, 5)).
+% h(edge(vertex3,  vertex9,  2)).
+% h(edge(vertex9,  vertex11, 7)).
+% h(edge(vertex12, vertex11, 6)).
+% h(edge(vertex9,  vertex12, 6)).
+
+% h(edge(vertex8,  vertex6,  8)).
+% h(edge(vertex7,  vertex3,  1)).
+% h(edge(vertex0,  vertex9,  4)).
+% h(edge(vertex13, vertex12, 2)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

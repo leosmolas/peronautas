@@ -282,15 +282,15 @@ visualRange(Step, Agent, VisualRange) :-
 
 
 % Intenciones posibles: explore, recharge
-intention(explore).
+% intention(explore).
 
-%argumentation :- 
+% argumentation :- 
 %    intention(recharge),
 %    max_energy(X),
 %    energy(X),
 %    retract( intention(recharge) ),
 %    assert(  intention(explore)  ).
-%argumentation :- 
+% argumentation :- 
 %    last_action_result(failed),
 %    retract( intention(_)        ),
 %    assert(  intention(recharge) ).
@@ -303,12 +303,12 @@ intention(explore).
 
 
 
-%planning :- 
+% planning :- 
 %    intention(explore),
 %    searchNeigh(N),
 %    retract( plan(_)         ),
 %    assert(  plan([goto(N)]) ).
-%planning :- 
+% planning :- 
 %    intention(recharge),
 %    retract( plan(_)          ),
 %    assert(  plan([recharge]) ).

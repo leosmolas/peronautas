@@ -1,4 +1,4 @@
-:- ['pl/graph/edges.pl', 
+﻿:- ['pl/graph/edges.pl', 
      'pl/graph/nodes.pl', 
      'pl/graph/agents.pl'
     % 'pl/kmap.pl'
@@ -106,6 +106,7 @@ teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :-
 
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
 % returns in Count the number of times that Team appears in the List, and in CountOtherTeam the number of times the other team appears.
+
 appears(_, [], 0, 0).
 appears(Head, [Head|Tail], CountTeam, CountOtherTeam) :- 
     appears(Head, Tail, Aux, CountOtherTeam), 
@@ -116,16 +117,16 @@ appears(Element, [_ | Tail], CountTeam, CountOtherTeam) :-
     CountOtherTeam is Aux + 1.
 
 
-
 % checkMajyorityInNode(+Node, +Team)
 % checks if the number of agents of team Team are majority in node Node.
-%checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
+
+% checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
 %                                    appears(Team, Teams, TeamInNode), 
 %                                    length(Teams, TeamsInNode), 
 %                                    Majority is floor(TeamsInNode / 2), 
 %                                    TeamInNode > Majority,
 %                                    setOwner([Node], Team).
-%checkMajorityInNode(_, _).
+% checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
     listOfTeams([Team1 | [Team2 | []]]),
@@ -291,32 +292,47 @@ visibleNode(N) :-
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
-% y como b(visibleNode(Node)) a los nodos a los que marque como explorados ESTE TURNO.
+% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
 coloringAlgorithm :- 
     setHypotheticalPositions,
     printAgentPositions,
     myName(Name),
     currentStep(Step),
-    % myTeam(T),
-    % write(T),nl,
     position(Step, Name, CurrentPosition),
-    assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
+    
+    myTeam(MyTeam),
     foreach(
-            bfs([bfsNode(CurrentPosition, [CurrentPosition], 0)], [], bfsNode(Node, _, _)),
-            (
-                write(' Marking node as explored: '),write(Node),nl,
-                retractall(notExplored(Node)),
-                assertOnce(explored(Node)),
-                retract(notVisible(Node)),
-                asserta(visibleNode(Node))
-            )
+                (
+                    team(Step, Agent, MyTeam),
+                    visualRange(Step, Agent, Range),
+                    Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañerp es un dato que se debería tener
+                ),
+                (
+                    position(Step, Agent, Position),
+                    
+                    assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+                    nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
+                    % trace,
+                    foreach(
+                                breadthFirst(Position, Node, _Path, _Cost),
+                                (
+                                    write(' Marking node as explored: '),write(Node),nl,
+                                    retractall(notExplored(Node)),
+                                    assertOnce(explored(Node)),
+                                    retract(notVisible(Node)),
+                                    asserta(visibleNode(Node))
+                                )
+                            ),
+                    % notrace,
+                    retractall(isGoal(_, _))
+                )
            ),
     write(' k(nodeTeam):'), nl,
     foreach(
             k(nodeTeam(Step, Node5, Team5)),
             (write(Node5), write(' : '), write(Team5), nl)
            ),
-    printHNodeTeams('Before  cleanColors'),
+    printHNodeTeams('Before cleanColors'),
     cleanColors,
     printHNodeTeams('After cleanColors'),
     step1,
@@ -326,11 +342,11 @@ coloringAlgorithm :-
     step3,
     printHNodeTeams('After step 3'),
     foreach(
-            visibleNode(N),
-            (
-                retract(visibleNode(N)),
-                assert(notVisible(N))
-            )
+                visibleNode(N),
+                (
+                    retract(visibleNode(N)),
+                    assert(notVisible(N))
+                )
            ),
     printHNodeTeams('After toggling visible nodes').
 
