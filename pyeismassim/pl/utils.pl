@@ -149,6 +149,11 @@ testBfs(P, C):-
 	
 % path([], _).
 
+% breadthFirst(+InitialNode, -FinalNode, -Path, -Cost)
+% wrapper para usar el bfs
+breadthFirst(InitialNode, FinalNode, Path, Cost) :-
+    bfs([bfsNode(InitialNode, [InitialNode], 0)], [InitialNode], bfsNode(FinalNode, Path, Cost)).
+
 bfs([bfsNode(Node, Path, Cost) | _RestOfFrontier], _Visited, bfsNode(Node, Path, Cost)) :- 
     % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, _RestOfFrontier),
     isGoal(Node, Cost).
