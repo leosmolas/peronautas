@@ -1,23 +1,100 @@
-step(Action) :-
-    handle_messages,
-    handle_percepts,
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               Sentinel                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Actions (priority order):
+%                   -survey
+%                   -goto
+%                   -parry  (no implemented)
+%                   -buy    (no implemented)
+%                   -rechage
+%                   -skip   (no implemented)
+
+exec(Action) :- 
+    write(1),nl,
     action(Action).
 
-action(recharge) :-
-    % Plan: recharge.
-    % get energy level.
-    % if at full charge, stop recharging
-    % if energy < maxenergy / 3, recharge
-    true.
+%-----------------------------------------------------------------------%
 
-action(buy(battery)) :-
-    % Plan: buy battery.
-    % get money
-    % if money < 10, we do not have enough money
-    % otherwise but battery
-    true.
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
+    !.
 
-action(survey) :-
+reachableNode(Node, [[Node, Cost] | _T]) :-
+    Cost \= unknown,
+    myName(Name),
+    currentStep(Step),
+    energy(Step, Name, Energy),
+    Energy >= Cost,
+    !.
+
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
+    
+%------------------------------  Survey  --------------------------------%
+
+action([survey, Position]) :-
+    currentStep(Step),
+    write(3),nl,
+    myName(Name),
+    write(3.1),nl,
+    energy(Step, Name, Energy),
+    write(3.2),nl,
+    Energy > 0,
+    write(3.3),nl,
+    position(Step, Name, Position),
+    write(3.4),nl,
+    hasAtLeastOneUnsurveyedEdge(Position), 
+    write(3.5),nl,
+    !.
+
+%-------------------------------  Goto  ---------------------------------%
+
+%-- First Node Goto --%
+
+action([goto, X]) :-
+    currentStep(Step),
+    write(5),nl,
+    myName(Name),
+    write(5.1),nl,
+    position(Step, Name, Position),
+    write(5.2),nl,
+    energy(Step, Name, Energy),
+    write(5.3),nl,
+    k(edge(Position, X, Cost)),
+    Cost \= unknown,
+    write(5.4),nl,
+    Energy >= Cost, 
+    write(5.5),nl,
+    !.
+
+%-------------------------------  Recharge  ------------------------------%
+    
+action([recharge]) :-
+    write(6),nl.
+
+%-------------------------------  Old Code  ------------------------------%
+
+% step(Action) :-
+%    handle_messages,
+%    handle_percepts,
+%    action(Action).
+
+% action(recharge) :-
+%    % Plan: recharge.
+%    % get energy level.
+%    % if at full charge, stop recharging
+%    % if energy < maxenergy / 3, recharge
+%    true.
+
+% action(buy(battery)) :-
+%    % Plan: buy battery.
+%    % get money
+%    % if money < 10, we do not have enough money
+%    % otherwise but battery
+%    true.
+
+% action(survey) :-
     %   println("I know " + getAllBeliefs("visibleEdge").size() + " visible edges");
     %   println("I know " + getAllBeliefs("surveyedEdge").size() + " surveyed edges");
     %
@@ -69,10 +146,10 @@ action(survey) :-
     %   return null;
         
 
-action(goto(Vertex)) :-
+% action(goto(Vertex)) :-
     % Random walking
     % select neighbouring vertex
-    Vertex = something.
+%    Vertex = something.
 
-action(skip).
+% action(skip).
 

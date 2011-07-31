@@ -1,90 +1,122 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               Explorer                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%------------------------------------------------------------------------------%
+%Actions (priority order):
+%                   -prove
+%                   -survey
+%                   -goto
+%                   -buy    (no implemented)
+%                   -rechage
+%                   -skip   (no implemented)
+
+%----------------------------------------------------------------------%
+
 exec(Action) :- 
     write(1),nl,
     action(Action).
 
-%------------------------------------------------------------------------------%
-reachable_node(_Node, []) :-
-    fail.
-reachable_node(Node, [[Node, unknown] | T]) :-
-    reachable_node(_, T).
-reachable_node(Node, [[Node, Cost] | _T]) :-
+%----------------------------------------------------------------------%
+
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
+    !.
+
+reachableNode(Node, [[Node, Cost] | _T]) :-
     Cost \= unknown,
-    energy(X),
-    X >= Cost.
-reachable_node(_, [_ | T]) :-
-    reachable_node(_, T).
+    myName(Name),
+    currentStep(Step),
+    energy(Step, Name, Energy),
+    Energy >= Cost,
+    !.
 
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
 
+%------------------------------  Probe  --------------------------------%
 
-%------------------------------------------------------------------------------%
-% si tenemos suficiente energia y no conocemos el valor del nodo, hacemos probe
+% si tenemos suficiente energia y 
+% no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
-    write(2),nl,
-    energy(X),
-    write(2.1),write(' energy: '),write(X),nl,
-    X > 0,
-    write(2.2),nl,
-    my_name(Name),
+    currentStep(Step),
+    myName(Name),
+    write(2),write(' name: '),write(Name),nl,
+    energy(Step, Name, Energy),
+    write(2.1),write(' energy: '),write(Energy),nl,
+    Energy > 0,
     write(2.3),write(' name: '),write(Name),nl,
-    kposition(Name, Position),
+    position(Step, Name, Position),
     write(2.4),write(' position: '),write(Position),nl,
-    knode(Position, unknown, _), 
+    k(nodeValue(Position, unknown)), 
     write(2.5),nl,
     !.
 
-%------------------------------------------------------------------------------%
+%------------------------------  Survey  --------------------------------%
+
 action([survey, Position]) :-
+    currentStep(Step),
     write(3),nl,
-    energy(X),
+    myName(Name),
     write(3.1),nl,
-    X > 0,
+    energy(Step, Name, Energy),
     write(3.2),nl,
-    my_name(Name),
+    Energy > 0,
     write(3.3),nl,
-    kposition(Name, Position),
+    position(Step, Name, Position),
     write(3.4),nl,
-    is_not_surveyed(Position), 
+    hasAtLeastOneUnsurveyedEdge(Position), 
     write(3.5),nl,
     !.
 
-%------------------------------------------------------------------------------%
+%-------------------------------  Goto  ---------------------------------%
+
+%-- First Node Reachable Goto --%
+
 action([goto, X]) :-
+    currentStep(Step),
     write(4),nl,
-    my_name(Name),
+    myName(Name),
     write(4.1),nl,
-    kposition(Name, Position),
+    position(Step, Name, Position),
     write(4.2),nl,
+    k(nodeValue(Name, Cost)),
+    write(4.3),nl,
+    energy(Step, Name, Energy),
+    write(4.5),nl,
+    Energy >= Cost,
     findall(
         [Node, Cost], 
         (
-            kedge(Position, Node, Cost), 
-            knode(Node, unknown, _)
+            k(edge(Position, Node, Cost)), 
+            k(nodeValue(Node, unknown))
         ), 
         L),
-    write(4.3),nl,
-    reachable_node(X, L), 
     write(4.4),nl,
+    write(4.6),nl,
+    reachableNode(X, L), 
+    write(4.7),nl,
     !.
      
-%------------------------------------------------------------------------------%
+%-- First Node Goto --%
+
 action([goto, X]) :-
+    currentStep(Step),
     write(5),nl,
-    my_name(Name),
+    myName(Name),
     write(5.1),nl,
-    kposition(Name, Position),
+    position(Step, Name, Position),
     write(5.2),nl,
-    energy(E),
+    energy(Step, Name, Energy),
     write(5.3),nl,
-    kedge(Position, X, Cost),
+    k(edge(Position, X, Cost)),
     Cost \= unknown,
     write(5.4),nl,
-    E >= Cost, 
+    Energy >= Cost, 
     write(5.5),nl,
     !.
 
-%------------------------------------------------------------------------------%
+%-------------------------------  Recharge  ------------------------------%
+
 action([recharge]) :-
     write(6),nl.
 

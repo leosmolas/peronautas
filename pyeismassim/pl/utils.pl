@@ -1,4 +1,4 @@
-:- [graph/map], [kmap].
+:- [graph/map].
 :- dynamic isGoal/1.
 
 % ucs(-Frontier, -Visited, +Path, +Actions, +Path_Cost)
@@ -73,7 +73,6 @@ precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Positi
 % Energy: energia actual.
 % Neighbors: lista con un ucsNodes por cada vecino.
 ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
-    % kneighbors(Position, Neigh),
     findall(Node, k(edge(Position, Node, _V)), Neigh),
     calcActions(Position, Energy, Neigh, ListOfActions),
     calcUcsNodes(Position, Path, Actions, Path_Cost, ListOfActions, Neighbors).
@@ -127,10 +126,6 @@ calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEner
     NewEnergy is Energy + RechargeEnergy,
     calcRecharge(NewEnergy, Value, [recharge | OldList], NewList, NewTurns, NewTurns2, RemainingEnergy).
 
-rechargeEnergy(2).
-maxEnergy(10).
-isGoal(vertex9).
-
 testUcs(P, A, C) :-
 	ucs([ucsNode(vertex11, 5, [], [], 0)], [], P, A, C).
 	
@@ -161,8 +156,9 @@ bfs([bfsNode(Node, Path, Cost) | _RestOfFrontier], _Visited, bfsNode(Node, Path,
 bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :- 
     % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, RestOfFrontier),
     %(bagof(Child, moves(Next_record, Open, Closed, Child), Children);Children = []),
-	% kneighbors(Node, Neighbors),
-    findall(Node1, k(edge(Node, Node1, _V)), Neighbors),
+    findall(Neighbor,
+            k(edge(Node, Neighbor, _)),
+            Neighbors),
 	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
@@ -206,13 +202,14 @@ append_queue(First, Second, Concatenation) :-
 add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
 
-% isGoal(_Node, Cost) :- Cost < 3.
-	
+
 testBfs(R) :-
+    assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
 	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
 	
 % lastKnownPosition(-Step, +Agent, -Position)
 lastKnownPosition(Step, Agent, Position) :-
+
 	currentStep(CurrentStep),
 	lastKnownPosition(CurrentStep, Step, Agent, Position).
 

@@ -1,27 +1,5 @@
-:- dynamic hposition/2.
+﻿:- dynamic hposition/2.
 :- dynamic energy/2.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                Operations                                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% moveAgent(+Agent, +Node).
-% Moves the agent from his current position to Node.
-moveAgent(Agent, Node) :- hnode(Node, _, _), retract(hposition(Agent, _OldNode)), assertz(hposition(Agent, Node)), !.
-
-
-% travel(+Agent, +Node).
-% Moves the agent from ActualNode to Node.  There must be and edge between these two nodes and the agent must have the necessary energy to travel.
-travel(Agent, Node) :-  energy(Agent, Energy),                        
-                        hposition(Agent, ActualNode),
-                        hedge(ActualNode, Node, Cost),
-                        NewEnergy is Energy - Cost, 
-                        NewEnergy >= 0,
-                        retract(hposition(Agent, ActualNode)), 
-                        assertz(hposition(Agent, Node)), 
-                        setEnergy(Agent, NewEnergy), !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,11 +7,19 @@ travel(Agent, Node) :-  energy(Agent, Energy),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
 % otherTeam(+Team, -OtherTeam).
 % returns in OtherTeam the name of the other Team.
-otherTeam(Team, OtherTeam) :- teams(OtherTeam), OtherTeam \= Team, !.
+otherTeam(Team, OtherTeam) :- 
+    teams(OtherTeam), 
+    OtherTeam \= Team, 
+    !.
 
-listOfTeams(Teams) :- findall(Team, team(Team), Teams).
+
+listOfTeams(Teams) :- 
+    findall(Team, team(Team), Teams).
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                              Representation                                 %
@@ -41,8 +27,10 @@ listOfTeams(Teams) :- findall(Team, team(Team), Teams).
 
 
 % teams(-ListofTeams).
-team(peronismo).
-team(cacoteam).
+% team(peronismo).
+% team(cacoteam).
+
+
 
 % team(+Name, +ListofAgents).
 % team(peronismo, [peron, evita, menem, cafiero]).
@@ -51,15 +39,15 @@ team(cacoteam).
 
 % teamOfAgent(?Agent, ?Team)
 % Team of an Agent.
-teamOfAgent(peron, peronismo).
-teamOfAgent(evita, peronismo).
-teamOfAgent(cafiero, peronismo).
-teamOfAgent(menem, peronismo).
+% teamOfAgent(peron,   peronismo).
+% teamOfAgent(evita,   peronismo).
+% teamOfAgent(cafiero, peronismo).
+% teamOfAgent(menem,   peronismo).
+% teamOfAgent(iorio,   cacoteam).
+% teamOfAgent(delia,   cacoteam).
+% teamOfAgent(moyano,  cacoteam).
+% teamOfAgent(castels, cacoteam).
 
-teamOfAgent(iorio, cacoteam).
-teamOfAgent(delia, cacoteam).
-teamOfAgent(moyano, cacoteam).
-teamOfAgent(castels, cacoteam).
 
 
 % hposition(?Agent, ?Node).

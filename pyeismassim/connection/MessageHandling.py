@@ -2,6 +2,7 @@
 
 from BeautifulSoup import BeautifulStoneSoup
 from string import replace, lower
+import pprint
 
 # Author: Iñaki Garay
 #
@@ -165,19 +166,26 @@ def parse_request_action(xml, output = 'dict'):
             'money'               : team_tag['money']            ,
             'score'               : team_tag['score']            
             }
-        result_public = {
-            'position'            : self_tag['position']
+        result_public = { 
+            'position'  : [{ 
+                u'name'     : u'self'             , 
+                u'node'     : self_tag['position'],
+                'vis_range' : self_tag['visrange']
+                }],
+            
             }
 
         if (achievements_tag != None):
             # This check is done because if the xml has no visible vertices tag, it will be None.
             achievements_list = []
             for i in range(len(achievements_tag.contents)):
-                if (achievements_tag.contents[i].__class__.__name__ == "Tag"): #Leo: @Iñaki: podés hacer en vez de esto isinstance(achievements_tag.contents[i], Tag)
+                if (achievements_tag.contents[i].__class__.__name__ == "Tag"):
                     # This check is done because the contents of the tag will be a list of objects which may be of class Tag or class NavigableString.
                     # In the latter case, it is most probably a space or junk and will not be indexable with strings.
                     achievements_list.append(achievements_tag.contents[i]['name'])
             result_private['achievements'] = achievements_list
+        else:
+            result_private['achievements'] = []
         
         if (vis_verts_tag != None):
             vis_verts_list = []
@@ -187,6 +195,8 @@ def parse_request_action(xml, output = 'dict'):
                         'name' : vis_verts_tag.contents[i]['name']         ,
                         'team' : vis_verts_tag.contents[i]['team'].lower() })
             result_public['vis_verts'] = vis_verts_list
+        else:
+            result_public['vis_verts'] = []
 
         if (vis_edges_tag != None):
             vis_edges_list = []
@@ -196,16 +206,21 @@ def parse_request_action(xml, output = 'dict'):
                         'node1' : vis_edges_tag.contents[i]['node1'] ,
                         'node2' : vis_edges_tag.contents[i]['node2'] })
             result_public['vis_edges'] = vis_edges_list
+        else:
+            result_public['vis_edges'] = []
 
         if (vis_ents_tag != None):
             vis_ents_list = []
             for i in range(len(vis_ents_tag.contents)):
                 if (vis_ents_tag.contents[i].__class__.__name__ == "Tag"):
                     vis_ents_list.append({ 
-                        'name' : vis_ents_tag.contents[i]['name']         ,
-                        'node' : vis_ents_tag.contents[i]['node']         ,
-                        'team' : vis_ents_tag.contents[i]['team'].lower() })
+                        'name'   : vis_ents_tag.contents[i]['name']        ,
+                        'node'   : vis_ents_tag.contents[i]['node']        ,
+                        'team'   : vis_ents_tag.contents[i]['team'].lower(),
+                        'status' : vis_ents_tag.contents[i]['status']      }) # normal | disabled
             result_public['vis_ents'] = vis_ents_list
+        else:
+            result_public['vis_ents'] = []
 
         if (probed_verts_tag != None):
             probed_verts_list = []
@@ -215,6 +230,8 @@ def parse_request_action(xml, output = 'dict'):
                         'name'  : probed_verts_tag.contents[i]['name']  ,
                         'value' : probed_verts_tag.contents[i]['value'] })
             result_public['probed_verts'] = probed_verts_list
+        else:
+            result_public['probed_verts'] = []
 
         if (surveyed_edges_tag != None):
             surveyed_edges_list = []
@@ -225,6 +242,8 @@ def parse_request_action(xml, output = 'dict'):
                         'node2'  : surveyed_edges_tag.contents[i]['node2']  ,
                         'weight' : surveyed_edges_tag.contents[i]['weight'] })
             result_public['surveyed_edges'] = surveyed_edges_list
+        else:
+            result_public['surveyed_edges'] = []
 
         if (inspected_ents_tag != None):
             inspected_ents_list = []
@@ -233,16 +252,19 @@ def parse_request_action(xml, output = 'dict'):
                     inspected_ents_list.append({ 
                         'energy'     : inspected_ents_tag.contents[i]['energy']       ,
                         'health'     : inspected_ents_tag.contents[i]['health']       ,
-                        'max_energy' : inspected_ents_tag.contents[i]['max_energy']   ,
-                        'max_health' : inspected_ents_tag.contents[i]['max_health']   ,
+                        'max_energy' : inspected_ents_tag.contents[i]['maxenergy']   ,
+                        'max_health' : inspected_ents_tag.contents[i]['maxhealth']   ,
                         'name'       : inspected_ents_tag.contents[i]['name']         ,
                         'node'       : inspected_ents_tag.contents[i]['node']         ,
                         'role'       : inspected_ents_tag.contents[i]['role']         ,
                         'strength'   : inspected_ents_tag.contents[i]['strength']     ,
                         'team'       : inspected_ents_tag.contents[i]['team'].lower() ,
-                        'vis_range'  : inspected_ents_tag.contents[i]['vis_range']    })
+                        'vis_range'  : inspected_ents_tag.contents[i]['visrange']    })
             result_public['inspected_ents'] = inspected_ents_list
+        else:
+            result_public['inspected_ents'] = []
             
+    # Cruft.
     elif (output == "prolog"):
         result_private = [
             'type(request_action)'                                    ,
@@ -258,14 +280,15 @@ def parse_request_action(xml, output = 'dict'):
             'max_energy_disabled(%s)' % self_tag['maxenergydisabled'] ,
             'max_health(%s)'          % self_tag['maxhealth']         ,
             'strength(%s)'            % self_tag['strength']          ,
-            'vis_range(%s)'           % self_tag['visrange']          ,
+            
             'zone_score(%s)'          % self_tag['zonescore']         ,
             'last_step_score(%s)'     % team_tag['laststepscore']     ,
             'money(%s)'               % team_tag['money']             ,
             'score(%s)'               % team_tag['score']             
             ]
         result_public = [
-            'position(%s)'            % self_tag['position']
+            'position(%s)'            % self_tag['position'],
+            'vis_range(%s)'           % self_tag['visrange']
             ]
 
         if (achievements_tag != None):
@@ -326,14 +349,14 @@ def parse_request_action(xml, output = 'dict'):
                 if (inspected_ents_tag.contents[i].__class__.__name__ == "Tag"):
                     inspected_ents_list.append('inspected_ent(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)' % (inspected_ents_tag.contents[i]['energy'], 
                                                                                                  inspected_ents_tag.contents[i]['health'], 
-                                                                                                 inspected_ents_tag.contents[i]['max_energy'], 
-                                                                                                 inspected_ents_tag.contents[i]['max_health'], 
+                                                                                                 inspected_ents_tag.contents[i]['maxenergy'], 
+                                                                                                 inspected_ents_tag.contents[i]['maxhealth'], 
                                                                                                  inspected_ents_tag.contents[i]['name'], 
                                                                                                  inspected_ents_tag.contents[i]['node'], 
                                                                                                  inspected_ents_tag.contents[i]['role'], 
                                                                                                  inspected_ents_tag.contents[i]['strength'], 
                                                                                                  inspected_ents_tag.contents[i]['team'].lower(), 
-                                                                                                 inspected_ents_tag.contents[i]['vis_range']))
+                                                                                                 inspected_ents_tag.contents[i]['visrange']))
             result_public += inspected_ents_list
     else:
         raise Exception
@@ -382,37 +405,9 @@ def print_message(result, input = 'dict'):
     """
     Use this function to pretty-print a parsed message.
     """
-
     if (input == 'dict'):
-        # This is a list comprehension; the part inside max() creates a list with the len function applied to every element in result.keys()
-        max_key_length = max([len(k) for k in result.keys()])
-        for key, value in sorted(result.iteritems()):
-            # For every key,value pair in the dictionary:
-            print "   ", key.ljust(max_key_length), ":",
-            # If the value is a list with more than one element, it is most likely a list of dicts, and they all have the same set of keys. 
-            # Except for the achievements, which is a list of strings. 
-            # So recover one set of keys, calculate the length for each key, and use that as the column width for that key.
-            if (value.__class__.__name__ == 'list' and (len(value) > 0)):
-                if (value[0].__class__.__name__ == 'dict'):
-                    print
-                    # Esto es como dos for anidades que recorre primero todos los valores v1 en value, 
-                    # y luego cada clave k2 dentro de cada valor v1, y para cada clave k2 calcula la longitud de la clave, 
-                    # y se queda con el maximo entre todos.
-                    # Luego hace lo mismo para los valores en los valores de value.
-                    # Esto es para que todo quede alineado bonito y para que mi OCD me deje dormir de noche.
-                    key_column_width = max( [ max([ len(k2) for k2 in v1.keys()   ]) for v1 in value] )
-                    val_column_width = max( [ max([ len(v2) for v2 in v1.values() ]) for v1 in value] )
-                    for i in value:
-                        print "       ", 
-                        for k2, v2  in i.iteritems():
-                            print k2.rjust(key_column_width), ":", v2.ljust(val_column_width), "|", 
-                        print
-                else:
-                    # It is a list of something else
-                    # TODO: pretty print list of something else
-                    print value
-            else:
-                print value
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(result)
     elif (input == 'prolog'):
         for predicate in result:
             print predicate

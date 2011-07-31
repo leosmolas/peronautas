@@ -1,4 +1,4 @@
-[X] 1 conexion 
+﻿[X] 1 conexion 
 [X] 2 integracion python prolog
 [X] 3 delirar soluciones al problema
 [X] 4 diseño arquitectonico agentes (bdi)
@@ -29,12 +29,12 @@ TAREAS INMEDIATAS:
         arc/2.
     [x] mejorar la incorporacion del conocimiento en la percepcion a la kb del agente
         pregunta: hecho unario con una lista, o conjunto de hechos individuales?
-    [ ] hacer que el arco contemple el costo (incorporacion de surveyed edges a la kb)
+    [x] hacer que el arco contemple el costo (incorporacion de surveyed edges a la kb)
     [ ] decidir como se va a guardar o generar la lista de adyacencia
         posibilidad: guardar tanto hechos separados para cada arco, como guardar el grafo como lista de adyacencia
     [ ] adaptar el codigo de dijkstra para generar los caminos mas cortos en python
     [ ] escribir la consulta para obtener desde prolog la lista de adyacencia
-    [x] TODO: abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
+    [x] abstraer el codigo en la rama del if que ejecuta cuando el tipo de mensaje es action-request, para cada rol
 
     [ ] determinar como se mapea la arquitectura propuesta del agente a llamadas, funciones, predicados, etc. (la idea basica esta en el codigo de la clase PrologAgent)
     [ ] desarrollar estrategias generales de: expansion, defensa, ataque, compra
@@ -52,6 +52,32 @@ TAREAS INMEDIATAS:
     [ ]     make the server use non.blocking sockets and timeouts
     [ ] what happens with the agent state when the configuration server has several simulations/matches ?
     [ ] go through the list of stuff that may appear in a percept and write down what we can do with each
+    [ ] true dummy agent which follows orders
+
+definir orden de las intenciones
+orden dentro de los agentes, dentro de los que tienen las mismas intenciones
+
+agarro la primer accion
+se puede ejecutar?
+si:
+    soy yo? si -> la hago
+        no soy yo -> la ejecuto hipoteticamente
+        hay un conflicto y soy yo?
+            no -> salteo
+            si -> pensar una posible intencion que no sea dañina
+    [x] write configuration file for a test match
+    [x] add role parse to messagehandling
+    [x] write code to instantiate the correct type of agent according to role
+    [x] java agents to prolog
+    [x] get functional team
+    [x] whole test suit
+    [x] new server
+    [x] percept server
+    [x]     make the server accept an iterations parameter
+    [x]     make the server use a loop to receive instead of a fixed-sized buffer
+    [ ]     make the server use non.blocking sockets and timeouts
+    [ ] what happens with the agent state when the configuration server has several simulations/matches ?
+    [x] go through the list of stuff that may appear in a percept and write down what we can do with each
     [ ] true dummy agent which follows orders
 
 definir orden de las intenciones
