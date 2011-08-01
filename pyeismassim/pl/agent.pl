@@ -282,6 +282,7 @@ myVisualRange(VisualRange) :-
 
 
 
+% X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
     lastKnownInfo(team, Step, Agent, Team).
 position(Step, Agent, Position) :-
@@ -402,6 +403,20 @@ searchNeigh(N) :-
 
 
 
+%-----------------------------------------------------------------------%
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
+    !.
+reachableNode(Node, [[Node, Cost] | _T]) :-
+    Cost \= unknown,
+    myEnergy(Energy),
+    Energy >= Cost,
+    !.
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
+
+
+
 %------------------------------------------------------------------------------%
 % Succeeds when Node has not been surveyed. 
 % Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
@@ -414,6 +429,24 @@ hasAtLeastOneUnsurveyedEdge(Node1) :-
     L \= [].
 
 
+
+%------------------------------------------------------------------------------%
+%makeAdjacencyList(Graph) :-
+%    findall(
+%        Node,
+%        k(nodeValue(Node, Cost)),
+%        Nodes
+%    ),
+%    findall(
+%        edge(Node, Node2, Value),
+%        k(edge(Node1, Node2, Value)),
+%        Edges
+%    ),
+%    makeAdjacencyList(Nodes, Edges, Graph).
+%
+%makeAdjacencyList(Nodes, Edges, Graph1) :-
+%    addNodes(Nodes, Graph0),
+%    addEdges(Edges, Graph1).
 
 %------------------------------------------------------------------------------%
 redirect_output(Filename) :-
