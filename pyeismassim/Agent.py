@@ -218,14 +218,12 @@ class PrologAgent(Agent):
     def processEntities(self, msg_dict_private, msg_dict_public):
         # Proceso el resto de las entidades visibles.
         for e in msg_dict_public['vis_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (e['name'], 
-                                                                                                                  e['team'], 
-                                                                                                                  e['node'])).next()
+            self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (e['name'], e['team'], e['node'])).next()
 
         # Proceso las entidades en la percepcion compartida.
         # Si o si son de tu equipo, luego el team se fija a el propio.
         for p in msg_dict_public.get('position', []):
-            # Find the team name.
+            # Get my own team name from the list of visible entities.
             team = 'd3lp0r'
             for e in msg_dict_public['vis_ents']:
                 if (unicode(self.username) == e['name']):
@@ -250,9 +248,7 @@ class PrologAgent(Agent):
                                                                                    strength,
                                                                                    vis_range)).next()
             else:
-                self.prolog.query("updateEntity(%s,%s,%s,unknown,unknown,unknown,unknown,unknown,unknown,unknown)" % (p['name'], 
-                                                                                                                      team, 
-                                                                                                                      p['node'])).next()
+                self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (p['name'], team, p['node'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:

@@ -13,7 +13,7 @@
 %----------------------------------------------------------------------%
 
 exec(Action) :- 
-    write(1),nl,
+    listing(k),
     action(Action).
 
 %----------------------------------------------------------------------%
@@ -24,9 +24,7 @@ reachableNode(Node, [[_, unknown] | T]) :-
 
 reachableNode(Node, [[Node, Cost] | _T]) :-
     Cost \= unknown,
-    myName(Name),
-    currentStep(Step),
-    energy(Step, Name, Energy),
+    myEnergy(Energy),
     Energy >= Cost,
     !.
 
@@ -39,16 +37,15 @@ reachableNode(Node, [_ | T]) :-
 % no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
     currentStep(Step),
-    myName(Name),
-    write(2),write(' name: '),write(Name),nl,
-    energy(Step, Name, Energy),
+    write(2),nl,
+    myEnergy(Energy),
     write(2.1),write(' energy: '),write(Energy),nl,
     Energy > 0,
-    write(2.3),write(' name: '),write(Name),nl,
-    position(Step, Name, Position),
-    write(2.4),write(' position: '),write(Position),nl,
+    write(2.2),nl,
+    myPosition(Position),
+    write(2.3),write(' position: '),write(Position),nl,
     k(nodeValue(Position, unknown)), 
-    write(2.5),nl,
+    write(2.4),nl,
     !.
 
 %------------------------------  Survey  --------------------------------%
@@ -56,16 +53,14 @@ action([probe, Position]) :-
 action([survey, Position]) :-
     currentStep(Step),
     write(3),nl,
-    myName(Name),
+    myEnergy(Energy),
     write(3.1),nl,
-    energy(Step, Name, Energy),
-    write(3.2),nl,
     Energy > 0,
+    write(3.2),nl,
+    myPosition(Position),
     write(3.3),nl,
-    position(Step, Name, Position),
-    write(3.4),nl,
     hasAtLeastOneUnsurveyedEdge(Position), 
-    write(3.5),nl,
+    write(3.4),nl,
     !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -82,8 +77,9 @@ action([goto, X]) :-
     k(nodeValue(Name, Cost)),
     write(4.3),nl,
     energy(Step, Name, Energy),
-    write(4.5),nl,
+    write(4.4),nl,
     Energy >= Cost,
+    write(4.5),nl,
     findall(
         [Node, Cost], 
         (
@@ -91,7 +87,6 @@ action([goto, X]) :-
             k(nodeValue(Node, unknown))
         ), 
         L),
-    write(4.4),nl,
     write(4.6),nl,
     reachableNode(X, L), 
     write(4.7),nl,
@@ -109,10 +104,11 @@ action([goto, X]) :-
     energy(Step, Name, Energy),
     write(5.3),nl,
     k(edge(Position, X, Cost)),
-    Cost \= unknown,
     write(5.4),nl,
-    Energy >= Cost, 
+    Cost \= unknown,
     write(5.5),nl,
+    Energy >= Cost, 
+    write(5.6),nl,
     !.
 
 %-------------------------------  Recharge  ------------------------------%
