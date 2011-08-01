@@ -209,3 +209,7 @@ myTeam(peronismo).
 myName(peron).
 
 myVisionRange(3).
+
+rechargeEnergy(2).
+
+maxEnergy(10).

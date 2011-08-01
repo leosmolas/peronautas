@@ -1,24 +1,44 @@
 :- [graph/map].
+:- [kmap].
 :- dynamic isGoal/1.
+
+
+% pathSearch(-InitialNode, -FinalNode, -Energy, +Path, +Actions, +PathCost)
+% wrapper para la uniform cost search.
+% asserta isGoal y lo retracta al final.
+% instancia todos los parametros para llamar a ucs
+% ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
+pathSearch(InitialNode, FinalNode, Energy, Path, Actions, PathCost) :-
+    assert(isGoal(FinalNode)),
+    ucs([ucsNode(InitialNode, Energy, [], [], 0)], [], Energy, Path, Actions, PathCost),
+    retract(isGoal(_)).
 
 % ucs(-Frontier, -Visited, +Path, +Actions, +Path_Cost)
 % Frontier: frontera del recorrido.
 % Visited: conjunto de visitados.
 % Energy : energia actual
-% Path: camino retornado.
+% Path: camino retornado. (lo retornara al reverso)
 % Actions: lista de acciones necesarias para llegar al nodo.
 % Path_Cost: costo del camino encontrado.
-ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost) :-
-    ucsSelect(Frontier, ucsNode(Position, _Energy, Path, Actions, Path_Cost), _Frontier1),
-    isGoal(Position).
+ucs(Frontier, _Visited, MinEnergy, [Position | Path], Actions, Path_Cost) :-
+    ucsSelect(Frontier, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
+    isGoal(Position),
+    minEnergy(MinEnergy, Energy, MinEnergy2),
+    asserta(pathSearch()).
+    
 
-ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost) :-
+ucs(Frontier, Visited, MinEnergy, SolutionPath, SolutionActions, Cost) :-
     ucsSelect(Frontier, SelectedNode, Frontier1),
     ucsNeighbors(SelectedNode, Neighbors),
     % add_paths(Neighbours, Selected_Node, Neighbours1),
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited),
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost).
 
+minEnergy(Energy1, Energy2, Energy1) :-
+    Energy1 < Energy2, !.
+
+minEnergy(_Energy1, Energy2, Energy2).
+    
 ucsSelect([Node | Frontier], Node, Frontier).
     
 % addToFrontier(-Neighbors, -Frontier, +FrontierNew, -Visited, +VisitedNew).
