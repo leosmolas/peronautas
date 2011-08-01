@@ -208,8 +208,8 @@ myTeam(peronismo).
 
 myName(peron).
 
-myVisionRange(3).
+% myVisionRange(3).
 
-rechargeEnergy(2).
+% rechargeEnergy(2).
 
-maxEnergy(10).
+% maxEnergy(10).

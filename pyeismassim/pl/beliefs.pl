@@ -26,7 +26,9 @@ setBeliefs :-
     printFindAll('', b(posibleAumento(_A))),
     % write('voy'),nl,
     setDifPuntos,
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true).
+    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    setDistancia,
+    printFindAll('setDistancia', b(setDistancia(_N2, _D2)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -153,7 +155,7 @@ setPosibleAumento :-
 	currentStep(Step),
     myName(MyName),
     visualRange(Step, MyName, VisualRange),
-	assert((isGoal(_Node, Cost) :- !, Cost < VisualRange)),
+	assert((isGoal(_Node, Cost) :- !, Cost < VisualRange, Cost > 0)),
     setof(
         FinalNode,
         Node^ _Path^ _Cost^ Team^(
@@ -169,6 +171,28 @@ setPosibleAumento :-
         assert(b(posibleAumento(X)))
     ),
     
-	retract((isGoal(_Node2, Cost):- !, Cost < VisualRange)).
+	retract((isGoal(_Node2, Cost):- !, Cost < VisualRange, Cost > 0)).
     
 setPosibleAumento.
+
+setDistancia :-
+    writeln('1'),nl,
+    myName(Name),
+    writeln('2'),nl,
+    currentStep(Step),
+    writeln('3'),nl,
+    position(Step, Name, Position),
+    writeln('4'),nl,
+    energy(Step, Name, Energy),
+    writeln('5'),nl,
+    foreach(
+        b(posibleAumento(Node)),
+        (
+            writeln('6.1'),nl,
+            pathSearch(Position, Node, Energy, _Path, _Actions, PathCost),
+            printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6))),
+            writeln('6.2'),nl,
+            assert(b(distancia(Node, PathCost) <- true)),
+            writeln('6.3'),nl
+        )
+    ).
