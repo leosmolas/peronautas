@@ -283,7 +283,7 @@ class PrologAgent(Agent):
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
-        self.prolog.query("coloringAlgorithm").next() # en este punto, en el primer turno, el agente no conoce su Team
+        # self.prolog.query("coloringAlgorithm").next() # en este punto, en el primer turno, el agente no conoce su Team
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "    @PrologAgent: received request-action. id: %s" % action_id
@@ -299,6 +299,7 @@ class PrologAgent(Agent):
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
+        self.prolog.query("argumentation").next()
         query_result = self.prolog.query("exec(X)").next()
         actionList   = query_result['X']
         if   len(actionList) == 1:

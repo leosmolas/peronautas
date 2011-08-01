@@ -27,11 +27,10 @@ doNotFail(_).
 meta(X) :-     
     assert(mejorMeta(_, -1000)), % meta con "menos infinito"
     foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
-    % foreach(posibleExplorar(N), doNotFail(calcMeta(explorar(N)))),
-    % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
-    % foreach(posibleAumento(N), doNotFail(calcMeta(aumento(N)))),
+    % foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
+    % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
+    % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
     mejorMeta(X, _),
-    % write(X),
     retract(mejorMeta(_, _)).
     
 calcMeta(X) :-

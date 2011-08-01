@@ -28,7 +28,7 @@
            myVisionRange/1.
 
 
-:- ['pl/graph/map.pl', 'pl/utils.pl'].
+:- ['pl/graph/map.pl', 'pl/utils.pl', 'pl/beliefs.pl'].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +75,7 @@
 % agent(Step, Name, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%% LALALA
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%% Cosas harcodeadas feas
 myTeam(a).
 team(a).
 team(b).
@@ -308,6 +308,23 @@ rechargeEnergy(Recharge) :-
 %    assert(  intention(recharge) ).
 
 
+argumentation :-
+    currentStep(0), !,
+    setExploredAndVisible,
+    toogleOffVisibleNodes.
+    
+argumentation :-
+    
+    setExploredAndVisible,
+    write('explored and visible'),nl,
+    setBeliefs,
+    meta(X),
+    nl, nl, nl, write('meta'),nl,
+    write(X),nl,
+    toogleOffVisibleNodes,
+    retractall(b(_)),
+    retractall(b(_) <- true).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
@@ -393,7 +410,21 @@ dumpKB :-
     printFindAll('POSITIONS:',   k(position(_X12, _X22, _X32))),
     printFindAll('AGENTS:',      k(agent(_X13, _X23, _X33, _X4, _X5, _X6, _X7, _X8, _X9, _X101, _X111))).
 
+%------------------------------------------------------------------------------%
+printHNodeTeams(Title) :-
+    write(Title), nl,
+    foreach(
+            h(nodeTeam(Node, Team)),
+            (write('Node: '), write(Node), write(' : '), write(Team), nl)
+           ),nl.
 
+%------------------------------------------------------------------------------%
+printAgentHPositions :-
+    currentStep(Step),
+    foreach(h(position(Step, T, A)),
+            (write('Agent: '), write(T), write(' at '), write(A), nl)
+        ).
+    
 %------------------------------------------------------------------------------%
 close_output :-
     current_output(S),
