@@ -2,5 +2,6 @@
 *.bak
 *.BAK
 *.db
+*.py~
 massim/scripts/.tmp_serverconfig.xml
 pyeismassim/run.sh
