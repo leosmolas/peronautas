@@ -411,7 +411,8 @@ teamHPoints(Team, Points) :-
         [Node, Team, Value],
         (
             h(nodeTeam(Node, Team)), 
-            k(nodeValue(Node, Value))
+            k(nodeValue(Node, Value)),
+            Value \= unknown
         ), 
         ListOfNodes),
     calcHPoints(ListOfNodes, 0, Points).

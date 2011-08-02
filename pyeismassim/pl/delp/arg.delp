@@ -36,8 +36,8 @@ expansion(Value, X) -<
 % Conocer todos los arcos que salen del nodo.
 explorar(Value, X) -< 
                ~estaLejos(X, Dist, 7),
-               ~explored(X),
-               difPuntosZona(X, DifPuntos), 
+               % ~explored(X),
+               b(difPuntosZona(X, DifPuntos)),
                positivoONegativo(DifPuntos, Positivo, Negativo),
                sust(7, Dist, Sust),
                power(Sust, 2, Pow),
@@ -45,28 +45,13 @@ explorar(Value, X) -<
                add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
                power(Negativo, 2, NegPow),
                sust(Add, NegPow, Value).
-               
-% se instancia con lo que no esta probeado
-% DESIRE explorar(Nodo)
-probear(Value, X) -< 
-    ~estaLejos(X, Dist, 10),
-    notProbedInZone(X, InZone),
-    difPuntosZona(X, DifPuntos),                
-    positivoONegativo(DifPuntos, Positivo, Negativo),
-    sust(10, Dist, Sust),
-    power(Sust, 2, Pow),
-    mult(Pow, 2, Mult),
-    add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
-    power(Negativo, 2, NegPow),
-    sust(Add, NegPow, Sust2),
-    add(Sust2, InZone, Value).               
+
 
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
 aumento(Value, X) -< 
               ~estaLejos(X, Dist, 10), 
-              ~estoyEnLaFrontera,
               esSeguro(X),
-              difPuntosZona(X, DifPuntos),
+              b(difPuntosZona(X, DifPuntos)),
               greater(DifPuntos, 0),
               mult(DifPuntos, 10, Mult),
               sust(10, Dist, Sust),
@@ -83,19 +68,16 @@ positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
 % ~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
                                % lessEqDist, 2).
 
-~estaLejos(X, Dist, _) -< distancia(X, Dist).
+~estaLejos(X, Dist, _) -< b(distancia(X, Dist)).
 
-estaLejos(X, Dist, Cota) <- distancia(X, Dist),
+estaLejos(X, Dist, Cota) <- b(distancia(X, Dist)),
                             greater(Dist, Cota).
 
 ~estoyEnLaFrontera -< true.
-~explored(_) -< true.
+% ~explored(_) -< true.
 ~probed(_) -< true.
 esSeguro(_) -< true.
-               
-notProbedInZone(_X, 0) -< true.
-notProbedInZone(X, 50) <- inZone(X).
-~notProbedInZone(X, 0) <- notProbedInZone(X, 50).
+
                
 % Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que estén en la misma escala. La otra es poner los números sueltos, como en explorar. No sé que decisión de diseño tomar.
 consExpansion(10) <- true. % ni idea que Value tendrá

@@ -19,16 +19,21 @@ setBeliefs :-
     write('estoy'),nl,
     setPosibleExpansion, !,
     write('expansion'),nl,
-    printFindAll('', b(estoyEnLaFrontera)),
-    printFindAll('', b(frontera(_B))),
-    printFindAll('', b(posibleExpansion(_E))),
+    printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
+    printFindAll('frontera', b(frontera(_B))),
+    printFindAll('posibleExpansion', b(posibleExpansion(_E))),
     setPosibleAumento, !,
-    printFindAll('', b(posibleAumento(_A))),
+    printFindAll('posibleAumento', b(posibleAumento(_A))),
     % write('voy'),nl,
+    setPosibleExplorar,
+    printFindAll('posibleExplorar', b(posibleExplorar(_))),
+    setPosibleProbear,
+    printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
     setDifPuntos,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    printFindAll('k', k(_)),
     setDistancia,
-    printFindAll('setDistancia', b(setDistancia(_N2, _D2)) <- true).
+    printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -38,12 +43,16 @@ setFrontera :-
     currentStep(Step),
     myTeam(T),
     foreach(
-        (
-            k(nodeTeam(Step, Node, T)),
-            T \= none,
-            findall(Neigh, k(edge(Node, Neigh, _V)), Neighbors),
-            chequearFrontera(Neighbors, T)
-        ),
+        doNotFail(
+            (
+                k(nodeTeam(Step, Node, T)),
+                T \= none,
+                findall(Neigh, k(edge(Node, Neigh, _V)), Neighbors),
+                chequearFrontera(Neighbors, T)
+            )
+            
+        )
+        ,
         assert(b(frontera(Node)))
     ).
 
@@ -84,36 +93,64 @@ setPosibleExpansion :-
 setPosibleExpansion.
     
 setDifPuntos :-
-    % write('entre'),nl,
     myName(A),
-    % write('0'),nl,
-    % kposition(A, X),
     myTeam(T),
-    % writeln('1'),nl,
     teamPoints(T, ActualPoints),
-    % writeln('2'),nl,
     foreach(
         b(posibleExpansion(Node)),
         (
-            % writeln('3'),nl,
-            setHypotheticalMap,
-            % writeln('4'),nl,
-            moveAgent(A, Node),
-            % writeln('5'),nl,
-            % printFindAll('position', h(_S)),
-            % printFindAll('visible', visibleNode(_N)),
-            % printFindAll('not visible', notVisible(_N2)),
-            % printFindAll('explored', explored(_N3)),
-            % printFindAll('not explored', notExplored(_N4)),
-            coloringAlgorithm,
-            % writeln('6'),nl,
-            teamHPoints(T, Points),
-            % writeln('7'),nl,
-            DifPuntos is Points - ActualPoints,
-            assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-            % writeln('8'),nl
+            doNotFail(
+                (
+                    setHypotheticalMap,
+                    moveAgent(A, Node),
+                    coloringAlgorithm,
+                    teamHPoints(T, Points),
+                    DifPuntos is Points - ActualPoints,
+                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
+                )
+            )
         )
-    ).
+    ),
+    printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
+    foreach(
+        (
+            b(posibleExplorar(Node)),
+            not(b(posibleExpansion(Node)))
+        ),
+        (
+            doNotFail(
+                (
+                    setHypotheticalMap,
+                    moveAgent(A, Node),
+                    coloringAlgorithm,
+                    teamHPoints(T, Points),
+                    DifPuntos is Points - ActualPoints,
+                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
+                )
+            )
+        )
+    ),
+    foreach(
+        (
+            b(posibleAumento(Node)),
+            not(b(posibleExplorar(Node))),
+            not(b(posibleExpansion(Node)))
+        ),
+        (
+            doNotFail(
+                (
+                    setHypotheticalMap,
+                    moveAgent(A, Node),
+                    coloringAlgorithm,
+                    teamHPoints(T, Points),
+                    DifPuntos is Points - ActualPoints,
+                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
+                )
+            )
+        )
+    ),
+    rolSetDifPuntos(A, T, ActualPoints).
+    
 	% foreach(
         % b(posibleProbear(Node)),
         % (
@@ -130,21 +167,6 @@ setDifPuntos :-
     % ).
     
 
-    
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Probear
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% probed(vertex0).
-% probed(vertex1).
-% probed(vertex3).
-
-setPosibleProbear :- 
-	foreach((k(nodeValue(Node, _Value)), not(probed(Node))), assert(b(posibleProbear(Node)))).
-	
-setInZone :-
-	myTeam(MyTeam),
-	foreach(k(nodeTeam(_Step, Node, MyTeam)), assert(inZone(Node) <- true)).
 	
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aumento
@@ -176,23 +198,48 @@ setPosibleAumento :-
 setPosibleAumento.
 
 setDistancia :-
-    writeln('1'),nl,
+    % writeln('1'),nl,
     myName(Name),
-    writeln('2'),nl,
+    % writeln('2'),nl,
     currentStep(Step),
-    writeln('3'),nl,
+    % writeln('3'),nl,
     position(Step, Name, Position),
-    writeln('4'),nl,
+    % writeln('4'),nl,
     energy(Step, Name, Energy),
-    writeln('5'),nl,
+    % writeln('5'),nl,
     foreach(
         b(posibleAumento(Node)),
         (
-            writeln('6.1'),nl,
-            pathSearch(Position, Node, Energy, _Path, _Actions, PathCost),
-            printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6))),
-            writeln('6.2'),nl,
-            assert(b(distancia(Node, PathCost) <- true)),
-            writeln('6.3'),nl
+            % writeln('6.1'),nl,
+            searchPath(Position, Node, Energy)
         )
+    ), 
+    foreach(
+        b(posibleExplorar(Node)),
+        (
+            % writeln('6.1'),nl,
+            searchPath(Position, Node, Energy)
+        )
+    ), !.
+    
+setDistancia.
+
+searchPath(Position, Node, Energy) :-
+    pathSearch(Position, Node, Energy, _Path, _Actions, PathCost), !,
+    % printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6))),
+    % writeln('6.2'),nl,
+    assert(b(distancia(Node, PathCost)) <- true).
+    % writeln('6.3'),nl.
+    
+searchPath(_Position, _Node, _Energy).
+
+    
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Explorar
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+setPosibleExplorar :-
+    foreach(
+        hasAtLeastOneUnsurveyedEdge(Node),
+        assertOnce(b(posibleExplorar(Node)))
     ).

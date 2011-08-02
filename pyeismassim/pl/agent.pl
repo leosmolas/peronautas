@@ -28,7 +28,10 @@
            myVisionRange/1.
 
 
-:- ['pl/graph/map.pl', 'pl/utils.pl', 'pl/beliefs.pl'].
+:- [graph/map, 
+    utils, 
+    beliefs].
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -362,11 +365,8 @@ searchNeigh(N) :-
 % Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
 % nodo, del cual no conoces el costo.
 hasAtLeastOneUnsurveyedEdge(Node1) :-
-    findall(
-        Node2, 
-        k(edge(Node1, Node2, unknown)), 
-        L),
-    L \= [].
+    k(edge(Node1, _Node2, unknown)). % hola
+
 
 
 
