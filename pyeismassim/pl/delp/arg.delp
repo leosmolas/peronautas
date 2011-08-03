@@ -58,6 +58,8 @@ aumento(Value, X) -<
               power(Sust, 2, Pow),
               add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
               
+quedarse(20, _) -< true.
+              
 % La diferencia de puntos entre la situación actual y el agente ubicado en Nodo
 % se pesa en la cuenta con 0, o la diferencia.
 positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).

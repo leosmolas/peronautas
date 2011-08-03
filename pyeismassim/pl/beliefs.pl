@@ -31,7 +31,7 @@ setBeliefs :-
     printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
     setDifPuntos,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
-    printFindAll('k', k(_)),
+    % printFindAll('k', k(_)),
     setDistancia,
     printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
 
@@ -42,18 +42,16 @@ setBeliefs :-
 setFrontera :-
     currentStep(Step),
     myTeam(T),
+    % T \= none, % ???????
     foreach(
-        doNotFail(
-            (
-                k(nodeTeam(Step, Node, T)),
-                T \= none,
-                findall(Neigh, k(edge(Node, Neigh, _V)), Neighbors),
-                chequearFrontera(Neighbors, T)
-            )
+        (
+            k(nodeTeam(Step, Node, T)),
             
-        )
-        ,
-        assert(b(frontera(Node)))
+            k(edge(Node, Neigh, _V)),
+            k(nodeTeam(Step, Neigh, T2)),
+            T2 \= T
+        ),
+        assertOnce(b(frontera(Node)))
     ).
 
 setEstoyEnLaFrontera :-
@@ -150,21 +148,6 @@ setDifPuntos :-
         )
     ),
     rolSetDifPuntos(A, T, ActualPoints).
-    
-	% foreach(
-        % b(posibleProbear(Node)),
-        % (
-            % assertHMap,
-            % moveAgent(A, Node),
-            % coloringAlgorithm,
-            % teamHPoints(T, Points),
-            % DifPuntos is Points - ActualPoints,
-            % assert(b(difPuntosZona(Node, DifPuntos)) <- true),
-            % retractall(hnode(_, _, _)),
-            % retractall(hedge(_, _, _)),
-            % retractall(hposition(_, _))
-        % )
-    % ).
     
 
 	
