@@ -11,24 +11,18 @@
 %                   -skip   (no implemented)
 
 exec(Action) :- 
-    write(1),nl,
     action(Action).
 
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
-    currentStep(Step),
-    write(3),nl,
-    myName(Name),
-    write(3.1),nl,
-    energy(Step, Name, Energy),
-    write(3.2),nl,
+    write(1.1),nl,
+    myEnergy(Energy),
     Energy > 0,
-    write(3.3),nl,
-    position(Step, Name, Position),
-    write(3.4),nl,
+    write(1.2),nl,
+    myPosition(Position),
     hasAtLeastOneUnsurveyedEdge(Position), 
-    write(3.5),nl,
+    write(1.3),nl,
     !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -36,23 +30,19 @@ action([survey, Position]) :-
 %-- First Node Goto --%
 
 action([goto, X]) :-
-    currentStep(Step),
-    write(5),nl,
-    myName(Name),
-    write(5.1),nl,
+    write(2.1),nl,
     position(Step, Name, Position),
-    write(5.2),nl,
-    energy(Step, Name, Energy),
-    write(5.3),nl,
     k(edge(Position, X, Cost)),
+    write(2.2),nl,
     Cost \= unknown,
-    write(5.4),nl,
+    write(2.3),nl,
+    energy(Step, Name, Energy),
     Energy >= Cost, 
-    write(5.5),nl,
+    write(2.4),nl,
     !.
 
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-
-    write(6),nl.
+    write(3),nl.
 

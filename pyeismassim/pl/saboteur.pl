@@ -73,18 +73,17 @@ action([goto, X]) :-
     write(4.1),nl,
     currentStep(Step),
     myPosition(Position),
-    write(5.2),nl,
+    write(4.2),nl,
     myEnergy(Energy),
-    write(5.3),nl,
     k(edge(Position, X, Cost)),
     Cost \= unknown,
-    write(5.4),nl,
+    write(4.3),nl,
     Energy >= Cost, 
-    write(5.5),nl,
+    write(4.4),nl,
     !.
 
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-
-    write(6),nl.
+    write(5),nl.
 
