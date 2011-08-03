@@ -299,8 +299,8 @@ class PrologAgent(Agent):
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        self.prolog.query("argumentation").next()
-        query_result = self.prolog.query("exec(X)").next()
+        # self.prolog.query("argumentation").next()
+        query_result = self.prolog.query("run(X)").next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])

@@ -181,6 +181,7 @@ setPosibleAumento :-
 setPosibleAumento.
 
 setDistancia :-
+    % writeln('setDistancia'),nl,
     % writeln('1'),nl,
     myName(Name),
     % writeln('2'),nl,
@@ -194,27 +195,30 @@ setDistancia :-
         b(posibleAumento(Node)),
         (
             % writeln('6.1'),nl,
-            searchPath(Position, Node, Energy)
+            writeln(Node),nl,
+            searchPath(Position, Node, Energy, [], 0)
         )
     ), 
     foreach(
         b(posibleExplorar(Node)),
         (
             % writeln('6.1'),nl,
-            searchPath(Position, Node, Energy)
+            writeln(Node),nl,
+            searchPath(Position, Node, Energy, [[survey]], 1)
         )
-    ), !.
+    ),
+    rolSetDistancia(Position, Energy), !.
     
 setDistancia.
 
-searchPath(Position, Node, Energy) :-
-    pathSearch(Position, Node, Energy, _Path, _Actions, PathCost), !,
+searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
+    pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost), !,
     % printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6))),
     % writeln('6.2'),nl,
     assert(b(distancia(Node, PathCost)) <- true).
     % writeln('6.3'),nl.
     
-searchPath(_Position, _Node, _Energy).
+searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

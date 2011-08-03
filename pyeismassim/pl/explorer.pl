@@ -62,6 +62,16 @@ rolSetDifPuntos(A, T, ActualPoints):-
         )
     ).
     
+rolSetDistancia(Position, Energy) :-
+    foreach(
+        b(posibleProbear(Node)),
+        (
+            % writeln('6.1'),nl,
+            writeln(Node),nl,
+            searchPath(Position, Node, Energy, [[probe]], 1)
+        )
+    ).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Actions (priority order):
@@ -74,9 +84,9 @@ rolSetDifPuntos(A, T, ActualPoints):-
 
 %----------------------------------------------------------------------%
 
-exec(Action) :- 
-    write(1),nl,
-    action(Action).
+% exec(Action) :- 
+    % write(1),nl,
+    % action(Action).
 
 %----------------------------------------------------------------------%
 
