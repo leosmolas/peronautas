@@ -15,6 +15,7 @@
            money/1,            %
            score/1,            %
            % Public
+           phase/1,
            currentStep/1,      %
            h/1,                %
            k/1,                %
@@ -70,7 +71,7 @@
 %
 % k(agentTeam(Agent, Team))
 % k(agentRole(Agent, Role))
-% k(agentNode(Agent, Step, Node))
+% k(agentPosition(Agent, Step, Position))
 % k(agentEnergy(Agent, Step, Energy))
 % k(agentMaxEnergy(Agent, Step, MaxEnergy))
 % k(agentHealth(Agent, Step, Health))
@@ -213,11 +214,11 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
-updateEntity(Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
+updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
     asserta( k(agentTeam(Agent,        Team))               ),
     asserta( k(agentRole(Agent,        Role))               ),
-    asserta( k(agentNode(Agent,        Step, Node))         ),
+    asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
     asserta( k(agentHealth(Agent,      Step, Health))       ),
@@ -240,7 +241,40 @@ updateEntityTeamPosition(Agent, Team, Position) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                     Acceso                                   %
+%                                    Phases                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Initial phase for all agents.
+phase(exploration).
+
+
+
+% Every turn, we check whether the phase has changed.
+updatePhase :-
+    phase(exploration),
+    
+    % Phase change condition: after a given number of turns.
+    currentStep(Step),
+    Step > 5,
+
+    % Phase change condition: no more nodes to explore.
+    % TODO cambiar esto para que use el codigo para inferir si quedan nodos
+    % jamas vistos, no sin sodear.
+    %findall(
+    %    Node,
+    %    k(nodeValue(Node, unknown)),
+    %    UnexploredNodes
+    %),
+    %UnexploresNodes = [],
+
+    write('The phase has changed!'),nl,
+    retractall(phase(_)),
+    asserta(phase(remaining)).
+% Don't you ever fail me!
+updatePhase.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                   Acceso                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
@@ -248,10 +282,10 @@ updateEntityTeamPosition(Agent, Team, Position) :-
 myTeam(Team) :-
     myName(Agent),
     k(agentTeam(Agent, Team)).
-myPosition(Node) :-
+myPosition(Position) :-
     myName(Agent),
     currentStep(Step),
-    k(agentPosition(Agent, Step, Node)).
+    k(agentPosition(Agent, Step, Position)).
 myRole(Role) :-
     myName(Agent),
     k(agentRole(Agent, Role)).
@@ -332,7 +366,7 @@ lastKnownInfo1(Field, CurrentStep, Step, Agent, Position) :-
 getInfo(team, Step, Agent, Team) :-
     k(agentTeam(Agent, Step, Team)).
 getInfo(position, Step, Agent, Position) :-
-    k(agentNode(Agent, Step, Position)).
+    k(agentPosition(Agent, Step, Position)).
 getInfo(role, Step, Agent, Role) :-
     k(agentRole(Agent, Step, Role)).
 getInfo(energy, Step, Agent, Energy) :-
@@ -487,7 +521,7 @@ dumpKB :-
     printFindAll('POSITIONS:',          k(position(         _X9,  _X10, _X11 ))),
     printFindAll('AGENT TEAM:',         k(agentTeam(        _X12, _X13       ))),
     printFindAll('AGENT ROLE:',         k(agentRole(        _X14, _X15       ))),
-    printFindAll('AGENT NODE:',         k(agentNode(        _X16, _X17, _X18 ))),
+    printFindAll('AGENT NODE:',         k(agentPosition(    _X16, _X17, _X18 ))),
     printFindAll('AGENT ENERGY:',       k(agentEnergy(      _X19, _X20, _X21 ))),
     printFindAll('AGENT MAX ENERGY:',   k(agentMaxEnergy(   _X22, _X23, _X24 ))),
     printFindAll('AGENT HEALTH:',       k(agentHealth(      _X25, _X26, _X27 ))),
