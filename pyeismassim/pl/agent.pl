@@ -365,7 +365,7 @@ searchNeigh(N) :-
 % Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
 % nodo, del cual no conoces el costo.
 hasAtLeastOneUnsurveyedEdge(Node1) :-
-    k(edge(Node1, _Node2, unknown)). % hola
+    k(edge(Node1, _Node2, unknown)), !. % hola
 
 
 

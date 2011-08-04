@@ -40,23 +40,12 @@ rolSetDifPuntos(A, T, ActualPoints):-
         (
             doNotFail(
                 (
-                    % writeln('3'),nl,
                     setHypotheticalMap,
-                    % writeln('4'),nl,
                     moveAgent(A, Node),
-                    % writeln('5'),nl,
-                    % printFindAll('position', h(_S)),
-                    % printFindAll('visible', visibleNode(_N)),
-                    % printFindAll('not visible', notVisible(_N2)),
-                    % printFindAll('explored', explored(_N3)),
-                    % printFindAll('not explored', notExplored(_N4)),
                     coloringAlgorithm,
-                    % writeln('6'),nl,
                     teamHPoints(T, Points),
-                    % writeln('7'),nl,
                     DifPuntos is Points - ActualPoints,
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                    % writeln('8'),nl
                 )
             )
         )

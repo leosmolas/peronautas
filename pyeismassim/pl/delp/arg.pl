@@ -1,6 +1,6 @@
 ﻿:- dynamic mejorMeta/2.
 
-:- [delp]. % interprete
+:- [interpreter/delp]. % interprete
 
 :- consult('arg.delp'). % reglas de argumentación
    % consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
