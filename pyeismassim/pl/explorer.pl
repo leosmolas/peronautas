@@ -21,6 +21,11 @@ rolMetas:-
 % probed(vertex1).
 % probed(vertex3).
 
+rolSetBeliefs :-
+    setPosibleProbear,
+    rolSetDifPuntos,
+    rolSetDistancia.
+
 setPosibleProbear :- 
 	foreach(
         (
@@ -34,7 +39,10 @@ setInZone :-
     currentStep(Step),
 	foreach(k(nodeTeam(Step, Node, MyTeam)), assert(b(inZone(Node)) <- true)).
     
-rolSetDifPuntos(A, T, ActualPoints):-
+rolSetDifPuntos:-
+    myName(A),
+    myTeam(T),
+    teamPoints(T, ActualPoints),
     foreach(
         b(posibleProbear(Node)),
         (
@@ -62,7 +70,14 @@ rolSetDifPuntos(A, T, ActualPoints):-
         )
     ).
     
-rolSetDistancia(Position, Energy) :-
+rolSetDistancia :-
+    myName(Name),
+    % writeln('2'),nl,
+    currentStep(Step),
+    % writeln('3'),nl,
+    position(Step, Name, Position),
+    % writeln('4'),nl,
+    energy(Step, Name, Energy),
     foreach(
         b(posibleProbear(Node)),
         (

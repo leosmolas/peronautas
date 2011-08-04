@@ -10,8 +10,8 @@
 % instancia todos los parametros para llamar a ucs
 % ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
 pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, PlanCost) :-
-    writeln('pathSearch'),nl,
-    writeln('1'),nl,
+    % writeln('pathSearch'),nl,
+    % writeln('1'),nl,
     
     
     % explored(InitialNode), % conozco todos los arcos, para poder salir
@@ -19,13 +19,13 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % V \= unknown, !, % tiene por lo menos un arco de salida del cual conoce su valor
     retractall(isGoal(_)),
     assert(isGoal(FinalNode)),
-    writeln('2'),nl,
+    % writeln('2'),nl,
     ucs([ucsNode(InitialNode, Energy, [], [], 0)], [ucsNode(InitialNode, 0, [], [], 0)], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
-    writeln('3'),nl,
+    % writeln('3'),nl,
     % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, 1, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
-    writeln('4'),nl,
+    % writeln('4'),nl,
     
     PlanCost is NewTurns2 + PathCost,
     
@@ -49,12 +49,12 @@ ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost, Energy) :-
 
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     % writeln('ucs'),nl,
-    writeln('ucs 1'),nl,
+    % writeln('ucs 1'),nl,
     ucsSelect(Frontier, SelectedNode, Frontier1),
     ucsNeighbors(SelectedNode, Neighbors),
-    writeln('ucs 2'),nl,
+    % writeln('ucs 2'),nl,
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), !,
-    writeln('3'),nl,
+    % writeln('3'),nl,
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
 minEnergy(Energy1, Energy2, Energy1) :-

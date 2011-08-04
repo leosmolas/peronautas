@@ -14,7 +14,9 @@
     
     
 setBeliefs :-
+    
     write('setBeliefs'),nl,
+    rolSetBeliefs,
     setEstoyEnLaFrontera,
     write('estoy'),nl,
     setPosibleExpansion, !,
@@ -27,8 +29,8 @@ setBeliefs :-
     % write('voy'),nl,
     setPosibleExplorar,
     printFindAll('posibleExplorar', b(posibleExplorar(_))),
-    setPosibleProbear,
-    printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
+    
+    % printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
     setDifPuntos,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('k', k(_)),
@@ -146,8 +148,7 @@ setDifPuntos :-
                 )
             )
         )
-    ),
-    rolSetDifPuntos(A, T, ActualPoints).
+    ).
     
 
 	
@@ -206,8 +207,7 @@ setDistancia :-
             writeln(Node),nl,
             searchPath(Position, Node, Energy, [[survey]], 1)
         )
-    ),
-    rolSetDistancia(Position, Energy), !.
+    ), !.
     
 setDistancia.
 
