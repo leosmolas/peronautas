@@ -22,9 +22,12 @@ rolMetas:-
 % probed(vertex3).
 
 rolSetBeliefs :-
-    setPosibleProbear,
-    rolSetDifPuntos,
-    rolSetDistancia.
+    calcTime('setPosibleProbear',
+    setPosibleProbear),
+    calcTime('rolSetDifPuntos',
+    rolSetDifPuntos),
+    calcTime('rolSetDistancia',
+    rolSetDistancia).
 
 setPosibleProbear :- 
 	foreach(

@@ -296,9 +296,16 @@ run(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     plan([]), !,
+    
+    get_time(BeforeArg),
+    
     setExploredAndVisible,
     
     argumentation(Meta),
+    get_time(BeforePlanning),
+    writeln('Argumentation time:'),
+    Time is (BeforePlanning - BeforeArg) * 1000 ,
+    write(Time), writeln(' in milisecs'),
     planning(Meta),
     exec(Action),
     retractall(b(_)),
@@ -332,14 +339,28 @@ plan([]).
 
 
 argumentation(Meta) :-
+    get_time(BeforeBeliefs),
     setBeliefs,
+    get_time(BeforeDelp),
     meta(Meta),
+    get_time(AfterDelp),
+    Beliefs is (BeforeDelp - BeforeBeliefs) *1000,
+    nl,writeln('tiempo de seteo de beliefs'),write(Beliefs), writeln(' milisecs'),nl,
+    Arg is (AfterDelp - BeforeDelp) * 1000,
+    writeln('tiempo de argumentacion'),write(Arg), writeln(' milisecs'),nl,
     write('meta'),nl,
     write(Meta),nl,
     retractall(intention(_)),
     assert(intention(Meta)).
 
-
+calcTime(Message, Exec) :-
+    write('<predicate name="'),write(Message), writeln('">'),
+    get_time(Before),
+    call(Exec),
+    get_time(After),
+    Time is (After - Before) * 1000,
+    write('<time value="'),write(Time), writeln('"/>'),
+    writeln('</predicate>').
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

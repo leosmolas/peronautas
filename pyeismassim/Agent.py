@@ -92,8 +92,8 @@ class Agent():
             #print "\nXML:"
             #print xml
             #print ""
-            if not self.dummy:
-                time.sleep(1.5)
+            # if not self.dummy:
+                # time.sleep(1.0)
             # else:
                 # time.sleep(1.5)
                 # print "hola"
@@ -317,7 +317,7 @@ class PrologAgent(Agent):
             query_result = self.prolog.query("run(X)").next()
         self.prologTime = time.time()
         print "hasta el fin la ejecucion de prolog"
-        print (self.prologTime - self.percetionProcessTime) * 1000, "milisegs"
+        print (self.prologTime - self.percetionProcessTime) * 1000, "milisegs\n\n\n"
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])

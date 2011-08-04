@@ -16,25 +16,29 @@
 setBeliefs :-
     
     % write('setBeliefs'),nl,
-    rolSetBeliefs,
-    setEstoyEnLaFrontera,
+    calcTime('rolSetBeliefs',
+    rolSetBeliefs),
+    calcTime('setEstoyEnLaFrontera',
+    setEstoyEnLaFrontera),
     % write('estoy'),nl,
-    setPosibleExpansion, !,
+    calcTime('setPosibleExpansion',
+    setPosibleExpansion), !,
     % write('expansion'),nl,
     % printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
     % printFindAll('frontera', b(frontera(_B))),
     % printFindAll('posibleExpansion', b(posibleExpansion(_E))),
-    setPosibleAumento, !,
+    calcTime('setPosibleAumento',
+    setPosibleAumento), !,
     % printFindAll('posibleAumento', b(posibleAumento(_A))),
     % write('voy'),nl,
-    setPosibleExplorar,
-    % printFindAll('posibleExplorar', b(posibleExplorar(_))),
-    
-    % printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
-    setDifPuntos,
+    calcTime('setPosibleExplorar',
+    setPosibleExplorar),
+    calcTime('setDifPuntos',
+    setDifPuntos),
     % printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('k', k(_)),
-    setDistancia.
+    calcTime('setDistancia',
+    setDistancia).
     % printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
