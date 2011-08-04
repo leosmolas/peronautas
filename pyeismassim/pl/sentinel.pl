@@ -10,10 +10,15 @@
 %                   -rechage
 %                   -skip   (no implemented)
 
-exec(Action) :- 
+execDummy(Action) :- 
     write(1),nl,
     action(Action).
 
+        
+rolMetas.
+
+rolSetBeliefs.
+    
 %-----------------------------------------------------------------------%
 
 reachableNode(Node, [[_, unknown] | T]) :-

@@ -199,12 +199,12 @@ if (__name__ == "__main__"):
     j = 0
     quit = False
     while (not quit):
-        print "Iteration:", j
+        # print "Iteration:", j
         # Initialize the global percept to an empty frozenset.
         globalPercept = frozenset([])
         percepts      = range(CONNECTIONS)
 
-        print "Reception phase."
+        # print "Reception phase."
         for i in range(CONNECTIONS):
 
             stop = False
@@ -235,8 +235,8 @@ if (__name__ == "__main__"):
             if (clientSocketConnected[i]):
                 percept    = percepts[i]
                 difference = globalPercept.difference(percept)
-                print "CONNECTION:", i
-                print "DIFFERENCE:", difference
+                # print "CONNECTION:", i
+                # print "DIFFERENCE:", difference
                 clientSocket[i].send(repr(difference))
                 clientSocket[i].send('\0')
 

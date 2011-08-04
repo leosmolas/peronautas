@@ -82,7 +82,7 @@ rolSetDistancia :-
         b(posibleProbear(Node)),
         (
             % writeln('6.1'),nl,
-            writeln(Node),nl,
+            % writeln(Node),nl,
             searchPath(Position, Node, Energy, [[probe]], 1)
         )
     ).
@@ -99,9 +99,9 @@ rolSetDistancia :-
 
 %----------------------------------------------------------------------%
 
-% exec(Action) :- 
-    % write(1),nl,
-    % action(Action).
+execDummy(Action) :- 
+    write(1),nl,
+    action(Action).
 
 %----------------------------------------------------------------------%
 

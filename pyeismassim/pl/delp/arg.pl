@@ -44,13 +44,13 @@ meta(X) :-
     retract(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    writeln(X),
+    % writeln(X),
     X =.. [Meta, Nodo | _],
     Query =.. [Meta, Value, Nodo],
     answer(Query, Answer),
-    writeln(Answer), 
+    % writeln(Answer), 
     Answer = yes, !,
-    writeln(Value),
+    % writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),

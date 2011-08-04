@@ -15,27 +15,27 @@
     
 setBeliefs :-
     
-    write('setBeliefs'),nl,
+    % write('setBeliefs'),nl,
     rolSetBeliefs,
     setEstoyEnLaFrontera,
-    write('estoy'),nl,
+    % write('estoy'),nl,
     setPosibleExpansion, !,
-    write('expansion'),nl,
-    printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
-    printFindAll('frontera', b(frontera(_B))),
-    printFindAll('posibleExpansion', b(posibleExpansion(_E))),
+    % write('expansion'),nl,
+    % printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
+    % printFindAll('frontera', b(frontera(_B))),
+    % printFindAll('posibleExpansion', b(posibleExpansion(_E))),
     setPosibleAumento, !,
-    printFindAll('posibleAumento', b(posibleAumento(_A))),
+    % printFindAll('posibleAumento', b(posibleAumento(_A))),
     % write('voy'),nl,
     setPosibleExplorar,
-    printFindAll('posibleExplorar', b(posibleExplorar(_))),
+    % printFindAll('posibleExplorar', b(posibleExplorar(_))),
     
     % printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
     setDifPuntos,
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    % printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('k', k(_)),
-    setDistancia,
-    printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
+    setDistancia.
+    % printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -111,7 +111,7 @@ setDifPuntos :-
             )
         )
     ),
-    printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
+    % printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
     foreach(
         (
             b(posibleExplorar(Node)),
@@ -196,7 +196,7 @@ setDistancia :-
         b(posibleAumento(Node)),
         (
             % writeln('6.1'),nl,
-            writeln(Node),nl,
+            % writeln(Node),nl,
             searchPath(Position, Node, Energy, [], 0)
         )
     ), 
@@ -204,7 +204,7 @@ setDistancia :-
         b(posibleExplorar(Node)),
         (
             % writeln('6.1'),nl,
-            writeln(Node),nl,
+            % writeln(Node),nl,
             searchPath(Position, Node, Energy, [[survey]], 1)
         )
     ), !.

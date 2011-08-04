@@ -293,6 +293,8 @@ rechargeEnergy(Recharge) :-
     rechargeEnergy(S, N, Recharge).
 
 run(Action) :-
+    currentStep(Step),
+    nl, nl, nl, write('Current Step: '), writeln(Step),
     plan([]), !,
     setExploredAndVisible,
     
@@ -332,7 +334,7 @@ plan([]).
 argumentation(Meta) :-
     setBeliefs,
     meta(Meta),
-    nl, nl, nl, write('meta'),nl,
+    write('meta'),nl,
     write(Meta),nl,
     retractall(intention(_)),
     assert(intention(Meta)).

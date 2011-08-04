@@ -5,6 +5,6 @@
 massim/scripts/.tmp_serverconfig.xml
 pyeismassim/run.sh
 *~
-pyeismassim/a1-kb.txt
-pyeismassim/a1-log.txt
+pyeismassim/*-kb.txt
+pyeismassim/*-log.txt
 pyeismassim/runw.sh
