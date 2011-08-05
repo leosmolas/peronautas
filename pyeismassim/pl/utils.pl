@@ -1,5 +1,5 @@
 :- [graph/map].
-% :- [kmap].
+:- [kmap].
 :- dynamic isGoal/1.
 
 
@@ -9,9 +9,9 @@
 % asserta isGoal y lo retracta al final.
 % instancia todos los parametros para llamar a ucs
 % ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
-pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, PlanCost) :-
-    % writeln('pathSearch'),nl,
-    % writeln('1'),nl,
+pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2) :-
+    writeln('pathSearch'),nl,
+    writeln('1'),nl,
     
     
     % explored(InitialNode), % conozco todos los arcos, para poder salir
@@ -19,18 +19,17 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % V \= unknown, !, % tiene por lo menos un arco de salida del cual conoce su valor
     retractall(isGoal(_)),
     assert(isGoal(FinalNode)),
-    % writeln('2'),nl,
-    ucs([ucsNode(InitialNode, Energy, [], [], 0)], [ucsNode(InitialNode, 0, [], [], 0)], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
-    % writeln('3'),nl,
+    writeln('2'),nl,
+    singleton_heap(InitialFrontier, 0, ucsNode(InitialNode, Energy, [], [], 0)),
+    ucs(InitialFrontier, [ucsNode(InitialNode, 0, [], [], 0)], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
+    writeln('3'),nl,
     % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
-    calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, 1, NewTurns2, RemainingEnergy1),
+    calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, PathCost, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
-    % writeln('4'),nl,
-    
-    PlanCost is NewTurns2 + PathCost,
+    writeln('4'),nl,
     
     
-    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, PlanCost, RemainingEnergy1))).
+    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
     
 % pathSearch(_InitialNode, _FinalNode, _Energy, _Path, _Actions, _PathCost) :-
     % retractall(isGoal(_)).
@@ -62,7 +61,8 @@ minEnergy(Energy1, Energy2, Energy1) :-
 
 minEnergy(_Energy1, Energy2, Energy2).
     
-ucsSelect([Node | Frontier], Node, Frontier).
+ucsSelect(OldFrontier, Node, Frontier) :-
+    get_from_heap(OldFrontier, Node, _Priority, Frontier) .
     
 % addToFrontier(-Neighbors, -Frontier, +FrontierNew, -Visited, +VisitedNew).
 
@@ -79,7 +79,7 @@ addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited
 	insert_pq(Neighbor, OldFrontier, NewFrontier),
     addToFrontier(Neighbors, NewFrontier, Frontier, OldVisited, Visited).
     
-addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
+addToFrontier([_Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
     !,
     addToFrontier(Neighbors, OldFrontier, Frontier, OldVisited, Visited).
     
@@ -118,14 +118,17 @@ check(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFront
     insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier).
     
 % Insercion ordenada
-insert_pq(State, [], [State]) :- !.
-insert_pq(State, [H | T], [State, H | T]) :-
-    precedes(State, H), !.
-insert_pq(State, [H|T], [H | T_new]) :-
-    insert_pq(State, T, T_new).
+% insert_pq(State, [], [State]) :- !.
+% insert_pq(State, [H | T], [State, H | T]) :-
+    % precedes(State, H), !.
+% insert_pq(State, [H|T], [H | T_new]) :-
+    % insert_pq(State, T, T_new).
     
-precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Position2, _Energy2, _Path2, _Actions2, PathCost2)) :-
-    PathCost < PathCost2, !.
+insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Old, New) :-
+    add_to_heap(Old, Path_Cost, ucsNode(Position, Energy, Path, Actions, Path_Cost), New).
+    
+% precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Position2, _Energy2, _Path2, _Actions2, PathCost2)) :-
+    % PathCost < PathCost2, !.
 
 % ucsNeighbors(-UcsNode, -Energy, +Neighbors)
 % UcsNode: el nodo actual.

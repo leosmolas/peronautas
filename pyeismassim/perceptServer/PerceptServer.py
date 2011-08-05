@@ -255,7 +255,7 @@ if (__name__ == "__main__"):
             
         stopSending = time.time()
         print "Tiempo enviando"
-        print (stopSending - startSendingTime) * 1000, "milisec"
+        print (stopSending - .startSendingTime) * 1000, "milisec"
         
     serverSocket.close()
 
