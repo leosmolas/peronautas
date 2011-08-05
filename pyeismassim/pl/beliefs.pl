@@ -103,7 +103,7 @@ writeLenght(Name, Node, Pattern) :-
         ListExpansion
     ),
     length(ListExpansion, L1),
-    
+   
     write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
     
 setDifPuntos :-
@@ -118,6 +118,7 @@ setDifPuntos :-
             not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
+
     foreach(
         (
             b(posibleExpansion(Node)),
