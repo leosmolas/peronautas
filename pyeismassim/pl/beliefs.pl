@@ -97,29 +97,28 @@ setPosibleExpansion :-
 setPosibleExpansion.
 
 writeLenght(Name, Node, Pattern) :-
-    writeln('1'),
     findall(
         Node, 
         Pattern,
         ListExpansion
     ),
-    writeln('2'),
-    lenght(ListExpansion, L1),
-    
+    length(ListExpansion, L1),
+   
     write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
     
 setDifPuntos :-
     myName(A),
     myTeam(T),
     teamPoints(T, ActualPoints),
-    % writeLenght(
-        % 'posibleExpansion', 
-        % Node1, 
-        % (
-            % b(posibleExpansion(Node1)),
-            % not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
-        % )
-    % ),
+    writeLenght(
+        'posibleExpansion', 
+        Node1, 
+        (
+            b(posibleExpansion(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+        )
+    ),
+
     foreach(
         (
             b(posibleExpansion(Node)),
@@ -139,6 +138,14 @@ setDifPuntos :-
         )
     ),
     % printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
+    writeLenght(
+        'posibleExplorar', 
+        Node1, 
+        (
+            b(posibleExplorar(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+        )
+    ),
     foreach(
         (
             b(posibleExplorar(Node)),
@@ -155,6 +162,14 @@ setDifPuntos :-
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
             )
+        )
+    ),
+    writeLenght(
+        'posibleAumento', 
+        Node1, 
+        (
+            b(posibleAumento(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
     foreach(
