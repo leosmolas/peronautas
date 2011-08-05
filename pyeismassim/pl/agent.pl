@@ -199,7 +199,7 @@ updateNodeValue(Name, Value) :-
     assertz( notVisible(Name) ),
     assertz( k(nodeValue(Name, Value)) ).
 
-assertOnce(X) :- X, !.
+assertOnce(X) :- call(X), !.
 assertOnce(X) :- asserta(X).
 
 %------------------------------------------------------------------------------%
@@ -421,9 +421,11 @@ exec(Action) :-
 % Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
 % nodo, del cual no conoces el costo.
 hasAtLeastOneUnsurveyedEdge(Node1) :-
-    k(edge(Node1, _Node2, unknown)), !. % hola
+	k(nodeValue(Node1, _V)),
+    hasAtLeastOneUnsurveyedEdgeAux(Node1).
 
-
+hasAtLeastOneUnsurveyedEdgeAux(Node) :-
+	k(edge(Node, _Node2, unknown)), !.
 
 
 %------------------------------------------------------------------------------%

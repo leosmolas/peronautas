@@ -75,6 +75,8 @@ rolSetDistancia :-
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,
+			retractall(isFail(_)),
+			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 4)),
             searchPath(Position, Node, Energy, [[probe]], 1)
         )
     ).
