@@ -95,11 +95,31 @@ setPosibleExpansion :-
     foreach((k(edge(X, Neigh, _)), k(nodeTeam(CurrentStep, Neigh, none))), assert(b(posibleExpansion(Neigh)))).
     
 setPosibleExpansion.
+
+writeLenght(Name, Node, Pattern) :-
+    writeln('1'),
+    findall(
+        Node, 
+        Pattern,
+        ListExpansion
+    ),
+    writeln('2'),
+    lenght(ListExpansion, L1),
+    
+    write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
     
 setDifPuntos :-
     myName(A),
     myTeam(T),
     teamPoints(T, ActualPoints),
+    % writeLenght(
+        % 'posibleExpansion', 
+        % Node1, 
+        % (
+            % b(posibleExpansion(Node1)),
+            % not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+        % )
+    % ),
     foreach(
         (
             b(posibleExpansion(Node)),
