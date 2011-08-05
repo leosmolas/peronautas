@@ -101,7 +101,10 @@ setDifPuntos :-
     myTeam(T),
     teamPoints(T, ActualPoints),
     foreach(
-        b(posibleExpansion(Node)),
+        (
+            b(posibleExpansion(Node)),
+            not(b(difPuntosZona(Node, _DifPuntos)) <- true)
+        ),
         (
             doNotFail(
                 (
@@ -119,7 +122,7 @@ setDifPuntos :-
     foreach(
         (
             b(posibleExplorar(Node)),
-            not(b(posibleExpansion(Node)))
+            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
         ),
         (
             doNotFail(
@@ -137,8 +140,7 @@ setDifPuntos :-
     foreach(
         (
             b(posibleAumento(Node)),
-            not(b(posibleExplorar(Node))),
-            not(b(posibleExpansion(Node)))
+            not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
         ),
         (
             doNotFail(
@@ -197,7 +199,10 @@ setDistancia :-
     energy(Step, Name, Energy),
     % writeln('5'),nl,
     foreach(
-        b(posibleAumento(Node)),
+        (
+            b(posibleAumento(Node)),
+            not(b(distancia(Node, _PathCost)) <- true)
+        ),
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,
@@ -205,7 +210,10 @@ setDistancia :-
         )
     ), 
     foreach(
-        b(posibleExplorar(Node)),
+        (
+            b(posibleExplorar(Node)),
+            not(b(distancia(Node, _PathCost2)) <- true)
+        ),
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,

@@ -297,16 +297,13 @@ run(Action) :-
     nl, nl, nl, write('Current Step: '), writeln(Step),
     plan([]), !,
     
-    get_time(BeforeArg),
+
     
-    setExploredAndVisible,
+    calcTime('setExploredAndVisible',setExploredAndVisible),
     
-    argumentation(Meta),
-    get_time(BeforePlanning),
-    writeln('Argumentation time:'),
-    Time is (BeforePlanning - BeforeArg) * 1000 ,
-    write(Time), writeln(' in milisecs'),
-    planning(Meta),
+    calcTime('argumentation',argumentation(Meta)),
+
+    calcTime('planning', planning(Meta)),
     exec(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
