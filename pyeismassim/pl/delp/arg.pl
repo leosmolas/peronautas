@@ -26,9 +26,9 @@ doNotFail(_).
    
 meta(X) :-     
     assert(mejorMeta(_, -1000)), % meta con "menos infinito"
-    foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
+    % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
     foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
-    foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
+    % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
     
     
     currentStep(Step),
@@ -44,13 +44,13 @@ meta(X) :-
     retract(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    writeln(X),
+    % writeln(X),
     X =.. [Meta, Nodo | _],
     Query =.. [Meta, Value, Nodo],
     answer(Query, Answer),
-    writeln(Answer), 
+    % writeln(Answer), 
     Answer = yes, !,
-    writeln(Value),
+    % writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),

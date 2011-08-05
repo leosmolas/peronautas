@@ -1,4 +1,4 @@
-import socket
+import socket, time
 import sys
 
 ####################################################################################################
@@ -199,12 +199,13 @@ if (__name__ == "__main__"):
     j = 0
     quit = False
     while (not quit):
-        print "Iteration:", j
+        # print "Iteration:", j
+        startIterationTime = time.time()
         # Initialize the global percept to an empty frozenset.
         globalPercept = frozenset([])
         percepts      = range(CONNECTIONS)
 
-        print "Reception phase."
+        # print "Reception phase."
         for i in range(CONNECTIONS):
 
             stop = False
@@ -227,7 +228,12 @@ if (__name__ == "__main__"):
                 #print "PERCEPT:", percept
                 percepts[i]   = eval(percept)
                 globalPercept = globalPercept.union(percepts[i])
-
+                
+                
+        startSendingTime = time.time()
+        print "Tiempo Recibiendo y mergeando"
+        print (startSendingTime - startIterationTime) * 1000, "milisec"
+        
         print "Sending phase."
         for i in range(CONNECTIONS):
             # for each socket, calculate the difference between the accumulator
@@ -235,8 +241,8 @@ if (__name__ == "__main__"):
             if (clientSocketConnected[i]):
                 percept    = percepts[i]
                 difference = globalPercept.difference(percept)
-                print "CONNECTION:", i
-                print "DIFFERENCE:", difference
+                # print "CONNECTION:", i
+                # print "DIFFERENCE:", difference
                 clientSocket[i].send(repr(difference))
                 clientSocket[i].send('\0')
 
@@ -245,5 +251,11 @@ if (__name__ == "__main__"):
         if (connectedClients == 0):
             print "Time to quit."
             quit = True
+            
+            
+        stopSending = time.time()
+        print "Tiempo enviando"
+        print (stopSending - startSendingTime) * 1000, "milisec"
+        
     serverSocket.close()
 

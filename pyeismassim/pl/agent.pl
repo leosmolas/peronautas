@@ -25,6 +25,8 @@
            notVisible/1,
            notExplored/1,
            explored/1,
+           plan/1,
+           intention/1,
            myVisionRange/1.
 
 
@@ -289,12 +291,34 @@ rechargeEnergy(Recharge) :-
     myName(N),
     currentStep(S),
     rechargeEnergy(S, N, Recharge).
+
+run(Action) :-
+    currentStep(Step),
+    nl, nl, nl, write('Current Step: '), writeln(Step),
+    plan([]), !,
+    
+
+    
+    calcTime('setExploredAndVisible',setExploredAndVisible),
+    
+    calcTime('argumentation',argumentation(Meta)),
+
+    calcTime('planning', planning(Meta)),
+    exec(Action),
+    retractall(b(_)),
+    retractall(b(_) <- true),
+    toogleOffVisibleNodes.
+    
+run(Action) :-
+    setExploredAndVisible,
+    exec(Action),
+    toogleOffVisibleNodes.
+    
+plan([]).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 % Intenciones posibles: explore, recharge
 % intention(explore).
@@ -311,24 +335,23 @@ rechargeEnergy(Recharge) :-
 %    assert(  intention(recharge) ).
 
 
-argumentation :-
-    currentStep(0), !,
-    setExploredAndVisible,
-    toogleOffVisibleNodes.
-    
-argumentation :-
-    
-    setExploredAndVisible,
-    write('explored and visible'),nl,
-    setBeliefs,
-    meta(X),
-    nl, nl, nl, write('meta'),nl,
-    write(X),nl,
-    toogleOffVisibleNodes,
-    retractall(b(_)),
-    retractall(b(_) <- true).
+argumentation(Meta) :-
 
+    calcTime('setBeliefs', setBeliefs),
 
+    calcTime('meta', meta(Meta)),
+    retractall(intention(_)),
+    assert(intention(Meta)).
+
+calcTime(Message, Exec) :-
+    write('<predicate name="'),write(Message), writeln('">'),
+    get_time(Before),
+    call(Exec),
+    get_time(After),
+    Time is (After - Before) * 1000,
+    write('<time value="'),write(Time), writeln('"/>'),
+    writeln('</predicate>').
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -345,14 +368,47 @@ argumentation :-
 %    retract( plan(_)          ),
 %    assert(  plan([recharge]) ).
 
+planning(explorar(Node)) :-
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, InitialPosition),
+    energy(Step, Name, Energy),
+    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    retract(plan(_)),
+    assert(plan(Actions)).
 
+planning(probear(Node)) :-
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, InitialPosition),
+    energy(Step, Name, Energy),
+    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    
+    retract(plan(_)),
+    assert(plan(Actions)).
 
-searchNeigh(N) :-
-    myName(A),
-    k(position(A, Pos)),
-    k(edge(Pos, N, _)).
+planning(quedarse(_Node)) :-
+    currentStep(Step),
+    myName(Name),
+    energy(Step, Name, Energy),
+    maxEnergy(Step, Name, Max),
+    Energy < Max, !,
+    retractall(plan(_)),
+    assert(plan([[recharge]])).
+    
+planning(quedarse(_Node)) :-
+    retractall(plan(_)),
+    assert(plan([[skip]])).
+    
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                    Exec                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+exec(Action) :-
+    plan([Action | Actions]),
+    retract(plan(_)),
+    assert(plan(Actions)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %

@@ -84,15 +84,19 @@ class Agent():
         while (not quit):
             step += 1
             print "@Agent: step: %s" % step
-
+            self.initTime = time.time()
+            
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
 
             #print "\nXML:"
             #print xml
             #print ""
-
-            time.sleep(1.5)
+            # if not self.dummy:
+                # time.sleep(1.0)
+            # else:
+                # time.sleep(1.5)
+                # print "hola"
             if (msg_type == 'request-action'):
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
@@ -115,10 +119,11 @@ class Agent():
 ####################################################################################################
 class PrologAgent(Agent):
 
-    def __init__(self, USER, PASS, log, perceptServerHost, perceptServerPort, prolog_source):
+    def __init__(self, USER, PASS, log, perceptServerHost, perceptServerPort, prolog_source, dummy):
         Agent.__init__(self, USER, PASS, log, perceptServerHost, perceptServerPort)
         print "Prolog initialization",
         # Creo una conexion con SWI.
+        self.dummy = dummy
         self.prolog = Prolog()
         self.prolog.consult(prolog_source)
         if (log):
@@ -206,7 +211,7 @@ class PrologAgent(Agent):
     def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
         for e in msg_dict.get('vis_edges', []):
-            print "@Agent: visible edge: %s" % e
+            # print "@Agent: visible edge: %s" % e
             self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
 
         for e in msg_dict.get('surveyed_edges', []):
@@ -293,14 +298,26 @@ class PrologAgent(Agent):
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        print "\n    @PrologAgent: PERCEPTION:"
-        print_message(msg_dict_public)
-        print ""
+        # print "\n    @PrologAgent: PERCEPTION:"
+        # print_message(msg_dict_public)
+        # print ""
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        self.prolog.query("argumentation").next()
-        query_result = self.prolog.query("exec(X)").next()
+        
+        self.percetionProcessTime = time.time()
+        
+        print "hasta el fin del procesamiento de la percepcion"
+        print (self.percetionProcessTime - self.initTime) * 1000, "milisegs"
+        
+        # self.prolog.query("argumentation").next()
+        if self.dummy:
+            query_result = self.prolog.query("execDummy(X)").next()
+        else:
+            query_result = self.prolog.query("run(X)").next()
+        self.prologTime = time.time()
+        print "hasta el fin la ejecucion de prolog"
+        print (self.prologTime - self.percetionProcessTime) * 1000, "milisegs\n\n\n"
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
@@ -323,11 +340,13 @@ if (__name__== "__main__"):
     parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
     parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
     parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
-    parser.add_argument('-l',                                            help="write-to-log mode.",                             action='store_const', const=True, dest='log')
+    parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
+    parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
+    
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/agent.pl")
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, "pl/agent.pl", args.dummy)
     agent.connect()
     agent.perceiveActLoop()
     agent.disconnect()

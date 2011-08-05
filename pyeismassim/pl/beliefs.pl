@@ -14,26 +14,32 @@
     
     
 setBeliefs :-
-    write('setBeliefs'),nl,
-    setEstoyEnLaFrontera,
-    write('estoy'),nl,
-    setPosibleExpansion, !,
-    write('expansion'),nl,
-    printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
-    printFindAll('frontera', b(frontera(_B))),
-    printFindAll('posibleExpansion', b(posibleExpansion(_E))),
-    setPosibleAumento, !,
-    printFindAll('posibleAumento', b(posibleAumento(_A))),
+    
+    % write('setBeliefs'),nl,
+    calcTime('rolSetBeliefs',
+    rolSetBeliefs),
+    calcTime('setEstoyEnLaFrontera',
+    setEstoyEnLaFrontera),
+    % write('estoy'),nl,
+    calcTime('setPosibleExpansion',
+    setPosibleExpansion), !,
+    % write('expansion'),nl,
+    % printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
+    % printFindAll('frontera', b(frontera(_B))),
+    % printFindAll('posibleExpansion', b(posibleExpansion(_E))),
+    calcTime('setPosibleAumento',
+    setPosibleAumento), !,
+    % printFindAll('posibleAumento', b(posibleAumento(_A))),
     % write('voy'),nl,
-    setPosibleExplorar,
-    printFindAll('posibleExplorar', b(posibleExplorar(_))),
-    setPosibleProbear,
-    printFindAll('setPosibleProbear', b(setPosibleProbear(_))),
-    setDifPuntos,
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    calcTime('setPosibleExplorar',
+    setPosibleExplorar),
+    calcTime('setDifPuntos',
+    setDifPuntos),
+    % printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('k', k(_)),
-    setDistancia,
-    printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
+    calcTime('setDistancia',
+    setDistancia).
+    % printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -95,7 +101,10 @@ setDifPuntos :-
     myTeam(T),
     teamPoints(T, ActualPoints),
     foreach(
-        b(posibleExpansion(Node)),
+        (
+            b(posibleExpansion(Node)),
+            not(b(difPuntosZona(Node, _DifPuntos1)) <- true)
+        ),
         (
             doNotFail(
                 (
@@ -109,11 +118,11 @@ setDifPuntos :-
             )
         )
     ),
-    printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
+    % printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
     foreach(
         (
             b(posibleExplorar(Node)),
-            not(b(posibleExpansion(Node)))
+            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
         ),
         (
             doNotFail(
@@ -131,8 +140,7 @@ setDifPuntos :-
     foreach(
         (
             b(posibleAumento(Node)),
-            not(b(posibleExplorar(Node))),
-            not(b(posibleExpansion(Node)))
+            not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
         ),
         (
             doNotFail(
@@ -146,8 +154,7 @@ setDifPuntos :-
                 )
             )
         )
-    ),
-    rolSetDifPuntos(A, T, ActualPoints).
+    ).
     
 
 	
@@ -181,6 +188,7 @@ setPosibleAumento :-
 setPosibleAumento.
 
 setDistancia :-
+    % writeln('setDistancia'),nl,
     % writeln('1'),nl,
     myName(Name),
     % writeln('2'),nl,
@@ -191,30 +199,39 @@ setDistancia :-
     energy(Step, Name, Energy),
     % writeln('5'),nl,
     foreach(
-        b(posibleAumento(Node)),
+        (
+            b(posibleExplorar(Node)),
+            not(b(distancia(Node, _PathCost2)) <- true)
+        ),
         (
             % writeln('6.1'),nl,
-            searchPath(Position, Node, Energy)
+            % writeln(Node),nl,
+            searchPath(Position, Node, Energy, [[survey]], 1)
+        )
+    ),
+    foreach(
+        (
+            b(posibleAumento(Node)),
+            not(b(distancia(Node, _PathCost)) <- true)
+        ),
+        (
+            % writeln('6.1'),nl,
+            % writeln(Node),nl,
+            searchPath(Position, Node, Energy, [], 0)
         )
     ), 
-    foreach(
-        b(posibleExplorar(Node)),
-        (
-            % writeln('6.1'),nl,
-            searchPath(Position, Node, Energy)
-        )
-    ), !.
+    !.
     
 setDistancia.
 
-searchPath(Position, Node, Energy) :-
-    pathSearch(Position, Node, Energy, _Path, _Actions, PathCost), !,
+searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
+    pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost), !,
     % printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6))),
     % writeln('6.2'),nl,
     assert(b(distancia(Node, PathCost)) <- true).
     % writeln('6.3'),nl.
     
-searchPath(_Position, _Node, _Energy).
+searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
