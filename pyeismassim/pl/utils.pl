@@ -19,15 +19,15 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % V \= unknown, !, % tiene por lo menos un arco de salida del cual conoce su valor
     retractall(isGoal(_)),	
     assert(isGoal(FinalNode)),
-	writeln('UCS'),
+	% writeln('UCS'),
     % writeln('2'),nl,
-	printFindAll('isGoal', isGoal(_)),
+	% printFindAll('isGoal', isGoal(_)),
     ucs([ucsNode(InitialNode, Energy, [], [], 0)], [ucsNode(InitialNode, 0, [], [], 0)], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
-    writeln('3'),nl,
+    % writeln('3'),nl,
     % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, 1, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
-    writeln('4'),nl,
+    % writeln('4'),nl,
     
     PlanCost is NewTurns2 + PathCost,
     
@@ -54,8 +54,8 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 
 ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost, Energy) :-
     ucsSelect(Frontier, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
-	writeln('UCS caso isgoal'),
-	writeln(Position),
+	% writeln('UCS caso isgoal'),
+	% writeln(Position),
     isGoal(Position).
 	
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
@@ -81,19 +81,19 @@ ucsSelect([Node | Frontier], Node, Frontier).
 addToFrontier([], Frontier, Frontier, Visited, Visited).
 
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
-	writeln('addToFrontier'),
+	% writeln('addToFrontier'),
 	check(Neighbor, OldFrontier, NewFrontier, OldVisited, NewVisited), !,
 	addToFrontier(Neighbors, NewFrontier, Frontier, NewVisited, Visited).
         
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
     % not(member(ucsNode(Neighbor, _, _, _, _), OldVisited)),
-	writeln('addToFrontier caso 2'),
+	% writeln('addToFrontier caso 2'),
     Neighbor = ucsNode(Node,  _, _, _, _),
-	writeln('1'),
+	% writeln('1'),
 	foreach(member(ucsNode(N, _, _, _, _), OldVisited), Node \= N), !,
-	writeln('2'),
+	% writeln('2'),
 	insert_pq(Neighbor, OldFrontier, NewFrontier),
-	writeln('3'),
+	% writeln('3'),
     addToFrontier(Neighbors, NewFrontier, Frontier, OldVisited, Visited).
     
 addToFrontier([_Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
@@ -191,10 +191,10 @@ calcActions(Pos, Energy, [Neigh | Neighs], ListOfListOfActions) :-
     % writeln('2'),nl,
     calcRecharge(Energy, Value, [[goto, Neigh]], ListOfActions, 1, Turns, RemainingEnergy),
     isFail(ucsNode(Neigh, RemainingEnergy, _Path, ListOfActions, Turns)), !,
-	writeln('Neigh'),
-	writeln(Neigh),
-	writeln('Turns'),
-	writeln(Turns),
+	% writeln('Neigh'),
+	% writeln(Neigh),
+	% writeln('Turns'),
+	% writeln(Turns),
     calcActions(Pos, Energy, Neighs, ListOfListOfActions).
 	
 calcActions(Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions]) :-
