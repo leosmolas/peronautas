@@ -240,7 +240,7 @@ setDistancia :-
             b(posibleExplorar(Node1))
         )
     ),
-	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
+	% printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
     foreach(
         (
             b(posibleExplorar(Node))
@@ -271,9 +271,9 @@ setDistancia :-
 setDistancia.
 
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
-	writeln('pathSearch'),
+	% writeln('pathSearch'),
     pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost), !,
-	printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7))),
+	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7))),
     % writeln('6.2'),nl,
     assert(b(distancia(Node, PathCost)) <- true).
     % writeln('6.3'),nl.
@@ -286,7 +286,7 @@ searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setPosibleExplorar :-
-	printFindAll('hasAtLeastOneUnsurveyedEdge(Node)', hasAtLeastOneUnsurveyedEdge(_)),
+	% printFindAll('hasAtLeastOneUnsurveyedEdge(Node)', hasAtLeastOneUnsurveyedEdge(_)),
     foreach(
         hasAtLeastOneUnsurveyedEdge(Node),
         assertOnce(b(posibleExplorar(Node)))
