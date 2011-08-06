@@ -8,3 +8,4 @@ pyeismassim/run.sh
 pyeismassim/*-kb.txt
 pyeismassim/*-log.txt
 pyeismassim/runw.sh
+pyeismassim/xml.txt
