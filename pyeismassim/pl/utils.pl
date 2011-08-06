@@ -2,14 +2,14 @@
 % :- [kmap].
 :- dynamic isGoal/1, isFail/1.
 
-
+testS :- pathSearch(vertex0, vertex10, 5, [], 0, Path, Plan, NewTurns2).
 
 % pathSearch(-InitialNode, -FinalNode, -Energy, -ActionToBeDone, -CostOfAction, +Path, +Actions, +PathCost)
 % wrapper para la uniform cost search.
 % asserta isGoal y lo retracta al final.
 % instancia todos los parametros para llamar a ucs
 % ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
-pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, PlanCost) :-
+pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2) :-
     % writeln('pathSearch'),nl,
     % writeln('1'),nl,
     
@@ -21,18 +21,17 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     assert(isGoal(FinalNode)),
 	% writeln('UCS'),
     % writeln('2'),nl,
+    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
 	% printFindAll('isGoal', isGoal(_)),
-    ucs([ucsNode(InitialNode, Energy, [], [], 0)], [ucsNode(InitialNode, 0, [], [], 0)], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
     % writeln('3'),nl,
     % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
-    calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, 1, NewTurns2, RemainingEnergy1),
+    calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, PathCost, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
     % writeln('4'),nl,
     
-    PlanCost is NewTurns2 + PathCost,
     
-    
-    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, PlanCost, RemainingEnergy1))).
+    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
     
 % pathSearch(_InitialNode, _FinalNode, _Energy, _Path, _Actions, _PathCost) :-
     % retractall(isGoal(_)).
@@ -52,8 +51,8 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % ucsSelect(Frontier, ucsNode(_Position, _Energy, _Path, _Actions, Path_Cost), _Frontier1),
     % isFail(ucsNode(_, _, _, _, Path_Cost)), writeln('Despues del !'), !,  fail. 
 
-ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost, Energy) :-
-    ucsSelect(Frontier, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
+ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
+    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
 	% writeln('UCS caso isgoal'),
 	% writeln(Position),
     isGoal(Position).
@@ -61,11 +60,14 @@ ucs(Frontier, _Visited, [Position | Path], Actions, Path_Cost, Energy) :-
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     % writeln('ucs'),nl,
     % writeln('ucs 1'),nl,
-    ucsSelect(Frontier, SelectedNode, Frontier1),
+    ucsSelect(Frontier, Visited, SelectedNode, Frontier1),
+    % writeln('ucs 20'),nl,
     ucsNeighbors(SelectedNode, Neighbors),
-	% writeln(Neighbors),
+	% writeln(SelectedNode),
+    % writeln(Neighbors),
     % writeln('ucs 2'),nl,
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), !,
+    % writeln(FrontierNew),
     % writeln('3'),nl,
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
@@ -73,8 +75,19 @@ minEnergy(Energy1, Energy2, Energy1) :-
     Energy1 < Energy2, !.
 
 minEnergy(_Energy1, Energy2, Energy2).
+        
+        
+% ucsSelect(OldFrontier, Visited, Node, NewFrontier) :-
+    % writeln('ucsSelect 1'),
+    % get_from_heap(OldFrontier, _P, ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier),
+    % writeln('ucsSelect 2'),
+    % member(Node2, Visited), !,
+    % writeln('ucsSelect 3'),
+    % ucsSelect(Frontier, Visited, Node, NewFrontier).
     
-ucsSelect([Node | Frontier], Node, Frontier).
+ucsSelect(OldFrontier, _Visited, Node, Frontier) :-
+    % writeln('ucsSelect 4'),
+    get_from_heap(OldFrontier, _P, Node, Frontier) .
     
 % addToFrontier(-Neighbors, -Frontier, +FrontierNew, -Visited, +VisitedNew).
 
@@ -135,14 +148,17 @@ check(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFront
     insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier).
     
 % Insercion ordenada
-insert_pq(State, [], [State]) :- !.
-insert_pq(State, [H | T], [State, H | T]) :-
-    precedes(State, H), !.
-insert_pq(State, [H|T], [H | T_new]) :-
-    insert_pq(State, T, T_new).
+% insert_pq(State, [], [State]) :- !.
+% insert_pq(State, [H | T], [State, H | T]) :-
+    % precedes(State, H), !.
+% insert_pq(State, [H|T], [H | T_new]) :-
+    % insert_pq(State, T, T_new).
     
-precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Position2, _Energy2, _Path2, _Actions2, PathCost2)) :-
-    PathCost < PathCost2, !.
+insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Old, New) :-
+    add_to_heap(Old, Path_Cost, ucsNode(Position, Energy, Path, Actions, Path_Cost), New).
+    
+% precedes(ucsNode(_Position, _Energy, _Path, _Actions, PathCost), ucsNode(_Position2, _Energy2, _Path2, _Actions2, PathCost2)) :-
+    % PathCost < PathCost2, !.
 
 % ucsNeighbors(-UcsNode, -Energy, +Neighbors)
 % UcsNode: el nodo actual.
