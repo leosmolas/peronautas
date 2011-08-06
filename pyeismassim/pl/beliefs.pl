@@ -115,15 +115,15 @@ setDifPuntos :-
         'posibleExpansion', 
         Node1, 
         (
-            b(posibleExpansion(Node1))
-            % not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExpansion(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
 
     foreach(
         (
-            b(posibleExpansion(Node))
-            % not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
+            b(posibleExpansion(Node)),
+            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
         ),
         (
             doNotFail(
@@ -143,14 +143,14 @@ setDifPuntos :-
         'posibleExplorar', 
         Node1, 
         (
-            b(posibleExplorar(Node1))
-            % not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExplorar(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleExplorar(Node))
-            % not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
+            b(posibleExplorar(Node)),
+            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
         ),
         (
             doNotFail(
@@ -169,14 +169,14 @@ setDifPuntos :-
         'posibleAumento', 
         Node1, 
         (
-            b(posibleAumento(Node1))
-            % not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleAumento(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleAumento(Node))
-            % not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
+            b(posibleAumento(Node)),
+            not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
         ),
         (
             doNotFail(
@@ -245,7 +245,7 @@ setDistancia :-
     foreach(
         (
             b(posibleExplorar(Node))
-            % not(b(distancia(Node, _PathCost2)) <- true)
+            % not(b(distancia(Node, [[survey]], _PathCost2)) <- true)
         ),
         (
             % writeln('6.1'),nl,
@@ -253,6 +253,13 @@ setDistancia :-
 			retractall(isFail(_)),
 			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
             searchPath(Position, Node, Energy, [[survey]], 1)
+        )
+    ),
+    writeLenght(
+        'posibleAumento', 
+        Node1, 
+        (
+            b(posibleAumento(Node1))
         )
     ),
     foreach(
@@ -289,7 +296,37 @@ searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 
 setPosibleExplorar :-
 	% printFindAll('hasAtLeastOneUnsurveyedEdge(Node)', hasAtLeastOneUnsurveyedEdge(_)),
-    foreach(
-        hasAtLeastOneUnsurveyedEdge(Node),
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, Position),
+    % writeln('1'),
+    retractall(isGoal(_, _)),
+    assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost < 2)),
+    % writeln('2'),
+	foreach(
+        (
+            breadthFirst(Position, FinalNode, _Path, _Cost)
+        ), 
         assertOnce(b(posibleExplorar(Node)))
-    ).
+    ),
+    chequearPosibleExplorar(2).
+    
+chequearPosibleExplorar(_) :-
+    b(posibleExplorar(Node)), !.
+    
+chequearPosibleExplorar(X) :-
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, Position),
+    % writeln('1'),
+    retractall(isGoal(_, _)),
+    NewCost is X + 2,
+    assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost >= X, Cost < NewCost)),
+    % writeln('2'),
+	foreach(
+        (
+            breadthFirst(Position, FinalNode, _Path, _Cost)
+        ), 
+        assertOnce(b(posibleExplorar(FinalNode)))
+    ),
+    chequearPosibleExplorar(NewCost).
