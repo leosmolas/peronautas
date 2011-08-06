@@ -35,7 +35,7 @@ expansion(Value, X) -<
 % DESIRE explorar(Nodo)
 % Conocer todos los arcos que salen del nodo.
 explorar(Value, X) -< 
-               ~estaLejos(X, Dist, 7),
+               ~estaLejos(X, [[survey]], Dist, 7),
                % ~explored(X),
                b(difPuntosZona(X, DifPuntos)),
                positivoONegativo(DifPuntos, Positivo, Negativo),
@@ -49,7 +49,7 @@ explorar(Value, X) -<
 
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
 aumento(Value, X) -< 
-              ~estaLejos(X, Dist, 10), 
+              ~estaLejos(X, [[]], Dist, 10), 
               esSeguro(X),
               b(difPuntosZona(X, DifPuntos)),
               greater(DifPuntos, 0),
@@ -70,9 +70,9 @@ positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
 % ~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
                                % lessEqDist, 2).
 
-~estaLejos(X, Dist, _) -< b(distancia(X, Dist)).
+~estaLejos(X, Acciones, Dist, _) -< b(distancia(X, Acciones, Dist)).
 
-estaLejos(X, Dist, Cota) <- b(distancia(X, Dist)),
+estaLejos(X, Acciones, Dist, Cota) <- b(distancia(X, Acciones, Dist)),
                             greater(Dist, Cota).
 
 ~estoyEnLaFrontera -< true.
