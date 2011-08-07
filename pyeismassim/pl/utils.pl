@@ -1,5 +1,5 @@
 :- [graph/map].
-% :- [kmap].
+:- [kmap].
 :- dynamic isGoal/1, isFail/1.
 
 testS :- pathSearch(vertex0, vertex10, 5, [], 0, Path, Plan, NewTurns2).
@@ -23,7 +23,7 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % writeln('2'),nl,
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
 	% printFindAll('isGoal', isGoal(_)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), !, % otro cut inexplicable
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), %!, % otro cut inexplicable
     % writeln('3'),nl,
     % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, PathCost, NewTurns2, RemainingEnergy1),
@@ -66,7 +66,7 @@ ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
 	% writeln(SelectedNode),
     % writeln(Neighbors),
     % writeln('ucs 2'),nl,
-    addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), !,
+    addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
     % writeln(FrontierNew),
     % writeln('3'),nl,
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
@@ -77,26 +77,24 @@ minEnergy(Energy1, Energy2, Energy1) :-
 minEnergy(_Energy1, Energy2, Energy2).
         
         
-% ucsSelect(OldFrontier, Visited, Node, NewFrontier) :-
-    % writeln('ucsSelect 1'),
-    % get_from_heap(OldFrontier, _P, ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier),
-    % writeln('ucsSelect 2'),
-    % member(Node2, Visited), !,
-    % writeln('ucsSelect 3'),
-    % ucsSelect(Frontier, Visited, Node, NewFrontier).
+ucsSelect(OldFrontier, Visited, Node, NewFrontier) :-
+    get_from_heap(OldFrontier, _P, Node2, Frontier),
+    ucsSelectAux(Node2, Frontier, Visited, Node, NewFrontier).
     
-ucsSelect(OldFrontier, _Visited, Node, Frontier) :-
-    % writeln('ucsSelect 4'),
-    get_from_heap(OldFrontier, _P, Node, Frontier) .
+ucsSelectAux(ucsNode(Position, _, _, _, _), Frontier, Visited, Node, NewFrontier) :-
+    member(ucsNode(Position, _, _, _, _), Visited), !,
+    ucsSelect(Frontier, Visited, Node, NewFrontier).
+
+ucsSelectAux(Node, Frontier, _Visited, Node, Frontier).
     
 % addToFrontier(-Neighbors, -Frontier, +FrontierNew, -Visited, +VisitedNew).
 
 addToFrontier([], Frontier, Frontier, Visited, Visited).
 
-addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
-	% writeln('addToFrontier'),
-	check(Neighbor, OldFrontier, NewFrontier, OldVisited, NewVisited), !,
-	addToFrontier(Neighbors, NewFrontier, Frontier, NewVisited, Visited).
+% addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
+	% % writeln('addToFrontier'),
+	% check(Neighbor, OldFrontier, NewFrontier, OldVisited, NewVisited), !,
+	% addToFrontier(Neighbors, NewFrontier, Frontier, NewVisited, Visited).
         
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
     % not(member(ucsNode(Neighbor, _, _, _, _), OldVisited)),
