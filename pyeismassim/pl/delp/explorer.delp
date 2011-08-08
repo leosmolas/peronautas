@@ -1,7 +1,7 @@
 ﻿% se instancia con lo que no esta probeado
 % DESIRE explorar(Nodo)
 probear(Value, X) -< 
-    ~estaLejos(X, Dist, 10),
+    ~estaLejos(X, [[probe]], Dist, 10),
     notProbedInZone(X, InZone),
     b(difPuntosZona(X, DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),

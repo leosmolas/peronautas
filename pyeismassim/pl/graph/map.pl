@@ -393,9 +393,9 @@ step2 :-
 % step3
 % third step of the coloring algorithm
 step3 :-    
-    findall(N1, (notExplored(N1), h(nodeTeam(N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
+    % findall(N1, (notExplored(N1), h(nodeTeam(N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
     findall(N2, (notVisible(N2), h(nodeTeam(N2, none))), ListOfNotVisible),
-    setOwner(ListOfNotExplored, ofNoOne),
+    % setOwner(ListOfNotExplored, ofNoOne),
     setOwner(ListOfNotVisible, ofNoOne),
     foreach(
         clearNode(Node), 
@@ -418,6 +418,11 @@ teamHPoints(Team, Points) :-
     calcHPoints(ListOfNodes, 0, Points).
     
 calcHPoints([], Points, Points).
+
+calcHPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkHNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcHPoints(Nodes, Points2, Points3).
 
 calcHPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     checkHNeighbors(Node, Team), !,
@@ -446,14 +451,20 @@ teamPoints(Team, Points) :-
     
 calcPoints([], Points, Points).
 
+calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcPoints(Nodes, Points2, Points3).
+
 calcPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     checkNeighbors(Node, Team), !,
     Points2 is Points1 + Value,
     calcPoints(Nodes, Points2, Points3).
     
-calcPoints([_ | Nodes], Points1, Points2):-
+calcPoints([Node | Nodes], Points1, Points2):-
     calcPoints(Nodes, Points1, Points2).
     
 checkNeighbors(Node, Team) :-
     k(edge(Node, X, _)),
-    k(nodeTeam(X, Team, _V)), !.
+    currentStep(Step),
+    k(nodeTeam(Step, X, Team)), !.

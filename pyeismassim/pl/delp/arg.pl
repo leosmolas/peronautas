@@ -28,7 +28,7 @@ meta(X) :-
     assert(mejorMeta(_, -1000)), % meta con "menos infinito"
     % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
     foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
-    % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
+    foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
     
     
     currentStep(Step),
@@ -44,13 +44,13 @@ meta(X) :-
     retract(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    % writeln(X),
+    writeln(X),
     X =.. [Meta, Nodo | _],
     Query =.. [Meta, Value, Nodo],
     answer(Query, Answer),
-    % writeln(Answer), 
+    writeln(Answer), 
     Answer = yes, !,
-    % writeln(Value),
+    writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),
@@ -68,6 +68,9 @@ is_a_built_in(greaterEq(_X,_Y)).
 is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
+is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _Value)).
+is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _Value2)).
+is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _Value3) ).
 
 % Operaciones aritméticas
 mult(X,Y,Z)    :- Z is X * Y.
