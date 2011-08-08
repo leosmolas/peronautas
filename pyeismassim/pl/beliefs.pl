@@ -110,7 +110,11 @@ writeLenght(Name, Node, Pattern) :-
 setDifPuntos :-
     myName(A),
     myTeam(T),
-    teamPoints(T, ActualPoints),
+    % teamPoints(T, ActualPoints),
+    setHypotheticalMap,
+    calcTime('coloringAlgorithm',
+    coloringAlgorithm),
+    teamHPoints(T, ActualPoints),
     writeLenght(
         'posibleExpansion', 
         Node1, 
@@ -119,7 +123,7 @@ setDifPuntos :-
             not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
         )
     ),
-
+    write('ActualPoints: '), writeln(ActualPoints),
     foreach(
         (
             b(posibleExpansion(Node)),
@@ -130,9 +134,12 @@ setDifPuntos :-
                 (
                     setHypotheticalMap,
                     moveAgent(A, Node),
-                    coloringAlgorithm,
+                    calcTime('coloringAlgorithm',
+                    coloringAlgorithm),
                     teamHPoints(T, Points),
                     DifPuntos is Points - ActualPoints,
+                    write('Node: '), writeln(Node),
+                    write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
             )
@@ -157,9 +164,12 @@ setDifPuntos :-
                 (
                     setHypotheticalMap,
                     moveAgent(A, Node),
-                    coloringAlgorithm,
+                    calcTime('coloringAlgorithm',
+                    coloringAlgorithm),
                     teamHPoints(T, Points),
                     DifPuntos is Points - ActualPoints,
+                    write('Node: '), writeln(Node),
+                    write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
             )
@@ -183,9 +193,12 @@ setDifPuntos :-
                 (
                     setHypotheticalMap,
                     moveAgent(A, Node),
-                    coloringAlgorithm,
+                    calcTime('coloringAlgorithm',
+                    coloringAlgorithm),
                     teamHPoints(T, Points),
                     DifPuntos is Points - ActualPoints,
+                    write('Node: '), writeln(Node),
+                    write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
             )

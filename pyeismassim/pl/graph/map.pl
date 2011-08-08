@@ -419,6 +419,11 @@ teamHPoints(Team, Points) :-
     
 calcHPoints([], Points, Points).
 
+calcHPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkHNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcHPoints(Nodes, Points2, Points3).
+
 calcHPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     checkHNeighbors(Node, Team), !,
     Points2 is Points1 + Value,
@@ -446,14 +451,20 @@ teamPoints(Team, Points) :-
     
 calcPoints([], Points, Points).
 
+calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcPoints(Nodes, Points2, Points3).
+
 calcPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     checkNeighbors(Node, Team), !,
     Points2 is Points1 + Value,
     calcPoints(Nodes, Points2, Points3).
     
-calcPoints([_ | Nodes], Points1, Points2):-
+calcPoints([Node | Nodes], Points1, Points2):-
     calcPoints(Nodes, Points1, Points2).
     
 checkNeighbors(Node, Team) :-
     k(edge(Node, X, _)),
-    k(nodeTeam(X, Team, _V)), !.
+    currentStep(Step),
+    k(nodeTeam(Step, X, Team)), !.

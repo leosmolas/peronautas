@@ -118,7 +118,7 @@ rolSetDistancia :-
             searchPath(Position, Node, Energy, [[probe]], 1)
         )
     ),
-    printFindAll('paths', b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
+    printFindAll('paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
