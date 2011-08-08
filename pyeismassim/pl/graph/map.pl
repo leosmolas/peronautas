@@ -411,25 +411,33 @@ teamHPoints(Team, Points) :-
         [Node, Team, Value],
         (
             h(nodeTeam(Node, Team)), 
-            k(nodeValue(Node, Value)),
-            Value \= unknown
+            k(nodeValue(Node, Value))
         ), 
         ListOfNodes),
-    calcHPoints(ListOfNodes, 0, Points).
+	write('teamHPoints, ListOfNodes: '), writeln(ListOfNodes),
+	writeln(Points),
+    calcHPoints(ListOfNodes, 0, Points),
+	writeln('fin calcHPoints').
     
-calcHPoints([], Points, Points).
+calcHPoints([], Points, Points) :-
+	writeln('caso base').
 
 calcHPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+	writeln('inicio calcHPoints'),
     checkHNeighbors(Node, Team), !,
     Points2 is Points1 + 1,
+	writeln('despues de la suma'),
     calcHPoints(Nodes, Points2, Points3).
 
 calcHPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
+	writeln('caso 2  calcHPoints'),
     checkHNeighbors(Node, Team), !,
     Points2 is Points1 + Value,
+	writeln('despues de la suma 2 '),
     calcHPoints(Nodes, Points2, Points3).
     
 calcHPoints([_ | Nodes], Points1, Points2):-
+	writeln('caso 3  calcHPoints'),
     calcHPoints(Nodes, Points1, Points2).
     
 % chequea que por lo menos un vecino sea del mismo equipo, para así podes sumar sus puntos

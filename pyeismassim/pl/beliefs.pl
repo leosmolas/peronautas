@@ -113,10 +113,10 @@ setDifPuntos :-
     teamPoints(T, ActualPoints),
     writeLenght(
         'posibleExpansion', 
-        Node1, 
+        Node4, 
         (
-            b(posibleExpansion(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExpansion(Node4)),
+            not(b(difPuntosZona(Node4, _DifPuntos1)) <- true)
         )
     ),
     write('ActualPoints: '), writeln(ActualPoints),
@@ -144,58 +144,58 @@ setDifPuntos :-
     % printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
     writeLenght(
         'posibleExplorar', 
-        Node1, 
+        Node3, 
         (
-            b(posibleExplorar(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExplorar(Node3)),
+            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleExplorar(Node)),
-            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
+            b(posibleExplorar(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos2)) <- true)
         ),
         (
             doNotFail(
                 (
-                    write('Node: '), writeln(Node),
+                    write('Node: '), writeln(Node1),
                     setHypotheticalMap,
-                    moveAgent(A, Node),
+                    moveAgent(A, Node1),
                     calcTime('coloringAlgorithm',
                     coloringAlgorithm),
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
+                    teamHPoints(T, Points1),
+                    DifPuntos1 is Points1 - ActualPoints,
+                    write('Points: '), writeln(Points1),
+                    assert(b(difPuntosZona(Node1, DifPuntos1)) <- true)
                 )
             )
         )
     ),
     writeLenght(
         'posibleAumento', 
-        Node1, 
+        Node2, 
         (
-            b(posibleAumento(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleAumento(Node2)),
+            not(b(difPuntosZona(Node2, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleAumento(Node)),
-            not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
+            b(posibleAumento(Node5)),
+            not(b(difPuntosZona(Node5, _DifPuntos3)) <- true)
         ),
         (
             doNotFail(
                 (
-                    write('Node: '), writeln(Node),
+                    write('Node: '), writeln(Node5),
                     setHypotheticalMap,
-                    moveAgent(A, Node),
+                    moveAgent(A, Node5),
                     calcTime('coloringAlgorithm',
                     coloringAlgorithm),
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
+                    teamHPoints(T, Points2),
+                    DifPuntos2 is Points2 - ActualPoints,
+                    write('Points: '), writeln(Points2),
+                    assert(b(difPuntosZona(Node5, DifPuntos2)) <- true)
                 )
             )
         )
