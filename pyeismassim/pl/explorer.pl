@@ -13,7 +13,6 @@
 %----------------------------------------------------------------------%
 
 exec(Action) :- 
-    listing(k),
     action(Action).
 
 %------------------------------  Probe  --------------------------------%
@@ -42,29 +41,30 @@ action([survey, Position]) :-
 
 %-------------------------------  Goto  ---------------------------------%
 
-%-- First Node Reachable Goto --%
+%-- Goto First Reachable Node --%
 
-action([goto, X]) :-
-    write(3.1),nl,
-    myPosition(Position),
-    k(nodeValue(Position, Cost)),
-    write(3.2),nl,
-    myEnergy(Energy),
-    Energy >= Cost,
-    write(3.3),nl,
-    findall(
-        [Node, Cost], 
-        (
-            k(edge(Position, Node, Cost)), 
-            k(nodeValue(Node, unknown))
-        ), 
-        Nodes),
-    write(3.4),nl,
-    reachableNode(X, Nodes), 
-    write(3.5),nl,
-    !.
+%action([goto, X]) :-
+%    write(3.1),nl,
+%    myPosition(Position),
+%    k(nodeValue(Position, Cost)),
+%    write(3.2),nl,
+%    myEnergy(Energy),
+%    write([myEnergy,Energy,cost,Cost]),nl,
+%    Energy >= Cost,
+%    write(3.3),nl,
+%    findall(
+%        [Node, Cost], 
+%        (
+%            k(edge(Position, Node, Cost)), 
+%            k(nodeValue(Node, unknown))
+%        ), 
+%        Nodes),
+%    write(3.4),nl,
+%    reachableNode(X, Nodes), 
+%    write(3.5),nl,
+%    !.
      
-%-- First Node Goto --%
+%-- Goto First Node --%
 
 action([goto, X]) :-
     write(4.1),nl,

@@ -143,7 +143,7 @@ class PrologAgent(Agent):
 
 
     def finalizationHook(self):
-        self.prolog.query("dumpKB").next()
+        #self.prolog.query("dumpKB").next()
         self.prolog.query("close_output").next()
         self.prolog = None
 
@@ -216,9 +216,14 @@ class PrologAgent(Agent):
 
 
     def processEntities(self, msg_dict_private, msg_dict_public):
+
+        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']])
+        inspected_entity_names = frozenset([e['name'] for e in msg_dict_public['inspected_ents']])
+
         # Proceso el resto de las entidades visibles.
-        for e in msg_dict_public['vis_ents']:
-            self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (e['name'], e['team'], e['node'])).next()
+        for vis_ent in msg_dict_public['vis_ents']:
+            if (vis_ent['name'] in inspected_entity_names):
+                self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'])).next()
 
         # Proceso las entidades en la percepcion compartida.
         # Si o si son de tu equipo, luego el team se fija a el propio.
@@ -228,6 +233,7 @@ class PrologAgent(Agent):
             for e in msg_dict_public['vis_ents']:
                 if (unicode(self.username) == e['name']):
                     team = e['team']
+                    break
 
             # Caso especial: cuando soy yo mismo.
             if (p['name'] == 'self'):
@@ -280,6 +286,8 @@ class PrologAgent(Agent):
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
+
+        self.prolog.query("updatePhase").next()
 
 
 
