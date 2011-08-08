@@ -302,7 +302,7 @@ run(Action) :-
     calcTime('setExploredAndVisible',setExploredAndVisible),
     
     calcTime('argumentation',argumentation(Meta)),
-
+    write('Meta: '), writeln(Meta),
     calcTime('planning', planning(Meta)),
     exec(Action),
     retractall(b(_)),

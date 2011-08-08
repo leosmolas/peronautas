@@ -36,11 +36,11 @@ setBeliefs :-
     calcTime('setDistancia',
     setDistancia),
     calcTime('setDifPuntos',
-    setDifPuntos).
-    % printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
-    % printFindAll('k', k(_)),
-
-    % printFindAll('setDistancia', b(distancia(Node, PathCost)) <- true).
+    setDifPuntos),
+    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    % printFindAll('edge', k(edge(N1, N2, V))),
+    printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))),
+    printFindAll('setDistancia', b(distancia(Node, A, PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -241,7 +241,9 @@ setDistancia :-
             b(posibleExplorar(Node1))
         )
     ),
-	% printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
+	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     foreach(
         (
             b(posibleExplorar(Node))
@@ -250,8 +252,7 @@ setDistancia :-
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,
-			retractall(isFail(_)),
-			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
+
             searchPath(Position, Node, Energy, [[survey]], 1)
         )
     ),
@@ -262,6 +263,8 @@ setDistancia :-
             b(posibleAumento(Node1))
         )
     ),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         (
             b(posibleAumento(Node))
@@ -270,8 +273,7 @@ setDistancia :-
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,
-			retractall(isFail(_)),
-            assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+
             searchPath(Position, Node, Energy, [], 0)
         )
     ), 
@@ -307,9 +309,11 @@ setPosibleExplorar :-
         (
             breadthFirst(Position, FinalNode, _Path, _Cost)
         ), 
-        assertOnce(b(posibleExplorar(Node)))
+        assertOnce(b(posibleExplorar(FinalNode)))
     ),
     chequearPosibleExplorar(2).
+    
+chequearPosibleExplorar(6) :- !.
     
 chequearPosibleExplorar(_) :-
     b(posibleExplorar(Node)), !.

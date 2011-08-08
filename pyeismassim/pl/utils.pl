@@ -10,8 +10,8 @@ testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
 % instancia todos los parametros para llamar a ucs
 % ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
 pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2) :-
-    % writeln('pathSearch'),nl,
-    % writeln('1'),nl,
+    % writeln('pathSearch'),
+    % writeln('1'),
     
     
     % explored(InitialNode), % conozco todos los arcos, para poder salir
@@ -20,16 +20,15 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     retractall(isGoal(_)),	
     assert(isGoal(FinalNode)),
 	% writeln('UCS'),
-    % writeln('2'),nl,
+    % writeln('2'),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
 	% printFindAll('isGoal', isGoal(_)),
     ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), %!, % otro cut inexplicable
-    % writeln('3'),nl,
-    % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
+    % writeln('3'),
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
-    % writeln('4'),nl,
+    % writeln('4'),
     not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
     
     assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
@@ -60,16 +59,16 @@ ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
 	
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     % writeln('ucs'),nl,
-    % writeln('ucs 1'),nl,
+    % writeln('ucs 1'),
     ucsSelect(Frontier, Visited, SelectedNode, Frontier1),
-    % writeln('ucs 20'),nl,
+    % writeln('ucs 20'),
     ucsNeighbors(SelectedNode, Neighbors),
 	% writeln(SelectedNode),
     % writeln(Neighbors),
-    % writeln('ucs 2'),nl,
+    % writeln('ucs 2'),
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
     % writeln(FrontierNew),
-    % writeln('3'),nl,
+    % writeln('ucs 3'),
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
 minEnergy(Energy1, Energy2, Energy1) :-
@@ -164,8 +163,8 @@ insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Old, New) :-
 % Energy: energia actual.
 % Neighbors: lista con un ucsNodes por cada vecino.
 ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
-    % writeln('ucsNeighbors'),nl,
-    % writeln('1'),nl,
+    % writeln('ucsNeighbors'),
+    % writeln('1'),
     findall(
         Node, 
         (
@@ -175,9 +174,9 @@ ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
         ), 
         Neigh
     ),
-    % writeln('2'),nl,
+    % writeln('2'),
     calcActions(Position, Energy, Neigh, ListOfActions),
-    % writeln('3'),nl,
+    % writeln('3'),
     calcUcsNodes(Position, Path, Actions, Path_Cost, ListOfActions, Neighbors).
 
 % calcUcsNodes(-Position, -Path, -Actions, -PathCost, -ListOfCalcActions, +ListOfUcsNodes)
@@ -192,15 +191,16 @@ calcUcsNodes(_Position, _Path, _Actions, _PathCost, [], []).
 calcUcsNodes(Position, Path, Actions, PathCost, [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions], Neighbors2) :-
     append(Actions, ListOfActions, NewActions),
     NewPathCost is PathCost + Turns,
-    
+    % writeln('calcUcsNodes'),
     calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, ucsNode(Neigh, RemainingEnergy, [Position | Path], NewActions, NewPathCost), Neighbors2).
 
 calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode, Neighbors) :-
     isFail(UcsNode), !,
-
+    % writeln('isFail'),
     calcUcsNodes(Position, Path, Actions, PathCost, ListOfListOfActions, Neighbors).
     
 calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode, [UcsNode | Neighbors]) :-
+    % writeln('calcUcsNodesAux'),
     calcUcsNodes(Position, Path, Actions, PathCost, ListOfListOfActions, Neighbors).
     
 % calcActions(-Pos, -Energy, -NeighborsList, +ListOfActions)
@@ -225,13 +225,18 @@ calcActions(_Pos, _Energy, [], []).
     % calcActions(Pos, Energy, Neighs, ListOfListOfActions).
 	
 calcActions(Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions]) :-
-    % writeln('calcActions'),nl,
-    % writeln('1'),nl,
+    % writeln('calcActions'),
+    % writeln('1'),
+    % writeln((Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions])),
     k(edge(Pos, Neigh, Value)),
-    % writeln('2'),nl,
+    % writeln('2'),
     calcRecharge(Energy, Value, [[goto, Neigh]], ListOfActions, 1, Turns, RemainingEnergy), !,
-    % writeln('3'),nl,
+    % writeln('3'),
     calcActions(Pos, Energy, Neighs, ListOfListOfActions).
+    
+calcActions(Pos, Energy, [_Neigh | Neighs], ListOfListOfActions) :-
+    calcActions(Pos, Energy, Neighs, ListOfListOfActions).
+    
 
 % calcRecharge(-Energy, -Value, -OldList, +NewList, -Turns, +NewTurns, +RemainingEnergy)
 % Energy: energia actual del agente en la suposicion que se movio
