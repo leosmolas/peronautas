@@ -256,7 +256,7 @@ setDistancia :-
     ),
 	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         (
             b(posibleExplorar(Node))

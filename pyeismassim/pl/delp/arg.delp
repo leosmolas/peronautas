@@ -27,36 +27,48 @@
 % DESIRE expansión(Nodo)
 expansion(Value, X) -< 
                 % estoyEnLaFrontera,
+                b(distancia(X, [[]], Dist)),
                 esSeguro(X),
                 b(difPuntosZona(X, DifPuntos)),
-                consExpansion(Cons),
-                mult(DifPuntos, Cons, Value).
+                expansionValue(Dist, DifPuntos, Value).
+                
+expansionValue(Dist, DifPuntos, Value) :-
+    Value is DifPuntos * 10 - Dist * 2.
                                
 % DESIRE explorar(Nodo)
-% Conocer todos los arcos que salen del nodo.
+
 explorar(Value, X) -< 
-               ~estaLejos(X, [[survey]], Dist, 7),
-               % ~explored(X),
-               b(difPuntosZona(X, DifPuntos)),
-               positivoONegativo(DifPuntos, Positivo, Negativo),
-               sust(7, Dist, Sust),
-               power(Sust, 2, Pow),
-               mult(Pow, 2, Mult),
-               add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
-               power(Negativo, 2, NegPow),
-               sust(Add, NegPow, Value).
+    b(distancia(X, [[survey]], Dist)),
+    % ~estaLejos(X, [[survey]], Dist, 10),
+    % ~explored(X),
+    b(difPuntosZona(X, DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    explorarValue(Dist, Positivo, Negativo, Value).
+    % sust(7, Dist, Sust),
+    % power(Sust, 2, Pow),
+    % mult(Pow, 2, Mult),
+    % add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
+    % power(Negativo, 2, NegPow),
+    % sust(Add, NegPow, Value).
+               
+explorarValue(Dist, Positivo, Negativo, Value) :-
+    Value is ((10 - Dist) ** 2) * 2 + Positivo - Negativo **2.
 
 
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
 aumento(Value, X) -< 
-              ~estaLejos(X, [[]], Dist, 10), 
-              esSeguro(X),
-              b(difPuntosZona(X, DifPuntos)),
-              greater(DifPuntos, 0),
-              mult(DifPuntos, 10, Mult),
-              sust(10, Dist, Sust),
-              power(Sust, 2, Pow),
-              add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
+    b(distancia(X, [[survey]], Dist)),
+    % ~estaLejos(X, [[]], Dist, 10), 
+    esSeguro(X),
+    b(difPuntosZona(X, DifPuntos)),
+    greater(DifPuntos, 0),
+    mult(DifPuntos, 10, Mult),
+    sust(10, Dist, Sust),
+    power(Sust, 2, Pow),
+    add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
+              
+aumentoValue(Dist,  DifPuntos, Value) :-
+    Value is DifPuntos * 10 + (10 - Dist) ** 2.
               
 quedarse(20, _) -< true.
               

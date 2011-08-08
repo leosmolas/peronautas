@@ -68,6 +68,9 @@ is_a_built_in(greaterEq(_X,_Y)).
 is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
+is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _Value)).
+is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _Value2)).
+is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _Value3) ).
 
 % Operaciones aritméticas
 mult(X,Y,Z)    :- Z is X * Y.
