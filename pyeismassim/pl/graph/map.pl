@@ -352,11 +352,11 @@ setExploredAndVisible :-
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
 coloringAlgorithm :- 
-    step1,
+    calcTime('Step1', step1),
     % printHNodeTeams('After step 1'),
-    step2,
+    calcTime('Step2', step2),
     % printHNodeTeams('After step 2'),
-    step3.
+    calcTime('Step3', step3).
     % printHNodeTeams('After step 3'),
 
     
@@ -439,6 +439,12 @@ checkHNeighbors(Node, Team) :-
     
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
+	setHypotheticalMap,
+    calcTime('coloringAlgorithm', coloringAlgorithm),
+    teamHPoints(Team, Points).
+
+/*
+teamPoints(Team, Points) :-
     currentStep(Step),
     findall(
         [Node, Team, Value],
@@ -448,7 +454,8 @@ teamPoints(Team, Points) :-
         ), 
         ListOfNodes),
     calcPoints(ListOfNodes, 0, Points).
-    
+*/
+	
 calcPoints([], Points, Points).
 
 calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-

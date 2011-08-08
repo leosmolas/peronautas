@@ -110,11 +110,7 @@ writeLenght(Name, Node, Pattern) :-
 setDifPuntos :-
     myName(A),
     myTeam(T),
-    % teamPoints(T, ActualPoints),
-    setHypotheticalMap,
-    calcTime('coloringAlgorithm',
-    coloringAlgorithm),
-    teamHPoints(T, ActualPoints),
+    teamPoints(T, ActualPoints),
     writeLenght(
         'posibleExpansion', 
         Node1, 
@@ -132,13 +128,13 @@ setDifPuntos :-
         (
             doNotFail(
                 (
+					write('Node: '), writeln(Node),
                     setHypotheticalMap,
                     moveAgent(A, Node),
                     calcTime('coloringAlgorithm',
                     coloringAlgorithm),
                     teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
+                    DifPuntos is Points - ActualPoints,                    
                     write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
@@ -162,13 +158,13 @@ setDifPuntos :-
         (
             doNotFail(
                 (
+                    write('Node: '), writeln(Node),
                     setHypotheticalMap,
                     moveAgent(A, Node),
                     calcTime('coloringAlgorithm',
                     coloringAlgorithm),
                     teamHPoints(T, Points),
                     DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
                     write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )
@@ -191,13 +187,13 @@ setDifPuntos :-
         (
             doNotFail(
                 (
+                    write('Node: '), writeln(Node),
                     setHypotheticalMap,
                     moveAgent(A, Node),
                     calcTime('coloringAlgorithm',
                     coloringAlgorithm),
                     teamHPoints(T, Points),
                     DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
                     write('Points: '), writeln(Points),
                     assert(b(difPuntosZona(Node, DifPuntos)) <- true)
                 )

@@ -373,7 +373,7 @@ planning(explorar(Node)) :-
     myName(Name),
     position(Step, Name, InitialPosition),
     energy(Step, Name, Energy),
-    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    b(path(InitialPosition, Node, [[survey]], _, _, Actions, _, RemainingEnergy)),
     retract(plan(_)),
     assert(plan(Actions)).
 
@@ -382,7 +382,7 @@ planning(probear(Node)) :-
     myName(Name),
     position(Step, Name, InitialPosition),
     energy(Step, Name, Energy),
-    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    b(path(InitialPosition, Node, [[probe]], _, _, Actions, _, RemainingEnergy)),
     
     retract(plan(_)),
     assert(plan(Actions)).
