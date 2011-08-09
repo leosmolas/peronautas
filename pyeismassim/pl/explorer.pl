@@ -86,20 +86,7 @@ rolSetDifPuntos:-
     ),
     foreach(
         b(posibleProbear(Node)),
-        (
-            doNotFail(
-                (
-					write('Node: '), writeln(Node),
-                    setHypotheticalMap,
-                    moveAgent(A, Node),
-                    coloringAlgorithm,
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node, ActualPoints, A, T)
     ).
     
 rolSetDistancia :-
