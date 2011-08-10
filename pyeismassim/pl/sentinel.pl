@@ -10,9 +10,34 @@
 %                   -rechage
 %                   -skip   (no implemented)
 
-exec(Action) :- 
+execDummy(Action) :- 
     action(Action).
 
+
+        
+rolMetas.
+
+
+
+rolSetBeliefs.
+    
+%-----------------------------------------------------------------------%
+
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
+    !.
+
+reachableNode(Node, [[Node, Cost] | _T]) :-
+    Cost \= unknown,
+    myName(Name),
+    currentStep(Step),
+    energy(Step, Name, Energy),
+    Energy >= Cost,
+    !.
+
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
+    
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-

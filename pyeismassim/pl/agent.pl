@@ -19,8 +19,21 @@
            currentStep/1,      %
            h/1,                %
            k/1,                %
-           agentTeam/2.        %
+           b/1,
+           agentTeam/2,        %
+           exploredNode/1,
+           visibleNode/1,
+           notVisible/1,
+           notExplored/1,
+           explored/1,
+           plan/1,
+           intention/1,
+           myVisionRange/1.
 
+:- [graph/map, 
+    utils, 
+    beliefs].
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,7 +91,6 @@
 % k(agentMaxHealth(Agent, Step, MaxHealth))
 % k(agentStrength(Agent, Step, Strength))
 % k(agentVisualRange(Agent, Step, VisualRange))
-
 
 
 
@@ -166,7 +178,14 @@ updateNodeValue(Name, Value) :-
     asserta(    k(nodeValue(Name, Value)) ).
 updateNodeValue(Name, Value) :-
     % El nodo es desconocido.
+    asserta( notExplored(Name) ),
+    asserta( notVisible(Name) ),
     asserta( k(nodeValue(Name, Value)) ).
+
+
+
+assertOnce(X) :- call(X), !.
+assertOnce(X) :- asserta(X).
 
 
 
@@ -174,6 +193,9 @@ updateNodeValue(Name, Value) :-
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
     asserta( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    % assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
+
+
 
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
@@ -229,14 +251,16 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 
 
 %------------------------------------------------------------------------------%
-updateEntityTeamPosition(Agent, Team, Position) :-
+updateTeammateEntity(Agent, Team, Position, VisualRange) :-
     k(agentTeam(Agent, Team)),
     currentStep(Step),
-    asserta( k(agentPosition(Agent, Step, Position) )).
-updateEntityTeamPosition(Agent, Team, Position) :-
+    asserta( k(agentPosition(    Agent, Step, Position) )),
+    asserta( k(agentVisualRange( Agent, Step, Position) )).
+updateTeammateEntity(Agent, Team, Position, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(Agent, Team) )),
-    asserta( k(agentPosition(Agent, Step, Position) )).
+    asserta( k(agentTeam(        Agent, Team) )),
+    asserta( k(agentPosition(    Agent, Step, Position) )),
+    asserta( k(agentVisualRange( Agent, Step, Position) )).
 
 
 
@@ -276,6 +300,13 @@ updatePhase.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Acceso                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+printK :-
+    currentStep(Step),
+    foreach(
+        k(nodeTeam(Step, V, T)),
+        (write('Node: '), write(V), write(', Team: '), write(T), nl)
+    ).
 
 % agent(Step, Agent, Team, Node, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange)
 
@@ -384,52 +415,135 @@ getInfo(visualRange, Step, Agent, VisualRange) :-
 
 
 
+rechargeEnergy(Step, Agent, unknown) :-
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  unknown, _Health, _MaxHealth, _Strength, _VisualRange)).
+    
+rechargeEnergy(Step, Agent, Recharge) :-
+    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
+    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto
+    
+rechargeEnergy(Recharge) :-
+    myName(N),
+    currentStep(S),
+    rechargeEnergy(S, N, Recharge).
+
+run(Action) :-
+    currentStep(Step),
+    nl, nl, nl, write('Current Step: '), writeln(Step),
+    plan([]), !,
+    
+
+    
+    calcTime('setExploredAndVisible',setExploredAndVisible),
+    
+    calcTime('argumentation',argumentation(Meta)),
+    write('Meta: '), writeln(Meta),
+    calcTime('planning', planning(Meta)),
+    exec(Action),
+    retractall(b(_)),
+    retractall(b(_) <- true),
+    toogleOffVisibleNodes.
+    
+run(Action) :-
+    setExploredAndVisible,
+    exec(Action),
+    toogleOffVisibleNodes.
+    
+plan([]).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 % Intenciones posibles: explore, recharge
-intention(explore).
+% intention(explore).
 
-%argumentation :- 
+% argumentation :- 
 %    intention(recharge),
 %    max_energy(X),
 %    energy(X),
 %    retract( intention(recharge) ),
 %    assert(  intention(explore)  ).
-%argumentation :- 
+% argumentation :- 
 %    last_action_result(failed),
 %    retract( intention(_)        ),
 %    assert(  intention(recharge) ).
 
 
+argumentation(Meta) :-
 
+    calcTime('setBeliefs', setBeliefs),
+
+    calcTime('meta', meta(Meta)),
+    retractall(intention(_)),
+    assert(intention(Meta)).
+
+calcTime(Message, Exec) :-
+    write('<predicate name="'),write(Message), writeln('">'),
+    get_time(Before),
+    call(Exec),
+    get_time(After),
+    Time is (After - Before) * 1000,
+    write('<time value="'),write(Time), writeln('"/>'),
+    writeln('</predicate>').
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-%planning :- 
+% planning :- 
 %    intention(explore),
 %    searchNeigh(N),
 %    retract( plan(_)         ),
 %    assert(  plan([goto(N)]) ).
-%planning :- 
+% planning :- 
 %    intention(recharge),
 %    retract( plan(_)          ),
 %    assert(  plan([recharge]) ).
 
+planning(explorar(Node)) :-
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, InitialPosition),
+    energy(Step, Name, Energy),
+    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    retract(plan(_)),
+    assert(plan(Actions)).
 
+planning(probear(Node)) :-
+    currentStep(Step),
+    myName(Name),
+    position(Step, Name, InitialPosition),
+    energy(Step, Name, Energy),
+    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    
+    retract(plan(_)),
+    assert(plan(Actions)).
 
-searchNeigh(N) :-
-    myName(A),
-    k(position(A, Pos)),
-    k(edge(Pos, N, _)).
+planning(quedarse(_Node)) :-
+    currentStep(Step),
+    myName(Name),
+    energy(Step, Name, Energy),
+    maxEnergy(Step, Name, Max),
+    Energy < Max, !,
+    retractall(plan(_)),
+    assert(plan([[recharge]])).
+    
+planning(quedarse(_Node)) :-
+    retractall(plan(_)),
+    assert(plan([[skip]])).
+    
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                    Exec                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+exec(Action) :-
+    plan([Action | Actions]),
+    retract(plan(_)),
+    assert(plan(Actions)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %
@@ -456,12 +570,11 @@ reachableNode(Node, [_ | T]) :-
 % Un nodo no ha sido surveyed cuando tenes al menos un arco que parte de ese
 % nodo, del cual no conoces el costo.
 hasAtLeastOneUnsurveyedEdge(Node1) :-
-    findall(
-        Node2, 
-        k(edge(Node1, Node2, unknown)), 
-        L),
-    L \= [].
+	k(nodeValue(Node1, _V)),
+    hasAtLeastOneUnsurveyedEdgeAux(Node1).
 
+hasAtLeastOneUnsurveyedEdgeAux(Node) :-
+	k(edge(Node, _Node2, unknown)), !.
 
 
 %------------------------------------------------------------------------------%
@@ -532,6 +645,22 @@ dumpKB :-
 
 
 %------------------------------------------------------------------------------%
+printHNodeTeams(Title) :-
+    write(Title), nl,
+    foreach(
+            h(nodeTeam(Node, Team)),
+            (write('Node: '), write(Node), write(' : '), write(Team), nl)
+           ),nl.
+
+%------------------------------------------------------------------------------%
+printAgentHPositions :-
+    currentStep(Step),
+    foreach(h(position(Step, T, A)),
+            (write('Agent: '), write(T), write(' at '), write(A), nl)
+        ).
+    
+%------------------------------------------------------------------------------%
 close_output :-
     current_output(S),
     close(S).
+

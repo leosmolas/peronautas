@@ -1,4 +1,4 @@
-[X] 1 conexion 
+﻿[X] 1 conexion 
 [X] 2 integracion python prolog
 [X] 3 delirar soluciones al problema
 [X] 4 diseño arquitectonico agentes (bdi)
@@ -65,21 +65,21 @@ TAREAS INMEDIATAS:
     [ ]     make the server use non.blocking sockets and timeouts¶
     [x] what happens with the agent state when the configuration server has several simulations/matches ?
     [x] go through the list of stuff that may appear in a percept and write down what we can do with each
-    [ ] true dummy agent which follows orders¶
-¶
-definir orden de las intenciones¶
-orden dentro de los agentes, dentro de los que tienen las mismas intenciones¶
-¶
-agarro la primer accion¶
-se puede ejecutar?¶
-si:¶
-    soy yo? si -> la hago¶
-        no soy yo -> la ejecuto hipoteticamente¶
-        hay un conflicto y soy yo?¶
-            no -> salteo¶
-            si -> pensar una posible intencion que no sea dañina¶
+    [ ] true dummy agent which follows orders
+
+definir orden de las intenciones
+orden dentro de los agentes, dentro de los que tienen las mismas intenciones
+
+agarro la primer accion
+se puede ejecutar?
+si:
+    soy yo? si -> la hago
+        no soy yo -> la ejecuto hipoteticamente
+        hay un conflicto y soy yo?
+            no -> salteo
+            si -> pensar una posible intencion que no sea dañina
 no:
-¶
+
 
 Cosas interesantes a implementar:
     predicado is_frontier que identifica cuando un conjunto de nodos va a definir una frontera de una zona segun el algoritmo de coloreo

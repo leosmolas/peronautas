@@ -1,12 +1,10 @@
-:- ['pl/graph/edges.pl', 
-    'pl/graph/nodes.pl', 
-    'pl/graph/agents.pl',
-    'pl/kmap.pl'
+﻿:- [
+        % 'edges.pl', 
+        'nodes.pl', 
+        'agents.pl'
    ].
 
 :- dynamic neighborOwner/2.
-
-
 
 % paths(+Start, +Finish, -Path)
 % Pretty obvius actually but returns a path in Path with start point at node Start and endpoint in node Finish.
@@ -34,6 +32,11 @@ neighbors(Node, Neighbors) :-
     ).
 
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% neighbors(+Node, -Neighbors)
+% returns in Neighbors a list of neighbors of node Node.
+kneighbors(Node, Neighbors) :- findall(Neigh, k(edge(Node,Neigh,_)), Neighbors).
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % agentsInNode(+Node, -Agents)
 % returns in Agents a list of agents which are at Node.
@@ -78,7 +81,7 @@ teamsInNeighbors([], TeamsNeighborsCount) :-
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
     currentStep(Step),
-    h(nodeTeam(Step, Neighbor, Owner)),
+    h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
     h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
@@ -91,7 +94,7 @@ teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :-
 
 teamsInNeighbors([Neighbor | Neighbors], TeamsNeighborsCount) :- 
     currentStep(Step),
-    h(nodeTeam(Step, Neighbor, Owner)),
+    h(nodeTeam(Neighbor, Owner)),
     Owner \= none,
     h(position(Step, Agent, Neighbor)),
     team(Agent, Owner),
@@ -106,6 +109,7 @@ teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :-
 
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
 % returns in Count the number of times that Team appears in the List, and in CountOtherTeam the number of times the other team appears.
+
 appears(_, [], 0, 0).
 appears(Head, [Head|Tail], CountTeam, CountOtherTeam) :- 
     appears(Head, Tail, Aux, CountOtherTeam), 
@@ -116,16 +120,16 @@ appears(Element, [_ | Tail], CountTeam, CountOtherTeam) :-
     CountOtherTeam is Aux + 1.
 
 
-
 % checkMajyorityInNode(+Node, +Team)
 % checks if the number of agents of team Team are majority in node Node.
-%checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
+
+% checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
 %                                    appears(Team, Teams, TeamInNode), 
 %                                    length(Teams, TeamsInNode), 
 %                                    Majority is floor(TeamsInNode / 2), 
 %                                    TeamInNode > Majority,
 %                                    setOwner([Node], Team).
-%checkMajorityInNode(_, _).
+% checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
     listOfTeams([Team1 | [Team2 | []]]),
@@ -253,29 +257,115 @@ checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :-
     checkNeighbors(Node, Tail, [Head|Visited], Team, ReachedNodes2),
     union(ReachedNodes1, ReachedNodes2, ReachedNodes).
 
-
-
 cleanColors :- 
     listOfNodes(ListOfNodes),
     setOwner(ListOfNodes, none).
 
+setHypotheticalMap :-
+    retractall(h(position(_, _, _))),
+    retractall(h(nodeTeam(_, _))),
+    foreach(
+        position(Step, A, N),
+        assert(h(position(Step, A, N)))
+    ),
+    foreach(
+        k(nodeValue(Node, _V)),
+        assert(h(nodeTeam(Node, none)))
+    ).
+    
+moveAgent(Agent, Node) :-
+    currentStep(Step),
+    retract(h(position(Step, Agent, _))),
+    assert(h(position(Step, Agent, Node))).
 
+visibleNode(N) :-
+    explored(N),
+    inRange(N),
+    foreach(
+        k(edge(N, N1, _)),
+        inRange(N1)
+    ), !,
+    retract(notVisible(N)),
+    asserta(visibleNode(N)).
+    
+    
+% toogleOnVisibleNode(+Node)
+% si el nodo ya estÃ¡ marcado como visible, no hace nada
+% sino, hace el toogle
+toogleOnVisibleNode(Node) :-
+    visibleNode(Node), !.
+    
+toogleOnVisibleNode(Node) :-
+    retractall(notVisible(Node)),
+    % write('1.3 retract '),write(Agent),nl,
+    asserta(visibleNode(Node)).
+    % write('1.4 asserta '),write(Agent),nl.
+    
+toogleOffVisibleNodes :-
+    foreach(
+                visibleNode(N),
+                (
+                    retract(visibleNode(N)),
+                    assert(notVisible(N))
+                )
+           ).
+    
+% setExploredAndVisible
+% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
+% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
+setExploredAndVisible :-
+    currentStep(Step),
+ 
+    myTeam(MyTeam),
+    foreach(
+        (
+            team(Step, Agent, MyTeam),
+            visualRange(Step, Agent, Range),
+            position(Step, Agent, Position),
+            Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+        ),
+        (
+            % write(position(Step, Agent, Position)),nl,
+            % k(agent(Step, Agent, _Team,  Position, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
+            % write('2position '),write(Position),nl,
+            assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+            % nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
+            foreach(
+                breadthFirst(Position, Node, _Path, _Cost),
+                (
+                    % write(' Marking node as explored: '),write(Node),nl,
+                    retractall(notExplored(Node)),
+                    % write('1.1 retractall '),write(Agent),nl,
+                    assertOnce(explored(Node)),
+                    % write('1.2 assertOnce '),write(Agent),nl,
+                    toogleOnVisibleNode(Node)
+                )
+            ),
+            retractall(isGoal(_, _))        
+            % write('termine agente '),write(Agent),nl
+        )
+    ).
+    
 
+    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
+
 coloringAlgorithm :- 
-    cleanColors,
     step1,
+    % printHNodeTeams('After step 1'),
     step2,
+    % printHNodeTeams('After step 2'),
     step3.
+    % printHNodeTeams('After step 3'),
 
-
+    
+    
 
 % step1
 % first step of the coloring algorithm
 step1 :- 
-    findall(Node, nonEmptyNode(Node), ListOfNodes),
-    % convertir ListOfNodes en un conjunto
+    setof(Node, nonEmptyNode(Node), ListOfNodes),
     foreach(
         member(Node2,ListOfNodes), 
         (
@@ -289,7 +379,10 @@ step1 :-
 % second step of the coloring algorithm
 step2 :- 
     foreach(
-        emptyNode(Node), 
+        (
+            emptyNode(Node),
+            visibleNode(Node)
+        ),
         (
             checkMajorityInNeighbors(Node)
         )
@@ -299,10 +392,79 @@ step2 :-
 
 % step3
 % third step of the coloring algorithm
-step3 :- 
+step3 :-    
+    % findall(N1, (notExplored(N1), h(nodeTeam(N1, none))), ListOfNotExplored), % agregue que el nodo no haya estado pintado en un paso anterior (estabamos pisando data)
+    findall(N2, (notVisible(N2), h(nodeTeam(N2, none))), ListOfNotVisible),
+    % setOwner(ListOfNotExplored, ofNoOne),
+    setOwner(ListOfNotVisible, ofNoOne),
     foreach(
         clearNode(Node), 
         (
             dfs(Node)
         )
     ).
+    
+    
+% Algoritmo para calcular los puntos de un equipo a partir de hnodes.
+teamHPoints(Team, Points) :-
+    findall(
+        [Node, Team, Value],
+        (
+            h(nodeTeam(Node, Team)), 
+            k(nodeValue(Node, Value)),
+            Value \= unknown
+        ), 
+        ListOfNodes),
+    calcHPoints(ListOfNodes, 0, Points).
+    
+calcHPoints([], Points, Points).
+
+calcHPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkHNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcHPoints(Nodes, Points2, Points3).
+
+calcHPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
+    checkHNeighbors(Node, Team), !,
+    Points2 is Points1 + Value,
+    calcHPoints(Nodes, Points2, Points3).
+    
+calcHPoints([_ | Nodes], Points1, Points2):-
+    calcHPoints(Nodes, Points1, Points2).
+    
+% chequea que por lo menos un vecino sea del mismo equipo, para así podes sumar sus puntos
+checkHNeighbors(Node, Team) :-
+    k(edge(Node, X, _)),
+    h(nodeTeam(X, Team)), !.
+    
+% Algoritmo para calcular los puntos de un equipo.
+teamPoints(Team, Points) :-
+    currentStep(Step),
+    findall(
+        [Node, Team, Value],
+        (
+            k(nodeTeam(Step, Node, Team)), 
+            k(nodeValue(Node, Value))
+        ), 
+        ListOfNodes),
+    calcPoints(ListOfNodes, 0, Points).
+    
+calcPoints([], Points, Points).
+
+calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
+    checkNeighbors(Node, Team), !,
+    Points2 is Points1 + 1,
+    calcPoints(Nodes, Points2, Points3).
+
+calcPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
+    checkNeighbors(Node, Team), !,
+    Points2 is Points1 + Value,
+    calcPoints(Nodes, Points2, Points3).
+    
+calcPoints([Node | Nodes], Points1, Points2):-
+    calcPoints(Nodes, Points1, Points2).
+    
+checkNeighbors(Node, Team) :-
+    k(edge(Node, X, _)),
+    currentStep(Step),
+    k(nodeTeam(Step, X, Team)), !.

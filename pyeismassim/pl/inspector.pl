@@ -12,8 +12,31 @@
 
 %-----------------------------------------------------------------------%
 
-exec(Action) :- 
+execDummy(Action) :- 
+    write(1),nl,
     action(Action).
+
+        
+rolMetas.
+
+rolSetBeliefs.
+
+%-----------------------------------------------------------------------%
+
+reachableNode(Node, [[_, unknown] | T]) :-
+    reachableNode(Node, T),
+    !.
+
+reachableNode(Node, [[Node, Cost] | _T]) :-
+    Cost \= unknown,
+    myName(Name),
+    currentStep(Step),
+    energy(Step, Name, Energy),
+    Energy >= Cost,
+    !.
+
+reachableNode(Node, [_ | T]) :-
+    reachableNode(Node, T).
 
 %------------------------------  Attack  --------------------------------%
 
@@ -88,3 +111,24 @@ action([goto, X]) :-
     
 action([recharge]) :-
     write(5),nl.
+
+%-------------------------------  Old Code  ------------------------------%
+
+% exec(Action) :- action(Action).
+
+% action(inspect(Agent)) :-
+   % energy(X),
+   % X > 1,
+   % my_name(Name),
+   % k(position(Name,  Position)),
+   % k(position(Agent, Position)),
+   % teamOfAgent(Agent, Team),
+   % Team \= d3lp0r, !.
+
+% action(goto(Vertex)) :-
+   % % Random walking
+   % % select a neighbouring vertex
+   % Vertex = something.
+
+% action(recharge).
+

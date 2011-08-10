@@ -1,0 +1,19 @@
+﻿% se instancia con lo que no esta probeado
+% DESIRE explorar(Nodo)
+probear(Value, X) -< 
+    ~estaLejos(X, [[probe]], Dist, 10),
+    notProbedInZone(X, InZone),
+    b(difPuntosZona(X, DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    sust(10, Dist, Sust),
+    power(Sust, 2, Pow),
+    mult(Pow, 2, Mult),
+    add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
+    power(Negativo, 2, NegPow),
+    sust(Add, NegPow, Sust2),
+    add(Sust2, InZone, Value).
+    
+               
+notProbedInZone(_X, 0) -< true.
+notProbedInZone(X, 50) <- b(inZone(X)).
+~notProbedInZone(X, 0) <- notProbedInZone(X, 50).

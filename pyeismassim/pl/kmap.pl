@@ -1,5 +1,3 @@
-:- style_check(-discontiguous).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                          MAPA DE JUGUETE                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -7,19 +5,19 @@
 % RandomSeed = 1
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
-k(nodeTeam(0, vertex0,  none)). 
+k(nodeTeam(0, vertex0,  peronismo)). 
 k(nodeTeam(0, vertex1,  none)). 
-k(nodeTeam(0, vertex3,  none)). 
-k(nodeTeam(0, vertex4,  none)). 
-k(nodeTeam(0, vertex8,  none)). 
-k(nodeTeam(0, vertex10, none)). 
-k(nodeTeam(0, vertex12, none)). 
-k(nodeTeam(0, vertex9,  none)).
-k(nodeTeam(0, vertex11, none)).
-k(nodeTeam(0, vertex7,  none)).
-k(nodeTeam(0, vertex2,  none)).
-k(nodeTeam(0, vertex6,  none)).
-k(nodeTeam(0, vertex5,  none)).
+k(nodeTeam(0, vertex3,  peronismo)). 
+k(nodeTeam(0, vertex4,  peronismo)). 
+k(nodeTeam(0, vertex8,  cacoteam)). 
+k(nodeTeam(0, vertex10, peronismo)). 
+k(nodeTeam(0, vertex12, peronismo)). 
+k(nodeTeam(0, vertex9,  peronismo)).
+k(nodeTeam(0, vertex11, peronismo)).
+k(nodeTeam(0, vertex7,  cacoteam)).
+k(nodeTeam(0, vertex2,  cacoteam)).
+k(nodeTeam(0, vertex6,  peronismo)).
+k(nodeTeam(0, vertex5,  cacoteam)).
 k(nodeTeam(0, vertex13, none)).
 
 k(nodeValue(vertex0,  10)). 
@@ -38,20 +36,20 @@ k(nodeValue(vertex5,   4)).
 k(nodeValue(vertex13,  2)).
 
 
-h(nodeTeam(0, vertex0,  none)). 
-h(nodeTeam(0, vertex1,  none)). 
-h(nodeTeam(0, vertex3,  none)). 
-h(nodeTeam(0, vertex4,  none)). 
-h(nodeTeam(0, vertex8,  none)). 
-h(nodeTeam(0, vertex10, none)). 
-h(nodeTeam(0, vertex12, none)). 
-h(nodeTeam(0, vertex9,  none)).
-h(nodeTeam(0, vertex11, none)).
-h(nodeTeam(0, vertex7,  none)).
-h(nodeTeam(0, vertex2,  none)).
-h(nodeTeam(0, vertex6,  none)).
-h(nodeTeam(0, vertex5,  none)).
-h(nodeTeam(0, vertex13, none)).
+h(nodeTeam(vertex0,  none)). 
+h(nodeTeam(vertex1,  none)). 
+h(nodeTeam(vertex3,  none)). 
+h(nodeTeam(vertex4,  none)). 
+h(nodeTeam(vertex8,  none)). 
+h(nodeTeam(vertex10, none)). 
+h(nodeTeam(vertex12, none)). 
+h(nodeTeam(vertex9,  none)).
+h(nodeTeam(vertex11, none)).
+h(nodeTeam(vertex7,  none)).
+h(nodeTeam(vertex2,  none)).
+h(nodeTeam(vertex6,  none)).
+h(nodeTeam(vertex5,  none)).
+h(nodeTeam(vertex13, none)).
 
 %h(nodeValue(vertex0,  10)). 
 %h(nodeValue(vertex1,   5)). 
@@ -106,6 +104,8 @@ k(edge(vertex7,  vertex3,  1)).
 k(edge(vertex0,  vertex9,  4)).
 k(edge(vertex13, vertex12, 2)).
 
+% Arcos invertidos
+
 k(edge(vertex8, vertex5, 4)).
 k(edge(vertex7, vertex8, 1)).
 k(edge(vertex5, vertex2, 9)).
@@ -138,38 +138,40 @@ k(edge(vertex6, vertex8, 8)).
 k(edge(vertex3, vertex7, 1)).
 k(edge(vertex9, vertex0, 4)).
 k(edge(vertex12, vertex13, 2)).
-%h(edge(vertex5,  vertex8,  4)). 
-%h(edge(vertex8,  vertex7,  1)). 
-%h(edge(vertex2,  vertex5,  9)). 
-%h(edge(vertex2,  vertex8,  9)). 
-%h(edge(vertex5,  vertex7,  9)). 
-%h(edge(vertex2,  vertex7,  6)). 
-%
-%h(edge(vertex6,  vertex10, 4)).
-%h(edge(vertex3,  vertex6,  1)).
-%h(edge(vertex4,  vertex10, 9)).
-%h(edge(vertex6,  vertex4,  9)).
-%h(edge(vertex3,  vertex10, 9)).
-%h(edge(vertex3,  vertex4,  6)).
-%
-%h(edge(vertex5,  vertex1,  9)). 
-%h(edge(vertex5,  vertex0,  5)). 
-%h(edge(vertex0,  vertex7,  2)). 
-%h(edge(vertex1,  vertex0,  7)). 
-%h(edge(vertex1,  vertex13, 6)). 
-%h(edge(vertex13, vertex0,  6)). 
-%
-%h(edge(vertex10, vertex11, 9)).
-%h(edge(vertex9,  vertex10, 5)).
-%h(edge(vertex3,  vertex9,  2)).
-%h(edge(vertex9,  vertex11, 7)).
-%h(edge(vertex12, vertex11, 6)).
-%h(edge(vertex9,  vertex12, 6)).
-%
-%h(edge(vertex8,  vertex6,  8)).
-%h(edge(vertex7,  vertex3,  1)).
-%h(edge(vertex0,  vertex9,  4)).
-%h(edge(vertex13, vertex12, 2)).
+
+
+% h(edge(vertex5,  vertex8,  4)). 
+% h(edge(vertex8,  vertex7,  1)). 
+% h(edge(vertex2,  vertex5,  9)). 
+% h(edge(vertex2,  vertex8,  9)). 
+% h(edge(vertex5,  vertex7,  9)). 
+% h(edge(vertex2,  vertex7,  6)). 
+
+% h(edge(vertex6,  vertex10, 4)).
+% h(edge(vertex3,  vertex6,  1)).
+% h(edge(vertex4,  vertex10, 9)).
+% h(edge(vertex6,  vertex4,  9)).
+% h(edge(vertex3,  vertex10, 9)).
+% h(edge(vertex3,  vertex4,  6)).
+
+% h(edge(vertex5,  vertex1,  9)). 
+% h(edge(vertex5,  vertex0,  5)). 
+% h(edge(vertex0,  vertex7,  2)). 
+% h(edge(vertex1,  vertex0,  7)). 
+% h(edge(vertex1,  vertex13, 6)). 
+% h(edge(vertex13, vertex0,  6)). 
+
+% h(edge(vertex10, vertex11, 9)).
+% h(edge(vertex9,  vertex10, 5)).
+% h(edge(vertex3,  vertex9,  2)).
+% h(edge(vertex9,  vertex11, 7)).
+% h(edge(vertex12, vertex11, 6)).
+% h(edge(vertex9,  vertex12, 6)).
+
+% h(edge(vertex8,  vertex6,  8)).
+% h(edge(vertex7,  vertex3,  1)).
+% h(edge(vertex0,  vertex9,  4)).
+% h(edge(vertex13, vertex12, 2)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,16 +180,16 @@ k(edge(vertex12, vertex13, 2)).
 
 currentStep(0).
 
-h(position(0, peron, vertex0)).
-h(position(0, evita, vertex13)).
-h(position(0, machinea, vertex7)).
-h(position(0, cavallo, vertex8)).
+position(0, peron, vertex0).
+position(0, evita, vertex12).
+position(0, machinea, vertex10).
+position(0, cavallo, vertex6).
 
 
-h(position(0, iorio, vertex5)).
-h(position(0, moyano, vertex5)).
-h(position(0, castels, vertex2)).
-h(position(0, delia, vertex2)).
+position(0, iorio, vertex8).
+position(0, moyano, vertex5).
+position(0, castels, vertex2).
+position(0, delia, vertex7).
 
 team(peron, peronismo).
 team(evita, peronismo).
@@ -201,3 +203,13 @@ team(delia, cacoteam).
 
 team(peronismo).
 team(cacoteam).
+
+myTeam(peronismo).
+
+myName(peron).
+
+visionRange(_S, _A, 3).
+
+rechargeEnergy(2).
+
+maxEnergy(_S, _A, 10).

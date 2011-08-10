@@ -1,5 +1,5 @@
-import socket
 import signal
+import socket
 import sys
 
 ####################################################################################################
@@ -43,9 +43,11 @@ class PerceptConnection():
             position_list = dictionary.get('position')
             position      = position_list[0]
             node          = position.get('node')
+            vis_range     = position.get('vis_range')
             result = [    (0,
                             username,
-                            node
+                            node,
+                            vis_range
                           )
                      ]
             for v in dictionary.get('vis_verts', []):
@@ -110,7 +112,8 @@ class PerceptConnection():
             for p in stringlist:
                 if   (p[0] == 0):
                     result['position'].append(      { 'name' : p[1],
-                                                      'node' : p[2] 
+                                                      'node' : p[2],
+                                                      'vis_range' : p[3]
                                                     })
                 elif (p[0] == 1):
                     result['vis_verts'].append(     { 'name' : p[1],
@@ -218,12 +221,12 @@ if (__name__ == "__main__"):
     j = 0
     quit = False
     while (not quit):
-        print "Iteration:", j
+        # print "Iteration:", j
         # Initialize the global percept to an empty frozenset.
         globalPercept = frozenset([])
         percepts      = range(CONNECTIONS)
 
-        print "Reception phase."
+        # print "Reception phase."
         for i in range(CONNECTIONS):
 
             stop = False
@@ -246,7 +249,7 @@ if (__name__ == "__main__"):
                 #print "PERCEPT:", percept
                 percepts[i]   = eval(percept)
                 globalPercept = globalPercept.union(percepts[i])
-
+                
         print "Sending phase."
         for i in range(CONNECTIONS):
             # for each socket, calculate the difference between the accumulator
@@ -254,8 +257,8 @@ if (__name__ == "__main__"):
             if (clientSocketConnected[i]):
                 percept    = percepts[i]
                 difference = globalPercept.difference(percept)
-                print "CONNECTION:", i
-                print "DIFFERENCE:", difference
+                # print "CONNECTION:", i
+                # print "DIFFERENCE:", difference
                 clientSocket[i].send(repr(difference))
                 clientSocket[i].send('\0')
 
@@ -264,5 +267,6 @@ if (__name__ == "__main__"):
         if (connectedClients == 0):
             print "Time to quit."
             quit = True
+            
     serverSocket.close()
 

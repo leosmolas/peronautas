@@ -1,0 +1,65 @@
+            ##             ##     
+#####        #   #        # #     
+ #   #       #            #       
+ #   #  ##   #  ##   ##  ###   ## 
+ ####  #  #  #   #  #  #  #   #   
+ #   # ####  #   #  ####  #    #  
+ #   # #     #   #  #     #     # 
+#####   ### ### ###  ### ###  ##
+
+
+De toda la información que manipula el agente, consideramos la siguiente información:
+
+	Información general sobre:
+		Nodos (valor, probeado, arcos, coloreado, etc)
+        Nodos vistos actualmente.
+		Arcos (costo, nodos extremos, test valor final)
+		Agentes aliados (posicion, rol, BDI)
+		Agentes enemigos (todo)
+	
+	Información sobre la zonas aliadas capturadas:
+		Nodos que las forman
+		Producción de puntos por turnos
+		Cantidad de agentes que la están manteniendo
+
+	Información sobre las zonas enemigas capturadas:
+		Nodos que la forman
+		Producción de puntos por turnos
+		Cantidad de agentes que la están manteniendo
+
+	Parámetro de tanque (límite mínimo para la recarga indiscutida)
+	
+	Inferencia sobre los proximos movimientos de los agentes enemigos
+	
+	Si un agente enemigo se encuentra a una distancia mínima de la zona, es factible creer que puede llegar a romperla
+	
+	Nodos con probabilidad de que aparezcan enemigos
+
+	División del mapa en 3 zonas:
+		Zona Enemiga u Hostil: 
+		es la zona en la cual los enemigos se mueven sin mayor dificultad. Está comprendida por el conjunto de nodos coloreados por su equipo.
+	
+		Zona Neutral:
+		es la zona a distancia mayor a 1 (en cantidad de arcos).
+
+		Zona Aliada:
+		es la zona coloreada por nuestro equipo.
+
+	Identificar los nodos en los cuales se encuentran los saboteadores (enemigos/aliados)
+
+	Nodos faltantes por prubear
+	
+	Movimiento de los agentes aliados en el turno actual (mantener una lista de movimientos tentativos y que luego tengan chance de cambiarlos)
+
+
+                                                                                    
+                                                                                    
+                                                                                    
+#####   #            #  ##              #    #   #     #####          #   #         
+  #     #            #   #             ##    #   #     #              #   #         
+ #     # ##   ###  #### #    ##       # #   #   #     #        ###   #   #  #   ##  
+ #     ##  #     #  #       #  #      # #   #   #     ####    #   #  #   # #   #  # 
+ #     #   #  ####  #        #       #  #   #   #     #       #   #  #   ##     #   
+#     #   #  #  #  #          #     ###### #   #     #       #   #  #   # #      #  
+#     #   #  #  #  #       #  #     #    # #   #     #       #   #  #   #  #  #  #  
+#     #   #   ## # ##       ##     #     # #   #     #        ###   #   #  #   ## 

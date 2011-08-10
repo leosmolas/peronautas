@@ -3,7 +3,6 @@
 import sys
 import time
 import argparse
-from timeit                         import Timer
 from connection.MASSimConnection    import MASSimConnection
 from connection.MessageHandling     import *
 from perceptServer.PerceptServer    import PerceptConnection, VortexPerceptConnection
@@ -13,10 +12,11 @@ from pyswip.easy                    import *
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort):
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy):
         self.username = USER
         self.password = PASS
         self.useLog   = useLog
+        self.dummy    = dummy
         if useLog:
             sys.stdout = open(USER + '-log.txt', 'w')
         else:
@@ -150,6 +150,14 @@ class PrologAgent(Agent):
 
 
     def processSimulationStart(self, msg_dict):
+        defaultVisionRange = {
+                                'explorer' : 2,
+                                'repairer' : 1,
+                                'saboteur' : 1,
+                                'sentinel' : 3,
+                                'inspector': 1
+                            }
+
         self.role = msg_dict['role'].lower()
         if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
@@ -167,6 +175,9 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
+        print "@PrologAgent: Guardando el rango de vision de %s: %s"% (self.role, defaultVisionRange[self.role])
+        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        
 
 
 
@@ -188,8 +199,10 @@ class PrologAgent(Agent):
         # Si lo esta, se actualiza la informacion del verice con su valor, 
         # sino, se actualiza con el valor unknown.
         probed_verts = msg_dict.get('probed_verts', [])
+        self.prolog.query("retractall(inRange(_))").next()
         for x in msg_dict.get('vis_verts', []):
             # Esta el vertice entre los vertices sondeados?
+            self.prolog.query("asserta(inRange(%s))" % x['name']).next()
             in_pv = False
             for pv in probed_verts:
                 if (pv['name'] == x['name']):
@@ -208,6 +221,7 @@ class PrologAgent(Agent):
     def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
         for e in msg_dict.get('vis_edges', []):
+            # print "@Agent: visible edge: %s" % e
             self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
 
         for e in msg_dict.get('surveyed_edges', []):
@@ -254,7 +268,7 @@ class PrologAgent(Agent):
                                                                                    strength,
                                                                                    vis_range)).next()
             else:
-                self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (p['name'], team, p['node'])).next()
+                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s)" % (p['name'], team, p['node'], p['vis_range'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
@@ -268,7 +282,6 @@ class PrologAgent(Agent):
                                                                                e['max_health'], 
                                                                                e['strength'], 
                                                                                e['vis_range'])).next()
-
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):
@@ -286,10 +299,7 @@ class PrologAgent(Agent):
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
-
         self.prolog.query("updatePhase").next()
-
-
 
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
         print "@PrologAgent: received request-action. id: %s" % action_id
@@ -305,7 +315,12 @@ class PrologAgent(Agent):
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        query_result = self.prolog.query("exec(X)").next()
+        
+        # self.prolog.query("argumentation").next()
+        if self.dummy:
+            query_result = self.prolog.query("execDummy(X)").next()
+        else:
+            query_result = self.prolog.query("run(X)").next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
@@ -328,10 +343,12 @@ if (__name__== "__main__"):
     parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
     parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
     parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
-    parser.add_argument('-l',                                            help="write-to-log mode.",                             action='store_const', const=True, dest='log')
+    parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
+    parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
+    
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy)
     agent.mainLoop()
 

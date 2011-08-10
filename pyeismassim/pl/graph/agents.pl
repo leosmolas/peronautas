@@ -1,4 +1,4 @@
-:- dynamic hposition/2.
+﻿:- dynamic hposition/2.
 :- dynamic energy/2.
 
 
@@ -27,27 +27,26 @@ listOfTeams(Teams) :-
 
 
 % teams(-ListofTeams).
-%team(peronismo).
-%team(cacoteam).
+% team(peronismo).
+% team(cacoteam).
 
 
 
 % team(+Name, +ListofAgents).
-%team(peronismo, [peron, evita, menem, cafiero]).
-%team(cacoteam, [iorio, delia, moyano, castels]).
-
+% team(peronismo, [peron, evita, menem, cafiero]).
+% team(cacoteam, [iorio, delia, moyano, castels]).
 
 
 % teamOfAgent(?Agent, ?Team)
 % Team of an Agent.
-%teamOfAgent(peron,   peronismo).
-%teamOfAgent(evita,   peronismo).
-%teamOfAgent(cafiero, peronismo).
-%teamOfAgent(menem,   peronismo).
-%teamOfAgent(iorio,   cacoteam).
-%teamOfAgent(delia,   cacoteam).
-%teamOfAgent(moyano,  cacoteam).
-%teamOfAgent(castels, cacoteam).
+% teamOfAgent(peron,   peronismo).
+% teamOfAgent(evita,   peronismo).
+% teamOfAgent(cafiero, peronismo).
+% teamOfAgent(menem,   peronismo).
+% teamOfAgent(iorio,   cacoteam).
+% teamOfAgent(delia,   cacoteam).
+% teamOfAgent(moyano,  cacoteam).
+% teamOfAgent(castels, cacoteam).
 
 
 
@@ -56,7 +55,7 @@ listOfTeams(Teams) :-
 % hposition(evita,a).
 % hposition(menem,g).
 % hposition(cafiero,b).
-% 
+
 % hposition(iorio,h).
 % hposition(delia,f).
 % hposition(castels,b).
@@ -87,13 +86,13 @@ listOfTeams(Teams) :-
 % Team = cacoteam.
 
 % 
-%hposition(peron,a).
-%hposition(evita,e).
-%hposition(menem,g).
-%hposition(cafiero,d).
+% hposition(peron,a).
+% hposition(evita,e).
+% hposition(menem,g).
+% hposition(cafiero,d).
 
-%hposition(iorio,h).
-%hposition(delia,f).
+% hposition(iorio,h).
+% hposition(delia,f).
 
 %%%%%%%%%%%%%%%%%%
 % CORRECT RESULT

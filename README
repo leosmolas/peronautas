@@ -38,9 +38,10 @@ massim-netbeans: a folder containing a netbeans project with the code for the
         and run the startServer.sh script to run the modified server,
         choosing the my2011-conf1.xml file.
 
-----------------------------------
-
+-----------------------------------------------------------------------------------
+    
 Situación de los branchs en este momento:
+
 
 master: 
     Tiene todas las versiones más viejas de todo. Se actualizará cuando tengamos algo estable (por más ínfimo que sea).
@@ -62,4 +63,5 @@ dev-agents:
     Aquí se encuentra la implementación del servidor central de percepciones, por Aki. A su vez, se encuentra la versión del agente más actualizada (y funcional).
     
 dev-estrategias:
+
     Branch con estrategias, o documentación. Nada de código.

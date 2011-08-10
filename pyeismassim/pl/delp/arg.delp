@@ -1,0 +1,103 @@
+% la consulta meta(X) te da la mejor meta
+% meta(expansion(X)) <- expansion(X).
+% meta(explorar(X)) <- explorar(X).
+
+% con estas reglas, se define que sólo haya una meta sin derrotar
+% ~explorar(_, _) <- expansion(_, _).
+% ~expansion(_, _) <- explorar(_, _).
+
+% ~expansion(Node, _) <- expansion(Node2, Value),
+                    % notEqual(Node, Node2).
+                    
+% ~explorar(Node, _) <- explorar(Node2),
+                   % notEqual(Node, Node2).
+                
+% ~expansion(_, Value) -< aumento(_, ValueD),
+%                        greater(ValueD, Value).
+                        
+% ~aumento(_, Value) -< explorar(_, ValueD),
+%                      greater(ValueD, Value).
+                      
+% ~aumento(_, Value) -< expansion(_, ValueD),
+%                      greater(ValueD, Value).
+                       
+% ~explorar(_, Value) -< aumento(_, ValueD),
+%                       greater(ValueD, Value).
+
+% DESIRE expansión(Nodo)
+expansion(Value, X) -< 
+                % estoyEnLaFrontera,
+                b(distancia(X, [[]], Dist)),
+                esSeguro(X),
+                b(difPuntosZona(X, DifPuntos)),
+                expansionValue(Dist, DifPuntos, Value).
+                
+expansionValue(Dist, DifPuntos, Value) :-
+    Value is DifPuntos * 10 - Dist * 2.
+                               
+% DESIRE explorar(Nodo)
+
+explorar(Value, X) -< 
+    b(distancia(X, [[survey]], Dist)),
+    % ~estaLejos(X, [[survey]], Dist, 10),
+    % ~explored(X),
+    b(difPuntosZona(X, DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    explorarValue(Dist, Positivo, Negativo, Value).
+    % sust(7, Dist, Sust),
+    % power(Sust, 2, Pow),
+    % mult(Pow, 2, Mult),
+    % add(Positivo, Mult, Add), % Value is DifPuntos + ((7 - Dist) ** 2) * 2
+    % power(Negativo, 2, NegPow),
+    % sust(Add, NegPow, Value).
+               
+explorarValue(Dist, Positivo, Negativo, Value) :-
+    Value is ((10 - Dist) ** 2) * 2 + Positivo - Negativo **2.
+
+
+% X instanciado con todos los nodos a distancia máxima 2 de la zona
+aumento(Value, X) -< 
+    b(distancia(X, [[survey]], Dist)),
+    % ~estaLejos(X, [[]], Dist, 10), 
+    esSeguro(X),
+    b(difPuntosZona(X, DifPuntos)),
+    greater(DifPuntos, 0),
+    mult(DifPuntos, 10, Mult),
+    sust(10, Dist, Sust),
+    power(Sust, 2, Pow),
+    add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
+              
+aumentoValue(Dist,  DifPuntos, Value) :-
+    Value is DifPuntos * 10 + (10 - Dist) ** 2.
+              
+quedarse(20, _) -< true.
+              
+% La diferencia de puntos entre la situación actual y el agente ubicado en Nodo
+% se pesa en la cuenta con 0, o la diferencia.
+positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
+positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
+ 
+% estaCercaDeLaZona(X, Dist) -< distanciaZona(X, Dist).
+                      
+% ~estaCercaDeLaZona(X, Dist) <- distanciaZona(X, Dist), 
+                               % lessEqDist, 2).
+
+~estaLejos(X, Acciones, Dist, _) -< b(distancia(X, Acciones, Dist)).
+
+estaLejos(X, Acciones, Dist, Cota) <- b(distancia(X, Acciones, Dist)),
+                            greater(Dist, Cota).
+
+~estoyEnLaFrontera -< true.
+% ~explored(_) -< true.
+~probed(_) -< true.
+esSeguro(_) -< true.
+
+               
+% Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que estén en la misma escala. La otra es poner los números sueltos, como en explorar. No sé que decisión de diseño tomar.
+consExpansion(10) <- true. % ni idea que Value tendrá
+
+% este argumento sólo sirve para poner el argValue, para que lo busque el criterio de comparación greaterArgValue
+% argValue(_) <- true.
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
