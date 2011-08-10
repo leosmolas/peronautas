@@ -2,7 +2,7 @@
 :-consult('lib.pl').
 :-set_ypa_address(localhost,8000). % get_ypa_address(Host,Port)
 
-:-	nl,nl,
+cartelito :-	nl,nl,
 	writeln('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'),
 	writeln('%%                        Agente Yellow Pages                                %%'),
 	writeln('%%                           Localhost:8000                                  %%'),
@@ -27,7 +27,7 @@
 %template: conectar(+Nombre)
 %descripción: conecta al agente al servidor de páginas amarillas.
 
-conectar(Nombre):-connect(Nombre, Error), writeln(Error).
+conectar(Nombre):- writeln('EMI PUTO'), connect(Nombre, Error), writeln(Error).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %metodo: enviar/2 
@@ -71,7 +71,8 @@ recibir(Emisor, Receptor, Datos, TimeOut):-recv(Data, TimeOut), member(content(D
 
 %ejemplodeuso:  recibirtodo(D, 0.0000000000001).
 
-recibirtodo(ListaDeMensajes, TimeOut):-recv(Message,TimeOut),
+recibirtodo(ListaDeMensajes, TimeOut):-
+            recv(Message,TimeOut),
             (
                 Message=timeout,
                 ListaDeMensajes=[]

@@ -1,0 +1,166 @@
+\documentclass{llncs}
+
+\begin{document}
+\title{Multi-Agent Programming Contest 2011\\Participation Registration Template}
+\author{\texttt{d3lp0r}\\LIDIA TEAM}
+\institute{Universidad Nacional del Sur,\\Bah\'ia Blanca, Buenos Aires, Argentina}
+\maketitle
+
+\begin{abstract}
+% Please follow the given template structure for your submission by
+% answering the questions as concisely as possible, not exceeding the
+% total of \textbf{4} pages. It is vital to explain in this submission
+% how are you using a multiagent approach.
+
+%   a \textit{description} of the system, the
+%   methodology/tools/infrastructure used and the (team) strategy that
+%   you plan to use in the contest.
+
+\textit{The multi-agent system implemented for this contest was designed based on cooperative BDI agents. Agents were implemented using Python, Prolog and DeLP (Defeasible Logic Programming). The main strategy consists on distributed agents that coordinate their goals in order to generate the maximum-profit zone while exploring as much as possible the map.\\Agents are based on a BDI architecture where beliefs include perceptions received from the server. Beliefs, desires and intentions are represented using Prolog and DeLP.}
+
+%   Please send your submission by email to J\"urgen Dix
+%   (\url{dix@tu-clausthal.de}) no later than August 9th. If
+%   modifications are necessary, we will directly ask you to submit a
+%   final version on August 16th.
+\end{abstract}
+
+
+\section*{Introduction}
+
+% Note: the information you provide in this section will be made available
+% to all participants. We will put it on the homepage.
+
+\begin{enumerate}
+\item \textbf{What is the name of your team?}\\The team is named \texttt{d3lp0r}.
+\item \textbf{Who are the members of your team? Please provide names, academic
+  degrees and institutions.}\\
+
+
+  \begin{tabular}{|l|c|c|}
+	\hline
+	Lastname, Name & Position & Institution\\
+	\hline
+	Marcovecchio, Diego & Student & UNS, LIDIA\footnotemark[1]\\
+	\hline
+	Molas, Leonardo	& Student & UNS, LIDIA\\
+	\hline
+	Garay, I\~naki	& Student & UNS, LIDIA\\
+	\hline
+	Sisul, Fernando	& Student & UNS, LIDIA\\
+	\hline
+	Torres, Manuel	& Student & UNS, LIDIA\\
+	\hline
+	Montenegro, Emiliano & Student & UNS, LIDIA\\
+	\hline
+	Gottifredi, Sebastian & PhD Student & UNS, LIDIA\\
+	\hline
+	Gomez, Mauro & PhD & UNS, LIDIA\\
+	\hline
+	Martinez, Diego & Professor & UNS, LIDIA\\
+	\hline
+	Simari, Guillermo & Professor & UNS, LIDIA\\
+	\hline
+	Garcia, Alejandro & Professor & UNS, LIDIA\\
+	\hline
+  \end{tabular}\\
+\footnotetext[1]{Universidad Nacional del Sur, Laboratorio de Investigaci\'on y Desarrollo en Inteligencia Artificial}\\
+
+
+%\item Which platform/architecture/programming language do you use? (in sec 3)
+
+\item \textbf{Who is the main-contact?}\\
+Any member of the team can be contacted using lidia.mapc@gmail.com.
+
+\item \textbf{How much time (man hours) will you have invested (approximately)
+  until the tournament?}\\
+  Currently, we have invested aproximately 800 man hours. We expect around 1.100 man hours until the tournament.
+\end{enumerate}
+
+\section*{System Analysis and Design}
+
+\begin{enumerate}
+  %\item How is your system  specified and designed?
+  \item \textbf{Briefly, what is the main strategy of the team?}\\
+	The main strategy of the team is to try to occupy the largest possible zones in the map. Each agent decides which position might be better to be placed in the map using Argumentation (with Defeasible Logic Programming), and communicates with the other agents in the team in order to coordinate the zone expansion.
+  \item \textbf{Will you use any existing multi-agent system
+  methodology such as Prometheus, O-MaSE, or Tropos?}\\
+  No.
+ \item \textbf{Do you plan to distribute your agents on several machines?}\\
+ Yes. Our agents and utilities were designed using multi-platform tools that allow the agents to be used in different machines and communicate using sockets. Nevertheless, they could also run in the same PC.
+ \item \textbf{Is your solution based on the centralisation of
+   coordination/information on a specific agent? Conversely if you
+   plan a decentralised solution, which strategy do you plan to use?}\\
+	No, our solution is completely distributed. Coordination and decision-making are made in a distributed way, and agents resolve their conflicts using peer-to-peer communcation.
+\item \textbf{Describe the communication strategy in the agent team. Can you
+   estimate the communication complexity in your approach?}\\
+   Agents communicate using a server that administrates the communcation between them asynchronously\footnote[2]{High Level Programming Tools for Robotic Interaction Protocols: a Logic Programming Approach (http://cs.uns.edu.ar/~mt/)}. Each agent can send both private or broadcast messages to the server, and ask the server to receive every message sent to them.
+ \item \textbf{Describe the team coordination strategy (if any)}\\
+	Given that our agents are based on a BDI architecture, after decision-making, the agents broadcast both their intentions and actions-to-take to the other members of the team. Depending on the phase and status of the game, different action priorities are used in order to decide which agents should procede to effectively execute their actions, and which agents should reconsider what they are going to do.
+ \item \textbf{How are the following agent features implemented:
+   \emph{autonomy}, \emph{proactiveness}, \emph{reactiveness}?}\\
+	Our agents are autonomous, given that they make their own decisions about what actions to take and inform the rest of the team to coordinate. Currently, the agents are purely reactive, but our intention is to make them proactive to defensive and attacking strategies, taking into account the enemy's actions.
+% Is your system a truly \textbf{multi}-agent system or
+%   rather a centralised system in disguise?
+\end{enumerate}
+
+
+\section*{Software Architecture}
+
+\begin{enumerate}
+\item \textbf{Which programming language do you plan to use to implement the
+  multi-agent system? (e.g. 2APL, Jason, Jadex, JIAC, Java, ...)}\\
+	The languages used by our system are:
+%Prolog: En la implementación de la base de conocimiento y en el motor de inferencia.
+%Python: Mantiene la comunicación con el servidor y la comunicación entre los agentes. Realiza la división de la percepción en los sectores principales y se lo provee a la base de conocimiento del agente.
+%XML: Utilizado como lenguaje de comunicación entre lenguajes diferentes, para mantener una representación común y entendible.
+%DeLP: Mantiene el razonamiento interno del agente y realize las inferencias obteniendo las decisiones.
+	\begin{itemize}
+		\item Prolog: used to represent the knowledge base and perform inferences from it.
+		\item Python: keeps the communication with the server and between the agents. It is also used to process the perception.
+		\item XML: used in auxiliar methods.
+		\item DeLP: used in the internal reasoning of the agents and decision-making.
+	\end{itemize}
+% \item How would you map the designed architecture (both multi-agent
+%   and individual agent architectures) to programming codes, i.e., how
+%   would you implement specific agent-oriented concepts and designed
+%   artifacts using the programming language?
+\item \textbf{Which development platform and tools are you planning to use?}\\
+	We developed using several distributions of GNU/Linux, vim, bash, and GIT for version control.
+\item \textbf{Which runtime platform and tools are you planning to use?}\\
+  SWI-Prolog and Python Parrot.
+\item \textbf{Which algorithms will be used?}\\
+	BFS, DFS, UCS, and DeLP Dialectical Argumentation.
+\end{enumerate}
+
+% \section{Agent team strategy}
+
+% Please address the following points, or at least comment if not applicable:
+
+% \begin{enumerate}
+%     \item Describe the navigation algorithms:
+%         \begin{itemize}
+%             \item obstacle avoiding
+%             \item strategy for finding and herding cows
+%             \item opponent blocking
+%         \end{itemize}
+%     \item Describe the team coordination strategy (if any)
+%     \item Does your team strategy use some distributed optimization
+%         technique w.r.t. e.g.  minimizing distances walked by the
+%         agents?
+%     \item Describe and discuss the information exchanged (and shared) in
+%         the agent team.
+%     \item Describe the communication strategy in the agent team. Can you
+%         estimate the communication complexity in your approach?
+%     \item Did your system do some background processing? Under background
+%         processing we understand some computation which happened while agents of
+%         the team were \textit{idle}, i.e. between sending an action
+%         message to the simulation server and receiving a perception
+%         message for the subsequent simulation step.
+%     \item Possibly discuss additional technical details of your system like
+%         e.g. failure/crash recovery and alike.
+% \end{enumerate}
+
+
+
+\end{document}
+

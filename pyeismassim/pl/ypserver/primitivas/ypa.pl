@@ -33,20 +33,32 @@
 % 
 % connects the agent to a existent YPA
 connect(Name, Error) :-
+    writeln(1),
 	get_ypa_address(YPAHost,YPAPort),	
+    writeln(2),
 	set_name(Name),
+    writeln(3),
 	connect_agent(ypa,YPAHost,YPAPort),
+    writeln(4),
 	gethostname(Host),
+    writeln(5),
 	start_server(Port),
+    writeln(6),
 	send_msg([receiver(ypa),performative(request),ontology(ypa),protocol(connect),
+    writeln(7),
 		  content(host(Host,Port))]),
+    writeln(8),
 	recv_msg([sender(ypa),performative(Answer),ontology(ypa),protocol(connect)],1000),
+    writeln(9),
 	(   Answer = agree,
 	    Error = no_error
 	;   Answer = refuse,
+    writeln(12),
 	    write(refuse),nl,
+    writeln(13),
 %	    member(Error,R),
 	    disconnect_agent(ypa),
+    writeln(1),
 	    close_server
 	).
 

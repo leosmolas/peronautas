@@ -118,9 +118,13 @@ quit :-
 % assigning the corresponding Name
 %
 connect_agent(Name, Host, Port) :-
+    writeln('CREANDO SOCKET Y ME CAGO EN DIOS'),
 	tcp_socket(Socket),
+    writeln('CREE EL SOCKET Y ME CAGO EN DIOS'),
 	catch(socket:tcp_connect(Socket, Host:Port),_,fail),
+    writeln('CATCH'),
 	create_messages_handler,
+    writeln('handle'),
 	tcp_open_socket(Socket, ReadFd, WriteFd),
 	add_stream_to_pool(ReadFd,handle_service(ReadFd)),
 	create_stream_pool_loop,

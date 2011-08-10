@@ -12,7 +12,7 @@ from pyswip.easy                    import *
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy):
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, communication):
         self.username = USER
         self.password = PASS
         self.useLog   = useLog
@@ -103,7 +103,12 @@ class Agent():
             if (msg_type == 'request-action'):
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
-                action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
+                # primer fase deliberativa: el agente considera por si mismo que accion realizar
+                action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
+                # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
+                self.prolog.query("enviartodos(d3lp0r, mapc, %s)" % action_str).next()
+                teammate_action_list = self.prolog.query("recibirtodos(L, 1)").next()['L']
+                print teammate_action_list
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
@@ -175,7 +180,10 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
-        print "@PrologAgent: Guardando el rango de vision de %s: %s"% (self.role, defaultVisionRange[self.role])
+        self.prolog.query("cartelito").next()
+        self.prolog.query("conectar(%s)" % self.username).next()
+        self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
+        print "@PrologAgent: Guardando el rango de vision de %s: %s" % (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
         
 
@@ -324,15 +332,18 @@ class PrologAgent(Agent):
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
+            action_str = actionList[0]
             print "@PrologAgent: sending %s" % actionList[0]
         elif len(actionList) == 2:
             print "@PrologAgent: sending %s %s" % (actionList[0], actionList[1])
+            action_str = '%s(%s)' % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
             print "@PrologAgent: error in returned action."
             print "@PrologAgent: return value: %s" % actionList
             action_xml = action(action_id, "skip")
-        return action_xml
+            action_str = 'skip'
+        return (action_xml, action_str)
 
 
 
@@ -345,10 +356,11 @@ if (__name__== "__main__"):
     parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
     parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
     parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
+    parser.add_argument('-c',                                            help="use communication after decision making",       action='store_const', const=True, dest='communication')
     
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy, args.communication)
     agent.mainLoop()
 
