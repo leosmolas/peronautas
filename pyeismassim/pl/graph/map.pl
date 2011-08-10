@@ -461,7 +461,7 @@ calcPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     Points2 is Points1 + Value,
     calcPoints(Nodes, Points2, Points3).
     
-calcPoints([Node | Nodes], Points1, Points2):-
+calcPoints([_Node | Nodes], Points1, Points2):-
     calcPoints(Nodes, Points1, Points2).
     
 checkNeighbors(Node, Team) :-

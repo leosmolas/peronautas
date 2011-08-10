@@ -329,7 +329,7 @@ setPosibleExplorar :-
 chequearPosibleExplorar(6) :- !.
     
 chequearPosibleExplorar(_) :-
-    b(posibleExplorar(Node)), !.
+    b(posibleExplorar(_Node)), !.
     
 chequearPosibleExplorar(X) :-
     currentStep(Step),

@@ -254,13 +254,13 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 updateTeammateEntity(Agent, Team, Position, VisualRange) :-
     k(agentTeam(Agent, Team)),
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position) )),
-    asserta( k(agentVisualRange( Agent, Step, Position) )).
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
 updateTeammateEntity(Agent, Team, Position, VisualRange) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position) )),
-    asserta( k(agentVisualRange( Agent, Step, Position) )).
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
 
 
@@ -507,8 +507,7 @@ planning(explorar(Node)) :-
     currentStep(Step),
     myName(Name),
     position(Step, Name, InitialPosition),
-    energy(Step, Name, Energy),
-    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
+    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
     retract(plan(_)),
     assert(plan(Actions)).
 
@@ -516,9 +515,7 @@ planning(probear(Node)) :-
     currentStep(Step),
     myName(Name),
     position(Step, Name, InitialPosition),
-    energy(Step, Name, Energy),
-    b(path(InitialPosition, Node, _, _, Actions, _, RemainingEnergy)),
-    
+    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
     retract(plan(_)),
     assert(plan(Actions)).
 

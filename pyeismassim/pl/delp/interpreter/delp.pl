@@ -52,14 +52,63 @@ running on:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % begin "working on" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Operators definition
+
+:- op(1101, xfx, -<).  % Defeasible Rules
+:- op(1101, xfx, <-).  % Strict Rules
+:- op(190,  fx,  ~).   % Strong negation
+:- op(191,  fx,  not). % Default negation
 
 % For SWI Prolog 
 % Agregado por Gotti
+:-dynamic volatile_knowledge/2.
+:- dynamic context_add/1, context_ignore/1.
+context_add([]).
+context_ignore([]).
+
+
 :- discontiguous '<-'/2,' -<'/2, is_a_built_in/1.
 :- multifile '<-' /2, '-<'/2, is_a_built_in/1.
 :- dynamic <- /2, -< /2.
 
 
+
+:- [tree_swi].
+:- [tree_xml].
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% AUX PREDICATES  %%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[aux_predicates].
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%    BUILT INS    %%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[aux_built_ins].
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%%  OUTPUT FILE  %%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+%:-[aux_output_file].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% DATE MANAGEMENT %%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[aux_date].
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%% SERVER CONFIG %%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[aux_server_config].
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%%% INTERN CONFIG %%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+:-[intern_config].
+
+
+:-config_on(save_tree).
 
 %------------------------------------------------------------------------------%
 % This predicate defines the interface for remote data extraction.
@@ -95,12 +144,7 @@ let_prolog_prove(H) :-
 % end "working on" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Operators definition
 
-:- op(1101, xfx, -<).  % Defeasible Rules
-:- op(1101, xfx, <-).  % Strict Rules
-:- op(190,  fx,  ~).   % Strong negation
-:- op(191,  fx,  not). % Default negation
 
 
 

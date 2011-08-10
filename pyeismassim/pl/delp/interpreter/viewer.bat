@@ -1,0 +1,1 @@
+java -cp .;JDeLPIndexPanel.jar mainApplication.DeLPStandaloneApp %1
