@@ -422,31 +422,39 @@ getInfo(visualRange, Step, Agent, VisualRange) :-
     k(agentVisualRange(Agent, Step, VisualRange)).
 
 
-
-rechargeEnergy(Step, Agent, unknown) :-
-    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  unknown, _Health, _MaxHealth, _Strength, _VisualRange)).
-    
-rechargeEnergy(Step, Agent, Recharge) :-
-    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
+myRechargeEnergy(Recharge) :-
+    myMaxEnergy(MaxEnergy),
     Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto
     
-rechargeEnergy(Recharge) :-
-    myName(N),
-    currentStep(S),
-    rechargeEnergy(S, N, Recharge).
+rechargeEnergy(Step, Agent, Recharge) :-
+	maxEnergy(Step, Agent, MaxEnergy),
+    Recharge is round(MaxEnergy * 0.2).
 
+checkLastAction :-
+	lastActionResult(Result),
+	Result \= successful, !,
+	
+	write('Not successful = '), writeln(Result).
+
+checkLastAction :-
+	plan([]), !.
+	
+checkLastAction :-
+	retract(plan([Action | Actions])),
+	assert(plan(Actions)).
+	
 run(Action) :-
+
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
-    
+    checkLastAction,
     plan([]),
-    % dumbKB, 
+    % dumpKB, 
     !,
-    
-
-    
+   
     calcTime('setExploredAndVisible',setExploredAndVisible),
-    
+
+	
     calcTime('argumentation',argumentation(Meta)),
     write('Meta: '), writeln(Meta),
     calcTime('planning', planning(Meta)),
@@ -456,6 +464,7 @@ run(Action) :-
     toogleOffVisibleNodes.
     
 run(Action) :-
+	
     setExploredAndVisible,
     exec(Action),
     toogleOffVisibleNodes.
@@ -549,9 +558,7 @@ planning(quedarse(_Node)) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 exec(Action) :-
-    plan([Action | Actions]),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    plan([Action | _Actions]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %

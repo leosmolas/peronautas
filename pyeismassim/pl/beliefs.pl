@@ -63,9 +63,9 @@ setFrontera :-
 
 setEstoyEnLaFrontera :-
     setFrontera,
-    myName(A),
     % writeln('1'),nl,
-    lastKnownPosition(_Step, A, X),
+	myPosition(X),
+    % lastKnownPosition(_Step, A, X),
     % myTeam(T),	
     % writeln('2'),nl,
     % k(nodeTeam(_S2, X, T)),
@@ -295,9 +295,9 @@ setDistancia :-
 setDistancia.
 
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
-	% writeln('pathSearch'),
+	writeln('pathSearch'),
     pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost), !,
-	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7))),
+	printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
     % writeln('6.2'),nl,
     assert(b(distancia(Node, ActionToBeDone, PathCost)) <- true).
     % writeln('6.3'),nl.
@@ -314,10 +314,12 @@ setPosibleExplorar :-
     currentStep(Step),
     myName(Name),
     position(Step, Name, Position),
-    % writeln('1'),
+    writeln('setPosibleExplorar 1'),
     retractall(isGoal(_, _)),
-    assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost < 2)),
-    % writeln('2'),
+    assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 < 2)),
+	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost < 2)),
+    
+    writeln('setPosibleExplorar 2'),
 	foreach(
         (
             breadthFirst(Position, FinalNode, _Path, _Cost)
@@ -329,17 +331,20 @@ setPosibleExplorar :-
 chequearPosibleExplorar(6) :- !.
     
 chequearPosibleExplorar(_) :-
-    b(posibleExplorar(_Node)), !.
+	b(posibleExplorar(_Node)), 
+	writeln('check caso 1'), !.
     
 chequearPosibleExplorar(X) :-
+	writeln('check caso 2'), 
     currentStep(Step),
     myName(Name),
     position(Step, Name, Position),
-    % writeln('1'),
+    writeln('check 1'),
     retractall(isGoal(_, _)),
-    NewCost is X + 2,
-    assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost >= X, Cost < NewCost)),
-    % writeln('2'),
+    NewCost is X + 2,    
+	assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 >= X, Cost2 < NewCost)),
+	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost >= X, Cost < NewCost)),
+    writeln('check 2'),
 	foreach(
         (
             breadthFirst(Position, FinalNode, _Path, _Cost)

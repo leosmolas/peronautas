@@ -318,44 +318,45 @@ setExploredAndVisible :-
     myTeam(MyTeam),
     foreach(
         (
-            team(Step, Agent, MyTeam),
+            team(Agent, MyTeam),
             visualRange(Step, Agent, Range),
             position(Step, Agent, Position),
             Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
         ),
-        (
-            % write(position(Step, Agent, Position)),nl,
-            % k(agent(Step, Agent, _Team,  Position, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
-            % write('2position '),write(Position),nl,
-            assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-            % nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
-            foreach(
-                breadthFirst(Position, Node, _Path, _Cost),
-                (
-                    % write(' Marking node as explored: '),write(Node),nl,
-                    retractall(notExplored(Node)),
-                    % write('1.1 retractall '),write(Agent),nl,
-                    assertOnce(explored(Node)),
-                    % write('1.2 assertOnce '),write(Agent),nl,
-                    toogleOnVisibleNode(Node)
-                )
-            ),
-            retractall(isGoal(_, _))        
-            % write('termine agente '),write(Agent),nl
-        )
+        setExploredAndVisibleAux1(Range, Position)        
     ).
-    
 
+setExploredAndVisibleAux1(Range, Position) :-	
+	% write(position(Step, Agent, Position)),nl,
+	retractall(isGoal(_, _)),
+	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+	% nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
+	foreach(
+		breadthFirst(Position, Node, _Path, _Cost),
+		setExploredAndVisibleAux2(Node)		
+	).
+	% write('termine agente '),write(Agent),nl	
+	
+setExploredAndVisibleAux2(Node) :- 
+	% write(' Marking node as explored: '),write(Node),nl,
+	retractall(notExplored(Node)),
+	% write('1.1 retractall '),nl,
+	assertOnce(explored(Node)),
+	% write('1.2 assertOnce '),nl,
+	toogleOnVisibleNode(Node).
     
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
 coloringAlgorithm :- 
-    step1,
+	calcTime('step1',
+    step1),
     % printHNodeTeams('After step 1'),
-    step2,
+    calcTime('step2',
+    step2),
     % printHNodeTeams('After step 2'),
-    step3.
+    calcTime('step3',
+    step3).
     % printHNodeTeams('After step 3').
 
     
