@@ -92,7 +92,9 @@
 % k(agentStrength(Agent, Step, Strength))
 % k(agentVisualRange(Agent, Step, VisualRange))
 
-
+% ASSERTAR Y BORRAR ESTO
+team(a).
+team(b).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Percept Processing                               %
@@ -238,6 +240,7 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
+    writeln('updateEntity'),
     asserta( k(agentTeam(Agent,        Team))               ),
     asserta( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
@@ -252,7 +255,7 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 
 %------------------------------------------------------------------------------%
 updateTeammateEntity(Agent, Team, Position, VisualRange) :-
-    k(agentTeam(Agent, Team)),
+    k(agentTeam(Agent, Team)), !,
     currentStep(Step),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
@@ -350,6 +353,7 @@ myVisualRange(VisualRange) :-
 % X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
     lastKnownInfo(team, Step, Agent, Team).
+    
 position(Step, Agent, Position) :-
     lastKnownInfo(position, Step, Agent, Position).
 role(Step, Agent, Role) :-
@@ -367,7 +371,11 @@ strength(Step, Agent, Strength) :-
 visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(visualRange, Step, Agent, VisualRange).
 
-
+team(Agent, Team) :-
+    lastKnownInfo(team, _Step, Agent, Team).
+role(Agent, Role) :-
+    lastKnownInfo(role, _Step, Agent, Role).
+    
 
 %------------------------------------------------------------------------------%
 % lastKnownInfo(+Field, -Step, +Agent, -Position) :-
@@ -394,12 +402,12 @@ lastKnownInfo1(Field, CurrentStep, Step, Agent, Position) :-
     !.
 
 %------------------------------------------------------------------------------%
-getInfo(team, Step, Agent, Team) :-
-    k(agentTeam(Agent, Step, Team)).
+getInfo(team, _Step, Agent, Team) :-
+    k(agentTeam(Agent, Team)).
 getInfo(position, Step, Agent, Position) :-
     k(agentPosition(Agent, Step, Position)).
-getInfo(role, Step, Agent, Role) :-
-    k(agentRole(Agent, Step, Role)).
+getInfo(role, _Step, Agent, Role) :-
+    k(agentRole(Agent, Role)).
 getInfo(energy, Step, Agent, Energy) :-
     k(agentEnergy(Agent, Step, Energy)).
 getInfo(maxEnergy, Step, Agent, MaxEnergy) :-
@@ -430,7 +438,10 @@ rechargeEnergy(Recharge) :-
 run(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
-    plan([]), !,
+    
+    plan([]),
+    % dumbKB, 
+    !,
     
 
     

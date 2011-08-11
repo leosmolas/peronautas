@@ -315,7 +315,6 @@ toogleOffVisibleNodes :-
 % y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
 setExploredAndVisible :-
     currentStep(Step),
- 
     myTeam(MyTeam),
     foreach(
         (
@@ -357,7 +356,7 @@ coloringAlgorithm :-
     step2,
     % printHNodeTeams('After step 2'),
     step3.
-    % printHNodeTeams('After step 3'),
+    % printHNodeTeams('After step 3').
 
     
     
@@ -366,6 +365,7 @@ coloringAlgorithm :-
 % first step of the coloring algorithm
 step1 :- 
     setof(Node, nonEmptyNode(Node), ListOfNodes),
+    % writeln('sale del set of del step 1'),
     foreach(
         member(Node2,ListOfNodes), 
         (

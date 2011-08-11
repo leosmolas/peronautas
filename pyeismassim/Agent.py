@@ -231,7 +231,7 @@ class PrologAgent(Agent):
 
     def processEntities(self, msg_dict_private, msg_dict_public):
 
-        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']])
+        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']]) # esto es necesario?
         inspected_entity_names = frozenset([e['name'] for e in msg_dict_public['inspected_ents']])
 
         # Proceso el resto de las entidades visibles.
