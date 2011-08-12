@@ -521,26 +521,17 @@ calcTime(Message, Exec) :-
 %    assert(  plan([recharge]) ).
 
 planning(explorar(Node)) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, InitialPosition),
-    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    assertPlan(Node, [[survey]]).
 
 planning(probear(Node)) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, InitialPosition),
-    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    assertPlan(Node, [[probe]]).
+    
+planning(aumento(Node)) :-
+    assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-
-    currentStep(Step),
-    myName(Name),
-    energy(Step, Name, Energy),
-    maxEnergy(Step, Name, Max),
+    myEnergy(Energy),
+    myMaxEnergy(Max),
     Energy < Max, !,
     retractall(plan(_)),
     assert(plan([[recharge]])).
@@ -549,7 +540,13 @@ planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
     
-
+assertPlan(Node, FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
+    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
+    retract(plan(_)),
+    assert(plan(Actions)).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -616,9 +613,32 @@ redirect_output(Filename) :-
 
 
 %------------------------------------------------------------------------------%
+% saveMap(+Filename)
+% Guarda en Filename en forma de un source de prolog. Terminado todo, vuelve el output a su Stream original
+saveMap(Filename) :-
+    current_output(Current),
+    open(Filename, write, S),
+    set_output(S),
+    dumpMap,
+    set_output(Current),
+    close(S).
+    
+dumpMap :-
+    printFindAll('% step', currentStep(_)),
+    printFindAll('% k', k(_)),
+    % printFindAll('% b', b(_)),
+    printFindAll('% myName', myName(_)),
+    printFindAll('% visible', visibleNode(_)),
+    printFindAll('% not visible', notVisible(_)),
+    printFindAll('% explored', explored(_)),
+    printFindAll('% not explored', notExplored(_)),
+    printFindAll('% inRange', inRange(_)).
+    % printFindAll('% k', k(_)),
+
+%------------------------------------------------------------------------------%
 printList([]).
 printList([H | T]) :-
-    write('    '),write(H),nl,
+    write('    '), write(H), write('.'), nl,
     printList(T).
 
 

@@ -28,7 +28,7 @@ meta(X) :-
     assert(mejorMeta(_, -1000)), % meta con "menos infinito"
     % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
     foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
-    foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
+    % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
     
     
     currentStep(Step),

@@ -245,6 +245,11 @@ checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :-
     !,
     checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(_Node, [Head|_Tail], Visited, Team, _ReachedNodes) :- 
+    var(Team), % me aseguro que no venga instanciado
+    checkOwner(Head, ofNoOne), !,
+    setOwner(Visited, ofNoOne),
+    fail.
+checkNeighbors(_Node, [Head|_Tail], Visited, Team, _ReachedNodes) :- 
     atom(Team), % me aseguro que venga instanciado
     checkOwner(Head, OtherTeam),
     OtherTeam \= none,
@@ -275,7 +280,7 @@ setHypotheticalMap :-
     
 moveAgent(Agent, Node) :-
     currentStep(Step),
-    retract(h(position(Step, Agent, _))),
+    retractall(h(position(_Step, Agent, _))),
     assert(h(position(Step, Agent, Node))).
 
 visibleNode(N) :-
@@ -349,15 +354,9 @@ setExploredAndVisibleAux2(Node) :-
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
 coloringAlgorithm :- 
-	calcTime('step1',
-    step1),
-    % printHNodeTeams('After step 1'),
-    calcTime('step2',
-    step2),
-    % printHNodeTeams('After step 2'),
-    calcTime('step3',
-    step3).
-    % printHNodeTeams('After step 3').
+    step1,
+    step2,
+    step3.
 
     
     
@@ -412,8 +411,7 @@ teamHPoints(Team, Points) :-
         [Node, Team, Value],
         (
             h(nodeTeam(Node, Team)), 
-            k(nodeValue(Node, Value)),
-            Value \= unknown
+            k(nodeValue(Node, Value))
         ), 
         ListOfNodes),
     calcHPoints(ListOfNodes, 0, Points).
@@ -440,6 +438,12 @@ checkHNeighbors(Node, Team) :-
     
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
+	setHypotheticalMap,
+    calcTime('coloringAlgorithm', coloringAlgorithm),
+    teamHPoints(Team, Points).
+
+/*
+teamPoints(Team, Points) :-
     currentStep(Step),
     findall(
         [Node, Team, Value],
@@ -449,7 +453,8 @@ teamPoints(Team, Points) :-
         ), 
         ListOfNodes),
     calcPoints(ListOfNodes, 0, Points).
-    
+*/
+	
 calcPoints([], Points, Points).
 
 calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
