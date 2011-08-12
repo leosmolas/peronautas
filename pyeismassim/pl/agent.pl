@@ -424,23 +424,20 @@ getInfo(visualRange, Step, Agent, VisualRange) :-
 
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto
+    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
     Recharge is round(MaxEnergy * 0.2).
 
 checkLastAction :-
-	lastActionResult(Result),
-	Result \= successful, !,
-	
-	write('Not successful = '), writeln(Result).
+	lastActionResult(failed), !.
 
 checkLastAction :-
 	plan([]), !.
 	
 checkLastAction :-
-	retract(plan([Action | Actions])),
+	retract(plan([_Action | Actions])),
 	assert(plan(Actions)).
 	
 run(Action) :-

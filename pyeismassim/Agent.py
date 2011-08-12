@@ -18,7 +18,7 @@ class Agent():
         self.useLog   = useLog
         self.dummy    = dummy
         if useLog:
-            sys.stdout = open(USER + '-log.txt', 'w')
+            sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
             pass
         self.log = sys.stdout
@@ -119,11 +119,14 @@ class Agent():
     def mainLoop(self):
         self.quit = False
         agent.connect()
+        self.currentLoop = 0
         while (not self.quit):
+            self.currentLoop += 1
             self.initializationHook()
             self.perceiveActLoop()
             self.finalizationHook()
-        raw_input("Finished. Press ENTER to continue...")
+        if not self.useLog:
+            raw_input("Finished. Press ENTER to continue...")
         agent.disconnect()
 
 
@@ -137,7 +140,7 @@ class PrologAgent(Agent):
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (log):
-            self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
+            self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
         print "done"
 
 
