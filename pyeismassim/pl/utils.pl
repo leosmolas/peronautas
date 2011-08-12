@@ -23,16 +23,16 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % writeln('2'),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
 	% printFindAll('isGoal', isGoal(_)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), %!, % otro cut inexplicable
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), % !, % otro cut inexplicable
     % writeln('3'),
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
     % writeln('4'),
     not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
-    % writeln('5'),
-    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
-    % writeln('6').
+
+    assert(b(path(InitialNode, FinalNode, ActionToBeDone, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
+    
 
 % pathSearch(_InitialNode, _FinalNode, _Energy, _Path, _Actions, _PathCost) :-
     % retractall(isGoal(_)).

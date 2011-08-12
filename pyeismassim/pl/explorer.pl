@@ -75,30 +75,19 @@ setInZone :-
 	foreach(k(nodeTeam(Step, Node, MyTeam)), assert(b(inZone(Node)) <- true)).
     
 rolSetDifPuntos:-
-
     myName(A),
     myTeam(T),
+
     teamPoints(T, ActualPoints),
     writeLenght(
         'posibleProbear', 
         Node1, 
-        (
-            b(posibleProbear(Node1))
-        )
+        b(posibleProbear(Node1))
     ),
+
     foreach(
         b(posibleProbear(Node)),
-        (
-            doNotFail(
-                (   setHypotheticalMap,
-                    moveAgent(A, Node),
-                    coloringAlgorithm,
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node, ActualPoints, A, T)
     ).
     
 rolSetDistancia :-

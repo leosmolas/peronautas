@@ -10,5 +10,6 @@ pyeismassim/*-kb*.txt
 pyeismassim/*-log*.txt
 pyeismassim/logs/*-kb*.txt
 pyeismassim/logs/*-log*.txt
+pyeismassim/logs/*.pl
 pyeismassim/runw.sh
 pyeismassim/xml.txt

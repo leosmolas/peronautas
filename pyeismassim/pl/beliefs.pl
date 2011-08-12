@@ -107,20 +107,41 @@ writeLenght(Name, Node, Pattern) :-
    
     write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
     
+setDifPuntosNode(Node, ActualPoints, A, T) :-
+    
+    % write('Node: '), writeln(Node),
+    
+    % currentStep(Step),
+    % myName(Name),
+    % concat('logs/', Name, S2),
+    % concat(S2, '-', S3),
+    % concat(S3, Step, S0),
+    % concat(S0, Node, S1),
+    % concat(S1, '.pl', File),
+    % writeln(File),
+    % saveMap(File),
+    
+    setHypotheticalMap,
+    moveAgent(A, Node),
+    coloringAlgorithm,
+    teamHPoints(T, Points),
+    DifPuntos is Points - ActualPoints,                    
+    % write('Points: '), writeln(Points),
+    assert(b(difPuntosZona(Node, DifPuntos)) <- true).
+    
+setDifPuntosNode(_Node, _ActualPoints, _A, _T).
+
+    
 setDifPuntos :-
     myName(A),
     myTeam(T),
-    % teamPoints(T, ActualPoints),
-    setHypotheticalMap,
-    calcTime('coloringAlgorithm',
-    coloringAlgorithm),
-    teamHPoints(T, ActualPoints),
+    teamPoints(T, ActualPoints),
     writeLenght(
         'posibleExpansion', 
-        Node1, 
+        Node4, 
         (
-            b(posibleExpansion(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExpansion(Node4)),
+            not(b(difPuntosZona(Node4, _DifPuntos1)) <- true)
         )
     ),
     write('ActualPoints: '), writeln(ActualPoints),
@@ -129,80 +150,39 @@ setDifPuntos :-
             b(posibleExpansion(Node)),
             not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
         ),
-        (
-            doNotFail(
-                (
-                    setHypotheticalMap,
-                    moveAgent(A, Node),
-                    calcTime('coloringAlgorithm',
-                    coloringAlgorithm),
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node, ActualPoints, A, T)
     ),
     % printFindAll('', b(difPuntosZona(Node, DifPuntos)) <- true),
     writeLenght(
         'posibleExplorar', 
-        Node1, 
+        Node3, 
         (
-            b(posibleExplorar(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleExplorar(Node3)),
+            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleExplorar(Node)),
-            not(b(difPuntosZona(Node, _DifPuntos2)) <- true)
+            b(posibleExplorar(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos2)) <- true)
         ),
-        (
-            doNotFail(
-                (
-                    setHypotheticalMap,
-                    moveAgent(A, Node),
-                    calcTime('coloringAlgorithm',
-                    coloringAlgorithm),
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node1, ActualPoints, A, T)
     ),
     writeLenght(
         'posibleAumento', 
-        Node1, 
+        Node2, 
         (
-            b(posibleAumento(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos1)) <- true)
+            b(posibleAumento(Node2)),
+            not(b(difPuntosZona(Node2, _DifPuntos1)) <- true)
         )
     ),
     foreach(
         (
-            b(posibleAumento(Node)),
-            not(b(difPuntosZona(Node, _DifPuntos3)) <- true)
+            b(posibleAumento(Node5)),
+            not(b(difPuntosZona(Node5, _DifPuntos3)) <- true)
         ),
-        (
-            doNotFail(
-                (
-                    setHypotheticalMap,
-                    moveAgent(A, Node),
-                    calcTime('coloringAlgorithm',
-                    coloringAlgorithm),
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    write('Node: '), writeln(Node),
-                    write('Points: '), writeln(Points),
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node5, ActualPoints, A, T)
+        
     ).
     
 
@@ -239,22 +219,19 @@ setPosibleAumento.
 setDistancia :-
     % writeln('setDistancia'),nl,
     % writeln('1'),nl,
-    myName(Name),
-    % writeln('2'),nl,
-    currentStep(Step),
     % writeln('3'),nl,
-    position(Step, Name, Position),
+    myPosition(Position),
     % writeln('4'),nl,
-    energy(Step, Name, Energy),
+    myEnergy(Energy),
     % writeln('5'),nl,
 	writeLenght(
         'posibleExplorar', 
-        Node1, 
+        Node12, 
         (
-            b(posibleExplorar(Node1))
+            b(posibleExplorar(Node12))
         )
     ),
-	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(Node))),
+	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(_Node))),
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
@@ -271,23 +248,23 @@ setDistancia :-
     ),
     writeLenght(
         'posibleAumento', 
-        Node1, 
+        Node13, 
         (
-            b(posibleAumento(Node1))
+            b(posibleAumento(Node13))
         )
     ),
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         (
-            b(posibleAumento(Node))
+            b(posibleAumento(Node1))
             % not(b(distancia(Node, _PathCost)) <- true)
         ),
         (
             % writeln('6.1'),nl,
             % writeln(Node),nl,
 
-            searchPath(Position, Node, Energy, [], 0)
+            searchPath(Position, Node1, Energy, [], 0)
         )
     ), 
     !.
@@ -295,9 +272,9 @@ setDistancia :-
 setDistancia.
 
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
-	writeln('pathSearch'),
+	% writeln('pathSearch'),
     pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost), !,
-	printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
+	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
     % writeln('6.2'),nl,
     assert(b(distancia(Node, ActionToBeDone, PathCost)) <- true).
     % writeln('6.3'),nl.
@@ -328,11 +305,14 @@ setPosibleExplorar :-
     ),
     chequearPosibleExplorar(2).
     
+    
+    
 chequearPosibleExplorar(6) :- !.
     
 chequearPosibleExplorar(_) :-
-	b(posibleExplorar(_Node)), 
-	writeln('check caso 1'), !.
+    b(posibleExplorar(_Node)), !.
+    
+    
     
 chequearPosibleExplorar(X) :-
 	writeln('check caso 2'), 
