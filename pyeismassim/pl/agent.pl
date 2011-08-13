@@ -431,11 +431,7 @@ run(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     plan([]), !,
-    
-
-    
     calcTime('setExploredAndVisible',setExploredAndVisible),
-    
     calcTime('argumentation',argumentation(Meta)),
     write('Meta: '), writeln(Meta),
     calcTime('planning', planning(Meta)),
@@ -471,21 +467,24 @@ plan([]).
 
 
 argumentation(Meta) :-
-
     calcTime('setBeliefs', setBeliefs),
-
     calcTime('meta', meta(Meta)),
     retractall(intention(_)),
     assert(intention(Meta)).
 
-calcTime(Message, Exec) :-
-    write('<predicate name="'),write(Message), writeln('">'),
-    get_time(Before),
+calcTime(_Message, Exec) :-
+    write(hello1),nl,
     call(Exec),
-    get_time(After),
-    Time is (After - Before) * 1000,
-    write('<time value="'),write(Time), writeln('"/>'),
-    writeln('</predicate>').
+    write(hello2),nl.
+
+%calcTime(Message, Exec) :-
+%    write('<predicate name="'),write(Message), writeln('">'),
+%    get_time(Before),
+%    call(Exec),
+%    get_time(After),
+%    Time is (After - Before) * 1000,
+%    write('<time value="'),write(Time), writeln('"/>'),
+%    writeln('</predicate>').
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %

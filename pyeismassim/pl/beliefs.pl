@@ -39,8 +39,8 @@ setBeliefs :-
     setDifPuntos),
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('edge', k(edge(N1, N2, V))),
-    printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))),
-    printFindAll('setDistancia', b(distancia(Node, A, PathCost)) <- true).
+    printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(InitialNode, FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
+    printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost)) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion

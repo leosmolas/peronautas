@@ -315,7 +315,6 @@ toogleOffVisibleNodes :-
 % y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
 setExploredAndVisible :-
     currentStep(Step),
- 
     myTeam(MyTeam),
     foreach(
         (
