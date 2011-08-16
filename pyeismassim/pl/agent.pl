@@ -448,12 +448,12 @@ run(Action) :-
     % dumpKB, 
     !,
    
-    calcTime('setExploredAndVisible',setExploredAndVisible),
+    calcTime(setExploredAndVisible),
 
 	
-    calcTime('argumentation',argumentation(Meta)), !,
+    calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
-    calcTime('planning', planning(Meta)),
+    calcTime(planning(Meta)),
     % writeln(1),
     exec(Action),
     % writeln(1),
@@ -491,14 +491,14 @@ plan([]).
 
 argumentation(Meta) :-
 
-    calcTime('setBeliefs', setBeliefs),
+    calcTime(setBeliefs),
 
-    calcTime('meta', meta(Meta)),
+    calcTime(meta(Meta)),
     retractall(intention(_)),
     assert(intention(Meta)).
 
-calcTime(Message, Exec) :-
-    write('<predicate name="'),write(Message), writeln('">'),
+calcTime(Exec) :-
+    write('<predicate name="'),write(Exec), writeln('">'),
     get_time(Before),
     call(Exec),
     get_time(After),
@@ -529,6 +529,9 @@ planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
     
 planning(aumento(Node)) :-
+    assertPlan(Node, []).
+    
+planning(expansion(Node)) :-
     assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-

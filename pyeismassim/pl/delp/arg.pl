@@ -26,14 +26,12 @@ doNotFail(_).
    
 meta(X) :-     
     assert(mejorMeta(_, -1000)), % meta con "menos infinito"
-    % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
-    foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
-    foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
+    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))),
+    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))),
+    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))),
     
     
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
+    myPosition(Position),
     doNotFail(calcMeta(quedarse(Position))),
     
     rolMetas, % predicado definido en cada rol

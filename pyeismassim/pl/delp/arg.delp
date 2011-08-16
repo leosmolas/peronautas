@@ -27,13 +27,13 @@
 % DESIRE expansión(Nodo)
 expansion(Value, X) -< 
                 % estoyEnLaFrontera,
-                b(distancia(X, [[]], Dist)),
+                b(distancia(X, [], Dist)),
                 esSeguro(X),
                 b(difPuntosZona(X, DifPuntos)),
                 expansionValue(Dist, DifPuntos, Value).
                 
 expansionValue(Dist, DifPuntos, Value) :-
-    Value is DifPuntos * 10 - Dist * 2.
+    Value is round(log(DifPuntos) * 60) - Dist * 2.
                                
 % DESIRE explorar(Nodo)
 

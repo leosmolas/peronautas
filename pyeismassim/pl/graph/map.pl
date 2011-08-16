@@ -439,7 +439,7 @@ checkHNeighbors(Node, Team) :-
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
 	setHypotheticalMap,
-    calcTime('coloringAlgorithm', coloringAlgorithm),
+    calcTime(coloringAlgorithm),
     teamHPoints(Team, Points).
 
 /*

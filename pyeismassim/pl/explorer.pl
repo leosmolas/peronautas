@@ -22,12 +22,9 @@ rolMetas:-
 % probed(vertex3).
 
 rolSetBeliefs :-
-    calcTime('setPosibleProbear',
-    setPosibleProbear),
-    calcTime('rolSetDifPuntos',
-    rolSetDifPuntos),
-    calcTime('rolSetDistancia',
-    rolSetDistancia).
+    calcTime(setPosibleProbear),
+    calcTime(rolSetDifPuntos),
+    calcTime(rolSetDistancia).
 
 setPosibleProbear :- 
     currentStep(Step),
