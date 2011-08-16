@@ -269,6 +269,7 @@ cleanColors :-
 setHypotheticalMap :-
     retractall(h(position(_, _, _))),
     retractall(h(nodeTeam(_, _))),
+    currentStep(Step),
     foreach(
         position(Step, A, N),
         assert(h(position(Step, A, N)))
@@ -315,6 +316,13 @@ toogleOffVisibleNodes :-
                 )
            ).
     
+agentsRangeVision(Step, MyTeam, Range, Position) :-
+    team(Agent, MyTeam),
+    visualRange(Step, Agent, Range),
+    position(Step, Agent, Position),
+    write(position(Step, Agent, Position)),nl,
+    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+    
 % setExploredAndVisible
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
 % y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
@@ -323,19 +331,20 @@ setExploredAndVisible :-
     myTeam(MyTeam),
     foreach(
         (
-            team(Agent, MyTeam),
-            visualRange(Step, Agent, Range),
-            position(Step, Agent, Position),
-            Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+            agentsRangeVision(Step, MyTeam, Range, Position)
         ),
-        setExploredAndVisibleAux1(Range, Position)        
+        (
+            setExploredAndVisibleAux1(Range, Position)
+            % writeln(Range),
+            % writeln(Position)
+        )
     ).
 
 setExploredAndVisibleAux1(Range, Position) :-	
-	% write(position(Step, Agent, Position)),nl,
+	
 	retractall(isGoal(_, _)),
 	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-	% nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
+	
 	foreach(
 		breadthFirst(Position, Node, _Path, _Cost),
 		setExploredAndVisibleAux2(Node)		
@@ -345,9 +354,7 @@ setExploredAndVisibleAux1(Range, Position) :-
 setExploredAndVisibleAux2(Node) :- 
 	% write(' Marking node as explored: '),write(Node),nl,
 	retractall(notExplored(Node)),
-	% write('1.1 retractall '),nl,
 	assertOnce(explored(Node)),
-	% write('1.2 assertOnce '),nl,
 	toogleOnVisibleNode(Node).
     
 % coloringAlgorithm
@@ -438,6 +445,7 @@ checkHNeighbors(Node, Team) :-
     
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
+
 	setHypotheticalMap,
     calcTime('coloringAlgorithm', coloringAlgorithm),
     teamHPoints(Team, Points).

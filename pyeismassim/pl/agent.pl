@@ -387,26 +387,26 @@ myStatus(Status) :-
 
 % X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
-    lastKnownInfo(team, Step, Agent, Team).
+    lastKnownInfo(agentTeam, Step, Agent, Team).
     
 position(Step, Agent, Position) :-
-    lastKnownInfo(position, Step, Agent, Position).
+    lastKnownInfo(agentPosition, Step, Agent, Position).
 role(Step, Agent, Role) :-
-    lastKnownInfo(role, Step, Agent, Role).
+    lastKnownInfo(agentRole, Step, Agent, Role).
 energy(Step, Agent, Energy) :-
-    lastKnownInfo(energy, Step, Agent, Energy).
+    lastKnownInfo(agentEnergy, Step, Agent, Energy).
 maxEnergy(Step, Agent, MaxEnergy) :-
-    lastKnownInfo(maxEnergy, Step, Agent, MaxEnergy).
+    lastKnownInfo(agentMaxEnergy, Step, Agent, MaxEnergy).
 health(Step, Agent, Health) :- 
-    lastKnownInfo(health, Step, Agent, Health).
+    lastKnownInfo(agentHealth, Step, Agent, Health).
 maxHealth(Step, Agent, MaxHealth) :-
-    lastKnownInfo(maxHealth, Step, Agent, MaxHealth).
+    lastKnownInfo(agentMaxHealth, Step, Agent, MaxHealth).
 strength(Step, Agent, Strength) :-
-    lastKnownInfo(strength, Step, Agent, Strength).
+    lastKnownInfo(agentStrength, Step, Agent, Strength).
 visualRange(Step, Agent, VisualRange) :-
-    lastKnownInfo(visualRange, Step, Agent, VisualRange).
+    lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
 status(Step, Agent, Status) :-
-    lastKnownInfo(status, Step, Agent, VisualRange).
+    lastKnownInfo(agentStatus, Step, Agent, VisualRange).
 
 team(Agent, Team) :-
     lastKnownInfo(team, _Step, Agent, Team).
@@ -415,47 +415,65 @@ role(Agent, Role) :-
     
 
 %------------------------------------------------------------------------------%
-% lastKnownInfo(+Field, -Step, +Agent, -Position) :-
+% lastKnownInfo(+Field, -Step, +Agent, -Value) :-
+lastKnownInfo(team, _Step, Agent, Value) :-
+    k(agentTeam(Agent, Value)).
+    
+lastKnownInfo(role, _Step, Agent, Value) :-
+    k(agentRole(Agent, Value)).
+    
+    
+% El step viene instanciado, por lo que no tiene sentido ponerse a buscar para atras
 lastKnownInfo(Field, Step, Agent, Value) :-
-    currentStep(InitialStep),
-    lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
+    nonvar(Step),
+    Field \= team,
+    Field \= role,
+    A =.. [Field, Agent, Step, Value],
+    Q =.. [k, A],
+    call(Q).
+    
+
+% lastKnownInfo(Field, Step, Agent, Value) :-
+    % var(Step),
+    % currentStep(InitialStep),
+    % lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
 
 
 
 %------------------------------------------------------------------------------%
 % Condicion de corte, exito.
 lastKnownInfo1(Field, Step, Step, Agent, Value) :-
-    getInfo(Field, Step, Agent, Value),
-    !.
+    getInfo(Field, Step, Agent, Value).
+    % !.
 
 % Condicion de corte, sin exito.
 lastKnownInfo1(_Field, 0, 0, _Agent, unknown) :-
-    !.
+    !, fail.
 
 % Recursion.
 lastKnownInfo1(Field, CurrentStep, Step, Agent, Position) :-
     NextStep is CurrentStep - 1,
-    lastKnownInfo(Field, NextStep, Step, Agent, Position),
+    lastKnownInfo1(Field, NextStep, Step, Agent, Position),
     !.
 
 %------------------------------------------------------------------------------%
-getInfo(team, _Step, Agent, Team) :-
+getInfo(agentTeam, _Step, Agent, Team) :-
     k(agentTeam(Agent, Team)).
-getInfo(position, Step, Agent, Position) :-
+getInfo(agentPosition, Step, Agent, Position) :-
     k(agentPosition(Agent, Step, Position)).
-getInfo(role, _Step, Agent, Role) :-
+getInfo(agentRole, _Step, Agent, Role) :-
     k(agentRole(Agent, Role)).
-getInfo(energy, Step, Agent, Energy) :-
+getInfo(agentEnergy, Step, Agent, Energy) :-
     k(agentEnergy(Agent, Step, Energy)).
-getInfo(maxEnergy, Step, Agent, MaxEnergy) :-
+getInfo(agentMaxEnergy, Step, Agent, MaxEnergy) :-
     k(agentMaxEnergy(Agent, Step, MaxEnergy)).
-getInfo(health, Step, Agent, Health) :-
+getInfo(agentHealth, Step, Agent, Health) :-
     k(agentHealth(Agent, Step, Health)).
-getInfo(maxHealth, Step, Agent, MaxHealth) :-
+getInfo(agentMaxHealth, Step, Agent, MaxHealth) :-
     k(agentMaxHealth(Agent, Step, MaxHealth)).
-getInfo(strength, Step, Agent, Strength) :-
+getInfo(agentStrength, Step, Agent, Strength) :-
     k(agentStrength(Step, Agent, Strength)).
-getInfo(visualRange, Step, Agent, VisualRange) :-
+getInfo(agentVisualRange, Step, Agent, VisualRange) :-
     k(agentVisualRange(Agent, Step, VisualRange)).
 
 
@@ -684,10 +702,10 @@ printList([H | T]) :-
 
 printFindAll(Title, WhatToFind) :-
     findall(WhatToFind, WhatToFind, L),
-    sort(L, SL),
+    % sort(L, SL),
     write(Title),
     nl,
-    printList(SL).
+    printList(L).
 
 
 
