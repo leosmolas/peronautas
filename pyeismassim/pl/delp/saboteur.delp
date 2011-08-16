@@ -1,0 +1,12 @@
+atacar(Value, Agent) -<
+    b(enemyPosition(Agent, Position)),
+    b(distancia(Position,[[attack, Agent]], Turns, EnergyLeft)),
+    agentRole(Agent, RolePoints),
+    atacarValue(Turns, EnergyLeft, RolePoints, Value).
+    
+atacarValue(Turns, EnergyLeft, RolePoints, Value) :-
+    Value is (10 - Turns) ** 2 + EnergyLeft + RolePoints + 50.
+    
+is_built_in(atacarValue(_Turns, _EnergyLeft, _RolePoints, _Value)).
+    
+agentRole(_A, 0) -< true.

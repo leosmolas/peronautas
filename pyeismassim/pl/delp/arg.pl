@@ -43,8 +43,8 @@ meta(X) :-
     
 calcMeta(X) :-
     writeln(X),
-    X =.. [Meta, Nodo | _],
-    Query =.. [Meta, Value, Nodo],
+    X =.. [Meta | Args],
+    Query =.. [Meta, Value | Args],
     answer(Query, Answer),
     writeln(Answer), 
     Answer = yes, !,

@@ -371,17 +371,17 @@ visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
 
 team(Agent, Team) :-
-    lastKnownInfo(team, _Step, Agent, Team).
+    lastKnownInfo(agentTeam, _Step, Agent, Team).
 role(Agent, Role) :-
-    lastKnownInfo(role, _Step, Agent, Role).
+    lastKnownInfo(agentRole, _Step, Agent, Role).
     
 
 %------------------------------------------------------------------------------%
 % lastKnownInfo(+Field, -Step, +Agent, -Value) :-
-lastKnownInfo(team, _Step, Agent, Value) :-
+lastKnownInfo(agentTeam, _Step, Agent, Value) :-
     k(agentTeam(Agent, Value)).
     
-lastKnownInfo(role, _Step, Agent, Value) :-
+lastKnownInfo(agentRole, _Step, Agent, Value) :-
     k(agentRole(Agent, Value)).
     
     
@@ -561,6 +561,16 @@ planning(explorar(Node)) :-
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
     
+planning(atacar(Agent)) :-
+    currentStep(Step),
+    position(Step, Agent, Node),
+    assertPlan(Node, [[attack, Agent]]).
+    
+planning(reparar(Agent)) :-
+    currentStep(Step),
+    position(Step, Agent, Node),
+    assertPlan(Node, [[repair, Agent]]).
+    
 planning(aumento(Node)) :-
     assertPlan(Node, []).
     
@@ -579,14 +589,29 @@ planning(quedarse(_Node)) :-
     assert(plan([[skip]])).
   
 replanning(explorar(Node)) :-
-    writeln(replanning),
     myPosition(Position),
     myEnergy(Energy),
-    writeln(1),
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
-    writeln(2),
     planning(explorar(Node)).
+    
+replanning(atacar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPath(Position, EnemyPosition, Energy, [[attack, Agent]], 2),
+    planning(atacar(Agent)).
+    
+replanning(reparar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPath(Position, EnemyPosition, Energy, [[repair, Agent]], 2),
+    planning(reparar(Agent)).
     
 replanning(probear(Node)) :-
     myPosition(Position),

@@ -30,7 +30,7 @@ setBeliefs :-
     calcTime(setPosibleAumento), !,
     % printFindAll('posibleAumento', b(posibleAumento(_A))),
     % write('voy'),nl,
-    calcTime(setPosibleExplorar),
+    calcTime(setPosibleExplorar), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('edge', k(edge(N1, N2, V))),
     printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _ActionToBeDone, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
