@@ -240,7 +240,6 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
-    writeln('updateEntity'),
     asserta( k(agentTeam(Agent,        Team))               ),
     asserta( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
@@ -452,10 +451,13 @@ run(Action) :-
     calcTime('setExploredAndVisible',setExploredAndVisible),
 
 	
-    calcTime('argumentation',argumentation(Meta)),
+    calcTime('argumentation',argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime('planning', planning(Meta)),
+    % writeln(1),
     exec(Action),
+    % writeln(1),
+    writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
@@ -539,10 +541,18 @@ planning(quedarse(_Node)) :-
 planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
+  
+assertPlan(Node, _FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
     
+    b(path(InitialPosition, Node, _, _, _, [], _, _)),
+    planning(quedarse(InitialPosition)).
+  
 assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
     % myEnergy(Energy),
+    
     b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
     retract(plan(_)),
     assert(plan(Actions)).

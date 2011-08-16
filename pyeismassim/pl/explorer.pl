@@ -77,17 +77,14 @@ setInZone :-
 rolSetDifPuntos:-
     myName(A),
     myTeam(T),
-
-    teamPoints(T, ActualPoints),
     writeLenght(
         'posibleProbear', 
         Node1, 
         b(posibleProbear(Node1))
     ),
-
     foreach(
         b(posibleProbear(Node)),
-        setDifPuntosNode(Node, ActualPoints, A, T)
+        setDifPuntosNode(Node, A, T)
     ).
     
 rolSetDistancia :-

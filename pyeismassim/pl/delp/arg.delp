@@ -57,15 +57,16 @@ explorarValue(Dist, Positivo, Negativo, Value) :-
 
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
 aumento(Value, X) -< 
-    b(distancia(X, [[survey]], Dist)),
+    b(distancia(X, [], Dist)),
     % ~estaLejos(X, [[]], Dist, 10), 
     esSeguro(X),
     b(difPuntosZona(X, DifPuntos)),
     greater(DifPuntos, 0),
-    mult(DifPuntos, 10, Mult),
-    sust(10, Dist, Sust),
-    power(Sust, 2, Pow),
-    add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
+    aumentoValue(Dist,  DifPuntos, Value).
+    % mult(DifPuntos, 10, Mult),
+    % sust(10, Dist, Sust),
+    % power(Sust, 2, Pow),
+    % add(Mult, Pow, Value). % Value is (DifPuntos * 10) * ((10 - Dist) ** 2)
               
 aumentoValue(Dist,  DifPuntos, Value) :-
     Value is DifPuntos * 10 + (10 - Dist) ** 2.
