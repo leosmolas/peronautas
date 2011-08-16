@@ -240,8 +240,8 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(Agent,        Team))               ),
-    asserta( k(agentRole(Agent,        Role))               ),
+    assertOnce( k(agentTeam(Agent,        Team))               ),
+    assertOnce( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
@@ -466,14 +466,14 @@ run(Action) :-
     % dumpKB, 
     !,
     
-    % currentStep(Step),
-    % myName(Name),
-    % concat('logs/', Name, S2),
-    % concat(S2, '-', S3),
-    % concat(S3, Step, S0),
-    % concat(S0, '.pl', File),
-    % writeln(File),
-    % saveMap(File),
+    currentStep(Step),
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '-', S3),
+    concat(S3, Step, S0),
+    concat(S0, '.pl', File),
+    writeln(File),
+    saveMap(File),
     
     
     calcTime(setExploredAndVisible),
@@ -492,8 +492,13 @@ run(Action) :-
     
 run(Action) :-
 	
-    setExploredAndVisible,
+    calcTime(setExploredAndVisible),
+    intention(Meta),
+    writeln(Meta),
+    replanning(Meta),
     exec(Action),
+    writeln(Action),
+    retractall(b(_)),
     toogleOffVisibleNodes.
     
 plan([]).
@@ -573,6 +578,40 @@ planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
   
+replanning(explorar(Node)) :-
+    writeln(replanning),
+    myPosition(Position),
+    myEnergy(Energy),
+    writeln(1),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [[survey]], 1),
+    writeln(2),
+    planning(explorar(Node)).
+    
+replanning(probear(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [[probe]], 1),
+    planning(probear(Node)).
+    
+replanning(aumento(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [], 0),
+    planning(aumento(Node)).
+    
+replanning(expansion(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [], 0),
+    planning(expansion(Node)).
+    
+replanning(_) :-
+    writeln('aca no deberia pasar').
+  
 assertPlan(Node, _FinalActions) :-
     myPosition(InitialPosition),
     % myEnergy(Energy),
@@ -594,6 +633,10 @@ assertPlan(Node, FinalActions) :-
     
 exec(Action) :-
     plan([Action | _Actions]).
+    
+exec([skip]) :-
+    writeln('aca no deberia haber llegado'),
+    plan([]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %
