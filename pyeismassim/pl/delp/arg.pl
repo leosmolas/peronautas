@@ -66,35 +66,36 @@ is_a_built_in(greaterEq(_X,_Y)).
 is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
-is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _Value)).
-is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _Value2)).
-is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _Value3) ).
+
 
 % Operaciones aritméticas
-mult(X,Y,Z)    :- Z is X * Y.
-add(X,Y,Z)     :- Z is X + Y.
-sust(X,Y,Z)    :- Z is X - Y.
+% DEPRECATED
+% Conviene usar una sola fórmula para las metas
+mult(X,Y,Z)    :- Z is X *  Y.
+add(X,Y,Z)     :- Z is X +  Y.
+sust(X,Y,Z)    :- Z is X -  Y.
 power(X,Y,Z)   :- Z is X ** Y.
-greater(X,Y)   :- X > Y.
-less(X,Y)      :- X < Y.
-greaterEq(X,Y) :- X >= Y.
-lessEq(X,Y)    :- X =< Y.
+greater(X,Y)   :- X >   Y.
+less(X,Y)      :- X <   Y.
+greaterEq(X,Y) :- X >=  Y.
+lessEq(X,Y)    :- X =<  Y.
 equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sólo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
-notEqual(X,Y)  :- X \= Y.
+notEqual(X,Y)  :- X \=  Y.
 
+% Por cuestiones históricas y emocionales, todo lo que sigue va a quedar. (El criterio de comparación).
 
 % posibleMeta(+Meta, -Prioridad)
 % La Meta tendrá una prioridad única, que le dará su orden de importancia
 % Valor más alto => mayor prioridad.
-posibleMeta(explorar(_), 2).
-posibleMeta(expansion(_), 1).
+% posibleMeta(explorar(_), 2).
+% posibleMeta(expansion(_), 1).
 
 % posibleMetaNeg(+Meta)
 % Chequea que el parámetro ingresado sea una meta, así esté negada.
-posibleMetaNeg(explorar(_)).
-posibleMetaNeg(expansion(_)).
-posibleMetaNeg(~explorar(_)).
-posibleMetaNeg(~expansion(_)).
+% posibleMetaNeg(explorar(_)).
+% posibleMetaNeg(expansion(_)).
+% posibleMetaNeg(~explorar(_)).
+% posibleMetaNeg(~expansion(_)).
 
 % criterio de comparación greaterArgValue
 % greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-
