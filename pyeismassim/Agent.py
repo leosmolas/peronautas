@@ -13,10 +13,11 @@ from pyswip.easy                    import *
 class Agent():
     
     def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, communication):
-        self.username = USER
-        self.password = PASS
-        self.useLog   = useLog
-        self.dummy    = dummy
+        self.username      = USER
+        self.password      = PASS
+        self.useLog        = useLog
+        self.dummy         = dummy
+        self.communication = communication
         if useLog:
             sys.stdout = open(USER + '-log.txt', 'w')
         else:
@@ -106,9 +107,25 @@ class Agent():
                 # primer fase deliberativa: el agente considera por si mismo que accion realizar
                 action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
-                self.prolog.query("enviartodos(d3lp0r, mapc, %s)" % action_str).next()
-                teammate_action_list = self.prolog.query("recibirtodos(L, 1)").next()['L']
-                print teammate_action_list
+                if (self.communication):
+                    self.prolog.query("broadcast(d3lp0r, mapc, %s)" % action_str).next()
+                    teammate_action_list = self.prolog.query("recibirTodoSimple(L, 1)").next()['L']
+                    print "Received from other agents:"
+                    if (len(teammate_action_list) > 2):
+                        for x1 in teammate_action_list:
+                            print '----'
+                            if   (len(x1) == 1):
+                                print x1[0]
+                            elif (len(x1) == 2):
+                                print x1[0]
+                                print x1[1]
+                            elif (len(x1) == 3):
+                                print x1[0]
+                                print x1[1]
+                                print x1[2]
+                            else:
+                                print "Error:", len(x1)
+
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
@@ -180,7 +197,6 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
-        self.prolog.query("cartelito").next()
         self.prolog.query("conectar(%s)" % self.username).next()
         self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
         print "@PrologAgent: Guardando el rango de vision de %s: %s" % (self.role, defaultVisionRange[self.role])
@@ -330,6 +346,7 @@ class PrologAgent(Agent):
         else:
             query_result = self.prolog.query("run(X)").next()
         actionList   = query_result['X']
+
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
             action_str = actionList[0]

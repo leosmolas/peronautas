@@ -1,4 +1,10 @@
-﻿% This file contains options and configs. used by the delp.pl, aux_server_config, tree_xml and tree_swi
+﻿%
+% This file contains options and configs. used by the delp.pl, aux_server_config, tree_xml and tree_swi
+% 
+%
+%
+%
+
 
 use_built_ins(yes). %%%are we letting free usage of built-ins?
 
@@ -30,6 +36,14 @@ is_a_built_in(set_tree_file(_)).
 is_a_built_in(set_output_file(_)).
 is_a_built_in(show_options).
 
+               
+                   
+
+
+
+
+               
+                
 %SHOW_OPTIONS/0 muestra por pantalla las opciones de configuracion segun
 %su estado actual
 show_options:-
@@ -38,6 +52,7 @@ show_options:-
         (member(Option,OpList),functor(OptionWithArg,Option,1),OptionWithArg),
         (write(OptionWithArg),nl)
         ).
+
 
 %SET_TREE_FILE/1 modifica el nombre del archivo que contiene la informacion de
 %los arboles de dialectica para ser graficados
