@@ -108,6 +108,7 @@ class Agent():
                 action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
                 if (self.communication):
+
                     self.prolog.query("broadcast(d3lp0r, mapc, %s)" % action_str).next()
                     teammate_action_list = self.prolog.query("recibirTodoSimple(L, 1)").next()['L']
                     print "Received from other agents:"
