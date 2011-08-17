@@ -140,7 +140,7 @@ class PrologAgent(Agent):
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (log):
-            self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
+            self.prolog.query("redirect_output('logs/%s-kb%d.xml')" % (self.username, self.currentLoop)).next()
         print "done"
 
 

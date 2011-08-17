@@ -194,15 +194,15 @@ setPosibleAumento :-
         setPosibleAumentoAux(FinalNode, Step, Team),
         Aumento
     ),
-    myPosition(Position),
+    myPosition(Position), !,
     foreach(
         (
             member(X, Aumento),
             Position \= X
         ),
         assert(b(posibleAumento(X)))
-    ),
-    calcTime(setPosibleAumentoDifPuntos),
+    ), !,
+    calcTime(setPosibleAumentoDifPuntos), !,
     calcTime(setPosibleAumentoDistancia).
     
 setPosibleAumento.

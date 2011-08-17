@@ -1,0 +1,6 @@
+- atacar
+- inspectar
+- defender
+- bloquear
+- posicionarse
+- romper zona
