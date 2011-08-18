@@ -4,12 +4,13 @@ expansion(Value, X) -<
     b(distancia(X, [], Dist, EnergyLeft)),
     esSeguro(X),
     b(difPuntosZona(X, DifPuntos)),
-    expansionValue(Dist, DifPuntos, EnergyLeft, Value).
+    phaseCoef(expansion, Coef),
+    expansionValue(Dist, DifPuntos, EnergyLeft, Coef, Value).
                 
-expansionValue(Dist, DifPuntos, EnergyLeft, Value) :-
-    Value is round(log(DifPuntos) * 60) - Dist * 2 + EnergyLeft.
+expansionValue(Dist, DifPuntos, EnergyLeft, Coef, Value) :-
+    Value is (round(log(DifPuntos) * 60) - Dist * 2 + EnergyLeft) * Coef.
                  
-is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _E, _Value2)).
+is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _E, _Coef, _Value2)).
                  
 % DESIRE explorar(Nodo)
 
@@ -18,12 +19,13 @@ explorar(Value, X) -<
     b(distancia(X, [[survey]], Dist, EnergyLeft)),
     b(difPuntosZona(X, DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),
-    explorarValue(Dist, Positivo, Negativo, EnergyLeft, Value).
+    phaseCoef(explorar, Coef),
+    explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value).
                
-explorarValue(Dist, Positivo, Negativo, EnergyLeft, Value) :-
-    Value is 20 + ((10 - Dist) ** 2) * 2 + Positivo - Negativo ** 2 + EnergyLeft.
+explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value) :-
+    Value is (20 + ((10 - Dist) ** 2) * 2 + Positivo - Negativo ** 2 + EnergyLeft) * Coef.
 
-is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _E, _Value)).
+is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _E, _Coef, _Value)).
     
 positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
@@ -35,12 +37,13 @@ aumento(Value, X) -<
     esSeguro(X),
     b(difPuntosZona(X, DifPuntos)),
     greater(DifPuntos, 0),
-    aumentoValue(Dist,  DifPuntos, EnergyLeft, Value).
+    phaseCoef(aumento, Coef),
+    aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value).
 
-aumentoValue(Dist,  DifPuntos, EnergyLeft, Value) :-
-    Value is DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft.
+aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
+    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * Coef.
     
-is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Value3)).
+is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
@@ -48,6 +51,16 @@ quedarse(20, _) -< true.
 ~estoyEnLaFrontera -< true.
 
 esSeguro(_) -< true.
+
+phaseCoef(_, 1.0) -< true.
+~phaseCoef(X, 1.0) <- phaseCoef(X, V), notEqual(V, 1.0).
+
+
+phaseCoef(expansion, 0.8) <- phase(exploration).
+phaseCoef(explorar,  1.2) <- phase(exploration).
+phaseCoef(aumento,   0.8) <- phase(exploration).
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%

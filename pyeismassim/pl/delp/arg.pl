@@ -67,6 +67,7 @@ is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
 
+is_a_built_in(phase(_)). % delp revisara las fases
 
 % Operaciones aritméticas
 % DEPRECATED

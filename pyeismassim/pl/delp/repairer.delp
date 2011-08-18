@@ -1,13 +1,13 @@
 reparar(Value, Agent) -<
-    % b(teammatePosition(Agent, Position)),
     b(distancia(_Position,[[repair, Agent]], Turns, EnergyLeft)),
     agentRole(Agent, RolePoints),
-    repararValue(Turns, EnergyLeft, RolePoints, Value).
+    phaseCoef(reparar, Coef),
+    repararValue(Turns, EnergyLeft, RolePoints, Coef, Value).
     
-repararValue(Turns, EnergyLeft, RolePoints, Value) :-
+repararValue(Turns, EnergyLeft, RolePoints, Coef, Value) :-
     % writeln('llegue a repararValue'),
-    Value is (10 - Turns) ** 2 + EnergyLeft + RolePoints + 50.
+    Value is ((10 - Turns) ** 2 + EnergyLeft + RolePoints) * Coef.
     
-is_a_built_in(repararValue(_Turns, _EnergyLeft, _RolePoints, _Value)).
+is_a_built_in(repararValue(_Turns, _EnergyLeft, _RolePoints, _Coef, _Value)).
     
 agentRole(_A, 0) -< true.

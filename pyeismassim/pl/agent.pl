@@ -466,14 +466,14 @@ run(Action) :-
     % dumpKB, 
     !,
     
-    currentStep(Step),
-    myName(Name),
-    concat('logs/', Name, S2),
-    concat(S2, '-', S3),
-    concat(S3, Step, S0),
-    concat(S0, '.pl', File),
-    writeln(File),
-    saveMap(File),
+    % currentStep(Step),
+    % myName(Name),
+    % concat('logs/', Name, S2),
+    % concat(S2, '-', S3),
+    % concat(S3, Step, S0),
+    % concat(S0, '.pl', File),
+    % writeln(File),
+    % saveMap(File),
     
     
     calcTime(setExploredAndVisible),

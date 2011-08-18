@@ -5,14 +5,18 @@ probear(Value, X) -<
     notProbedInZone(X, InZone),
     b(difPuntosZona(X, DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),
-    probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Value).
+    phaseCoef(probear, Coef),
+    probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value).
     
-probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Value) :-
-    Value is (10 - Dist) ** 2 * 2 + Positivo - Negativo ** 2 + InZone + EnergyLeft.
+probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value) :-
+    Value is ((10 - Dist) ** 2 * 2 + Positivo - Negativo ** 2 + InZone + EnergyLeft) * Coef.
     
-is_a_built_in(probearValue(_Dist, _EnergyLeft, _InZone, _Positivo, _Negativo, _Value)).
+is_a_built_in(probearValue(_Dist, _EnergyLeft, _InZone, _Positivo, _Negativo, _Coef, _Value)).
+
 
                
 notProbedInZone(_X, 0) -< true.
 notProbedInZone(X, 50) <- b(inZone(X)).
 ~notProbedInZone(X, 0) <- notProbedInZone(X, 50).
+
+phaseCoef(probear, 1.5) <- phase(exploration).
