@@ -22,9 +22,9 @@
             <configuration
                     xmlns:meta="http://www.tu-clausthal.de/"
                     maxNumberOfSteps="50"
-                    numberOfAgents="10"
+                    numberOfAgents="20"
                     numberOfTeams="2"
-                    agentsPerTeam="5"
+                    agentsPerTeam="10"
                     numberOfNodes="50"
                     gridWidth="15"
                     gridHeight="15"
@@ -242,33 +242,33 @@
                     team="red">
                     <configuration roleName="Explorer"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Explorer"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Repairer"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Repairer"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Saboteur"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Saboteur"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Sentinel"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Sentinel"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Inspector"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="red">
                     <configuration roleName="Inspector"/>
-                </agent-->
+                </agent>
                 <!--
                 -->
                 
@@ -284,33 +284,33 @@
                     <!--<configuration roleName="Sentinel"/>  -->
                     <!--<configuration roleName="Inspector"/> -->
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Explorer"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Repairer"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Repairer"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Saboteur"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Saboteur"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Sentinel"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Sentinel"/>
-                </agent-->
+                </agent>
                 <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Inspector"/>
                 </agent>
-                <!--agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
+                <agent agentclass="massim.competition2011.GraphSimulationAgent" agentcreationclass="massim.competition2011.GraphSimulationAgentParameter" team="blue">
                     <configuration roleName="Inspector"/>
-                </agent-->
+                </agent>
                 <!--
                 -->
             </agents>
@@ -326,11 +326,11 @@
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a3" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a4" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a5" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
-        <!--account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
+        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a7" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a8" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a9" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
-        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/-->
+        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="A" timeout="2000" username="a10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamA.xml"/>
         <!--
         -->
 
@@ -339,11 +339,11 @@
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b3" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b4" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b5" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
-        <!--account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
+        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b6" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b7" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b8" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b9" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
-        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/-->
+        <account actionclassmap="Graph" auxtimeout="500" defaultactionclass="massim.competition2011.GraphSimulationAgentAction" maxpacketlength="65536" password="1" team="B" timeout="2000" username="b10" xml:base="file:/home/mko/Documents/massim-svn/massim/trunk/massim/scripts/conf/helpers/2010/teamB.xml"/>
         <!--
         -->
     </accounts>
