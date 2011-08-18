@@ -240,9 +240,8 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
-    writeln('updateEntity'),
-    asserta( k(agentTeam(Agent,        Team))               ),
-    asserta( k(agentRole(Agent,        Role))               ),
+    assertOnce( k(agentTeam(Agent,        Team))               ),
+    assertOnce( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
@@ -352,73 +351,91 @@ myVisualRange(VisualRange) :-
 
 % X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
-    lastKnownInfo(team, Step, Agent, Team).
+    lastKnownInfo(agentTeam, Step, Agent, Team).
     
 position(Step, Agent, Position) :-
-    lastKnownInfo(position, Step, Agent, Position).
+    lastKnownInfo(agentPosition, Step, Agent, Position).
 role(Step, Agent, Role) :-
-    lastKnownInfo(role, Step, Agent, Role).
+    lastKnownInfo(agentRole, Step, Agent, Role).
 energy(Step, Agent, Energy) :-
-    lastKnownInfo(energy, Step, Agent, Energy).
+    lastKnownInfo(agentEnergy, Step, Agent, Energy).
 maxEnergy(Step, Agent, MaxEnergy) :-
-    lastKnownInfo(maxEnergy, Step, Agent, MaxEnergy).
+    lastKnownInfo(agentMaxEnergy, Step, Agent, MaxEnergy).
 health(Step, Agent, Health) :- 
-    lastKnownInfo(health, Step, Agent, Health).
+    lastKnownInfo(agentHealth, Step, Agent, Health).
 maxHealth(Step, Agent, MaxHealth) :-
-    lastKnownInfo(maxHealth, Step, Agent, MaxHealth).
+    lastKnownInfo(agentMaxHealth, Step, Agent, MaxHealth).
 strength(Step, Agent, Strength) :-
-    lastKnownInfo(strength, Step, Agent, Strength).
+    lastKnownInfo(agentStrength, Step, Agent, Strength).
 visualRange(Step, Agent, VisualRange) :-
-    lastKnownInfo(visualRange, Step, Agent, VisualRange).
+    lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
 
 team(Agent, Team) :-
-    lastKnownInfo(team, _Step, Agent, Team).
+    lastKnownInfo(agentTeam, _Step, Agent, Team).
 role(Agent, Role) :-
-    lastKnownInfo(role, _Step, Agent, Role).
+    lastKnownInfo(agentRole, _Step, Agent, Role).
     
 
 %------------------------------------------------------------------------------%
-% lastKnownInfo(+Field, -Step, +Agent, -Position) :-
+% lastKnownInfo(+Field, -Step, +Agent, -Value) :-
+lastKnownInfo(agentTeam, _Step, Agent, Value) :-
+    k(agentTeam(Agent, Value)).
+    
+lastKnownInfo(agentRole, _Step, Agent, Value) :-
+    k(agentRole(Agent, Value)).
+    
+    
+% El step viene instanciado, por lo que no tiene sentido ponerse a buscar para atras
 lastKnownInfo(Field, Step, Agent, Value) :-
-    currentStep(InitialStep),
-    lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
+    nonvar(Step),
+    Field \= team,
+    Field \= role,
+    A =.. [Field, Agent, Step, Value],
+    Q =.. [k, A],
+    call(Q).
+    
+
+% lastKnownInfo(Field, Step, Agent, Value) :-
+    % var(Step),
+    % currentStep(InitialStep),
+    % lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
 
 
 
 %------------------------------------------------------------------------------%
 % Condicion de corte, exito.
 lastKnownInfo1(Field, Step, Step, Agent, Value) :-
-    getInfo(Field, Step, Agent, Value),
-    !.
+    getInfo(Field, Step, Agent, Value).
+    % !.
 
 % Condicion de corte, sin exito.
 lastKnownInfo1(_Field, 0, 0, _Agent, unknown) :-
-    !.
+    !, fail.
 
 % Recursion.
 lastKnownInfo1(Field, CurrentStep, Step, Agent, Position) :-
     NextStep is CurrentStep - 1,
-    lastKnownInfo(Field, NextStep, Step, Agent, Position),
+    lastKnownInfo1(Field, NextStep, Step, Agent, Position),
     !.
 
 %------------------------------------------------------------------------------%
-getInfo(team, _Step, Agent, Team) :-
+getInfo(agentTeam, _Step, Agent, Team) :-
     k(agentTeam(Agent, Team)).
-getInfo(position, Step, Agent, Position) :-
+getInfo(agentPosition, Step, Agent, Position) :-
     k(agentPosition(Agent, Step, Position)).
-getInfo(role, _Step, Agent, Role) :-
+getInfo(agentRole, _Step, Agent, Role) :-
     k(agentRole(Agent, Role)).
-getInfo(energy, Step, Agent, Energy) :-
+getInfo(agentEnergy, Step, Agent, Energy) :-
     k(agentEnergy(Agent, Step, Energy)).
-getInfo(maxEnergy, Step, Agent, MaxEnergy) :-
+getInfo(agentMaxEnergy, Step, Agent, MaxEnergy) :-
     k(agentMaxEnergy(Agent, Step, MaxEnergy)).
-getInfo(health, Step, Agent, Health) :-
+getInfo(agentHealth, Step, Agent, Health) :-
     k(agentHealth(Agent, Step, Health)).
-getInfo(maxHealth, Step, Agent, MaxHealth) :-
+getInfo(agentMaxHealth, Step, Agent, MaxHealth) :-
     k(agentMaxHealth(Agent, Step, MaxHealth)).
-getInfo(strength, Step, Agent, Strength) :-
+getInfo(agentStrength, Step, Agent, Strength) :-
     k(agentStrength(Step, Agent, Strength)).
-getInfo(visualRange, Step, Agent, VisualRange) :-
+getInfo(agentVisualRange, Step, Agent, VisualRange) :-
     k(agentVisualRange(Agent, Step, VisualRange)).
 
 
@@ -448,22 +465,40 @@ run(Action) :-
     plan([]),
     % dumpKB, 
     !,
-   
-    calcTime('setExploredAndVisible',setExploredAndVisible),
+    
+    currentStep(Step),
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '-', S3),
+    concat(S3, Step, S0),
+    concat(S0, '.pl', File),
+    writeln(File),
+    saveMap(File),
+    
+    
+    calcTime(setExploredAndVisible),
 
 	
-    calcTime('argumentation',argumentation(Meta)),
+    calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
-    calcTime('planning', planning(Meta)),
+    calcTime(planning(Meta)),
+    % writeln(1),
     exec(Action),
+    % writeln(1),
+    writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
     
 run(Action) :-
 	
-    setExploredAndVisible,
+    calcTime(setExploredAndVisible),
+    intention(Meta),
+    writeln(Meta),
+    replanning(Meta),
     exec(Action),
+    writeln(Action),
+    retractall(b(_)),
     toogleOffVisibleNodes.
     
 plan([]).
@@ -489,14 +524,14 @@ plan([]).
 
 argumentation(Meta) :-
 
-    calcTime('setBeliefs', setBeliefs),
+    calcTime(setBeliefs),
 
-    calcTime('meta', meta(Meta)),
+    calcTime(meta(Meta)),
     retractall(intention(_)),
     assert(intention(Meta)).
 
-calcTime(Message, Exec) :-
-    write('<predicate name="'),write(Message), writeln('">'),
+calcTime(Exec) :-
+    write('<predicate name="'),write(Exec), writeln('">'),
     get_time(Before),
     call(Exec),
     get_time(After),
@@ -526,7 +561,20 @@ planning(explorar(Node)) :-
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
     
+planning(atacar(Agent)) :-
+    currentStep(Step),
+    position(Step, Agent, Node),
+    assertPlan(Node, [[attack, Agent]]).
+    
+planning(reparar(Agent)) :-
+    currentStep(Step),
+    position(Step, Agent, Node),
+    assertPlan(Node, [[repair, Agent]]).
+    
 planning(aumento(Node)) :-
+    assertPlan(Node, []).
+    
+planning(expansion(Node)) :-
     assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-
@@ -539,10 +587,67 @@ planning(quedarse(_Node)) :-
 planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
+  
+replanning(explorar(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [[survey]], 1),
+    planning(explorar(Node)).
     
+replanning(atacar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPath(Position, EnemyPosition, Energy, [[attack, Agent]], 2),
+    planning(atacar(Agent)).
+    
+replanning(reparar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPath(Position, EnemyPosition, Energy, [[repair, Agent]], 2),
+    planning(reparar(Agent)).
+    
+replanning(probear(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [[probe]], 1),
+    planning(probear(Node)).
+    
+replanning(aumento(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [], 0),
+    planning(aumento(Node)).
+    
+replanning(expansion(Node)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_, _)),
+    searchPath(Position, Node, Energy, [], 0),
+    planning(expansion(Node)).
+    
+replanning(_) :-
+    writeln('aca no deberia pasar').
+  
+assertPlan(Node, _FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
+    
+    b(path(InitialPosition, Node, _, _, _, [], _, _)),
+    planning(quedarse(InitialPosition)).
+  
 assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
     % myEnergy(Energy),
+    
     b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
     retract(plan(_)),
     assert(plan(Actions)).
@@ -553,6 +658,10 @@ assertPlan(Node, FinalActions) :-
     
 exec(Action) :-
     plan([Action | _Actions]).
+    
+exec([skip]) :-
+    writeln('aca no deberia haber llegado'),
+    plan([]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %
@@ -647,10 +756,10 @@ printList([H | T]) :-
 
 printFindAll(Title, WhatToFind) :-
     findall(WhatToFind, WhatToFind, L),
-    sort(L, SL),
+    % sort(L, SL),
     write(Title),
     nl,
-    printList(SL).
+    printList(L).
 
 
 

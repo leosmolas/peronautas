@@ -2,7 +2,9 @@
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Actions (priority order):
+:- ['delp/saboteur.delp'].
+
+% Actions (priority order):
 %                   -attack
 %                   -survey
 %                   -goto
@@ -16,14 +18,58 @@
 execDummy(Action) :- 
     action(Action).
     
-
-
 rolMetas.
-
-
 
 rolSetBeliefs.
 
+% rolMetas :-
+    % foreach(
+        % b(enemyPosition(Agent, _Node)),
+        % calcMeta(atacar(Agent))
+    % ).
+
+
+
+% rolSetBeliefs :-
+    % setEnemyPosition,
+    % setEnemyDistance.
+    
+
+setEnemyPosition :-
+    myTeam(MyTeam),
+    currentStep(Step),
+    foreach(
+        (
+            team(Agent, Team),
+            Team \= MyTeam
+        ),
+        assertEnemyPosition(Step, Agent)
+    ).
+    
+assertEnemyPosition(Step, Agent) :-
+    writeln(assertEnemyPosition),
+    position(Step, Agent, Position),
+    write(Agent),writeln(Position),
+    assert(b(enemyPosition(Agent, Position)) <- true).
+    
+setEnemyDistance :-
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, Position),
+    energy(Step, Name, Energy),
+    foreach(
+        b(enemyPosition(_Agent, Node)),
+        (
+			retractall(isFail(_)),
+			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+            searchPath(Position, Node, Energy, [[attack]], 2)
+        )
+    ),
+    printFindAll('attack paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))).
+
+    
+
+    
 %------------------------------  Attack  --------------------------------%
 
 action([attack, Enemy]):-
@@ -34,6 +80,7 @@ action([attack, Enemy]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    myName(Name),
     Enemy \= Name,
     write(1.3),nl,
     myTeam(Team),
@@ -79,7 +126,6 @@ action([goto, NeighborNode]) :-
 
 action([goto, X]) :-
     write(4.1),nl,
-    currentStep(Step),
     myPosition(Position),
     write(4.2),nl,
     myEnergy(Energy),

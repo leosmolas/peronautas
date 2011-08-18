@@ -13,16 +13,68 @@
 
 %-----------------------------------------------------------------------%
 
+:- ['delp/repairer.delp'].
+
 execDummy(Action) :- 
     action(Action).
     
 
         
-rolMetas.
+% rolMetas.
 
 
 
-rolSetBeliefs.
+% rolSetBeliefs.
+
+
+rolMetas :-
+    % printFindAll(, b
+    foreach(
+        b(teammatePosition(Agent, _Node)),
+        doNotFail(calcMeta(reparar(Agent)))
+    ).
+
+
+
+rolSetBeliefs :-
+    setTeammatePosition, !,
+    setTeammateDistance.
+    
+
+setTeammatePosition :-
+    myTeam(MyTeam),
+    currentStep(Step),
+    myName(Self),
+    foreach(
+        (
+            team(Agent, MyTeam),
+            Agent \= Self
+        ),
+        assertTeamMatePosition(Step, Agent)
+    ).
+    
+assertTeamMatePosition(Step, Agent) :-
+    % writeln(assertTeamMatePosition),
+    position(Step, Agent, Position),
+    % write(Agent),writeln(Position),
+    assert(b(teammatePosition(Agent, Position)) <- true),
+    assert(b(teammatePosition(Agent, Position))).
+    
+setTeammateDistance :-
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, Position),
+    energy(Step, Name, Energy),
+    foreach(
+        b(teammatePosition(Agent, Node)),
+        (
+			retractall(isFail(_)),
+			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+            searchPath(Position, Node, Energy, [[repair, Agent]], 2)
+        )
+    ),
+    printFindAll('repair paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
+
 
 %------------------------------  Repair  --------------------------------%
 
