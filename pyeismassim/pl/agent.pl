@@ -6,6 +6,7 @@
            maxEnergy/3,        %
            health/3,           %
            maxHealth/3,        %
+		   status/3,				
            lastAction/1,       %
            lastActionResult/1, %
            strength/1,         %
@@ -92,9 +93,6 @@
 % k(agentStrength(Agent, Step, Strength))
 % k(agentVisualRange(Agent, Step, VisualRange))
 
-% ASSERTAR Y BORRAR ESTO
-team(a).
-team(b).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Percept Processing                               %
@@ -475,10 +473,7 @@ run(Action) :-
     % writeln(File),
     % saveMap(File),
     
-    
     calcTime(setExploredAndVisible),
-
-	
     calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
@@ -489,17 +484,33 @@ run(Action) :-
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
-    
-run(Action) :-
-	
+
+run(Action) :-	
+    intention(Meta),
+    writeln(Meta),
+	cutCondition(Meta), !, 
+	writeln('Condicion de corte!'),
+    calcTime(setExploredAndVisible),
+	calcTime(argumentation(Meta)), !,
+    write('Meta: '), writeln(Meta),
+    calcTime(planning(Meta)),
+    % writeln(1),
+    exec(Action),
+    % writeln(1),
+    writeln(Action),
+    retractall(b(_)),
+    retractall(b(_) <- true),
+    toogleOffVisibleNodes.
+	    
+run(Action) :-	
     calcTime(setExploredAndVisible),
     intention(Meta),
     writeln(Meta),
-    replanning(Meta),
+	replanning(Meta),
     exec(Action),
     writeln(Action),
     retractall(b(_)),
-    toogleOffVisibleNodes.
+    toogleOffVisibleNodes.	
     
 plan([]).
     
@@ -652,6 +663,93 @@ assertPlan(Node, FinalActions) :-
     retract(plan(_)),
     assert(plan(Actions)).
     
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            Condicion de corte                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+cutCondition(explorar(Node)) :-
+	explored(Node),
+	not(hasAtLeastOneUnsurveyedEdge(Node)).
+	
+cutCondition(explorar(Node)) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Node),
+	team(Agent, Team),
+	MyTeam \= Team,
+	( 
+		role(Agent, unknown);
+		role(Agent, saboteur)
+	).
+	
+cutCondition(probe(Node)) :- 
+	nodeValue(Node, Value),
+	Value \= unknown.
+	
+cutCondition(probe(Node)) :- 
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Node),
+	team(Agent, Team),
+	MyTeam \= Team,
+	( 
+		role(Agent, unknown);
+		role(Agent, saboteur)
+	).
+
+% cutCondition(atacar(Agent)) :-
+	% currentStep(Step),
+	% status(Step, Agent, disabled).
+	
+cutCondition(atacar(Agent)) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Node),
+	position(Step, Agent2, Node),
+	team(Agent2, Team),
+	MyTeam \= Team,
+	Agent \= Agent2,
+	( 
+		role(Agent, unknown);
+		role(Agent, saboteur)
+	).
+	
+cutCondition(aumento(Node)) :- 
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Node),
+	team(Agent, Team),
+	MyTeam \= Team,
+	( 
+		role(Agent, unknown);
+		role(Agent, saboteur)
+	).
+	
+cutCondition(expansion(Node)) :- 
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Node),
+	team(Agent, Team),
+	MyTeam \= Team,
+	( 
+		role(Agent, unknown);
+		role(Agent, saboteur)
+	).
+
+cutCondition(reparar(Agent)) :-
+	currentStep(Step),
+	health(Step, Agent, Value),
+	maxHealth(Step, Agent, Value).
+	
+% cutCondition(reparar(Agent)) :-
+	% myTeam(MyTeam),
+	% currentStep(Step),
+	% status(Step, Agent, normal),
+	% status(Step, Agent2, disabled),
+	% Agent \= Agent2,
+	% team(Agent2, MyTeam).
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

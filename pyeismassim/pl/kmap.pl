@@ -5,6 +5,8 @@
 % RandomSeed = 1
 % Number of nodes = 15 (si, tiene 14 x ser simetrico).
 
+:- dynamic explored/1, notVisible/1.
+
 k(nodeTeam(0, vertex0,  peronismo)). 
 k(nodeTeam(0, vertex1,  none)). 
 k(nodeTeam(0, vertex3,  peronismo)). 
@@ -186,10 +188,10 @@ position(0, machinea, vertex10).
 position(0, cavallo, vertex6).
 
 
-position(0, iorio, vertex8).
-position(0, moyano, vertex5).
-position(0, castels, vertex2).
-position(0, delia, vertex7).
+% position(0, iorio, vertex8).
+% position(0, moyano, vertex5).
+% position(0, castels, vertex2).
+% position(0, delia, vertex7).
 
 team(peron, peronismo).
 team(evita, peronismo).
@@ -201,8 +203,8 @@ team(moyano, cacoteam).
 team(castels, cacoteam).
 team(delia, cacoteam).
 
-team(peronismo).
-team(cacoteam).
+% team(peronismo).
+% team(cacoteam).
 
 myTeam(peronismo).
 

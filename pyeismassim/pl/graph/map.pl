@@ -1,5 +1,8 @@
-﻿:- [
+﻿:- dynamic h/1.
+
+:- [
         % 'edges.pl', 
+		% '../kmap.pl',
         'nodes.pl', 
         'agents.pl'
    ].
@@ -110,13 +113,14 @@ teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :-
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
 % returns in Count the number of times that Team appears in the List, and in CountOtherTeam the number of times the other team appears.
 
-appears(_, [], 0, 0).
-appears(Head, [Head|Tail], CountTeam, CountOtherTeam) :- 
-    appears(Head, Tail, Aux, CountOtherTeam), 
+appears(_, [], 0, 0, _).
+appears(Head, [Head|Tail], CountTeam, CountOtherTeam, OtherTeam) :- 
+    appears(Head, Tail, Aux, CountOtherTeam, OtherTeam), 
     CountTeam is Aux + 1, 
     !.
-appears(Element, [_ | Tail], CountTeam, CountOtherTeam) :- 
-    appears(Element, Tail, CountTeam, Aux), 
+appears(Element, [OtherTeam | Tail], CountTeam, CountOtherTeam, OtherTeam) :- 
+	Element \= OtherTeam,
+    appears(Element, Tail, CountTeam, Aux, OtherTeam), 
     CountOtherTeam is Aux + 1.
 
 
@@ -132,8 +136,9 @@ appears(Element, [_ | Tail], CountTeam, CountOtherTeam) :-
 % checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
-    listOfTeams([Team1 | [Team2 | []]]),
-    appears(Team1, Teams, Team1InNode, Team2InNode), 
+	myTeam(Team1),
+    % listOfTeams([Team1 | [Team2 | []]]),
+    appears(Team1, Teams, Team1InNode, Team2InNode, Team2), 
     length(Teams, TeamsInNode), 
     Majority is floor(TeamsInNode / 2), 
     checkMajorityInNodeAux(Team1, Team1InNode, Team2, Team2InNode, Majority, Team),

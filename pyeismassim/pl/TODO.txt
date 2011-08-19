@@ -1,3 +1,7 @@
+
+Esquivar enemigos en el path
+
+Metas:
 - atacar
 - inspectar
 - defender

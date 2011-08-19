@@ -16,8 +16,8 @@ otherTeam(Team, OtherTeam) :-
     !.
 
 
-listOfTeams(Teams) :- 
-    findall(Team, team(Team), Teams).
+% listOfTeams(Teams) :- 
+    % findall(Team, team(Team), Teams).
 
 
 
