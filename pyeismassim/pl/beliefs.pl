@@ -135,6 +135,7 @@ setDifPuntosNode(Node, A, T) :-
     
     % write('Node: '), writeln(Node),
     
+
     % currentStep(Step),
     % myName(Name),
     % concat('logs/', Name, S2),
@@ -145,6 +146,7 @@ setDifPuntosNode(Node, A, T) :-
     % writeln(File),
     % saveMap(File),
     b(actualPoints(ActualPoints)),
+
     setHypotheticalMap,
     moveAgent(A, Node),
     coloringAlgorithm,
@@ -311,6 +313,8 @@ setPosibleExplorar :-
     
     
 setPosibleExplorar. 
+    
+    
     
     
     

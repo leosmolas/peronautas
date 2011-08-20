@@ -239,8 +239,8 @@ class PrologAgent(Agent):
 
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
-            if (vis_ent['name'] in inspected_entity_names):
-                self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'])).next()
+            # if (vis_ent['name'] in inspected_entity_names):
+            self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'])).next()
 
         # Proceso las entidades en la percepcion compartida.
         # Si o si son de tu equipo, luego el team se fija a el propio.
