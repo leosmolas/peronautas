@@ -265,6 +265,15 @@ updateTeammateEntity(Agent, Team, Position, VisualRange) :-
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
+updateEntityTeamPosition(Agent, Team, Position) :-
+    k(agentTeam(Agent, Team)), !,
+    currentStep(Step),
+    asserta( k(agentPosition(    Agent, Step, Position    ) )).
+updateEntityTeamPosition(Agent, Team, Position) :-
+    currentStep(Step),
+    asserta( k(agentTeam(        Agent, Team) )),
+    asserta( k(agentPosition(    Agent, Step, Position    ) )).
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
