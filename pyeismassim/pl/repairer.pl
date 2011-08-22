@@ -28,7 +28,6 @@ execDummy(Action) :-
 
 
 rolMetas :-
-    % printFindAll(, b
     foreach(
         b(teammatePosition(Agent, _Node)),
         doNotFail(calcMeta(reparar(Agent)))
@@ -41,15 +40,19 @@ rolSetBeliefs :-
     setTeammateDistance.
     
 
-setTeammatePosition :-
+injuredAgent(Agent) :-
     myTeam(MyTeam),
     currentStep(Step),
     myName(Self),
+    team(Agent, MyTeam),
+    Agent \= Self,
+    health(Step, Agent, Health),
+    maxHealth(Step, Agent, Max),
+    Health < Max.
+
+setTeammatePosition :-
     foreach(
-        (
-            team(Agent, MyTeam),
-            Agent \= Self
-        ),
+        injuredAgent(Step, Self, MyTeam, Agent),
         assertTeamMatePosition(Step, Agent)
     ).
     
