@@ -1,6 +1,45 @@
-communicateAndResolveConflicts(MyGoal, MyAction, NewAction) :-
-    broadcast(d3lp0r, mapc, [MyGoal, MyAction]),
+:- dynamic valorDeMeta/2.
+
+communicateAndResolveConflicts(MyAction, NewAction) :-
+    intention(Intention),
+    broadcast(d3lp0r, mapc, [Intention, MyAction]),
     recibirTodoSimple(GoalActionList, 1),
+    phase(Phase),
+    setPriorities(Phase),
+    solveConflicts(GoalActionList).
+
+setPriorities(exploracion) :-
+    retractall(valorDeMeta(_,_)),
+    assert(valorDeMeta(1,  probear      )),
+    assert(valorDeMeta(2,  explorar     )),
+    assert(valorDeMeta(3,  aumento      )),
+    assert(valorDeMeta(4,  expandirse   )),
+    assert(valorDeMeta(5,  atacar       )),
+    assert(valorDeMeta(6,  reparar      )),
+    assert(valorDeMeta(7,  inspectar    )),
+    assert(valorDeMeta(8,  bloquear     )),
+    assert(valorDeMeta(9,  defender     )),
+    assert(valorDeMeta(10, romperzonas  )).
+
+setPriorities(expansion) :-
+    retractall(valorDeMeta(_,_)),
+    assert(valorDeMeta(1,  aumento      )),
+    assert(valorDeMeta(2,  expandirse   )),
+    assert(valorDeMeta(3,  romperzonas  )),
+    assert(valorDeMeta(4,  defender     )),
+    assert(valorDeMeta(5,  probear      )),
+    assert(valorDeMeta(6,  explorar     )),
+    assert(valorDeMeta(7,  atacar       )),
+    assert(valorDeMeta(8,  reparar      )),
+    assert(valorDeMeta(9,  inspectar    )),
+    assert(valorDeMeta(10, bloquear     )).
+
+solveConflicts([]) :- writeln("End of GoalActionList.").
+
+solveConflicts([[Goal, Action] | T]) :-
+    write("Goal is "), write(Goal), write(" and Action is "), write(Action),nl,
+    solveConflicts(T).
+
 
     % ordenar la lista de acciones de acuerdo al orden de prioridad, que va a depender de la fase del juego
     % el orden de prioridad va a tomar en consideracion las metas de cada agente

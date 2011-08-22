@@ -33,7 +33,8 @@
 :- [graph/map, 
     utils, 
     ypserver/ypagent,
-    beliefs].
+    beliefs,
+    communication].
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -270,7 +271,7 @@ updateTeammateEntity(Agent, Team, Position, VisualRange) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initial phase for all agents.
-phase(exploration).
+phase(exploracion).
 
 
 

@@ -109,8 +109,7 @@ class Agent():
                 # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
                 if (self.communication):
 
-                    self.prolog.query("broadcast(d3lp0r, mapc, %s)" % action_str).next()
-                    teammate_action_list = self.prolog.query("recibirTodoSimple(L, 1)").next()['L']
+                    self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
                     print "Received from other agents:"
                     if (len(teammate_action_list) > 2):
                         for x1 in teammate_action_list:
