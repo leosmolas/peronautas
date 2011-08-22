@@ -240,6 +240,7 @@ class PrologAgent(Agent):
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
             # if (vis_ent['name'] in inspected_entity_names):
+            print vis_ent
             self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
         # Proceso las entidades en la percepcion compartida.
@@ -260,7 +261,7 @@ class PrologAgent(Agent):
                 max_health = msg_dict_private['max_health']
                 strength   = msg_dict_private['strength']
                 vis_range  = msg_dict_private['vis_range']
-                self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (self.username, 
+                self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (self.username, 
                                                                                       team, 
                                                                                       p['node'],
                                                                                       self.role,
@@ -269,16 +270,14 @@ class PrologAgent(Agent):
                                                                                       health,
                                                                                       max_health,
                                                                                       strength,
-                                                                                      vis_range,
-                                                                                      p['status'])).next()
+                                                                                      vis_range)).next()
             else:
-                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s,%s,%s,%s)" % (p['name'], 
+                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s,%s,%s)" % (p['name'], 
                                                                                   team, 
                                                                                   p['node'], 
                                                                                   p['health'], 
                                                                                   p['max_health'], 
-                                                                                  p['vis_range'], 
-                                                                                  p['status'])).next()
+                                                                                  p['vis_range'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
