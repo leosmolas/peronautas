@@ -168,9 +168,12 @@ def parse_request_action(xml, output = 'dict'):
             }
         result_public = { 
             'position'  : [{ 
-                u'name'     : u'self'             , 
-                u'node'     : self_tag['position'],
-                'vis_range' : self_tag['visrange']
+                u'name'     : u'self'              , 
+                u'node'     : self_tag['position'] ,
+                'vis_range' : self_tag['visrange'] ,
+                'health'    : self_tag['health']   ,
+                'max_health': self_tag['maxhealth'],
+                
                 }],
             
             }

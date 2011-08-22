@@ -238,9 +238,24 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
+updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
+    currentStep(Step),
+    asserta( k(agentTeam(Agent,        Team))               ),
+    asserta( k(agentRole(Agent,        Role))               ),
+    asserta( k(agentPosition(Agent,    Step, Position))     ),
+    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
+    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    asserta( k(agentHealth(Agent,      Step, Health))       ),
+    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    asserta( k(agentStrength(Agent,    Step, Strength))     ),
+    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    asserta( k(agentStatus(Agent,      Step, Status))       ).
+
+
+
+%------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
-    writeln('updateEntity'),
     asserta( k(agentTeam(Agent,        Team))               ),
     asserta( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
@@ -252,27 +267,34 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
-
 %------------------------------------------------------------------------------%
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange, Status) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
 
-updateEntityTeamPosition(Agent, Team, Position) :-
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )).
-updateEntityTeamPosition(Agent, Team, Position) :-
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )).
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -356,6 +378,10 @@ myVisualRange(VisualRange) :-
     myName(Agent),
     currentStep(Step),
     k(agentVisualRange(Agent, Step, VisualRange)).
+myStatus(Status) :-
+    myName(Agent),
+    currentStep(Step),
+    k(agentStatus(Agent, Step, Status)).
 
 
 
@@ -379,6 +405,8 @@ strength(Step, Agent, Strength) :-
     lastKnownInfo(strength, Step, Agent, Strength).
 visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(visualRange, Step, Agent, VisualRange).
+status(Step, Agent, Status) :-
+    lastKnownInfo(status, Step, Agent, VisualRange).
 
 team(Agent, Team) :-
     lastKnownInfo(team, _Step, Agent, Team).
