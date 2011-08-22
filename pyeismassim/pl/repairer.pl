@@ -55,10 +55,12 @@ setTeammatePosition :-
     
 assertTeamMatePosition(Step, Agent) :-
     % writeln(assertTeamMatePosition),
-    position(Step, Agent, Position),
+    position(Step, Agent, Position), !,
     % write(Agent),writeln(Position),
     assert(b(teammatePosition(Agent, Position)) <- true),
     assert(b(teammatePosition(Agent, Position))).
+    
+assertTeamMatePosition(_Step, _Agent).
     
 setTeammateDistance :-
     myName(Name),

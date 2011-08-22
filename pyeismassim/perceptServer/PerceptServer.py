@@ -47,7 +47,9 @@ class PerceptConnection():
             result = [    (0,
                             username,
                             node,
-                            vis_range
+                            vis_range,
+                            position['health'],
+                            position['max_health'],
                           )
                      ]
             for v in dictionary.get('vis_verts', []):
@@ -64,7 +66,8 @@ class PerceptConnection():
                 result.append((3,
                             v['node'],
                             v['name'],
-                            v['team']
+                            v['team'],
+                            v['status']
                           ))
             for v in dictionary.get('probed_verts', []):
                 result.append((4, 
@@ -113,7 +116,9 @@ class PerceptConnection():
                 if   (p[0] == 0):
                     result['position'].append(      { 'name' : p[1],
                                                       'node' : p[2],
-                                                      'vis_range' : p[3]
+                                                      'vis_range' : p[3],
+                                                      'health' : p[4],
+                                                      'max_health' : p[5]
                                                     })
                 elif (p[0] == 1):
                     result['vis_verts'].append(     { 'name' : p[1],
@@ -126,7 +131,8 @@ class PerceptConnection():
                 elif (p[0] == 3):
                     result['vis_ents'].append(      { 'node' : p[1],
                                                       'name' : p[2],
-                                                      'team' : p[3] 
+                                                      'team' : p[3],
+                                                      'status': p[4]
                                                     })
                 elif (p[0] == 4):
                     result['probed_verts'].append(  { 'name'  : p[1],

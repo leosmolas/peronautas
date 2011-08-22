@@ -236,6 +236,22 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
+updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
+    currentStep(Step),
+    asserta( k(agentTeam(Agent,        Team))               ),
+    asserta( k(agentRole(Agent,        Role))               ),
+    asserta( k(agentPosition(Agent,    Step, Position))     ),
+    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
+    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    asserta( k(agentHealth(Agent,      Step, Health))       ),
+    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    asserta( k(agentStrength(Agent,    Step, Strength))     ),
+    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    asserta( k(agentStatus(Agent,      Step, Status))       ).
+
+
+
+%------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
@@ -249,27 +265,32 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
-
 %------------------------------------------------------------------------------%
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
-updateEntityTeamPosition(Agent, Team, Position) :-
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )).
-updateEntityTeamPosition(Agent, Team, Position) :-
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )).
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -353,6 +374,10 @@ myVisualRange(VisualRange) :-
     myName(Agent),
     currentStep(Step),
     k(agentVisualRange(Agent, Step, VisualRange)).
+myStatus(Status) :-
+    myName(Agent),
+    currentStep(Step),
+    k(agentStatus(Agent, Step, Status)).
 
 
 
@@ -376,6 +401,8 @@ strength(Step, Agent, Strength) :-
     lastKnownInfo(agentStrength, Step, Agent, Strength).
 visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
+status(Step, Agent, Status) :-
+    lastKnownInfo(agentStatus, Step, Agent, VisualRange).
 
 team(Agent, Team) :-
     lastKnownInfo(agentTeam, _Step, Agent, Team).
@@ -447,8 +474,18 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 
 
 myRechargeEnergy(Recharge) :-
+    myStatus(disabled), !,
+    myMaxEnergy(MaxEnergy),
+    Recharge is round(MaxEnergy * 0.1).
+    
+myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
     Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    
+rechargeEnergy(Step, Agent, Recharge) :-
+    status(Step, Agent, disabled), !,
+	maxEnergy(Step, Agent, MaxEnergy),
+    Recharge is round(MaxEnergy * 0.1).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
@@ -888,6 +925,7 @@ dumpKB :-
     printFindAll('AGENT HEALTH:',       k(agentHealth(      _X25, _X26, _X27 ))),
     printFindAll('AGENT MAX HEALTH:',   k(agentMaxHealth(   _X28, _X29, _X30 ))),
     printFindAll('AGENT STRENGTH:',     k(agentStrength(    _X31, _X32, _X33 ))),
+    printFindAll('AGENT STATUS:',       k(agentStatus(      _,    _,    _ ))),
     printFindAll('AGENT VISUAL RANGE:', k(agentVisualRange( _X34, _X35, _X36 ))).
 
 
