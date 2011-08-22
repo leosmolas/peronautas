@@ -75,11 +75,20 @@ phaseCoef(expansion, 0.8) <- phase(exploration).
 phaseCoef(explorar,  1.2) <- phase(exploration).
 phaseCoef(aumento,   0.8) <- phase(exploration).
 
-
-
+b(difPuntosSinMi(0)) -< true.
+~b(difPuntosSinMi(0)) <- 
+	b(difPuntosSinMi(P)),
+	notEqual(P, 0).
+	
+agentRolePoints(_, _R, 0) -< true.
+	
+~agentRolePoints(I, R, 0) <- 
+	agentRolePoints(I, R, V),
+	notEqual(V, 0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
+is_a_built_in(role(_, _)).
 % Para poner banderas
 is_a_built_in(w(_)).
 

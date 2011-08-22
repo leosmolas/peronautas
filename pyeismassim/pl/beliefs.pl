@@ -19,6 +19,9 @@ setBeliefs :-
     myTeam(T),
     teamPoints(T, ActualPoints),
     assert(b(actualPoints(ActualPoints))),
+	myPosition(MyPosition),
+	assert(b(myPosition(MyPosition)) <- true),
+	calcTime(setEsSeguro),
     calcTime(rolSetBeliefs),
     calcTime(setEstoyEnLaFrontera),
     % write('estoy'),nl,
@@ -36,6 +39,23 @@ setBeliefs :-
     printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _ActionToBeDone, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
 
+saboteurPosition(Position) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+	position(Step, Agent, Position),
+	team(Agent, Team),
+	Team \=MyTeam,
+	(
+		role(Agent, saboteur) ;
+		role(Agent, unknown)
+	).
+	
+setEsSeguro :-
+	foreach(
+		saboteurPosition(Position),
+		assert(b(~esSeguro(Position)) <- true)
+	).
+	
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,6 +176,25 @@ setDifPuntosNode(Node, A, T) :-
     assert(b(difPuntosZona(Node, DifPuntos)) <- true).
     
 setDifPuntosNode(_Node, _A, _T).
+
+setDifPuntosSinMi :-
+	(b(difPuntosSinMi(_DifPuntos)) <- true), !.
+
+setDifPuntosSinMi :-
+    
+    b(actualPoints(ActualPoints)),
+
+    setHypotheticalMap,
+	currentStep(Step),
+    retract(h(position(Step, Agent, _))),
+    coloringAlgorithm,
+	myTeam(T),
+    teamHPoints(T, Points),
+    DifPuntos is Points - ActualPoints,                    
+    % write('Points: '), writeln(Points),
+    assert(b(difPuntosSinMi(DifPuntos)) <- true).
+	
+setDifPuntosSinMi(_A, _T).
 
     
 setDifPuntosExpansion :-

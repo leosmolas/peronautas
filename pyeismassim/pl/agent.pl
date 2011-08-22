@@ -238,9 +238,9 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
     currentStep(Step),
-    asserta( k(agentTeam(Agent,        Team))               ),
-    asserta( k(agentRole(Agent,        Role))               ),
-    asserta( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentTeam(Agent,        Team))               ),
+    assertOnce( k(agentRole(Agent,        Role))               ),
+	asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
     asserta( k(agentHealth(Agent,      Step, Health))       ),
@@ -416,7 +416,9 @@ lastKnownInfo(agentTeam, _Step, Agent, Value) :-
     k(agentTeam(Agent, Value)).
     
 lastKnownInfo(agentRole, _Step, Agent, Value) :-
-    k(agentRole(Agent, Value)).
+    k(agentRole(Agent, Value)), !.
+	
+lastKnownInfo(agentRole, _Step, _Agent, unknown).
     
     
 % El step viene instanciado, por lo que no tiene sentido ponerse a buscar para atras
@@ -518,7 +520,8 @@ run(Action) :-
     % concat(S0, '.pl', File),
     % writeln(File),
     % saveMap(File),
-    
+    retractall(countTurns(_)),
+	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
     calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
@@ -536,6 +539,8 @@ run(Action) :-
     writeln(Meta),
 	cutCondition(Meta), !, 
 	writeln('Condicion de corte!'),
+	retractall(countTurns(_)),
+	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
@@ -552,11 +557,24 @@ run(Action) :-
     calcTime(setExploredAndVisible),
     intention(Meta),
     writeln(Meta),
-	replanning(Meta),
+	replanning(Meta), !,
     exec(Action),
     writeln(Action),
     retractall(b(_)),
     toogleOffVisibleNodes.	
+
+	
+run(Action) :-	
+	retractall(countTurns(_)),
+	assert(countTurns(0)),
+    calcTime(argumentation(Meta)), !,
+    write('Meta: '), writeln(Meta),
+    calcTime(planning(Meta)),
+    exec(Action),
+    writeln(Action),
+    retractall(b(_)),
+    retractall(b(_) <- true),
+    toogleOffVisibleNodes.
     
 plan([]).
     
@@ -713,7 +731,17 @@ assertPlan(Node, FinalActions) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            Condicion de corte                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 	
+cutCondition(_) :-
+	countTurns(V),
+	V2 is V + 1, 
+	retractall(countTurns(_)),
+	assert(countTurns(V2)),
+	fail.
+	
+
 cutCondition(explorar(Node)) :-
 	explored(Node),
 	not(hasAtLeastOneUnsurveyedEdge(Node)), 
@@ -745,9 +773,12 @@ cutCondition(probe(Node)) :-
 		role(Agent, saboteur)
 	).
 
-% cutCondition(atacar(Agent)) :-
-	% currentStep(Step),
-	% status(Step, Agent, disabled).
+cutCondition(atacar(Agent)) :-
+	countTurns(5), !.
+	
+cutCondition(atacar(Agent)) :-
+	currentStep(Step),
+	status(Step, Agent, disabled).
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
@@ -760,6 +791,10 @@ cutCondition(atacar(Agent)) :-
 	( 
 		role(Agent, unknown);
 		role(Agent, saboteur)
+	),
+	( 
+		role(Agent2, unknown);
+		role(Agent2, saboteur)
 	).
 	
 cutCondition(aumento(Node)) :- 

@@ -18,23 +18,32 @@
 execDummy(Action) :- 
     action(Action).
     
-rolMetas.
+% rolMetas.
 
-rolSetBeliefs.
+% rolSetBeliefs.
 
-% rolMetas :-
-    % foreach(
-        % b(enemyPosition(Agent, _Node)),
-        % calcMeta(atacar(Agent))
-    % ).
+rolMetas :-
+    foreach(
+        b(enemyPosition(Agent, _Node)),
+        doNotFail(calcMeta(atacar(Agent)))
+    ).
 
 
 
-% rolSetBeliefs :-
-    % setEnemyPosition,
-    % setEnemyDistance.
+rolSetBeliefs :-
+    calcTime(setEnemyPosition),
+    calcTime(setEnemyDistance),
+	calcTime(setAttackDifPuntos).
     
-
+setAttackDifPuntos :-
+	myPosition(MyPosition),
+	b(enemyPosition(Agent, Node)),
+	(b(distancia(Node, [[attack, Agent]], _C, _E)) <- true),
+	Node \= MyPosition, !,
+	setDifPuntosSinMi.
+	
+setAttackDifPuntos.
+	
 setEnemyPosition :-
     myTeam(MyTeam),
     currentStep(Step),
@@ -53,6 +62,8 @@ assertEnemyPosition(Step, Agent) :-
     write(Agent),writeln(Position),
     assert(b(enemyPosition(Agent, Position))),
     assert(b(enemyPosition(Agent, Position)) <- true).
+	
+assertEnemyPosition(_Step, _Agent).
     
 setEnemyDistance :-
     myName(Name),
@@ -62,13 +73,13 @@ setEnemyDistance :-
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
-        b(enemyPosition(_Agent, Node)),
+        b(enemyPosition(Agent, Node)),
         (
 			
-            searchPath(Position, Node, Energy, [[attack]], 2)
+            searchPath(Position, Node, Energy, [[attack, Agent]], 2)
         )
     ),
-    printFindAll('attack paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))).
+    printFindAll('attack paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
 
     
 
