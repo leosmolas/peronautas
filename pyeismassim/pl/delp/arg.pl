@@ -25,21 +25,21 @@ doNotFail(_).
 % Realiza todo el ciclo de argumentación, teniendo previamente todo lo que necesita asertado.
    
 meta(X) :-     
-    assert(mejorMeta(_, -1000)), % meta con "menos infinito"
-    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))),
-    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))),
-    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))),
+    assert(mejorMeta(_, -1000)), !, writeln('Meta 1'), % meta con "menos infinito"
+    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !, writeln('Meta 2'),
+    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !, writeln('Meta 3'),
+    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, writeln('Meta 4'),
     
     
     myPosition(Position),
-    doNotFail(calcMeta(quedarse(Position))),
+    doNotFail(calcMeta(quedarse(Position))), !, writeln('Meta quedarse'),
     
     rolMetas, % predicado definido en cada rol
     
     % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     
     mejorMeta(X, _),
-    retract(mejorMeta(_, _)).
+    retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
     writeln(X),

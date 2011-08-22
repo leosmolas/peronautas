@@ -46,19 +46,19 @@ aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
 is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
 	   
-% auxilio(Value, Repairer) -<
-	% b(position(Repairer, Nodo)),
-	% b(maxHealth(Max)),
-	% b(health(Health)),
-	% b(difPointsWithoutMe(Points)),
-	% positivoONegativo(Points, _Positivo, Negativo),
-	% b(distancia(Nodo, [], Dist, EnergyLeft)),
-	% auxilioValue(Dist, EnergyLeft, Value).
+auxilio(Value, Repairer) -<
+	b(position(Repairer, Nodo)),
+	b(maxHealth(Max)),
+	b(health(Health)),
+	b(difPointsWithoutMe(Points)),
+	positivoONegativo(Points, _Positivo, Negativo),
+	b(distancia(Nodo, [], Dist, EnergyLeft)),
+	auxilioValue(Dist, EnergyLeft, Value).
 	
-% auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
-	% Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
+auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
+	Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
 	
-% is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
+is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
 	   
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.

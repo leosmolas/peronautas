@@ -537,9 +537,9 @@ run(Action) :-
 	cutCondition(Meta), !, 
 	writeln('Condicion de corte!'),
     calcTime(setExploredAndVisible),
-	calcTime(argumentation(Meta)), !,
-    write('Meta: '), writeln(Meta),
-    calcTime(planning(Meta)),
+	calcTime(argumentation(MetaNueva)), !,
+    write('Meta Nueva: '), writeln(MetaNueva),
+    calcTime(planning(MetaNueva)),
     % writeln(1),
     exec(Action),
     % writeln(1),
@@ -716,7 +716,8 @@ assertPlan(Node, FinalActions) :-
 	
 cutCondition(explorar(Node)) :-
 	explored(Node),
-	not(hasAtLeastOneUnsurveyedEdge(Node)).
+	not(hasAtLeastOneUnsurveyedEdge(Node)), 
+	writeln('el nodo ya fue explorado').
 	
 cutCondition(explorar(Node)) :-
 	myTeam(MyTeam),

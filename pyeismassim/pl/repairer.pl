@@ -52,18 +52,21 @@ injuredAgent(Agent) :-
 
 setTeammatePosition :-
     foreach(
-        injuredAgent(Step, Self, MyTeam, Agent),
-        assertTeamMatePosition(Step, Agent)
+        injuredAgent(Agent),
+        assertTeammatePosition(Agent)
     ).
     
-assertTeamMatePosition(Step, Agent) :-
+assertTeammatePosition(Agent) :-
+	currentStep(Step),
     % writeln(assertTeamMatePosition),
     position(Step, Agent, Position), !,
+	health(Step, Agent, Health), !, 
+	maxHealth(Step, Agent, MaxHealth), !,
     % write(Agent),writeln(Position),
-    assert(b(teammatePosition(Agent, Position)) <- true),
+    assert(b(teammateHealthInfo(Agent, Health, MaxHealth)) <- true),
     assert(b(teammatePosition(Agent, Position))).
     
-assertTeamMatePosition(_Step, _Agent).
+assertTeammatePosition(_Step, _Agent).
     
 setTeammateDistance :-
     myName(Name),

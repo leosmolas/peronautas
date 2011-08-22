@@ -18,21 +18,21 @@
 execDummy(Action) :- 
     action(Action).
     
-% rolMetas.
+rolMetas.
 
-% rolSetBeliefs.
+rolSetBeliefs.
 
-rolMetas :-
-    foreach(
-        b(enemyPosition(Agent, _Node)),
-        calcMeta(atacar(Agent))
-    ).
+% rolMetas :-
+    % foreach(
+        % b(enemyPosition(Agent, _Node)),
+        % calcMeta(atacar(Agent))
+    % ).
 
 
 
-rolSetBeliefs :-
-    setEnemyPosition,
-    setEnemyDistance.
+% rolSetBeliefs :-
+    % setEnemyPosition,
+    % setEnemyDistance.
     
 
 setEnemyPosition :-
@@ -51,7 +51,7 @@ assertEnemyPosition(Step, Agent) :-
     writeln(assertEnemyPosition),
     position(Step, Agent, Position),
     write(Agent),writeln(Position),
-    assert(b(enemyPosition(Agent, Position)))
+    assert(b(enemyPosition(Agent, Position))),
     assert(b(enemyPosition(Agent, Position)) <- true).
     
 setEnemyDistance :-
