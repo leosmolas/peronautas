@@ -21,21 +21,15 @@ setBeliefs :-
     assert(b(actualPoints(ActualPoints))),
 	myPosition(MyPosition),
 	assert(b(myPosition(MyPosition)) <- true),
+    myStatus(Status),
+    assert(b(myStatus(Status)) <- true),
 	calcTime(setEsSeguro),
     calcTime(rolSetBeliefs),
     calcTime(setEstoyEnLaFrontera),
-    % write('estoy'),nl,
     calcTime(setPosibleExpansion), !,
-    % write('expansion'),nl,
-    % printFindAll('estoyEnLaFrontera', b(estoyEnLaFrontera)),
-    % printFindAll('frontera', b(frontera(_B))),
-    % printFindAll('posibleExpansion', b(posibleExpansion(_E))),
     calcTime(setPosibleAumento), !,
-    % printFindAll('posibleAumento', b(posibleAumento(_A))),
-    % write('voy'),nl,
     calcTime(setPosibleExplorar), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
-    % printFindAll('edge', k(edge(N1, N2, V))),
     printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _ActionToBeDone, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
 
@@ -352,10 +346,6 @@ setPosibleExplorar :-
     
     
 setPosibleExplorar. 
-    
-    
-    
-    
     
 chequearPosibleExplorar(6) :- !.
     

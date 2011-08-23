@@ -67,10 +67,6 @@ teamsInNode(Node, Teams) :-
     ).
 
 
-
-% doNotFail(X) :- call(X), !.
-% doNotFail(_).              ._.
-
 % teamsInNeighbors(+Neighbors, -TeamsNeighborsCount)
 % returns in TeamsNeighborsCount a list of pairs (Owner, Count), representing count of neighbor nodes owned by the teams.
 teamsInNeighbors([], TeamsNeighborsCount) :- 
@@ -277,6 +273,7 @@ setHypotheticalMap :-
     currentStep(Step),
     foreach(
         position(Step, A, N),
+        status(Step, A, normal),
         assert(h(position(Step, A, N)))
     ),
     foreach(

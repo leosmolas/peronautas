@@ -29,6 +29,7 @@
            explored/1,
            plan/1,
            intention/1,
+           countTurns/1
            myVisionRange/1.
 
 :- [graph/map, 
@@ -503,6 +504,10 @@ checkLastAction :-
 	retract(plan([_Action | Actions])),
 	assert(plan(Actions)).
 	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                      Run                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
 run(Action) :-
 
     currentStep(Step),
@@ -582,21 +587,6 @@ plan([]).
 %                                 Argumentacion                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Intenciones posibles: explore, recharge
-% intention(explore).
-
-% argumentation :- 
-%    intention(recharge),
-%    max_energy(X),
-%    energy(X),
-%    retract( intention(recharge) ),
-%    assert(  intention(explore)  ).
-% argumentation :- 
-%    last_action_result(failed),
-%    retract( intention(_)        ),
-%    assert(  intention(recharge) ).
-
-
 argumentation(Meta) :-
 
     calcTime(setBeliefs),
@@ -613,6 +603,9 @@ calcTime(Exec) :-
     Time is (After - Before) * 1000,
     write('<time value="'),write(Time), writeln('"/>'),
     writeln('</predicate>').
+    
+% calcTime(Exec) :-
+    % call(Exec).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
@@ -741,6 +734,15 @@ cutCondition(_) :-
 	assert(countTurns(V2)),
 	fail.
 	
+cutCondition(Meta) :-
+    Meta \= atacar(_),
+    myPosition(MyPos),
+    currentStep(Step),
+    position(Step, Agent, MyPos),
+    myTeam(MyTeam),
+    team(Agent, Team),
+    Team \= MyTeam,
+    role(Agent, saboteur).
 
 cutCondition(explorar(Node)) :-
 	explored(Node),
@@ -824,13 +826,13 @@ cutCondition(reparar(Agent)) :-
 	health(Step, Agent, Value),
 	maxHealth(Step, Agent, Value).
 	
-% cutCondition(reparar(Agent)) :-
-	% myTeam(MyTeam),
-	% currentStep(Step),
-	% status(Step, Agent, normal),
-	% status(Step, Agent2, disabled),
-	% Agent \= Agent2,
-	% team(Agent2, MyTeam).
+cutCondition(reparar(Agent)) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+	status(Step, Agent, normal),
+	status(Step, Agent2, disabled),
+	Agent \= Agent2,
+	team(Agent2, MyTeam).
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
@@ -915,14 +917,12 @@ saveMap(Filename) :-
 dumpMap :-
     printFindAll('% step', currentStep(_)),
     printFindAll('% k', k(_)),
-    % printFindAll('% b', b(_)),
     printFindAll('% myName', myName(_)),
     printFindAll('% visible', visibleNode(_)),
     printFindAll('% not visible', notVisible(_)),
     printFindAll('% explored', explored(_)),
     printFindAll('% not explored', notExplored(_)),
     printFindAll('% inRange', inRange(_)).
-    % printFindAll('% k', k(_)),
 
 %------------------------------------------------------------------------------%
 printList([]).

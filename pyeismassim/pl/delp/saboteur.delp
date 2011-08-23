@@ -17,7 +17,7 @@ is_a_built_in(atacarValue(_Turns, _EnergyLeft, _, _RolePoints, _, _Value)).
 agentRolePoints(atacar, saboteur, 40) <- true.
 agentRolePoints(atacar, repairer, 40) <- true.
 
-
+esSeguro(_) <- true. % soy el saboteador
 
 attackOrDie(0) <- 
 	b(myPosition(MyPosition)),
