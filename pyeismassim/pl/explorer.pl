@@ -22,6 +22,7 @@ rolMetas:-
 % probed(vertex3).
 
 rolSetBeliefs :-
+    myStatus(normal),
     calcTime(setPosibleProbear),
     calcTime(rolSetDifPuntos),
     calcTime(rolSetDistancia).

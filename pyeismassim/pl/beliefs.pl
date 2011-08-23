@@ -98,6 +98,7 @@ setPosibleExpansion :-
     b(estoyEnLaFrontera),
     myPosition(X),
     myTeam(T),	
+    myStatus(normal),
     k(nodeTeam(_S2, X, T)),
     currentStep(Step),
     foreach(
@@ -219,7 +220,7 @@ setDifPuntosExpansion :-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setPosibleAumento :-
-
+    myStatus(normal),
     myTeam(Team),
 	currentStep(Step),
     retractall(isGoal(_, _)),
@@ -326,6 +327,7 @@ searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setPosibleExplorar :-
+    myStatus(normal),
 	% printFindAll('hasAtLeastOneUnsurveyedEdge(Node)', hasAtLeastOneUnsurveyedEdge(_)),
     currentStep(Step),
     myName(Name),
