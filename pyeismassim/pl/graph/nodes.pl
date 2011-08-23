@@ -28,8 +28,9 @@ nodesOfTeam(Team, NodesOfTeam) :-
 % clearNode(-Node)
 
 clearNode(Node) :- 
-    h(nodeTeam(Node, none)). 
-    % not(h(position(Step, _, Node))). % (??)
+    h(nodeTeam(Node, none)),
+	currentStep(Step),
+    not(h(position(Step, _, Node))).
 
 % emptyNode(-Node)
 emptyNode(Node) :- 

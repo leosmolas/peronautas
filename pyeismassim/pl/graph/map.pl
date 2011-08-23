@@ -245,6 +245,11 @@ checkNeighbors(Node, [Head|Tail], Visited, Team, ReachedNodes) :-
     !,
     checkNeighbors(Node, Tail, Visited, Team, ReachedNodes).
 checkNeighbors(_Node, [Head|_Tail], Visited, Team, _ReachedNodes) :- 
+    var(Team), % me aseguro que no venga instanciado
+    checkOwner(Head, ofNoOne), !,
+    setOwner(Visited, ofNoOne),
+    fail.
+checkNeighbors(_Node, [Head|_Tail], Visited, Team, _ReachedNodes) :- 
     atom(Team), % me aseguro que venga instanciado
     checkOwner(Head, OtherTeam),
     OtherTeam \= none,
@@ -264,6 +269,7 @@ cleanColors :-
 setHypotheticalMap :-
     retractall(h(position(_, _, _))),
     retractall(h(nodeTeam(_, _))),
+    currentStep(Step),
     foreach(
         position(Step, A, N),
         assert(h(position(Step, A, N)))
@@ -275,7 +281,7 @@ setHypotheticalMap :-
     
 moveAgent(Agent, Node) :-
     currentStep(Step),
-    retract(h(position(Step, Agent, _))),
+    retractall(h(position(_Step, Agent, _))),
     assert(h(position(Step, Agent, Node))).
 
 visibleNode(N) :-
@@ -310,54 +316,54 @@ toogleOffVisibleNodes :-
                 )
            ).
     
+agentsRangeVision(Step, MyTeam, Range, Position) :-
+    team(Agent, MyTeam),
+    visualRange(Step, Agent, Range),
+    position(Step, Agent, Position),
+    write(position(Step, Agent, Position)),nl,
+    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+    
 % setExploredAndVisible
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
 % y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
 setExploredAndVisible :-
     currentStep(Step),
- 
     myTeam(MyTeam),
     foreach(
         (
-            team(Step, Agent, MyTeam),
-            visualRange(Step, Agent, Range),
-            position(Step, Agent, Position),
-            Range \= unknown % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+            agentsRangeVision(Step, MyTeam, Range, Position)
         ),
         (
-            % write(position(Step, Agent, Position)),nl,
-            % k(agent(Step, Agent, _Team,  Position, _Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
-            % write('2position '),write(Position),nl,
-            assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-            % nl,write(' bfsing agent: '),write(Agent),nl, write(Range),nl,
-            foreach(
-                breadthFirst(Position, Node, _Path, _Cost),
-                (
-                    % write(' Marking node as explored: '),write(Node),nl,
-                    retractall(notExplored(Node)),
-                    % write('1.1 retractall '),write(Agent),nl,
-                    assertOnce(explored(Node)),
-                    % write('1.2 assertOnce '),write(Agent),nl,
-                    toogleOnVisibleNode(Node)
-                )
-            ),
-            retractall(isGoal(_, _))        
-            % write('termine agente '),write(Agent),nl
+            setExploredAndVisibleAux1(Range, Position)
+            % writeln(Range),
+            % writeln(Position)
         )
     ).
-    
 
+setExploredAndVisibleAux1(Range, Position) :-	
+	
+	retractall(isGoal(_, _)),
+	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+	
+	foreach(
+		breadthFirst(Position, Node, _Path, _Cost),
+		setExploredAndVisibleAux2(Node)		
+	).
+	% write('termine agente '),write(Agent),nl	
+	
+setExploredAndVisibleAux2(Node) :- 
+	% write(' Marking node as explored: '),write(Node),nl,
+	retractall(notExplored(Node)),
+	assertOnce(explored(Node)),
+	toogleOnVisibleNode(Node).
     
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
 coloringAlgorithm :- 
     step1,
-    % printHNodeTeams('After step 1'),
     step2,
-    % printHNodeTeams('After step 2'),
     step3.
-    % printHNodeTeams('After step 3'),
 
     
     
@@ -366,6 +372,7 @@ coloringAlgorithm :-
 % first step of the coloring algorithm
 step1 :- 
     setof(Node, nonEmptyNode(Node), ListOfNodes),
+    % writeln('sale del set of del step 1'),
     foreach(
         member(Node2,ListOfNodes), 
         (
@@ -411,8 +418,7 @@ teamHPoints(Team, Points) :-
         [Node, Team, Value],
         (
             h(nodeTeam(Node, Team)), 
-            k(nodeValue(Node, Value)),
-            Value \= unknown
+            k(nodeValue(Node, Value))
         ), 
         ListOfNodes),
     calcHPoints(ListOfNodes, 0, Points).
@@ -439,6 +445,13 @@ checkHNeighbors(Node, Team) :-
     
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
+
+	setHypotheticalMap,
+    calcTime('coloringAlgorithm', coloringAlgorithm),
+    teamHPoints(Team, Points).
+
+/*
+teamPoints(Team, Points) :-
     currentStep(Step),
     findall(
         [Node, Team, Value],
@@ -448,7 +461,8 @@ teamPoints(Team, Points) :-
         ), 
         ListOfNodes),
     calcPoints(ListOfNodes, 0, Points).
-    
+*/
+	
 calcPoints([], Points, Points).
 
 calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-
@@ -461,7 +475,7 @@ calcPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
     Points2 is Points1 + Value,
     calcPoints(Nodes, Points2, Points3).
     
-calcPoints([Node | Nodes], Points1, Points2):-
+calcPoints([_Node | Nodes], Points1, Points2):-
     calcPoints(Nodes, Points1, Points2).
     
 checkNeighbors(Node, Team) :-

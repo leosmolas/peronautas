@@ -19,7 +19,7 @@ class Agent():
         self.dummy         = dummy
         self.communication = communication
         if useLog:
-            sys.stdout = open(USER + '-log.txt', 'w')
+            sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
             pass
         self.log = sys.stdout
@@ -141,11 +141,14 @@ class Agent():
     def mainLoop(self):
         self.quit = False
         agent.connect()
+        self.currentLoop = 0
         while (not self.quit):
+            self.currentLoop += 1
             self.initializationHook()
             self.perceiveActLoop()
             self.finalizationHook()
-        raw_input("Finished. Press ENTER to continue...")
+        if not self.useLog:
+            raw_input("Finished. Press ENTER to continue...")
         agent.disconnect()
 
 
@@ -159,7 +162,7 @@ class PrologAgent(Agent):
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (log):
-            self.prolog.query("redirect_output('" + self.username + "-kb.txt')").next()
+            self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
         print "done"
 
 
@@ -255,13 +258,14 @@ class PrologAgent(Agent):
 
     def processEntities(self, msg_dict_private, msg_dict_public):
 
-        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']])
+        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']]) # esto es necesario?
         inspected_entity_names = frozenset([e['name'] for e in msg_dict_public['inspected_ents']])
 
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
-            if (vis_ent['name'] in inspected_entity_names):
-                self.prolog.query("updateEntityTeamPosition(%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'])).next()
+            # if (vis_ent['name'] in inspected_entity_names):
+            print vis_ent
+            self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
         # Proceso las entidades en la percepcion compartida.
         # Si o si son de tu equipo, luego el team se fija a el propio.
@@ -282,30 +286,35 @@ class PrologAgent(Agent):
                 strength   = msg_dict_private['strength']
                 vis_range  = msg_dict_private['vis_range']
                 self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (self.username, 
-                                                                                   team, 
-                                                                                   p['node'],
-                                                                                   self.role,
-                                                                                   energy,
-                                                                                   max_energy,
-                                                                                   health,
-                                                                                   max_health,
-                                                                                   strength,
-                                                                                   vis_range)).next()
+                                                                                      team, 
+                                                                                      p['node'],
+                                                                                      self.role,
+                                                                                      energy,
+                                                                                      max_energy,
+                                                                                      health,
+                                                                                      max_health,
+                                                                                      strength,
+                                                                                      vis_range)).next()
             else:
-                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s)" % (p['name'], team, p['node'], p['vis_range'])).next()
+                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s,%s,%s)" % (p['name'], 
+                                                                                  team, 
+                                                                                  p['node'], 
+                                                                                  p['health'], 
+                                                                                  p['max_health'], 
+                                                                                  p['vis_range'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
-                                                                               e['team'], 
-                                                                               e['node'], 
-                                                                               e['role'], 
-                                                                               e['energy'], 
-                                                                               e['max_energy'], 
-                                                                               e['health'], 
-                                                                               e['max_health'], 
-                                                                               e['strength'], 
-                                                                               e['vis_range'])).next()
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
+                                                                                  e['team'], 
+                                                                                  e['node'], 
+                                                                                  e['role'], 
+                                                                                  e['energy'], 
+                                                                                  e['max_energy'], 
+                                                                                  e['health'], 
+                                                                                  e['max_health'], 
+                                                                                  e['strength'], 
+                                                                                  e['vis_range'])).next()
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):

@@ -23,16 +23,17 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     % writeln('2'),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
 	% printFindAll('isGoal', isGoal(_)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), %!, % otro cut inexplicable
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), % !, % otro cut inexplicable
     % writeln('3'),
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
     % writeln('4'),
     not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
+
+    assert(b(path(InitialNode, FinalNode, ActionToBeDone, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
     
-    assert(b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
-    
+
 % pathSearch(_InitialNode, _FinalNode, _Energy, _Path, _Actions, _PathCost) :-
     % retractall(isGoal(_)).
 
@@ -264,7 +265,7 @@ calcRecharge(Energy, Value, OldList, OldList, Turns, Turns, RemainingEnergy) :-
     RemainingEnergy is Energy - Value.
 
 calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEnergy) :-
-    rechargeEnergy(RechargeEnergy),
+    myRechargeEnergy(RechargeEnergy),
     % writeln('5'),nl,
     NewTurns is OldTurns + 1,
     NewEnergy is Energy + RechargeEnergy,
@@ -351,20 +352,3 @@ add_to_set(X, S, [X|S]).
 testBfs(R) :-
     assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
 	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
-	
-% lastKnownPosition(-Step, +Agent, -Position)
-lastKnownPosition(Step, Agent, Position) :-
-
-	currentStep(CurrentStep),
-	lastKnownPosition(CurrentStep, Step, Agent, Position).
-
-% Condicion de corte, exito.
-lastKnownPosition(Step, Step, Agent, Position) :-
-	position(Step, Agent, Position), !.
-
-% Condicion de corte, sin exito.
-lastKnownPosition(0, 0, _Agent, unknown).
-
-lastKnownPosition(CurrentStep, Step, Agent, Position) :-
-	PreviousStep is CurrentStep - 1,
-	lastKnownPosition(PreviousStep, Step, Agent, Position).
