@@ -88,7 +88,9 @@ class Agent():
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: received simulation start notification."
             print_message(msg_dict)
+            print "@Agent: processing simulation start"
             self.processSimulationStart(msg_dict)
+            print "@Agent: finished simulation start"
             quitPerceiveActLoop = False
         elif (msg_type == 'bye'):
             print "@Agent: received bye"
@@ -98,6 +100,7 @@ class Agent():
             quitPerceiveActLoop = True
 
         while (not quitPerceiveActLoop):
+            print "@Agent: Receiving perception froms server...\n"
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
             time.sleep(0.5)
@@ -108,24 +111,23 @@ class Agent():
                 action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
                 if (self.communication):
-
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
-                    print "Received from other agents:"
-                    if (len(teammate_action_list) > 2):
-                        for x1 in teammate_action_list:
-                            print '----'
-                            if   (len(x1) == 1):
-                                print x1[0]
-                            elif (len(x1) == 2):
-                                print x1[0]
-                                print x1[1]
-                            elif (len(x1) == 3):
-                                print x1[0]
-                                print x1[1]
-                                print x1[2]
-                            else:
-                                print "Error:", len(x1)
-
+#                    print "Received from other agents:"
+#                    if (len(teammate_action_list) > 2):
+#                        for x1 in teammate_action_list:
+#                            print '----'
+#                            if   (len(x1) == 1):
+#                                print x1[0]
+#                            elif (len(x1) == 2):
+#                                print x1[0]
+#                                print x1[1]
+#                            elif (len(x1) == 3):
+#                                print x1[0]
+#                                print x1[1]
+#                                print x1[2]
+#                            else:
+#                                print "Error:", len(x1)
+#
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
@@ -200,8 +202,9 @@ class PrologAgent(Agent):
 
         # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
-        self.prolog.query("conectar(%s)" % self.username).next()
-        self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
+        if (self.communication):
+            self.prolog.query("conectar(%s)" % self.username).next()
+            self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
         print "@PrologAgent: Guardando el rango de vision de %s: %s" % (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
         

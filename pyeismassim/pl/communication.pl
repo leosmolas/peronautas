@@ -2,11 +2,16 @@
 
 communicateAndResolveConflicts(MyAction, NewAction) :-
     intention(Intention),
+    write('Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
     broadcast(d3lp0r, mapc, [Intention, MyAction]),
+    writeln('Receiving teammate action list'),
     recibirTodoSimple(GoalActionList, 1),
     phase(Phase),
+    writeln('Setting priorities'),
     setPriorities(Phase),
-    solveConflicts(GoalActionList).
+    write('Solving conflicts with '),writeln(GoalActionList),
+    solveConflicts(GoalActionList),
+    writeln('Done :D').
 
 setPriorities(exploracion) :-
     retractall(valorDeMeta(_,_)),

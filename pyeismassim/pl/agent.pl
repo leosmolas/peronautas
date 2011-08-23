@@ -242,8 +242,8 @@ updateEdge(Node1, Node2, Cost) :-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
     currentStep(Step),
-    asserta( k(agentTeam(Agent,        Team))               ),
-    asserta( k(agentRole(Agent,        Role))               ),
+    assertOnce( k(agentTeam(Agent,        Team))               ),
+    assertOnce( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
@@ -258,8 +258,8 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(Agent,        Team))               ),
-    asserta( k(agentRole(Agent,        Role))               ),
+    assertOnce( k(agentTeam(Agent,        Team))               ),
+    assertOnce( k(agentRole(Agent,        Role))               ),
     asserta( k(agentPosition(Agent,    Step, Position))     ),
     asserta( k(agentEnergy(Agent,      Step, Energy))       ),
     asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
@@ -729,6 +729,7 @@ dumpKB :-
     printFindAll('NODE TEAMS:',         k(nodeTeam(         _X3,  _X4,  _X5  ))),
     printFindAll('EDGES:',              k(edge(             _X6,  _X7,  _X8  ))),
     printFindAll('POSITIONS:',          k(position(         _X9,  _X10, _X11 ))),
+    printFindAll('AGENT NAME:',         myName(                 _Name)),
     printFindAll('AGENT TEAM:',         k(agentTeam(        _X12, _X13       ))),
     printFindAll('AGENT ROLE:',         k(agentRole(        _X14, _X15       ))),
     printFindAll('AGENT NODE:',         k(agentPosition(    _X16, _X17, _X18 ))),
