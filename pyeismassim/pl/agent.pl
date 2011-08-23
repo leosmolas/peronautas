@@ -29,7 +29,7 @@
            explored/1,
            plan/1,
            intention/1,
-           countTurns/1
+           countTurns/1,
            myVisionRange/1.
 
 :- [graph/map, 
@@ -403,7 +403,7 @@ strength(Step, Agent, Strength) :-
 visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
 status(Step, Agent, Status) :-
-    lastKnownInfo(agentStatus, Step, Agent, VisualRange).
+    lastKnownInfo(agentStatus, Step, Agent, Status).
 
 team(Agent, Team) :-
     lastKnownInfo(agentTeam, _Step, Agent, Team).
@@ -728,7 +728,7 @@ assertPlan(Node, FinalActions) :-
 
 	
 cutCondition(_) :-
-	countTurns(V),
+	countTurns(V), % este predicado se lleva para controlar que las metas que persiguen agentes no se pasen de mambo    
 	V2 is V + 1, 
 	retractall(countTurns(_)),
 	assert(countTurns(V2)),
@@ -775,8 +775,8 @@ cutCondition(probe(Node)) :-
 		role(Agent, saboteur)
 	).
 
-cutCondition(atacar(Agent)) :-
-	countTurns(5), !.
+cutCondition(atacar(_Agent)) :-
+	countTurns(5).
 	
 cutCondition(atacar(Agent)) :-
 	currentStep(Step),
@@ -821,6 +821,9 @@ cutCondition(expansion(Node)) :-
 		role(Agent, saboteur)
 	).
 
+cutCondition(reparar(_Agent)) :-
+	countTurns(5).
+    
 cutCondition(reparar(Agent)) :-
 	currentStep(Step),
 	health(Step, Agent, Value),

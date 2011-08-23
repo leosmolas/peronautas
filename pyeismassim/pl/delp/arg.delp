@@ -53,7 +53,7 @@ auxilio(Value, Repairer) -<
 	b(difPointsWithoutMe(Points)),
 	positivoONegativo(Points, _Positivo, Negativo),
 	b(distancia(Nodo, [], Dist, EnergyLeft)),
-	auxilioValue(Dist, EnergyLeft, Value).
+	auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value).
 	
 auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
 	Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.

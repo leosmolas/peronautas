@@ -40,7 +40,7 @@ reachableNode(Node, [_ | T]) :-
 
 %------------------------------  Attack  --------------------------------%
 
-action([inspect, Enemy]):-
+action([inspect]):-
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,

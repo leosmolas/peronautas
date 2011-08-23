@@ -272,8 +272,10 @@ setHypotheticalMap :-
     retractall(h(nodeTeam(_, _))),
     currentStep(Step),
     foreach(
-        position(Step, A, N),
-        status(Step, A, normal),
+        (
+            position(Step, A, N),
+            status(Step, A, normal)
+        ),
         assert(h(position(Step, A, N)))
     ),
     foreach(

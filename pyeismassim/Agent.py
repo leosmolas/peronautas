@@ -281,7 +281,8 @@ class PrologAgent(Agent):
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
+            print e
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
                                                                                   e['team'], 
                                                                                   e['node'], 
                                                                                   e['role'], 

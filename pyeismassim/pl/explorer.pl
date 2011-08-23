@@ -26,6 +26,8 @@ rolSetBeliefs :-
     calcTime(setPosibleProbear),
     calcTime(rolSetDifPuntos),
     calcTime(rolSetDistancia).
+    
+rolSetBeliefs.
 
 setPosibleProbear :- 
     currentStep(Step),

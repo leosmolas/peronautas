@@ -15,7 +15,7 @@
     
 setBeliefs :-
     
-    % write('setBeliefs'),nl,
+    write('setBeliefs'),nl,
     myTeam(T),
     teamPoints(T, ActualPoints),
     assert(b(actualPoints(ActualPoints))),
@@ -181,6 +181,7 @@ setDifPuntosSinMi :-
 
     setHypotheticalMap,
 	currentStep(Step),
+    myName(Agent),
     retract(h(position(Step, Agent, _))),
     coloringAlgorithm,
 	myTeam(T),

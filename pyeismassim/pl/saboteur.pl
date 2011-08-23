@@ -31,10 +31,12 @@ rolMetas :-
 
 
 rolSetBeliefs :-
-    myStatus(normal),
+    myStatus(normal), !,
     calcTime(setEnemyPosition),
     calcTime(setEnemyDistance),
 	calcTime(setAttackDifPuntos).
+    
+rolSetBeliefs.
     
 setAttackDifPuntos :-
 	myPosition(MyPosition),
