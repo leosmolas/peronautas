@@ -38,6 +38,15 @@ reachableNode(Node, [[Node, Cost] | _T]) :-
 reachableNode(Node, [_ | T]) :-
     reachableNode(Node, T).
 
+%-----------------------------------------------------------------------%
+
+vecinos(Node,Vecinos):-
+  findall(
+  NuevoVecino,
+  k(edge(Node, NuevoVecino, _Valor)),
+  Vecinos
+  ).
+
 %------------------------------  Attack  --------------------------------%
 
 action([inspect]):-
