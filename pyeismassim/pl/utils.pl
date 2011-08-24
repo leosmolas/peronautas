@@ -1,5 +1,5 @@
 :- [graph/map].
-:- dynamic isGoal/1, isFail/1.
+:- dynamic isGoal/1, isFail/1, isFail/2.
 
 testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
 
@@ -196,30 +196,33 @@ bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :-
     findall(Neighbor,
             k(edge(Node, Neighbor, _)),
             Neighbors),
-	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
+	filter(bfsNode(Node, Path, Cost), Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
     bfs(NewFrontier, NewVisited, Result).
 
-filter(Nodes, Frontier, Visited, FilteredNodes) :-
+filter(bfsNode(_Node, _Path, Cost), Neighbors, Frontier, Visited, FilteredNodes) :-
+	Cost2 is Cost + 1,
 	findall(
-        Node, 
+        Neigh, 
         (
-            member(Node, Nodes), 
-            not(member(bfsNode(Node, _P, _C), Frontier)), 
-            not(member(bfsNode(Node, _P2, _C2), Visited))
+            member(Neigh, Neighbors), 
+            not(member(bfsNode(Neigh, _P, _C), Frontier)), 
+            not(member(bfsNode(Neigh, _P2, _C2), Visited)),
+			not(isFail(Neigh, Cost2))
         ),
         FilteredNodes).
 	
-
 add_list_to_queue([], _Path, _Cost, Queue, Queue).
 add_list_to_queue([H|T], Path, Cost, Queue, NewQueue) :-
 	NewCost is Cost + 1,
     add_to_queue(bfsNode(H, [H | Path], NewCost), Queue, TempQueue),
     add_list_to_queue(T, Path, Cost, TempQueue, NewQueue).
 
-add_to_queue(E, [], [E]).
-add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
+% add_to_queue(E, [], [E]).
+% add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
+
+add_to_queue(E, L, [E|L]).
 
 remove_from_queue(E, [E|T], T).
 

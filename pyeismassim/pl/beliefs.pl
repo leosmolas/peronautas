@@ -12,6 +12,17 @@
 % setBeliefs :-
     % currentStep(0), !.
     
+setNodesAtDistance(Distance) :-
+	myPosition(Node),
+	retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
+	assert(isGoal(_Result, _Cost)),
+	assert(isFail(_Result2, Cost2) :- Cost2 > Distance),
+	foreach(
+		breadthFirst(Node, Dest, _Path, Cost3),
+		assert(b(nodeAtDistance(Dest, Cost3)))
+	).
+	
     
 setBeliefs :-
     
@@ -236,6 +247,7 @@ setPosibleAumento :-
     myTeam(Team),
 	currentStep(Step),
     retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
 	assert((isGoal(_Node, Cost) :- !, Cost =< 2, Cost > 0)),
     setof(
         FinalNode,
@@ -246,7 +258,8 @@ setPosibleAumento :-
     foreach(
         (
             member(X, Aumento),
-            Position \= X
+            Position \= X,
+			b(nodeAtDistance(X, _))
         ),
         assert(b(posibleAumento(X)))
     ), !,
@@ -256,7 +269,7 @@ setPosibleAumento :-
 setPosibleAumento.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
-    b(frontera(Node)),
+    b(frontera(Node)),	
     breadthFirst(Node, FinalNode, _Path, _Cost),
     k(nodeTeam(Step, FinalNode, Team)), 
     Team \= MyTeam.
@@ -336,6 +349,7 @@ setPosibleExplorar :-
     myName(Name),
     position(Step, Name, Position),
     retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
     assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 < 2)),
 	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost < 2)),
 	foreach(
@@ -364,6 +378,7 @@ chequearPosibleExplorar(X) :-
     myName(Name),
     position(Step, Name, Position),
     retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
     NewCost is X + 2,    
 	assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 >= X, Cost2 < NewCost)),
 	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost >= X, Cost < NewCost)),

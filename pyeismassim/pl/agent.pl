@@ -528,6 +528,7 @@ run(Action) :-
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
+	calcTime(setNodesAtDistance(6)),
     calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
@@ -546,6 +547,7 @@ run(Action) :-
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
+	calcTime(setNodesAtDistance(6)),
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
@@ -559,6 +561,7 @@ run(Action) :-
 	    
 run(Action) :-	
     calcTime(setExploredAndVisible),
+	calcTime(setNodesAtDistance(6)),
     intention(Meta),
     writeln(Meta),
 	replanning(Meta), !,
@@ -680,7 +683,7 @@ replanning(atacar(Agent)) :-
     currentStep(Step),
     position(Step, Agent, EnemyPosition),
     retractall(isFail(_, _)),
-    searchPathSaboteur(Position, EnemyPosition, Agent, Energy)
+    searchPathSaboteur(Position, EnemyPosition, Agent, Energy),
     planning(atacar(Agent)).
     
 replanning(reparar(Agent)) :-

@@ -34,6 +34,7 @@ setPosibleProbear :-
     myName(Name),
     position(Step, Name, Position),
     retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
     assert((isGoal(Node, Cost) :- k(nodeValue(Node, unknown)), Cost < 2)),
 	foreach(
         (
@@ -51,6 +52,7 @@ chequearPosibleProbear(X) :-
     myName(Name),
     position(Step, Name, Position),
     retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
     NewCost is X + 2,
     assert((isGoal(Node, Cost) :- k(nodeValue(Node, unknown)), Cost >= X, Cost < NewCost)),
 	foreach(

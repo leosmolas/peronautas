@@ -333,10 +333,10 @@ setExploredAndVisible :-
     ).
 
 setExploredAndVisibleAux1(Range, Position) :-	
-	
 	retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
 	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-	
+	assert((isFail(_Node3, Cost3) :- Cost3 >= Range, write('fail por costo '), writeln(Cost3))),	
 	foreach(
 		breadthFirst(Position, Node, _Path, _Cost),
 		setExploredAndVisibleAux2(Node)		
