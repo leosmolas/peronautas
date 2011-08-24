@@ -19,6 +19,10 @@ execDummy(Action) :-
         
 rolMetas.
 
+rolSetBeliefs :-
+    myStatus(normal), !,
+    calcTime(setPosibleInspectar).
+
 rolSetBeliefs.
 
 %-----------------------------------------------------------------------%
@@ -45,7 +49,66 @@ vecinos(Node,Vecinos):-
   NuevoVecino,
   k(edge(Node, NuevoVecino, _Valor)),
   Vecinos
-  ).
+  ).    
+
+buscarEnemigos(Posicion, CantEnemigos):-
+  currentStep(Step),
+  myTeam(MyTeam),
+  findall(
+  NuevoVecino
+  ,(
+    k(edge(Posicion, NuevoVecino, _Valor))
+    position(Step, Agent, Posicion),
+    team(Agent, Team),
+    MyTeam \= Team
+  ),
+  Vecinos
+  ),
+  length(Vecinos, CantEnemigos).
+
+
+%-----------------------------------------------------------------------%
+
+setPosibleInspectar :-
+    myStatus(normal),
+    currentStep(Step),
+    enemigosPosicion(Step, Posiciones),
+    foreach(
+      (
+        member(par(PosicionAgente, Agent), Posiciones)
+      )
+      ,
+      (
+        vecinos(PosicionAgente, LVecinosPosicion),
+        buscarEnemigos(PosicionAgente, CantEnemigos),
+        CantEnemigosConAgenteVisible is CantEnemigos + 1,
+        foreach(
+            member(Vecino, LVecinosPosicion)
+            ,(
+              buscarEnemigos(Vecino, CantEnemigosVecino),
+              CantEnemigosConAgenteVecino is CantEnemigosVecino + 1,
+              assert(b(posibleInspectar(Agent, Vecino, CantEnemigosConAgenteVecino)))
+            )
+        ),
+        assert(b(posibleInspectar(Agent, PosicionAgente, CantEnemigosConAgenteVisible)))
+      )
+    ).
+    
+setPosibleInspectar.
+
+enemigosPosicion(Step, Posiciones):-
+    myTeam(MyTeam),
+    findall(
+      par(Position, Agent)
+    ,
+    (
+      team(Agent, Team),
+      MyTeam \= Team,
+      position(Step, Agent, Position)
+    )
+    ,
+      Posiciones
+    ).
 
 %------------------------------  Attack  --------------------------------%
 

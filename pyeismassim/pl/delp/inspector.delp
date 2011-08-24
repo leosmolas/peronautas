@@ -1,0 +1,9 @@
+﻿inspectar(Value, Agent, Position, CantEnemies) -<
+    b(distancia(Position,[[inspect]], Turns, EnergyLeft)),
+    b(difPuntosSinMi(DifPuntos)),
+    inspectarValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies).
+    
+inspectValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies) :-
+    Value is (10 - Turns) ** 2 * 2 - DifPuntos ** 2 + EnergyLeft + 25 * CantEnemies.
+    
+is_a_built_in(atacarValue(_Turns, _EnergyLeft, _, _Value, CantEnemies)).
