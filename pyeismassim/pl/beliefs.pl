@@ -23,9 +23,9 @@ setBeliefs :-
 	assert(b(myPosition(MyPosition)) <- true),
     myStatus(Status),
     assert(b(myStatus(Status)) <- true),
-	calcTime(setEsSeguro),
-    calcTime(rolSetBeliefs),
-    calcTime(setEstoyEnLaFrontera),
+	calcTime(setEsSeguro), !,
+    calcTime(rolSetBeliefs), !,
+    calcTime(setEstoyEnLaFrontera), !,
     calcTime(setPosibleExpansion), !,
     calcTime(setPosibleAumento), !,
     calcTime(setPosibleExplorar), !,
@@ -38,7 +38,7 @@ saboteurPosition(Position) :-
 	currentStep(Step),
 	position(Step, Agent, Position),
 	team(Agent, Team),
-	Team \=MyTeam,
+	Team \= MyTeam,
 	(
 		role(Agent, saboteur) ;
 		role(Agent, unknown)
@@ -47,9 +47,20 @@ saboteurPosition(Position) :-
 setEsSeguro :-
 	foreach(
 		saboteurPosition(Position),
-		assert(b(~esSeguro(Position)) <- true)
+		assert(b(~esSeguro(Position)) -<  equal(1,1)) % truchada para que la especifidad agarre este
 	).
 	
+    
+searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
+	% writeln('pathSearch'),
+    pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost, RemainingEnergy), !,
+	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
+    % writeln('6.2'),nl,
+    assert(b(distancia(Node, ActionToBeDone, PathCost, RemainingEnergy)) <- true).
+    % writeln('6.3'),nl.
+    
+searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
+    
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,15 +323,6 @@ setDistanciaExplorar :-
     
 setDistanciaExplorar.
 
-searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
-	% writeln('pathSearch'),
-    pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost, RemainingEnergy), !,
-	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
-    % writeln('6.2'),nl,
-    assert(b(distancia(Node, ActionToBeDone, PathCost, RemainingEnergy)) <- true).
-    % writeln('6.3'),nl.
-    
-searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

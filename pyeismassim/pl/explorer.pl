@@ -77,7 +77,6 @@ rolSetDifPuntos:-
     ),
     foreach(
         b(posibleProbear(Node)),
-
         setDifPuntosNode(Node, A, T)
     ).
     

@@ -87,9 +87,3 @@ agentRolePoints(_, _R, 0) -< true.
 	notEqual(V, 0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-
-is_a_built_in(role(_, _)).
-% Para poner banderas
-is_a_built_in(w(_)).
-
-w(X) :- writeln(X).

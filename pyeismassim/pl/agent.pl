@@ -542,8 +542,7 @@ run(Action) :-
 run(Action) :-	
     intention(Meta),
     writeln(Meta),
-	cutCondition(Meta), !, 
-	writeln('Condicion de corte!'),
+	calcTime(cutCondition(Meta)), !, 
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
@@ -612,17 +611,6 @@ calcTime(Exec) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-% planning :- 
-%    intention(explore),
-%    searchNeigh(N),
-%    retract( plan(_)         ),
-%    assert(  plan([goto(N)]) ).
-% planning :- 
-%    intention(recharge),
-%    retract( plan(_)          ),
-%    assert(  plan([recharge]) ).
-
 planning(explorar(Node)) :-
     assertPlan(Node, [[survey]]).
 
@@ -655,7 +643,30 @@ planning(quedarse(_Node)) :-
 planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
+
   
+assertPlan(Node, _FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
+    
+    b(path(InitialPosition, Node, _, _, _, [], _, _)),
+    planning(quedarse(InitialPosition)).
+  
+assertPlan(Node, FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
+    
+    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
+    retract(plan(_)),
+    assert(plan(Actions)).
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  Replanning                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Calcula un nuevo plan todos los turnos. No genera problemas porque sobra el tiempo.
+% Genera el nuevo plan, y llama a planning para que lo ejecute.
+
 replanning(explorar(Node)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -669,7 +680,7 @@ replanning(atacar(Agent)) :-
     currentStep(Step),
     position(Step, Agent, EnemyPosition),
     retractall(isFail(_, _)),
-    searchPath(Position, EnemyPosition, Energy, [[attack, Agent]], 2),
+    searchPathSaboteur(Position, EnemyPosition, Agent, Energy)
     planning(atacar(Agent)).
     
 replanning(reparar(Agent)) :-
@@ -704,21 +715,7 @@ replanning(expansion(Node)) :-
     
 replanning(_) :-
     writeln('aca no deberia pasar').
-  
-assertPlan(Node, _FinalActions) :-
-    myPosition(InitialPosition),
-    % myEnergy(Energy),
-    
-    b(path(InitialPosition, Node, _, _, _, [], _, _)),
-    planning(quedarse(InitialPosition)).
-  
-assertPlan(Node, FinalActions) :-
-    myPosition(InitialPosition),
-    % myEnergy(Energy),
-    
-    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -739,48 +736,31 @@ cutCondition(Meta) :-
     myPosition(MyPos),
     currentStep(Step),
     position(Step, Agent, MyPos),
+    status(Step, Agent, normal),
     myTeam(MyTeam),
     team(Agent, Team),
     Team \= MyTeam,
-    role(Agent, saboteur).
+    role(Agent, saboteur),
+    writeln('hay un enemigo saboteador en mi nodo').
 
 cutCondition(explorar(Node)) :-
 	explored(Node),
 	not(hasAtLeastOneUnsurveyedEdge(Node)), 
 	writeln('el nodo ya fue explorado').
 	
-cutCondition(explorar(Node)) :-
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
-	
 cutCondition(probe(Node)) :- 
 	nodeValue(Node, Value),
-	Value \= unknown.
-	
-cutCondition(probe(Node)) :- 
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
+	Value \= unknown,
+    writeln('el nodo ya fue probeado').
 
 cutCondition(atacar(_Agent)) :-
-	countTurns(5).
+	countTurns(5),
+    writeln('pasaron 5 turnos y no le pegue').
 	
 cutCondition(atacar(Agent)) :-
 	currentStep(Step),
-	status(Step, Agent, disabled).
+	status(Step, Agent, disabled),
+    writeln('moli a palos al agente enemigo').
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
@@ -797,37 +777,18 @@ cutCondition(atacar(Agent)) :-
 	( 
 		role(Agent2, unknown);
 		role(Agent2, saboteur)
-	).
-	
-cutCondition(aumento(Node)) :- 
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
-	
-cutCondition(expansion(Node)) :- 
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
+	),
+    writeln('estoy por ser atacado por dos saboteadores').
 
 cutCondition(reparar(_Agent)) :-
-	countTurns(5).
+	countTurns(5),
+    writeln('pase 5 turnos sin reparar a mi amigo').
     
 cutCondition(reparar(Agent)) :-
 	currentStep(Step),
 	health(Step, Agent, Value),
-	maxHealth(Step, Agent, Value).
+	maxHealth(Step, Agent, Value),
+    writeln('ya repare a mi amigo').
 	
 cutCondition(reparar(Agent)) :-
 	myTeam(MyTeam),
@@ -835,7 +796,8 @@ cutCondition(reparar(Agent)) :-
 	status(Step, Agent, normal),
 	status(Step, Agent2, disabled),
 	Agent \= Agent2,
-	team(Agent2, MyTeam).
+	team(Agent2, MyTeam),
+    writeln('hay otro agente que necesita mas ayuda').
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %

@@ -119,17 +119,6 @@ appears(Element, [OtherTeam | Tail], CountTeam, CountOtherTeam, OtherTeam) :-
     appears(Element, Tail, CountTeam, Aux, OtherTeam), 
     CountOtherTeam is Aux + 1.
 
-
-% checkMajyorityInNode(+Node, +Team)
-% checks if the number of agents of team Team are majority in node Node.
-
-% checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
-%                                    appears(Team, Teams, TeamInNode), 
-%                                    length(Teams, TeamsInNode), 
-%                                    Majority is floor(TeamsInNode / 2), 
-%                                    TeamInNode > Majority,
-%                                    setOwner([Node], Team).
-% checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
 	myTeam(Team1),
@@ -324,7 +313,6 @@ agentsRangeVision(Step, MyTeam, Range, Position) :-
     team(Agent, MyTeam),
     visualRange(Step, Agent, Range),
     position(Step, Agent, Position),
-    write(position(Step, Agent, Position)),nl,
     Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
     
 % setExploredAndVisible
@@ -455,19 +443,6 @@ teamPoints(Team, Points) :-
     teamHPoints(Team, Points),
     write(actualPoints),write(': '),
     writeln(Points).
-
-/*
-teamPoints(Team, Points) :-
-    currentStep(Step),
-    findall(
-        [Node, Team, Value],
-        (
-            k(nodeTeam(Step, Node, Team)), 
-            k(nodeValue(Node, Value))
-        ), 
-        ListOfNodes),
-    calcPoints(ListOfNodes, 0, Points).
-*/
 	
 calcPoints([], Points, Points).
 

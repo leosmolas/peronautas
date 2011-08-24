@@ -69,6 +69,12 @@ is_a_built_in(notEqual(_X,_Y)).
 
 is_a_built_in(phase(_)). % delp revisara las fases
 
+is_a_built_in(role(_, _)).
+% Para poner banderas
+is_a_built_in(w(_)).
+
+w(X) :- writeln(X).
+
 % Operaciones aritméticas
 % DEPRECATED
 % Conviene usar una sola fórmula para las metas
@@ -82,6 +88,8 @@ greaterEq(X,Y) :- X >=  Y.
 lessEq(X,Y)    :- X =<  Y.
 equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sólo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
 notEqual(X,Y)  :- X \=  Y.
+
+
 
 % Por cuestiones históricas y emocionales, todo lo que sigue va a quedar. (El criterio de comparación).
 

@@ -240,7 +240,6 @@ class PrologAgent(Agent):
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
             # if (vis_ent['name'] in inspected_entity_names):
-            print vis_ent
             self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
         # Proceso las entidades en la percepcion compartida.
@@ -281,17 +280,16 @@ class PrologAgent(Agent):
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
-            print e
             self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
-                                                                                  e['team'], 
-                                                                                  e['node'], 
-                                                                                  e['role'], 
-                                                                                  e['energy'], 
-                                                                                  e['max_energy'], 
-                                                                                  e['health'], 
-                                                                                  e['max_health'], 
-                                                                                  e['strength'], 
-                                                                                  e['vis_range'])).next()
+                                                                               e['team'], 
+                                                                               e['node'], 
+                                                                               e['role'], 
+                                                                               e['energy'], 
+                                                                               e['max_energy'], 
+                                                                               e['health'], 
+                                                                               e['max_health'], 
+                                                                               e['strength'], 
+                                                                               e['vis_range'])).next()
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):

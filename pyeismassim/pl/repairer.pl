@@ -73,11 +73,12 @@ setTeammateDistance :-
     currentStep(Step),
     position(Step, Name, Position),
     energy(Step, Name, Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         b(teammatePosition(Agent, Node)),
         (
-			retractall(isFail(_)),
-			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+
             searchPath(Position, Node, Energy, [[repair, Agent]], 2)
         )
     ),
