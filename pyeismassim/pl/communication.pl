@@ -1,17 +1,17 @@
 :- dynamic valorDeMeta/2.
 
-communicateAndResolveConflicts(MyAction, NewAction) :-
+communicateAndResolveConflicts(MyAction, _NewAction) :-
     intention(Intention),
-    write('Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
+    write('    Comm: Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
     broadcast(d3lp0r, mapc, [Intention, MyAction]),
-    writeln('Receiving teammate action list'),
+    writeln('    Comm: Receiving teammate action list'),
     recibirTodoSimple(GoalActionList, 1),
+    writeln('    Comm: Setting priorities'),
     phase(Phase),
-    writeln('Setting priorities'),
     setPriorities(Phase),
-    write('Solving conflicts with '),writeln(GoalActionList),
+    write('    Comm: Solving conflicts with '),writeln(GoalActionList),
     solveConflicts(GoalActionList),
-    writeln('Done :D').
+    writeln('    Comm: Done :D').
 
 setPriorities(exploracion) :-
     retractall(valorDeMeta(_,_)),
@@ -39,7 +39,8 @@ setPriorities(expansion) :-
     assert(valorDeMeta(9,  inspectar    )),
     assert(valorDeMeta(10, bloquear     )).
 
-solveConflicts([]) :- writeln("End of GoalActionList.").
+solveConflicts([]) :- 
+    writeln('End of GoalActionList.').
 
 solveConflicts([[Goal, Action] | T]) :-
     write("Goal is "), write(Goal), write(" and Action is "), write(Action),nl,

@@ -100,34 +100,22 @@ class Agent():
             quitPerceiveActLoop = True
 
         while (not quitPerceiveActLoop):
-            print "@Agent: Receiving perception froms server...\n"
+            print "@Agent: Receiving perception from server...\n"
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
             time.sleep(0.5)
             if (msg_type == 'request-action'):
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
-                # primer fase deliberativa: el agente considera por si mismo que accion realizar
+
+                # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
                 action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
-                # segunda fase: los agentes se comunican entre si, y se reconsideran las acciones
+
+                # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
                 if (self.communication):
+                    print "PYTHON: INTENTION!!! %s" % self.prolog.query("intention(Bad)").next()['Bad']
+                    print "@Agent: calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
-#                    print "Received from other agents:"
-#                    if (len(teammate_action_list) > 2):
-#                        for x1 in teammate_action_list:
-#                            print '----'
-#                            if   (len(x1) == 1):
-#                                print x1[0]
-#                            elif (len(x1) == 2):
-#                                print x1[0]
-#                                print x1[1]
-#                            elif (len(x1) == 3):
-#                                print x1[0]
-#                                print x1[1]
-#                                print x1[2]
-#                            else:
-#                                print "Error:", len(x1)
-#
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
                 print "@Agent: received sim-end"
@@ -362,9 +350,9 @@ class PrologAgent(Agent):
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
             action_str = actionList[0]
-            print "@PrologAgent: sending %s" % actionList[0]
+            print "@PrologAgent: action: %s" % actionList[0]
         elif len(actionList) == 2:
-            print "@PrologAgent: sending %s %s" % (actionList[0], actionList[1])
+            print "@PrologAgent: action: %s %s" % (actionList[0], actionList[1])
             action_str = '%s(%s)' % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:

@@ -1,10 +1,4 @@
-﻿:- [
-        % 'edges.pl', 
-        'nodes.pl', 
-        'agents.pl'
-   ].
-
-:- dynamic neighborOwner/2.
+﻿:- dynamic neighborOwner/2.
 
 % paths(+Start, +Finish, -Path)
 % Pretty obvius actually but returns a path in Path with start point at node Start and endpoint in node Finish.
@@ -340,21 +334,21 @@ setExploredAndVisible :-
         )
     ).
 
-setExploredAndVisibleAux1(Range, Position) :-	
-    write('setExploredAndVisibleAux1('), write(Range), writeln(Position),
-	retractall(isGoal(_, _)),
-	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-	foreach(
-		breadthFirst(Position, Node, _Path, _Cost),
-		setExploredAndVisibleAux2(Node)		
-	).
-	% write('termine agente '),write(Agent),nl	
-	
+setExploredAndVisibleAux1(Range, Position) :-   
+    write('setExploredAndVisibleAux1:'), write(Range), write(','), write(Position), nl,
+    retractall(isGoal(_, _)),
+    assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+    foreach(
+        breadthFirst(Position, Node, _Path, _Cost),
+        (
+            setExploredAndVisibleAux2(Node)
+        )
+    ).
+    
 setExploredAndVisibleAux2(Node) :- 
-	% write(' Marking node as explored: '),write(Node),nl,
-	retractall(notExplored(Node)),
-	assertOnce(explored(Node)),
-	toogleOnVisibleNode(Node).
+    retractall(notExplored(Node)),
+    assertOnce(explored(Node)),
+    toogleOnVisibleNode(Node).
     
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
@@ -363,9 +357,6 @@ coloringAlgorithm :-
     step1,
     step2,
     step3.
-
-    
-    
 
 % step1
 % first step of the coloring algorithm
@@ -437,7 +428,7 @@ calcHPoints([[Node, Team, Value] | Nodes], Points1, Points3):-
 calcHPoints([_ | Nodes], Points1, Points2):-
     calcHPoints(Nodes, Points1, Points2).
     
-% chequea que por lo menos un vecino sea del mismo equipo, para así podes sumar sus puntos
+% chequea que por lo menos un vecino sea del mismo equipo, para asi podes sumar sus puntos
 checkHNeighbors(Node, Team) :-
     k(edge(Node, X, _)),
     h(nodeTeam(X, Team)), !.
@@ -445,7 +436,7 @@ checkHNeighbors(Node, Team) :-
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
 
-	setHypotheticalMap,
+    setHypotheticalMap,
     calcTime('coloringAlgorithm', coloringAlgorithm),
     teamHPoints(Team, Points).
 
@@ -461,7 +452,7 @@ teamPoints(Team, Points) :-
         ListOfNodes),
     calcPoints(ListOfNodes, 0, Points).
 */
-	
+    
 calcPoints([], Points, Points).
 
 calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-

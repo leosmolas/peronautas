@@ -30,11 +30,14 @@
            intention/1,
            myVisionRange/1.
 
-:- [graph/map, 
-    utils, 
-    ypserver/ypagent,
-    beliefs,
-    communication].
+:- [ 'graph/map.pl'
+   , 'graph/agents.pl'
+   , 'graph/nodes.pl'
+   , 'utils.pl'
+   , 'beliefs.pl'
+   , 'communication.pl'
+   , 'ypserver/ypagent.pl'
+   ].
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -406,7 +409,7 @@ strength(Step, Agent, Strength) :-
 visualRange(Step, Agent, VisualRange) :-
     lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
 status(Step, Agent, Status) :-
-    lastKnownInfo(agentStatus, Step, Agent, VisualRange).
+    lastKnownInfo(agentStatus, Step, Agent, Status).
 
 team(Agent, Team) :-
     lastKnownInfo(team, _Step, Agent, Team).
@@ -511,13 +514,11 @@ run(Action) :-
     nl, nl, nl, write('Current Step: '), writeln(Step),
     checkLastAction,
     plan([]),
-    % dumpKB, 
     !,
    
     calcTime('setExploredAndVisible',setExploredAndVisible),
 
-	
-    calcTime('argumentation',argumentation(Meta)),
+    calcTime('argumentation', argumentation(Meta)),
     write('Meta: '), writeln(Meta),
     calcTime('planning', planning(Meta)),
     exec(Action),
@@ -553,12 +554,11 @@ plan([]).
 
 
 argumentation(Meta) :-
-
     calcTime('setBeliefs', setBeliefs),
-
     calcTime('meta', meta(Meta)),
     retractall(intention(_)),
-    assert(intention(Meta)).
+    assert(intention(Meta)),
+    write('ARG: Asserting intention:'),writeln(Meta).
 
 calcTime(Message, Exec) :-
     write('<predicate name="'),write(Message), writeln('">'),
@@ -729,7 +729,7 @@ dumpKB :-
     printFindAll('NODE TEAMS:',         k(nodeTeam(         _X3,  _X4,  _X5  ))),
     printFindAll('EDGES:',              k(edge(             _X6,  _X7,  _X8  ))),
     printFindAll('POSITIONS:',          k(position(         _X9,  _X10, _X11 ))),
-    printFindAll('AGENT NAME:',         myName(                 _Name)),
+    printFindAll('AGENT NAME:',         myName(                         _Name )),
     printFindAll('AGENT TEAM:',         k(agentTeam(        _X12, _X13       ))),
     printFindAll('AGENT ROLE:',         k(agentRole(        _X14, _X15       ))),
     printFindAll('AGENT NODE:',         k(agentPosition(    _X16, _X17, _X18 ))),

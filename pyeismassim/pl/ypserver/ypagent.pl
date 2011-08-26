@@ -52,6 +52,8 @@ broadcast(Caracteristica, Ontolgia, Data) :-
     which_agents(ListofAgents, Caracteristica, Ontolgia, _Error), 
     ip:name(Name),
     delete(ListofAgents, Name, ListofAgentsOutMe),
+    write('    Comm: sending: '),write(Data),nl,
+    write('    Comm: to:      '),write(ListofAgents),nl,
     send([receiver(ListofAgentsOutMe), content(Data)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,8 +97,7 @@ recibirTodo(ListaDeMensajes, TimeOut):-
         is_list(Message),
         recibirTodo(ListaDeMensajesNuevos, TimeOut),
         append(ListaDeMensajesNuevos, [Message], ListaDeMensajes)
-    ),
-    writeln(ListaDeMensajes).
+    ).
 
 functor2list(A,    A) :-
     atom(A),

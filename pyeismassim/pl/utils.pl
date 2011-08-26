@@ -1,5 +1,3 @@
-:- [graph/map].
-% :- [kmap].
 :- dynamic isGoal/1, isFail/1.
 
 testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
@@ -12,8 +10,6 @@ testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
 pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2) :-
     % writeln('pathSearch'),
     % writeln('1'),
-    
-    
     % explored(InitialNode), % conozco todos los arcos, para poder salir
     % k(edge(InitialNode, Node, V)), 
     % V \= unknown, !, % tiene por lo menos un arco de salida del cual conoce su valor
@@ -30,9 +26,7 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     append(Actions, NewActions, Plan),
     % writeln('4'),
     not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
-
     assert(b(path(InitialNode, FinalNode, ActionToBeDone, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
-    
 
 % pathSearch(_InitialNode, _FinalNode, _Energy, _Path, _Actions, _PathCost) :-
     % retractall(isGoal(_)).
@@ -185,7 +179,7 @@ ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
 % Path: camino a la posicion actual
 % Actions: lista de acciones hasta la posicion actual
 % PathCost: costo del camino hasta la posicion actual
-% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energia restante, lista de acciones necesarias].
 % ListOfUcsNodes: lista con la informacion de cada nodo vecino con la forma ucsNode(_).
 calcUcsNodes(_Position, _Path, _Actions, _PathCost, [], []).
 
@@ -206,9 +200,9 @@ calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode,
     
 % calcActions(-Pos, -Energy, -NeighborsList, +ListOfActions)
 % Pos: posicion actual.
-% Energy: energía actual.
-% NeighborsList: lista de vecinos de la posición actual.
-% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% Energy: energia actual.
+% NeighborsList: lista de vecinos de la posicion actual.
+% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energia restante, lista de acciones necesarias].
 calcActions(_Pos, _Energy, [], []).
 
 % calcActions(Pos, Energy, [Neigh | Neighs], ListOfListOfActions) :-
@@ -275,18 +269,16 @@ calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEner
 % testUcs(P, A, C) :-
 	% ucs([ucsNode(vertex11, 5, [], [], 0)], [], P, A, C).
 	
-/*	
-bfs(Node, _, Path, Path, Cost, Cost) :- isGoal(Node, Cost).
-bfs(Node, Visited, OldPath, NewPath, OldCost, NewCost) :-
-	k(edge(Node, Neighbor, _)),
-	not(member(Neighbor, Visited)),
-	Cost is OldCost + 1,
-	bfs(Neighbor, [Neighbor | Visited], [Neighbor | OldPath], NewPath, Cost, NewCost).
-
-
-testBfs(P, C):-
-	bfs(vertex11, [vertex11], [vertex11], P, 0, C).
-*/	
+%bfs(Node, _, Path, Path, Cost, Cost) :- isGoal(Node, Cost).
+%bfs(Node, Visited, OldPath, NewPath, OldCost, NewCost) :-
+%	k(edge(Node, Neighbor, _)),
+%	not(member(Neighbor, Visited)),
+%	Cost is OldCost + 1,
+%	bfs(Neighbor, [Neighbor | Visited], [Neighbor | OldPath], NewPath, Cost, NewCost).
+%
+%
+%testBfs(P, C):-
+%	bfs(vertex11, [vertex11], [vertex11], P, 0, C).
 	
 % path([], _).
 

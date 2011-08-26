@@ -2,7 +2,7 @@
 % meta(expansion(X)) <- expansion(X).
 % meta(explorar(X)) <- explorar(X).
 
-% con estas reglas, se define que sólo haya una meta sin derrotar
+% con estas reglas, se define que solo haya una meta sin derrotar
 % ~explorar(_, _) <- expansion(_, _).
 % ~expansion(_, _) <- explorar(_, _).
 
@@ -24,7 +24,7 @@
 % ~explorar(_, Value) -< aumento(_, ValueD),
 %                       greater(ValueD, Value).
 
-% DESIRE expansión(Nodo)
+% DESIRE expansion(Nodo)
 expansion(Value, X) -< 
                 % estoyEnLaFrontera,
                 b(distancia(X, [[]], Dist)),
@@ -55,7 +55,7 @@ explorarValue(Dist, Positivo, Negativo, Value) :-
     Value is 20 + ((10 - Dist) ** 2) * 2 + Positivo - Negativo **2.
 
 
-% X instanciado con todos los nodos a distancia máxima 2 de la zona
+% X instanciado con todos los nodos a distancia mÃ¡xima 2 de la zona
 aumento(Value, X) -< 
     b(distancia(X, [[survey]], Dist)),
     % ~estaLejos(X, [[]], Dist, 10), 
@@ -72,7 +72,7 @@ aumentoValue(Dist,  DifPuntos, Value) :-
               
 quedarse(20, _) -< true.
               
-% La diferencia de puntos entre la situación actual y el agente ubicado en Nodo
+% La diferencia de puntos entre la situacion actual y el agente ubicado en Nodo
 % se pesa en la cuenta con 0, o la diferencia.
 positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
@@ -93,10 +93,10 @@ estaLejos(X, Acciones, Dist, Cota) <- b(distancia(X, Acciones, Dist)),
 esSeguro(_) -< true.
 
                
-% Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que estén en la misma escala. La otra es poner los números sueltos, como en explorar. No sé que decisión de diseño tomar.
-consExpansion(10) <- true. % ni idea que Value tendrá
+% Esta es una manera de poner las constantes que van a afectar a los valores de argValue, para que esten en la misma escala. La otra es poner los numeros sueltos, como en explorar. No sÃ© que decision de diseÃ±o tomar.
+consExpansion(10) <- true. % ni idea que Value tendrÃ¡
 
-% este argumento sólo sirve para poner el argValue, para que lo busque el criterio de comparación greaterArgValue
+% este argumento solo sirve para poner el argValue, para que lo busque el criterio de comparaciÃ³n greaterArgValue
 % argValue(_) <- true.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
