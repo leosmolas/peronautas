@@ -29,7 +29,7 @@ meta(X) :-
     foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !, writeln('Meta 2'),
     foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !, writeln('Meta 3'),
     foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, writeln('Meta 4'),
-    
+    foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !, writeln('Meta 5'),
     
     myPosition(Position),
     doNotFail(calcMeta(quedarse(Position))), !, writeln('Meta quedarse'),
@@ -70,6 +70,13 @@ is_a_built_in(notEqual(_X,_Y)).
 is_a_built_in(phase(_)). % delp revisara las fases
 
 is_a_built_in(role(_, _)).
+
+is_a_built_in(position(_, _)).
+
+position(Agent, Position) :-
+    currentStep(Step),
+    position(Step, Agent, Position).
+
 % Para poner banderas
 is_a_built_in(w(_)).
 

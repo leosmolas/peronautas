@@ -29,19 +29,21 @@ setBeliefs :-
     write('setBeliefs'),nl,
     myTeam(T),
     teamPoints(T, ActualPoints),
-    assert(b(actualPoints(ActualPoints))),
+    assert(b(actualPoints(ActualPoints))), !,
 	myPosition(MyPosition),
-	assert(b(myPosition(MyPosition)) <- true),
+	assert(b(myPosition(MyPosition)) <- true), !,
     myStatus(Status),
-    assert(b(myStatus(Status)) <- true),
+    assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
+    printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
     calcTime(setPosibleExpansion), !,
     calcTime(setPosibleAumento), !,
     calcTime(setPosibleExplorar), !,
+    calcTime(setPosibleAuxilio), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
-    printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _ActionToBeDone, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
+    printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
 
 saboteurPosition(Position) :-
@@ -61,6 +63,9 @@ setEsSeguro :-
 		assert(b(~esSeguro(Position)) -<  equal(1,1)) % truchada para que la especifidad agarre este
 	).
 	
+    
+% searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
+    % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
     
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
 	% writeln('pathSearch'),
@@ -235,8 +240,6 @@ setDifPuntosExpansion :-
     ).
 
 
-    
-
 	
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aumento
@@ -312,6 +315,71 @@ setPosibleAumentoDistancia :-
     ).
     
 
+
+
+    
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Explorar
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+setPosibleExplorar :-
+    myStatus(normal),
+    chequearPosibleExplorar(0),
+    b(posibleExplorar(_Node)), !,
+    calcTime(setDistanciaExplorar),
+    calcTime(setDifPuntosExplorar).
+    
+    
+setPosibleExplorar. 
+    
+chequearPosibleExplorar(6) :- !.
+    
+chequearPosibleExplorar(_) :-
+    b(posibleExplorar(_Node)), !.
+    
+
+    
+chequearPosibleExplorar(X) :-
+    NewCost is X + 2,
+	foreach(
+        posibleExplorar(X, NewCost, FinalNode), 
+        assertOnce(b(posibleExplorar(FinalNode)))
+    ),
+    chequearPosibleExplorar(NewCost).
+    
+posibleExplorar(X, NewCost, FinalNode) :-
+    b(nodeAtDistance(FinalNode, Cost)),
+    notExplored(FinalNode),
+    Cost >= X, 
+    Cost < NewCost.
+    
+posibleExplorar(X, NewCost, FinalNode) :-
+    b(nodeAtDistance(FinalNode, Cost)),
+    hasAtLeastOneUnsurveyedEdge(FinalNode),
+    Cost >= X, 
+    Cost < NewCost.
+
+setDifPuntosExplorar :-
+    myName(A),
+    myTeam(T),
+    writeLenght(
+        'posibleExplorar', 
+        Node3, 
+        (
+            b(posibleExplorar(Node3)),
+            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
+        )
+    ),
+    foreach(
+        (
+            b(posibleExplorar(Node1)),
+            not(b(difPuntosZona(Node1, _DifPuntos2)) <- true),
+            (b(distancia(Node1, [[survey]], _PathCost, _E)) <- true)
+        ),
+        setDifPuntosNode(Node1, A, T)
+    ).
+    
+
 setDistanciaExplorar :-
     myPosition(Position),
     myEnergy(Energy),
@@ -336,76 +404,54 @@ setDistanciaExplorar :-
     
 setDistanciaExplorar.
 
-
-    
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Explorar
+% Auxilio
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-setPosibleExplorar :-
-    myStatus(normal),
-	% printFindAll('hasAtLeastOneUnsurveyedEdge(Node)', hasAtLeastOneUnsurveyedEdge(_)),
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-    assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 < 2)),
-	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost < 2)),
-	foreach(
-        (
-            breadthFirst(Position, FinalNode, _Path, _Cost)
-        ), 
-        assertOnce(b(posibleExplorar(FinalNode)))
-    ),
-    chequearPosibleExplorar(2),
-    b(posibleExplorar(_Node)),
-    calcTime(setDistanciaExplorar),
-    calcTime(setDifPuntosExplorar).
-    
-    
-setPosibleExplorar. 
-    
-chequearPosibleExplorar(6) :- !.
-    
-chequearPosibleExplorar(_) :-
-    b(posibleExplorar(_Node)), !.
-    
-    
-    
-chequearPosibleExplorar(X) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-    NewCost is X + 2,    
-	assert((isGoal(Node2, Cost2) :- notExplored(Node2), Cost2 >= X, Cost2 < NewCost)),
-	assert((isGoal(Node, Cost) :- hasAtLeastOneUnsurveyedEdge(Node), Cost >= X, Cost < NewCost)),
-	foreach(
-        (
-            breadthFirst(Position, FinalNode, _Path, _Cost)
-        ), 
-        assertOnce(b(posibleExplorar(FinalNode)))
-    ),
-    chequearPosibleExplorar(NewCost).
-
-setDifPuntosExplorar :-
-    myName(A),
-    myTeam(T),
-    writeLenght(
-        'posibleExplorar', 
-        Node3, 
-        (
-            b(posibleExplorar(Node3)),
-            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
-        )
-    ),
+setPosibleAuxilio :-
+    myHealth(Health),
+    myMaxHealth(Max),
+    Health < Max,
+    writeln(1),
     foreach(
         (
-            b(posibleExplorar(Node1)),
-            not(b(difPuntosZona(Node1, _DifPuntos2)) <- true),
-            (b(distancia(Node1, [[survey]], _PathCost, _E)) <- true)
+            myTeam(MyTeam),
+            team(Agent, MyTeam),
+            role(Agent, repairer)
         ),
-        setDifPuntosNode(Node1, A, T)
-    ).
+        assert(b(posibleAuxilio(Agent)))
+    ),
+    writeLenght(
+        'posibleAuxilio', 
+        Agent1, 
+        (
+            b(posibleAuxilio(Agent1))
+        )
+    ),
+    b(posibleAuxilio(_)), !,
+    setDifPuntosSinMi,
+    writeln(2),
+    setDistanciaAuxilio.
+    
+setPosibleAuxilio.
+    
+setDistanciaAuxilio :-
+    myPosition(Position),
+    myEnergy(Energy),
+    writeln(3),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)), !,
+    writeln(4),
+    foreach(
+        (
+            currentStep(Step),
+            b(posibleAuxilio(Agent)),
+            position(Step, Agent, FinalNode)
+        ),
+        (
+            searchPath(Position, FinalNode, Energy, [], 0)
+        )
+    ),
+    writeln(5), !.
+    
+setDistanciaAuxilio.

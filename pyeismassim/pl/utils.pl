@@ -1,8 +1,6 @@
 :- [graph/map].
 :- dynamic isGoal/1, isFail/1, isFail/2.
 
-testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
-
 % pathSearch(-InitialNode, -FinalNode, -Energy, -ActionToBeDone, -CostOfAction, +Path, +Actions, +PathCost)
 % wrapper para la uniform cost search.
 % asserta isGoal y lo retracta al final.

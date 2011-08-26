@@ -58,11 +58,11 @@ setTeammatePosition :-
     
 assertTeammatePosition(Agent) :-
 	currentStep(Step),
-    % writeln(assertTeamMatePosition),
+    writeln(assertTeamMatePosition),
+    write(Agent),writeln(Position),
     position(Step, Agent, Position), !,
 	health(Step, Agent, Health), !, 
 	maxHealth(Step, Agent, MaxHealth), !,
-    % write(Agent),writeln(Position),
     assert(b(teammateHealthInfo(Agent, Health, MaxHealth)) <- true),
     assert(b(teammatePosition(Agent, Position))).
     

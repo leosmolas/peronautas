@@ -89,7 +89,7 @@ searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
         isGoal(ucsNode(FinalNode, RemainingEnergy, _, _, _)) :- 
             myMaxEnergy(MaxEnergy),
             HalfEnergy is MaxEnergy / 2 + 2,
-            RemainingEnergy =< HalfEnergy
+            RemainingEnergy >= HalfEnergy
     )),
     singleton_heap(InitialFrontier, ucsNode(Position, Energy, [], [], 0), 0),
     ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 

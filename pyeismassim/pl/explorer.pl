@@ -30,39 +30,27 @@ rolSetBeliefs :-
 rolSetBeliefs.
 
 setPosibleProbear :- 
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-    assert((isGoal(Node, Cost) :- k(nodeValue(Node, unknown)), Cost < 2)),
-	foreach(
-        (
-            breadthFirst(Position, FinalNode, _Path, _Cost)
-        ), 
-        assert(b(posibleProbear(FinalNode)))
-    ),
-    chequearPosibleProbear(2).
-    
+    chequearPosibleProbear(0).
+ 
+chequearPosibleProbear(6) :- !.
+ 
 chequearPosibleProbear(_) :-
     b(posibleProbear(_FinalNode)), !.
     
 chequearPosibleProbear(X) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
     NewCost is X + 2,
-    assert((isGoal(Node, Cost) :- k(nodeValue(Node, unknown)), Cost >= X, Cost < NewCost)),
 	foreach(
-        (
-            breadthFirst(Position, FinalNode, _Path, _Cost)
-        ), 
-        assert(b(posibleProbear(FinalNode)))
+        posibleProbear(X, NewCost, FinalNode), 
+        assertOnce(b(posibleProbear(FinalNode)))
     ),
     chequearPosibleProbear(NewCost).
 
+posibleProbear(X, NewCost, FinalNode) :-
+    
+    b(nodeAtDistance(FinalNode, Cost)),
+    k(nodeValue(FinalNode, unknown)), 
+    Cost >= X, 
+    Cost < NewCost.
 	
 setInZone :-
 	myTeam(MyTeam),
@@ -83,19 +71,18 @@ rolSetDifPuntos:-
     ).
     
 rolSetDistancia :-
-    myName(Name),
-    currentStep(Step),
-    position(Step, Name, Position),
-    energy(Step, Name, Energy),
+    myPosition(Position),
+    myEnergy(Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         b(posibleProbear(Node)),
         (
-			retractall(isFail(_)),
-			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+			
             searchPath(Position, Node, Energy, [[probe]], 1)
         )
     ),
-    printFindAll('paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))).
+    printFindAll('paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

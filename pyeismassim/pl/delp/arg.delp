@@ -47,10 +47,10 @@ is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
 	   
 auxilio(Value, Repairer) -<
-	b(position(Repairer, Nodo)),
-	b(maxHealth(Max)),
-	b(health(Health)),
-	b(difPointsWithoutMe(Points)),
+	position(Repairer, Nodo),
+	myMaxHealth(Max),
+	myHealth(Health),
+	b(difPuntosSinMi(Points)),
 	positivoONegativo(Points, _Positivo, Negativo),
 	b(distancia(Nodo, [], Dist, EnergyLeft)),
 	auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value).

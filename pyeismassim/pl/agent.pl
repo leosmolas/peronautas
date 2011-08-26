@@ -635,6 +635,11 @@ planning(aumento(Node)) :-
     
 planning(expansion(Node)) :-
     assertPlan(Node, []).
+    
+planning(auxilio(Repairer)) :-
+    currentStep(Step),
+    position(Step, Repairer, Node),
+    assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-
     myEnergy(Energy),
@@ -647,17 +652,23 @@ planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
 
+assertPlan(Node, _FinalActions) :-
+    myPosition(InitialPosition),
+    not(b(path(_, _, _, _, _, _, _, _))), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
   
 assertPlan(Node, _FinalActions) :-
     myPosition(InitialPosition),
-    % myEnergy(Energy),
     
-    b(path(InitialPosition, Node, _, _, _, [], _, _)),
+    b(path(InitialPosition, Node, _, _, _, [], _, _)), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
   
 assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
-    % myEnergy(Energy),
     
     b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
     retract(plan(_)),
@@ -716,8 +727,20 @@ replanning(expansion(Node)) :-
     searchPath(Position, Node, Energy, [], 0),
     planning(expansion(Node)).
     
-replanning(_) :-
-    writeln('aca no deberia pasar').
+replanning(atacar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPathSaboteur(Position, EnemyPosition, Agent, Energy),
+    planning(atacar(Agent)).
+    
+%si algun camino no se encontro, se planea quedarse
+replanning(_) :- 
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
 
     
 
