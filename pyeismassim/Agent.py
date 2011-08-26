@@ -113,7 +113,6 @@ class Agent():
 
                 # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
                 if (self.communication):
-                    print "PYTHON: INTENTION!!! %s" % self.prolog.query("intention(Bad)").next()['Bad']
                     print "@Agent: calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
                 self.massimConnection.send(action_xml)
@@ -171,7 +170,7 @@ class PrologAgent(Agent):
                                 'saboteur' : 1,
                                 'sentinel' : 3,
                                 'inspector': 1
-                            }
+                             }
 
         self.role = msg_dict['role'].lower()
         if   (self.role == 'explorer'):

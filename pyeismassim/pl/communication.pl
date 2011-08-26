@@ -2,14 +2,19 @@
 
 communicateAndResolveConflicts(MyAction, _NewAction) :-
     intention(Intention),
-    write('    Comm: Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
+    write(  '    Comm: Broadcasting intention:'),writeln(Intention),
+    write(  '    Comm: Broadcasting action:   '),writeln(MyAction),
     broadcast(d3lp0r, mapc, [Intention, MyAction]),
     writeln('    Comm: Receiving teammate action list'),
-    recibirTodoSimple(GoalActionList, 1),
+    %recibirTodoSimple(GoalActionList, 1),
+    myName(Receptor),
+    recibir(Emisor, Receptor, GoalActionList, 1),
+    write(  '    Comm: Emisor: '),writeln(Emisor),
+    write(  '    Comm: GoalActionList: '),writeln(GoalActionList),
     writeln('    Comm: Setting priorities'),
     phase(Phase),
     setPriorities(Phase),
-    write('    Comm: Solving conflicts with '),writeln(GoalActionList),
+    write(  '    Comm: Solving conflicts with '),writeln(GoalActionList),
     solveConflicts(GoalActionList),
     writeln('    Comm: Done :D').
 

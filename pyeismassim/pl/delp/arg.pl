@@ -29,19 +29,12 @@ meta(X) :-
     % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
     foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
     % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
-    
-    
     currentStep(Step),
     myName(Name),
     position(Step, Name, Position),
-
-    writeln('BREAKING'),
-    calcMeta(quedarse(Position)),
-    writeln('BROKEN'),
-    
+    doNotFail(calcMeta(quedarse(Position))),
     rolMetas, % predicado definido en cada rol
     % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
-    
     mejorMeta(X, _),
     retract(mejorMeta(_, _)).
     
@@ -57,7 +50,6 @@ calcMeta(X) :-
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),
     assert(mejorMeta(X, Value)).
-    
 
 % todos los predicados que siguen son operaciones aritmeticas y de comparacion, para que los use delp.
 is_a_built_in(mult(_X,_Y,_Z)).
