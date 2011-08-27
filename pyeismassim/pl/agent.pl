@@ -525,6 +525,7 @@ run(Action) :-
     % concat(S0, '.pl', File),
     % writeln(File),
     % saveMap(File),
+    
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
@@ -532,9 +533,7 @@ run(Action) :-
     calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
-    % writeln(1),
     exec(Action),
-    % writeln(1),
     writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
@@ -551,9 +550,7 @@ run(Action) :-
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
-    % writeln(1),
     exec(Action),
-    % writeln(1),
     writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
@@ -605,9 +602,6 @@ calcTime(Exec) :-
     Time is (After - Before) * 1000,
     write('<time value="'),write(Time), writeln('"/>'),
     writeln('</predicate>').
-    
-% calcTime(Exec) :-
-    % call(Exec).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
@@ -867,24 +861,6 @@ hasAtLeastOneUnsurveyedEdge(Node1) :-
 hasAtLeastOneUnsurveyedEdgeAux(Node) :-
 	k(edge(Node, _Node2, unknown)), !.
 
-
-%------------------------------------------------------------------------------%
-%makeAdjacencyList(Graph) :-
-%    findall(
-%        Node,
-%        k(nodeValue(Node, Cost)),
-%        Nodes
-%    ),
-%    findall(
-%        edge(Node, Node2, Value),
-%        k(edge(Node1, Node2, Value)),
-%        Edges
-%    ),
-%    makeAdjacencyList(Nodes, Edges, Graph).
-%
-%makeAdjacencyList(Nodes, Edges, Graph1) :-
-%    addNodes(Nodes, Graph0),
-%    addEdges(Edges, Graph1).
 
 %------------------------------------------------------------------------------%
 redirect_output(Filename) :-

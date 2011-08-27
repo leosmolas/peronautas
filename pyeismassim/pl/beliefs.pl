@@ -1,28 +1,10 @@
-﻿% posibleExpansion(Nodo)
-
-% estoyEnLaFrontera
-
-:-  [utils], 
+﻿:-  [utils], 
     % [kmap], 
     [graph/map], 
     [delp/arg].
     
 :- dynamic b/1.
 
-% setBeliefs :-
-    % currentStep(0), !.
-    
-setNodesAtDistance(Distance) :-
-	myPosition(Node),
-	retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-	assert(isGoal(_Result, _Cost)),
-	assert(isFail(_Result2, Cost2) :- Cost2 > Distance),
-	foreach(
-		breadthFirst(Node, Dest, _Path, Cost3),
-		assert(b(nodeAtDistance(Dest, Cost3)))
-	).
-	
     
 setBeliefs :-
     
@@ -35,17 +17,32 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
-    printFindAll('b', b(_)),
+    % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
     calcTime(setPosibleExpansion), !,
     calcTime(setPosibleAumento), !,
     calcTime(setPosibleExplorar), !,
-    calcTime(setPosibleAuxilio), !,
+    % calcTime(setPosibleAuxilio), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Utils
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+setNodesAtDistance(Distance) :-
+	myPosition(Node),
+	retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
+	assert(isGoal(_Result, _Cost)),
+	assert(isFail(_Result2, Cost2) :- Cost2 > Distance),
+	foreach(
+		breadthFirst(Node, Dest, _Path, Cost3),
+		assert(b(nodeAtDistance(Dest, Cost3)))
+	).
+    
 saboteurPosition(Position) :-
 	myTeam(MyTeam),
 	currentStep(Step),
@@ -60,7 +57,7 @@ saboteurPosition(Position) :-
 setEsSeguro :-
 	foreach(
 		saboteurPosition(Position),
-		assert(b(~esSeguro(Position)) -<  equal(1,1)) % truchada para que la especifidad agarre este
+		assert(b(~esSeguro(Position)) -<  true) 
 	).
 	
     
@@ -68,14 +65,82 @@ setEsSeguro :-
     % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
     
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
-	% writeln('pathSearch'),
     pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost, RemainingEnergy), !,
-	% printFindAll('paths', b(path(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8))),
-    % writeln('6.2'),nl,
     assert(b(distancia(Node, ActionToBeDone, PathCost, RemainingEnergy)) <- true).
-    % writeln('6.3'),nl.
     
 searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
+    
+
+visibleNode(N) :-
+    explored(N),
+    inRange(N),
+    foreach(
+        k(edge(N, N1, _)),
+        inRange(N1)
+    ), !,
+    retract(notVisible(N)),
+    asserta(visibleNode(N)).
+    
+    
+% toogleOnVisibleNode(+Node)
+% si el nodo ya estÃ¡ marcado como visible, no hace nada
+% sino, hace el toogle
+toogleOnVisibleNode(Node) :-
+    visibleNode(Node), !.
+    
+toogleOnVisibleNode(Node) :-
+    retractall(notVisible(Node)),
+    % write('1.3 retract '),write(Agent),nl,
+    asserta(visibleNode(Node)).
+    % write('1.4 asserta '),write(Agent),nl.
+    
+toogleOffVisibleNodes :-
+    foreach(
+                visibleNode(N),
+                (
+                    retract(visibleNode(N)),
+                    assert(notVisible(N))
+                )
+           ).
+    
+agentsRangeVision(Step, MyTeam, Range, Position) :-
+    team(Agent, MyTeam),
+    visualRange(Step, Agent, Range),
+    position(Step, Agent, Position),
+    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+    
+% setExploredAndVisible
+% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
+% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
+setExploredAndVisible :-
+    currentStep(Step),
+    myTeam(MyTeam),
+    foreach(
+        (
+            agentsRangeVision(Step, MyTeam, Range, Position)
+        ),
+        (
+            setExploredAndVisibleAux1(Range, Position)
+        )
+    ).
+
+setExploredAndVisibleAux1(Range, Position) :-	
+	retractall(isGoal(_, _)),
+	retractall(isFail(_, _)),
+	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
+	assert((isFail(_Node3, Cost3) :- Cost3 >= Range)),	
+	foreach(
+		breadthFirst(Position, Node, _Path, _Cost),
+		setExploredAndVisibleAux2(Node)		
+	).
+	% write('termine agente '),write(Agent),nl	
+	
+setExploredAndVisibleAux2(Node) :- 
+	% write(' Marking node as explored: '),write(Node),nl,
+	retractall(notExplored(Node)),
+	assertOnce(explored(Node)),
+	toogleOnVisibleNode(Node).
+    
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Expansion
@@ -84,7 +149,6 @@ searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
 setFrontera :-
     currentStep(Step),
     myTeam(T),
-    % T \= none, % ???????
     foreach(
         (
             k(nodeTeam(Step, Node, T)),
@@ -98,16 +162,7 @@ setFrontera :-
 
 setEstoyEnLaFrontera :-
     setFrontera,
-    % writeln('1'),nl,
 	myPosition(X),
-    % lastKnownPosition(_Step, A, X),
-    % myTeam(T),	
-    % writeln('2'),nl,
-    % k(nodeTeam(_S2, X, T)),
-    % findall(Neigh, k(edge(X, Neigh, _V)), Neighbors),
-    % % writeln('3'),nl,
-    % chequearFrontera(Neighbors, T),
-    % % writeln('4'),nl,
     b(frontera(X)), !,
     assert(b(estoyEnLaFrontera)).
     
@@ -115,8 +170,6 @@ setEstoyEnLaFrontera.
 
 chequearFrontera(Neigh, T) :-
 	currentStep(Step),
-    % member(X, Neigh),
-    % k(nodeTeam(Step, X, T)), !,
     member(Y, Neigh),
     k(nodeTeam(Step, Y, Other)), 
 	Other \= T, !.

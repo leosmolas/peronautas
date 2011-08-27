@@ -1,8 +1,6 @@
 ﻿:- dynamic h/1.
 
 :- [
-        % 'edges.pl', 
-		% '../kmap.pl',
         'nodes.pl', 
         'agents.pl'
    ].
@@ -277,78 +275,6 @@ moveAgent(Agent, Node) :-
     retractall(h(position(_Step, Agent, _))),
     assert(h(position(Step, Agent, Node))).
 
-visibleNode(N) :-
-    explored(N),
-    inRange(N),
-    foreach(
-        k(edge(N, N1, _)),
-        inRange(N1)
-    ), !,
-    retract(notVisible(N)),
-    asserta(visibleNode(N)).
-    
-    
-% toogleOnVisibleNode(+Node)
-% si el nodo ya estÃ¡ marcado como visible, no hace nada
-% sino, hace el toogle
-toogleOnVisibleNode(Node) :-
-    visibleNode(Node), !.
-    
-toogleOnVisibleNode(Node) :-
-    retractall(notVisible(Node)),
-    % write('1.3 retract '),write(Agent),nl,
-    asserta(visibleNode(Node)).
-    % write('1.4 asserta '),write(Agent),nl.
-    
-toogleOffVisibleNodes :-
-    foreach(
-                visibleNode(N),
-                (
-                    retract(visibleNode(N)),
-                    assert(notVisible(N))
-                )
-           ).
-    
-agentsRangeVision(Step, MyTeam, Range, Position) :-
-    team(Agent, MyTeam),
-    visualRange(Step, Agent, Range),
-    position(Step, Agent, Position),
-    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
-    
-% setExploredAndVisible
-% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
-% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
-setExploredAndVisible :-
-    currentStep(Step),
-    myTeam(MyTeam),
-    foreach(
-        (
-            agentsRangeVision(Step, MyTeam, Range, Position)
-        ),
-        (
-            setExploredAndVisibleAux1(Range, Position)
-            % writeln(Range),
-            % writeln(Position)
-        )
-    ).
-
-setExploredAndVisibleAux1(Range, Position) :-	
-	retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-	assert((isFail(_Node3, Cost3) :- Cost3 >= Range)),	
-	foreach(
-		breadthFirst(Position, Node, _Path, _Cost),
-		setExploredAndVisibleAux2(Node)		
-	).
-	% write('termine agente '),write(Agent),nl	
-	
-setExploredAndVisibleAux2(Node) :- 
-	% write(' Marking node as explored: '),write(Node),nl,
-	retractall(notExplored(Node)),
-	assertOnce(explored(Node)),
-	toogleOnVisibleNode(Node).
-    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
