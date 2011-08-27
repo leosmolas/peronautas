@@ -1,8 +1,5 @@
-:- [graph/map].
-% :- [kmap].
-:- dynamic isGoal/1, isFail/1.
-
-testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
+ï»¿:- [graph/map].
+:- dynamic isGoal/1, isFail/1, isFail/2.
 
 % pathSearch(-InitialNode, -FinalNode, -Energy, -ActionToBeDone, -CostOfAction, +Path, +Actions, +PathCost)
 % wrapper para la uniform cost search.
@@ -10,27 +7,14 @@ testS :- pathSearch(vertex0, vertex10, 5, [], 0, _Path, _Plan, _NewTurns2).
 % instancia todos los parametros para llamar a ucs
 % ucs assertara todos los resultados que haya podido alcanzar, para minimizar el costo de la busqueda
 pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2, RemainingEnergy1) :-
-    % writeln('pathSearch'),
-    % writeln('1'),
-    
-    
-    % explored(InitialNode), % conozco todos los arcos, para poder salir
-    % k(edge(InitialNode, Node, V)), 
-    % V \= unknown, !, % tiene por lo menos un arco de salida del cual conoce su valor
     retractall(isGoal(_)),	
-    assert(isGoal(FinalNode)),
-	% writeln('UCS'),
-    % writeln('2'),
+    assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
-	% printFindAll('isGoal', isGoal(_)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), % !, % otro cut inexplicable
-    % writeln('3'),
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
-    % writeln('4'),
     not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
-
     assert(b(path(InitialNode, FinalNode, ActionToBeDone, Energy, Path, Plan, NewTurns2, RemainingEnergy1))).
     
 
@@ -45,31 +29,14 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 % Actions: lista de acciones necesarias para llegar al nodo.
 % Path_Cost: costo del camino encontrado.
 
-
-% ucs(Frontier, _Visited, _, _, _, _) :-
-	
-	% writeln('Caso Fail'),
-    % ucsSelect(Frontier, ucsNode(_Position, _Energy, _Path, _Actions, Path_Cost), _Frontier1),
-    % isFail(ucsNode(_, _, _, _, Path_Cost)), writeln('Despues del !'), !,  fail. 
-
 ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
     ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
-	% writeln('UCS caso isgoal'),
-	% writeln(Position),
-    isGoal(Position).
+    isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)).
 	
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
-    % writeln('ucs'),nl,
-    % writeln('ucs 1'),
     ucsSelect(Frontier, Visited, SelectedNode, Frontier1),
-    % writeln('ucs 20'),
     ucsNeighbors(SelectedNode, Neighbors),
-	% writeln(SelectedNode),
-    % writeln(Neighbors),
-    % writeln('ucs 2'),
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
-    % writeln(FrontierNew),
-    % writeln('ucs 3'),
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
 minEnergy(Energy1, Energy2, Energy1) :-
@@ -91,11 +58,6 @@ ucsSelectAux(Node, Frontier, _Visited, Node, Frontier).
 % addToFrontier(-Neighbors, -Frontier, +FrontierNew, -Visited, +VisitedNew).
 
 addToFrontier([], Frontier, Frontier, Visited, Visited).
-
-% addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
-	% % writeln('addToFrontier'),
-	% check(Neighbor, OldFrontier, NewFrontier, OldVisited, NewVisited), !,
-	% addToFrontier(Neighbors, NewFrontier, Frontier, NewVisited, Visited).
         
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
     % not(member(ucsNode(Neighbor, _, _, _, _), OldVisited)),
@@ -111,47 +73,7 @@ addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited
 addToFrontier([_Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
     !,
     addToFrontier(Neighbors, OldFrontier, Frontier, OldVisited, Visited).
-    
-% check/5
-% check(+Node, Old_Frontier, New_Frontier, Old_Visited, New_Visited)
-%
-% Verifica si se da alguna de las siguientes condiciones para un nodo dado:
-%
-% (1) Si existe en F un nodo N etiquetado con una posicion P, y generamos P por un mejor camino que 
-% el representado por N, % entonces reemplazamos N en F por un nodo N' para P con este nuevo camino.
-% (2) Si existe en V un nodo N etiquetado con una posicion P, y generamos P por un mejor camino que 
-% el representado por N, entonces N es eliminado de V y se agrega a la frontera un nuevo nodo N' 
-% para P con este nuevo camino.
 
-% check(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier, Visited, Visited) :-
-    % member(ucsNode(Position, _, _, _, Path_Cost2), OldFrontier),
-    % Path_Cost < Path_Cost2, !,
-    % delete(OldFrontier, ucsNode(Position, _, _, _, Path_Cost2), Frontier),
-    % insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier, NewFrontier).
-    
-% check(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier, OldVisited, NewVisited) :-
-    % % writeln('check 1'),
-    % !, % CUT
-    % member(ucsNode(Position, _, _, _, Path_Cost2), OldVisited),
-    % % writeln(ucsNode(Position, Energy, Path, Actions, Path_Cost)),
-    % % writeln(ucsNode(Position, _, _, _, Path_Cost2)),
-    
-    % % writeln('2'),
-    % Path_Cost < Path_Cost2, !,
-    
-    % % writeln('chech'),
-    % % writeln(ucsNode(Position, _, _, _, Path_Cost2)),
-    
-    
-    % delete(OldVisited, ucsNode(Position, _, _, _, Path_Cost2), NewVisited),
-    % insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), OldFrontier, NewFrontier).
-    
-% Insercion ordenada
-% insert_pq(State, [], [State]) :- !.
-% insert_pq(State, [H | T], [State, H | T]) :-
-    % precedes(State, H), !.
-% insert_pq(State, [H|T], [H | T_new]) :-
-    % insert_pq(State, T, T_new).
     
 insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Old, New) :-
     add_to_heap(Old, Path_Cost, ucsNode(Position, Energy, Path, Actions, Path_Cost), New).
@@ -164,20 +86,15 @@ insert_pq(ucsNode(Position, Energy, Path, Actions, Path_Cost), Old, New) :-
 % Energy: energia actual.
 % Neighbors: lista con un ucsNodes por cada vecino.
 ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
-    % writeln('ucsNeighbors'),
-    % writeln('1'),
     findall(
         Node, 
         (
             k(edge(Position, Node, V)), 
             V \= unknown
-            % explored(Node) % solo los agrego en la frontera si fueron explorados
         ), 
         Neigh
     ),
-    % writeln('2'),
     calcActions(Position, Energy, Neigh, ListOfActions),
-    % writeln('3'),
     calcUcsNodes(Position, Path, Actions, Path_Cost, ListOfActions, Neighbors).
 
 % calcUcsNodes(-Position, -Path, -Actions, -PathCost, -ListOfCalcActions, +ListOfUcsNodes)
@@ -185,7 +102,7 @@ ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
 % Path: camino a la posicion actual
 % Actions: lista de acciones hasta la posicion actual
 % PathCost: costo del camino hasta la posicion actual
-% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energÃ­a restante, lista de acciones necesarias].
 % ListOfUcsNodes: lista con la informacion de cada nodo vecino con la forma ucsNode(_).
 calcUcsNodes(_Position, _Path, _Actions, _PathCost, [], []).
 
@@ -206,24 +123,11 @@ calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode,
     
 % calcActions(-Pos, -Energy, -NeighborsList, +ListOfActions)
 % Pos: posicion actual.
-% Energy: energía actual.
-% NeighborsList: lista de vecinos de la posición actual.
-% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% Energy: energÃ­a actual.
+% NeighborsList: lista de vecinos de la posiciÃ³n actual.
+% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energÃ­a restante, lista de acciones necesarias].
 calcActions(_Pos, _Energy, [], []).
 
-% calcActions(Pos, Energy, [Neigh | Neighs], ListOfListOfActions) :-
-	% k(edge(Pos, Neigh, Value)),
-    % % writeln('2'),nl,
-    
-    % calcRecharge(Energy, Value, [[goto, Neigh]], ListOfActions, 1, Turns, RemainingEnergy),
-    % writeln('Turns'),
-	% writeln(Turns),
-    % isFail(ucsNode(Neigh, RemainingEnergy, _Path, ListOfActions, Turns)), !,
-	% writeln('Neigh'),
-	% writeln(Neigh),
-	% writeln('Turns'),
-	% writeln(Turns),
-    % calcActions(Pos, Energy, Neighs, ListOfListOfActions).
 	
 calcActions(Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions]) :-
     % writeln('calcActions'),
@@ -272,21 +176,6 @@ calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEner
     % writeln('6'),nl,
     calcRecharge(NewEnergy, Value, [[recharge] | OldList], NewList, NewTurns, NewTurns2, RemainingEnergy).
 
-% testUcs(P, A, C) :-
-	% ucs([ucsNode(vertex11, 5, [], [], 0)], [], P, A, C).
-	
-/*	
-bfs(Node, _, Path, Path, Cost, Cost) :- isGoal(Node, Cost).
-bfs(Node, Visited, OldPath, NewPath, OldCost, NewCost) :-
-	k(edge(Node, Neighbor, _)),
-	not(member(Neighbor, Visited)),
-	Cost is OldCost + 1,
-	bfs(Neighbor, [Neighbor | Visited], [Neighbor | OldPath], NewPath, Cost, NewCost).
-
-
-testBfs(P, C):-
-	bfs(vertex11, [vertex11], [vertex11], P, 0, C).
-*/	
 	
 % path([], _).
 
@@ -305,40 +194,33 @@ bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :-
     findall(Neighbor,
             k(edge(Node, Neighbor, _)),
             Neighbors),
-	filter(Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
+	filter(bfsNode(Node, Path, Cost), Neighbors, RestOfFrontier, Visited, FilteredNeighbors),
     add_list_to_queue(FilteredNeighbors, Path, Cost, RestOfFrontier, NewFrontier), 
     add_to_set(bfsNode(Node, Path, Cost), Visited, NewVisited),
     bfs(NewFrontier, NewVisited, Result).
 
-filter(Nodes, Frontier, Visited, FilteredNodes) :-
+filter(bfsNode(_Node, _Path, Cost), Neighbors, Frontier, Visited, FilteredNodes) :-
+	Cost2 is Cost + 1,
 	findall(
-        Node, 
+        Neigh, 
         (
-            member(Node, Nodes), 
-            not(member(bfsNode(Node, _P, _C), Frontier)), 
-            not(member(bfsNode(Node, _P2, _C2), Visited))
+            member(Neigh, Neighbors), 
+            not(member(bfsNode(Neigh, _P, _C), Frontier)), 
+            not(member(bfsNode(Neigh, _P2, _C2), Visited)),
+			not(isFail(Neigh, Cost2))
         ),
         FilteredNodes).
 	
-/*	
-moves(State_record, Open, Closed, Child_record) :-
-    state_record(State, _, State_record),
-    mov(State, Next),
-    % not (unsafe(Next)),
-    state_record(Next, _, Test),
-    not(member_queue(Test, Open)),
-    not(member_set(Test, Closed)),
-    state_record(Next, State, Child_record).
-*/
-
 add_list_to_queue([], _Path, _Cost, Queue, Queue).
 add_list_to_queue([H|T], Path, Cost, Queue, NewQueue) :-
 	NewCost is Cost + 1,
     add_to_queue(bfsNode(H, [H | Path], NewCost), Queue, TempQueue),
     add_list_to_queue(T, Path, Cost, TempQueue, NewQueue).
 
-add_to_queue(E, [], [E]).
-add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
+% add_to_queue(E, [], [E]).
+% add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
+
+add_to_queue(E, L, [E|L]).
 
 remove_from_queue(E, [E|T], T).
 

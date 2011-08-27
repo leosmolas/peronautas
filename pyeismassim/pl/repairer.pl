@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Repairer                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -28,7 +28,6 @@ execDummy(Action) :-
 
 
 rolMetas :-
-    % printFindAll(, b
     foreach(
         b(teammatePosition(Agent, _Node)),
         doNotFail(calcMeta(reparar(Agent)))
@@ -41,37 +40,45 @@ rolSetBeliefs :-
     setTeammateDistance.
     
 
-setTeammatePosition :-
+injuredAgent(Agent) :-
     myTeam(MyTeam),
     currentStep(Step),
     myName(Self),
+    team(Agent, MyTeam),
+    Agent \= Self,
+    health(Step, Agent, Health),
+    maxHealth(Step, Agent, Max),
+    Health < Max.
+
+setTeammatePosition :-
     foreach(
-        (
-            team(Agent, MyTeam),
-            Agent \= Self
-        ),
-        assertTeamMatePosition(Step, Agent)
+        injuredAgent(Agent),
+        assertTeammatePosition(Agent)
     ).
     
-assertTeamMatePosition(Step, Agent) :-
-    % writeln(assertTeamMatePosition),
+assertTeammatePosition(Agent) :-
+	currentStep(Step),
+    writeln(assertTeamMatePosition),
+    write(Agent),writeln(Position),
     position(Step, Agent, Position), !,
-    % write(Agent),writeln(Position),
-    assert(b(teammatePosition(Agent, Position)) <- true),
+	health(Step, Agent, Health), !, 
+	maxHealth(Step, Agent, MaxHealth), !,
+    assert(b(teammateHealthInfo(Agent, Health, MaxHealth)) <- true),
     assert(b(teammatePosition(Agent, Position))).
     
-assertTeamMatePosition(_Step, _Agent).
+assertTeammatePosition(_Step, _Agent).
     
 setTeammateDistance :-
     myName(Name),
     currentStep(Step),
     position(Step, Name, Position),
     energy(Step, Name, Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         b(teammatePosition(Agent, Node)),
         (
-			retractall(isFail(_)),
-			assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+
             searchPath(Position, Node, Energy, [[repair, Agent]], 2)
         )
     ),

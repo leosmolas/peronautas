@@ -1,5 +1,5 @@
-
-% DESIRE expansión(Nodo)
+ï»¿
+% DESIRE expansiÃ³n(Nodo)
 expansion(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
     esSeguro(X),
@@ -31,7 +31,7 @@ positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
 
 
-% X instanciado con todos los nodos a distancia máxima 2 de la zona
+% X instanciado con todos los nodos a distancia mÃ¡xima 2 de la zona
 aumento(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
     esSeguro(X),
@@ -46,19 +46,19 @@ aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
 is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
 	   
-% auxilio(Value, Repairer) -<
-	% b(position(Repairer, Nodo)),
-	% b(maxHealth(Max)),
-	% b(health(Health)),
-	% b(difPointsWithoutMe(Points)),
-	% positivoONegativo(Points, _Positivo, Negativo),
-	% b(distancia(Nodo, [], Dist, EnergyLeft)),
-	% auxilioValue(Dist, EnergyLeft, Value).
+auxilio(Value, Repairer) -<
+	position(Repairer, Nodo),
+	myMaxHealth(Max),
+	myHealth(Health),
+	b(difPuntosSinMi(Points)),
+	positivoONegativo(Points, _Positivo, Negativo),
+	b(distancia(Nodo, [], Dist, EnergyLeft)),
+	auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value).
 	
-% auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
-	% Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
+auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
+	Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
 	
-% is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
+is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
 	   
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
@@ -75,12 +75,15 @@ phaseCoef(expansion, 0.8) <- phase(exploration).
 phaseCoef(explorar,  1.2) <- phase(exploration).
 phaseCoef(aumento,   0.8) <- phase(exploration).
 
-
-
+b(difPuntosSinMi(0)) -< true.
+~b(difPuntosSinMi(0)) <- 
+	b(difPuntosSinMi(P)),
+	notEqual(P, 0).
+	
+agentRolePoints(_, _R, 0) -< true.
+	
+~agentRolePoints(I, R, 0) <- 
+	agentRolePoints(I, R, V),
+	notEqual(V, 0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-
-% Para poner banderas
-is_a_built_in(w(_)).
-
-w(X) :- writeln(X).
