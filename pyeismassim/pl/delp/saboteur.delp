@@ -1,4 +1,4 @@
-atacar(Value, Agent) -<
+﻿atacar(Value, Agent) -<
     b(enemyPosition(Agent, Position)),
     b(distancia(Position,[[attack, Agent]], Turns, EnergyLeft)),
 	b(difPuntosSinMi(DifPuntos)),

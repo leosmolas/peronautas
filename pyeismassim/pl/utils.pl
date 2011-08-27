@@ -1,4 +1,4 @@
-:- [graph/map].
+ï»¿:- [graph/map].
 :- dynamic isGoal/1, isFail/1, isFail/2.
 
 % pathSearch(-InitialNode, -FinalNode, -Energy, -ActionToBeDone, -CostOfAction, +Path, +Actions, +PathCost)
@@ -102,7 +102,7 @@ ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors) :-
 % Path: camino a la posicion actual
 % Actions: lista de acciones hasta la posicion actual
 % PathCost: costo del camino hasta la posicion actual
-% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% ListOfCalcActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energÃ­a restante, lista de acciones necesarias].
 % ListOfUcsNodes: lista con la informacion de cada nodo vecino con la forma ucsNode(_).
 calcUcsNodes(_Position, _Path, _Actions, _PathCost, [], []).
 
@@ -123,9 +123,9 @@ calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode,
     
 % calcActions(-Pos, -Energy, -NeighborsList, +ListOfActions)
 % Pos: posicion actual.
-% Energy: energía actual.
-% NeighborsList: lista de vecinos de la posición actual.
-% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energía restante, lista de acciones necesarias].
+% Energy: energÃ­a actual.
+% NeighborsList: lista de vecinos de la posiciÃ³n actual.
+% ListOfActions: lista que contiene, para cada vecino, una lista de la forma [nombre, turnos que lleva llegar, energÃ­a restante, lista de acciones necesarias].
 calcActions(_Pos, _Energy, [], []).
 
 	

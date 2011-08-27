@@ -1,5 +1,5 @@
-
-% DESIRE expansión(Nodo)
+ï»¿
+% DESIRE expansiÃ³n(Nodo)
 expansion(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
     esSeguro(X),
@@ -31,7 +31,7 @@ positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
 
 
-% X instanciado con todos los nodos a distancia máxima 2 de la zona
+% X instanciado con todos los nodos a distancia mÃ¡xima 2 de la zona
 aumento(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
     esSeguro(X),

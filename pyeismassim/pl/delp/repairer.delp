@@ -1,4 +1,4 @@
-reparar(Value, Agent) -<
+﻿reparar(Value, Agent) -<
 	b(teammateHealthInfo(Agent, Health, MaxHealth)),
 	teammateDisabled(Health, DisablePoints),
     b(distancia(_Position,[[repair, Agent]], Turns, EnergyLeft)),
