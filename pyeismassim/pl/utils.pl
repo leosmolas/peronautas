@@ -10,7 +10,7 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     retractall(isGoal(_)),	
     assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
+    ucsAux(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
@@ -29,12 +29,29 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 % Actions: lista de acciones necesarias para llegar al nodo.
 % Path_Cost: costo del camino encontrado.
 
+ucsAux(_Frontier, _Visited, [Position | Path], Actions, PathCost, Energy) :-
+    b(ucsNode(Position, Energy, Path, Actions, PathCost)),
+    isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)), !,
+    writeln('corte camino').
+    
+ucsAux(_Frontier, _Visited, Path, Actions, PathCost, Energy) :-
+    b(lastUcs(Frontier1, Visited)), !,
+    writeln('recomienzo ucs'),
+    ucs(Frontier1, Visited, Path, Actions, PathCost, Energy).
+    
+ucsAux(Frontier, Visited, Path, Actions, PathCost, Energy) :-
+    ucs(Frontier, Visited, Path, Actions, PathCost, Energy).
+
 ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
-    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
-    isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)).
+    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier1),
+    retractall(b(lastUcs(_, _))),
+    assert(b(lastUcs(Frontier1, [ucsNode(Position, Energy, Path, Actions, Path_Cost) | Visited]))),
+    assert(b(ucsNode(Position, Energy, Path, Actions, Path_Cost))),
+    isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)), !.
 	
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     ucsSelect(Frontier, Visited, SelectedNode, Frontier1),
+
     ucsNeighbors(SelectedNode, Neighbors),
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
@@ -60,14 +77,9 @@ ucsSelectAux(Node, Frontier, _Visited, Node, Frontier).
 addToFrontier([], Frontier, Frontier, Visited, Visited).
         
 addToFrontier([Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-
-    % not(member(ucsNode(Neighbor, _, _, _, _), OldVisited)),
-	% writeln('addToFrontier caso 2'),
     Neighbor = ucsNode(Node,  _, _, _, _),
-	% writeln('1'),
 	foreach(member(ucsNode(N, _, _, _, _), OldVisited), Node \= N), !,
-	% writeln('2'),
 	insert_pq(Neighbor, OldFrontier, NewFrontier),
-	% writeln('3'),
     addToFrontier(Neighbors, NewFrontier, Frontier, OldVisited, Visited).
     
 addToFrontier([_Neighbor | Neighbors], OldFrontier, Frontier, OldVisited, Visited) :-

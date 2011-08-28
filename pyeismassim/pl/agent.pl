@@ -529,7 +529,7 @@ run(Action) :-
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(6)),
+	calcTime(setNodesAtDistance(8)),
     calcTime(argumentation(Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
@@ -542,7 +542,7 @@ run(Action) :-
 run(Action) :-	
     intention(Meta),
     writeln(Meta),
-	calcTime(cutCondition(Meta)), !, 
+	cutCondition(Meta), !, 
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
@@ -646,7 +646,7 @@ planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
 
-assertPlan(Node, _FinalActions) :-
+assertPlan(_Node, _FinalActions) :-
     myPosition(InitialPosition),
     not(b(path(_, _, _, _, _, _, _, _))), !,
     retractall(intention(_)),
