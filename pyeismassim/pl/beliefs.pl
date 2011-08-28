@@ -21,7 +21,7 @@ setBeliefs :-
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
     calcTime(setPosibleExpansion), !,
-    calcTime(setPosibleAumento), !,
+    calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     % calcTime(setPosibleAuxilio), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
@@ -298,7 +298,7 @@ setDifPuntosExpansion :-
 % Aumento
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-setPosibleAumento :-
+setAumento :-
     myStatus(normal),
     myTeam(Team),
 	currentStep(Step),
@@ -310,23 +310,38 @@ setPosibleAumento :-
         setPosibleAumentoAux(FinalNode, Step, Team),
         Aumento
     ),
-    myPosition(Position), !,
-    foreach(
-        (
-            member(X, Aumento),
-            Position \= X,
-			b(nodeAtDistance(X, _))
-        ),
-        assert(b(posibleAumento(X)))
-    ), !,
+    setPosibleAumento(0, Aumento),
     calcTime(setPosibleAumentoDifPuntos), !,
     calcTime(setPosibleAumentoDistancia).
     
-setPosibleAumento.
+setAumento.
+
+setPosibleAumento(6, _Aumento) :- !.
+
+setPosibleAumento(_, _Aumento) :- 
+    b(posibleAumento(_)), !.
+
+setPosibleAumento(X, Aumento) :-
+    NewCost is X + 2,
+    foreach(
+        posibleAumento(X, Aumento, Nodo),
+        assert(b(posibleAumento(Nodo)))
+    ), !,
+    setPosibleAumento(NewCost, Aumento).
+    
+posibleAumento(X, Aumento, Nodo) :-
+    myPosition(MyPosition),
+    NewCost is X + 2,
+    member(Nodo, Aumento),
+    MyPosition \= Nodo,
+    b(nodeAtDistance(Nodo, Dist)),
+    Dist >= X,
+    Dist < NewCost.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
     b(frontera(Node)),	
     breadthFirst(Node, FinalNode, _Path, _Cost),
+    b(nodeAtDistance(FinalNode, _)),
     k(nodeTeam(Step, FinalNode, Team)), 
     Team \= MyTeam.
     

@@ -85,12 +85,7 @@ setEnemyDistance :-
 
 searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
     retractall(isGoal(_)),	
-    assert((
-        isGoal(ucsNode(FinalNode, RemainingEnergy, _, _, _)) :- 
-            myMaxEnergy(MaxEnergy),
-            HalfEnergy is MaxEnergy / 2 + 2,
-            RemainingEnergy >= HalfEnergy
-    )),
+    assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, ucsNode(Position, Energy, [], [], 0), 0),
     ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
