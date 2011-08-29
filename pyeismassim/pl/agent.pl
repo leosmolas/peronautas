@@ -698,10 +698,19 @@ replanning(reparar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
     currentStep(Step),
-    position(Step, Agent, EnemyPosition),
+    position(Step, Agent, Position2),
     retractall(isFail(_, _)),
-    searchPath(Position, EnemyPosition, Energy, [[repair, Agent]], 2),
+    searchPath(Position, Position2, Energy, [[repair, Agent]], 2),
     planning(reparar(Agent)).
+    
+replanning(auxilio(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, Position2),
+    retractall(isFail(_, _)),
+    searchPath(Position, Position2, Energy, [], 0),
+    planning(auxilio(Agent)).
     
 replanning(probear(Node)) :-
     myPosition(Position),
@@ -790,6 +799,15 @@ cutCondition(atacar(Agent)) :-
 	currentStep(Step),
 	status(Step, Agent, disabled),
     writeln('moli a palos al agente enemigo').
+    
+cutCondition(auxilio(_Agent)) :-
+	countTurns(5),
+    writeln('pasaron 5 turnos y no consegui ayuda').
+    
+cutCondition(auxilio(_Agent)) :-
+	myMaxHealth(Health),
+    myHealth(Health),
+    writeln('me curaron :D').
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
