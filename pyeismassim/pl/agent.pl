@@ -656,10 +656,10 @@ assertPlan(_Node, _FinalActions) :-
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
   
-assertPlan(Node, _FinalActions) :-
+assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
     
-    b(path(InitialPosition, Node, _, _, _, [], _, _)), !,
+    b(path(InitialPosition, Node, FinalActions, _, _, [], _, _)), !,
     retractall(intention(_)),
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
