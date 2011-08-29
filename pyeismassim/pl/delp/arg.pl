@@ -29,7 +29,7 @@ meta(X) :-
     foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
     foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
     foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
-    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
+    foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
     
     myPosition(Position),
     doNotFail(calcMeta(quedarse(Position))), !,
@@ -69,10 +69,10 @@ is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
 
 is_a_built_in(phase(_)). % delp revisara las fases
-
 is_a_built_in(role(_, _)).
-
 is_a_built_in(position(_, _)).
+is_a_built_in(myMaxHealth(_)).
+is_a_built_in(myHealth(_)).
 
 position(Agent, Position) :-
     currentStep(Step),

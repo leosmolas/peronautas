@@ -22,7 +22,7 @@ setBeliefs :-
     calcTime(setPosibleExpansion), !,
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
-    % calcTime(setPosibleAuxilio), !,
+    calcTime(setPosibleAuxilio), !,
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
@@ -253,13 +253,17 @@ setDifPuntosNode(Node, A, T) :-
     
 setDifPuntosNode(_Node, _A, _T).
 
+
 setDifPuntosSinMi :-
 	(b(difPuntosSinMi(_DifPuntos)) <- true), !.
 
 setDifPuntosSinMi :-
+    myStatus(disabled), !,
+    assert(b(difPuntosSinMi(0)) <- true).
+
+setDifPuntosSinMi :-
     
     b(actualPoints(ActualPoints)),
-
     setHypotheticalMap,
 	currentStep(Step),
     myName(Agent),
@@ -480,35 +484,31 @@ setDistanciaExplorar.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setPosibleAuxilio :-
+
     myHealth(Health),
     myMaxHealth(Max),
     Health < Max,
     foreach(
-        (
-            myTeam(MyTeam),
-            team(Agent, MyTeam),
-            role(Agent, repairer)
-        ),
+        posibleAuxilio(Agent),
         assert(b(posibleAuxilio(Agent)))
     ),
-    writeLenght(
-        'posibleAuxilio', 
-        Agent1, 
-        (
-            b(posibleAuxilio(Agent1))
-        )
-    ),
     b(posibleAuxilio(_)), !,
-    setDifPuntosSinMi,
-    setDistanciaAuxilio.
+    calcTime(setDifPuntosSinMi),
+    calcTime(setDistanciaAuxilio).
     
 setPosibleAuxilio.
+
+posibleAuxilio(Agent) :-
+    myName(MyName),
+    myTeam(MyTeam),
+    role(Agent, repairer),
+    team(Agent, MyTeam),    
+    Agent \= MyName.
     
 setDistanciaAuxilio :-
     myPosition(Position),
     myEnergy(Energy),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)), !,
     foreach(
         (
             currentStep(Step),
@@ -518,6 +518,4 @@ setDistanciaAuxilio :-
         (
             searchPath(Position, FinalNode, Energy, [], 0)
         )
-    ), !.
-    
-setDistanciaAuxilio.
+    ).

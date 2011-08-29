@@ -58,8 +58,6 @@ setTeammatePosition :-
     
 assertTeammatePosition(Agent) :-
 	currentStep(Step),
-    writeln(assertTeamMatePosition),
-    write(Agent),writeln(Position),
     position(Step, Agent, Position), !,
 	health(Step, Agent, Health), !, 
 	maxHealth(Step, Agent, MaxHealth), !,
@@ -74,7 +72,7 @@ setTeammateDistance :-
     position(Step, Name, Position),
     energy(Step, Name, Energy),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 15)),
     foreach(
         b(teammatePosition(Agent, Node)),
         (

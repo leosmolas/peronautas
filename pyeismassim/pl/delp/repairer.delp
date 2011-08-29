@@ -9,7 +9,7 @@
     
 repararValue(Turns, EnergyLeft, RolePoints, Coef, Value, Health, MaxHealth, DisablePoints) :-
     % writeln('llegue a repararValue'),
-    Value is ((10 - Turns) ** 2 + (12 - (12 * (Health/MaxHealth))) ** 2 + DisablePoints + EnergyLeft + RolePoints) * Coef.
+    Value is ((15 - Turns) ** 2 + (12 - (12 * (Health/MaxHealth))) ** 2 + DisablePoints + EnergyLeft + RolePoints) * Coef.
     
 is_a_built_in(repararValue(_Turns, _EnergyLeft, _RolePoints, _Coef, _Value, _Health, _MaxHealth, _DisablePoints)).
     
