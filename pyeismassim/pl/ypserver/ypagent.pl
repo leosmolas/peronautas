@@ -49,12 +49,14 @@ enviar(Receptor, Data) :-
 %descripcion: envia un dato a todos los agentes registrados en el servidor de paginas amarillas.
 
 broadcast(Caracteristica, Ontolgia, Data) :-
-    which_agents(ListofAgents, Caracteristica, Ontolgia, _Error), 
+    which_agents(AllAgents, Caracteristica, Ontolgia, _Error), 
     ip:name(Name),
-    delete(ListofAgents, Name, ListofAgentsOutMe),
-    write('    Comm: sending: '),write(Data),nl,
-    write('    Comm: to:      '),write(ListofAgents),nl,
-    send([receiver(ListofAgentsOutMe), content(Data)]).
+    delete(AllAgents, Name, OtherAgents),
+    write('    Comm: agents: '), writeln(AllAgents),
+    write('    Comm: name: '), writeln(Name),
+    write('    Comm: sending: '),writeln(Data),
+    write('    Comm: to:      '),writeln(OtherAgents),
+    send([receiver(OtherAgents), content(Data)]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %metodo: recibir/3 
@@ -99,31 +101,22 @@ recibirTodo(ListaDeMensajes, TimeOut):-
         append(ListaDeMensajesNuevos, [Message], ListaDeMensajes)
     ).
 
-functor2list(A,    A) :-
-    atom(A),
-    !.
-functor2list(Term, [Name, Argument]) :- 
-    functor(Term, Name, 1),
-    arg(1, Term, Argument).
-
+% recibirTodoSimple2([], TimeOut).
 recibirTodoSimple(ListaDeMensajes, TimeOut):-
     recv(Message,TimeOut),
+    %Message = [sender(a2),content([quedarse(vertex0),skip]),receiver(a1)],
     (
         Message = timeout,
         ListaDeMensajes = []
     ;
         (
             is_list(Message),
-            recibirTodo(ListaDeMensajesNuevos, TimeOut),
-            member(content(Datos), Message),
+            member(content([IntentionFunctor, ActionFunctor]), Message),
             member(sender(Emisor), Message),
-            (
-                functor2list(Datos, [Action, Parameter]),
-                append(ListaDeMensajesNuevos, [[Emisor, Action, Parameter]], ListaDeMensajes)
-            ;
-                functor2list(Datos, Action),
-                append(ListaDeMensajesNuevos, [[Emisor, Action]], ListaDeMensajes)
-            )
+            IntentionFunctor =.. IntentionList,
+            ActionFunctor =.. ActionList,
+            recibirTodoSimple(ListaDeMensajesNuevos, TimeOut),
+            ListaDeMensajes = [[Emisor, IntentionList, ActionList] | ListaDeMensajesNuevos]
         )
     ).
 

@@ -2,20 +2,15 @@
 
 communicateAndResolveConflicts(MyAction, _NewAction) :-
     intention(Intention),
-    write(  '    Comm: Broadcasting intention:'),writeln(Intention),
-    write(  '    Comm: Broadcasting action:   '),writeln(MyAction),
+    write(  '    Comm: Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
     broadcast(d3lp0r, mapc, [Intention, MyAction]),
     writeln('    Comm: Receiving teammate action list'),
-    %recibirTodoSimple(GoalActionList, 1),
-    myName(Receptor),
-    recibir(Emisor, Receptor, GoalActionList, 1),
-    write(  '    Comm: Emisor: '),writeln(Emisor),
-    write(  '    Comm: GoalActionList: '),writeln(GoalActionList),
+    recibirTodoSimple(IntentionActionList, 1),
     writeln('    Comm: Setting priorities'),
     phase(Phase),
-    setPriorities(Phase),
-    write(  '    Comm: Solving conflicts with '),writeln(GoalActionList),
-    solveConflicts(GoalActionList),
+    setPriorities(Phase),                
+    write(  '    Comm: Solving conflicts with '),writeln(IntentionActionList),
+    solveConflicts(IntentionActionList),
     writeln('    Comm: Done :D').
 
 setPriorities(exploracion) :-
@@ -45,10 +40,12 @@ setPriorities(expansion) :-
     assert(valorDeMeta(10, bloquear     )).
 
 solveConflicts([]) :- 
-    writeln('End of GoalActionList.').
+    writeln('End of IntentionActionList.').
 
-solveConflicts([[Goal, Action] | T]) :-
-    write("Goal is "), write(Goal), write(" and Action is "), write(Action),nl,
+solveConflicts([[Agent, Intention, Action] | T]) :-
+    write('Agent:         '), writeln(Agent),
+    write('    Intention: '), writeln(Intention), 
+    write('    Action:    '), writeln(Action),
     solveConflicts(T).
 
 
@@ -117,12 +114,12 @@ solveConflicts([[Goal, Action] | T]) :-
     % si la accion es efectivamente dañina o sea reduce en 10% puntos o esta en
     % conflicto, no se hace y se pasa a la accion siguiente considerando que la
     % accion que se realizara sera recharge
+    %
+    % por cada accion que pasa el checqueo, guardas cuantos puntos da
+    % si la accion es efectivamente dañina o sea reduce en 10% puntos o esta en
+    % conflicto, no se hace y se pasa a la accion siguiente considerando que la
+    % accion que se realizara sera recharge
     % si la accion que se cancela es la mia, hay que devolver que sera recharge
     % o algo mejor pero que no entre conflicto
 
     % todo: hacer que se broadcastee la meta del agente
-    % todo: asertar la informacion que viene en el sim start para decidir los
-    % cambios de fases
-    % todo: asegurarse que la info de los agentes enemigoss se aserta
-    % todo: hacer que se comparta el health y max health energy max energy
-
