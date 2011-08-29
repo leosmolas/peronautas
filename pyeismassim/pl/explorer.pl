@@ -10,22 +10,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rolMetas:-
-    foreach(b(posibleProbear(N)), doNotFail(calcMeta(probear(N)))).
+    writeln(1),
+    foreach(
+        b(posibleProbear(N)), 
+        doNotFail(calcMeta(probear(N)))
+    ),
+    writeln(2).
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Probear
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% probed(vertex0).
-% probed(vertex1).
-% probed(vertex3).
 
 rolSetBeliefs :-
-    myStatus(normal),
+    myStatus(normal), !,
     calcTime(setPosibleProbear),
-    calcTime(rolSetDifPuntos),
-    calcTime(rolSetDistancia).
+    calcTime(setInZone),
+    calcTime(rolSetDistancia),
+    calcTime(rolSetDifPuntos).
     
 rolSetBeliefs.
 
@@ -61,15 +64,29 @@ rolSetDifPuntos:-
     myName(A),
     myTeam(T),
     writeLenght(
-        'posibleProbear', 
+        'posibleProbear dif puntos', 
         Node1, 
-        b(posibleProbear(Node1))
+        posibleProbearDif(Node1)
     ),
     foreach(
-        b(posibleProbear(Node)),
+        posibleProbearDif(Node),
         setDifPuntosNode(Node, A, T)
-    ).
+    ),
+    rolSetDifPuntosSinMi.
     
+rolSetDifPuntosSinMi :-
+    b(posibleProbear(Node)),
+    (b(distancia(Node, [[probe]], PathCost, _RemainingEnergy)) <- true),
+    PathCost >= 3, !,
+    setDifPuntosSinMi, !.
+    
+rolSetDifPuntosSinMi.
+    
+posibleProbearDif(Node) :-
+    b(posibleProbear(Node)),
+    (b(distancia(Node, [[probe]], PathCost, _RemainingEnergy)) <- true),
+    PathCost < 3.
+        
 rolSetDistancia :-
     myPosition(Position),
     myEnergy(Energy),
@@ -77,12 +94,9 @@ rolSetDistancia :-
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
         b(posibleProbear(Node)),
-        (
-			
-            searchPath(Position, Node, Energy, [[probe]], 1)
-        )
-    ),
-    printFindAll('paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
+        searchPath(Position, Node, Energy, [[probe]], 1)
+
+    ).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
