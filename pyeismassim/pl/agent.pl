@@ -30,6 +30,7 @@
            plan/1,
            intention/1,
            countTurns/1,
+           verbose/0,
            myVisionRange/1.
 
 :- [graph/map, 
@@ -560,8 +561,7 @@ run(Action) :-
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(6)),
     intention(Meta),
-    writeln(Meta),
-	replanning(Meta), !,
+	calcTime(replanning(Meta)), !,
     exec(Action),
     writeln(Action),
     retractall(b(_)),
@@ -595,6 +595,7 @@ argumentation(Meta) :-
     assert(intention(Meta)).
 
 calcTime(Exec) :-
+    verbose, !,
     write('<predicate name="'),write(Exec), writeln('">'),
     get_time(Before),
     call(Exec),
@@ -602,6 +603,8 @@ calcTime(Exec) :-
     Time is (After - Before) * 1000,
     write('<time value="'),write(Time), writeln('"/>'),
     writeln('</predicate>').
+    
+calcTime(Exec) :- call(Exec).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
@@ -908,13 +911,14 @@ printList([H | T]) :-
 %------------------------------------------------------------------------------%
 
 printFindAll(Title, WhatToFind) :-
+    verbose,
     findall(WhatToFind, WhatToFind, L),
     % sort(L, SL),
     write(Title),
     nl,
     printList(L).
 
-
+printFindAll(_Title, _WhatToFind).
 
 %------------------------------------------------------------------------------%
 dumpKB :-
