@@ -26,6 +26,7 @@ setBeliefs :-
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
+    
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Utils
@@ -80,6 +81,19 @@ visibleNode(N) :-
     retract(notVisible(N)),
     asserta(visibleNode(N)).
     
+
+writeLenght(Name, Node, Pattern) :-
+    verbose, !,
+    findall(
+        Node, 
+        Pattern,
+        ListExpansion
+    ),
+    length(ListExpansion, L1),
+   
+    write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
+    
+writeLenght(_Name, _Node, _Pattern).
     
 % toogleOnVisibleNode(+Node)
 % si el nodo ya estÃ¡ marcado como visible, no hace nada
@@ -213,16 +227,6 @@ setDistanciaExpansion :-
     
 setDistanciaExpansion.
 
-writeLenght(Name, Node, Pattern) :-
-    findall(
-        Node, 
-        Pattern,
-        ListExpansion
-    ),
-    length(ListExpansion, L1),
-   
-    write('<cant name="'), write(Name),write('" value='), write(L1), writeln('/>').
-    
 setDifPuntosNode(Node, A, T) :-
     
     % write('Node: '), writeln(Node),
