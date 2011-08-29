@@ -18,6 +18,7 @@ class Agent():
         self.useLog   = useLog
         self.dummy    = dummy
         self.verbose  = verbose
+        self.auxTimeDummy = 10 #10 milisegundos para ejecutar dummy
         if useLog:
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
@@ -100,8 +101,9 @@ class Agent():
         while (not quitPerceiveActLoop):
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
-            time.sleep(0.5)
+            # time.sleep(0.5)
             if (msg_type == 'request-action'):
+                self.turnStartTime = time.time()
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
@@ -328,10 +330,16 @@ class PrologAgent(Agent):
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # self.prolog.query("argumentation").next()
+        self.startRunTime = time.time()
+        # print "turn time:", msg_dict_private['total_time'], "ms"
+        self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
+        # print "percept processing time: ", self.processingTime, "ms"
+        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
+        # print "remaining time: ", self.remainingTime, "segs"
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
         else:
-            query_result = self.prolog.query("run(X)").next()
+            query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
