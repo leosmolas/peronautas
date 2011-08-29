@@ -762,6 +762,12 @@ cutCondition(Meta) :-
     Team \= MyTeam,
     role(Agent, saboteur),
     writeln('hay un enemigo saboteador en mi nodo').
+    
+cutCondition(Meta) :-
+    Meta \= reparar(_),
+    Meta \= auxilio(_),
+    myStatus(disabled),
+    writeln('me mataron').
 
 cutCondition(explorar(Node)) :-
 	explored(Node),

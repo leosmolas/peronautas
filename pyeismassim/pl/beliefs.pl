@@ -8,7 +8,6 @@
     
 setBeliefs :-
     
-    write('setBeliefs'),nl,
     myTeam(T),
     teamPoints(T, ActualPoints),
     assert(b(actualPoints(ActualPoints))), !,
@@ -90,18 +89,16 @@ toogleOnVisibleNode(Node) :-
     
 toogleOnVisibleNode(Node) :-
     retractall(notVisible(Node)),
-    % write('1.3 retract '),write(Agent),nl,
     asserta(visibleNode(Node)).
-    % write('1.4 asserta '),write(Agent),nl.
     
 toogleOffVisibleNodes :-
     foreach(
-                visibleNode(N),
-                (
-                    retract(visibleNode(N)),
-                    assert(notVisible(N))
-                )
-           ).
+        visibleNode(N),
+        (
+            retract(visibleNode(N)),
+            assert(notVisible(N))
+        )
+   ).
     
 agentsRangeVision(Step, MyTeam, Range, Position) :-
     team(Agent, MyTeam),
@@ -311,8 +308,8 @@ setAumento :-
         Aumento
     ),
     setPosibleAumento(0, Aumento),
-    calcTime(setPosibleAumentoDifPuntos), !,
-    calcTime(setPosibleAumentoDistancia).
+    calcTime(setPosibleAumentoDistancia), !, 
+    calcTime(setPosibleAumentoDifPuntos), !.
     
 setAumento.
 
@@ -348,10 +345,20 @@ setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
 setPosibleAumentoDifPuntos :-
     myName(A),
     myTeam(T),
+    writeLenght(
+        'posibleAumento', 
+        Node, 
+        (
+            b(posibleAumento(Node)),
+            not(b(difPuntosZona(Node, _)) <- true),
+            (b(distancia(Node, [], _, _)) <- true)
+        )
+    ),
     foreach(
         (
             b(posibleAumento(Node5)),
-            not(b(difPuntosZona(Node5, _DifPuntos3)) <- true)
+            not(b(difPuntosZona(Node5, _DifPuntos3)) <- true),
+            (b(distancia(Node5, [], _PathCost, _RemainingEnergy)) <- true)
         ),
         setDifPuntosNode(Node5, A, T)
     ).
@@ -361,9 +368,8 @@ setPosibleAumentoDistancia :-
         'posibleAumento', 
         Node13, 
         (
-            b(posibleAumento(Node13)),
-            (b(difPuntosZona(Node13, DifPuntos13)) <- true),
-            DifPuntos13 > 0
+            b(posibleAumento(Node13))
+
         )
     ),
     retractall(isFail(_)),
@@ -372,18 +378,12 @@ setPosibleAumentoDistancia :-
     myPosition(Position),
     foreach(
         (
-            b(posibleAumento(Node1)),
-            (b(difPuntosZona(Node1, DifPuntos1)) <- true),
-            DifPuntos1 > 0
+            b(posibleAumento(Node1))
         ),
         (
             searchPath(Position, Node1, Energy, [], 0)
-
         )
     ).
-    
-
-
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -458,7 +458,6 @@ setDistanciaExplorar :-
             b(posibleExplorar(Node12))
         )
     ),
-	printFindAll('b(posibleExplorar(Node))', b(posibleExplorar(_Node))),
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
@@ -480,7 +479,6 @@ setPosibleAuxilio :-
     myHealth(Health),
     myMaxHealth(Max),
     Health < Max,
-    writeln(1),
     foreach(
         (
             myTeam(MyTeam),
@@ -498,7 +496,6 @@ setPosibleAuxilio :-
     ),
     b(posibleAuxilio(_)), !,
     setDifPuntosSinMi,
-    writeln(2),
     setDistanciaAuxilio.
     
 setPosibleAuxilio.
@@ -506,10 +503,8 @@ setPosibleAuxilio.
 setDistanciaAuxilio :-
     myPosition(Position),
     myEnergy(Energy),
-    writeln(3),
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)), !,
-    writeln(4),
     foreach(
         (
             currentStep(Step),
@@ -519,7 +514,6 @@ setDistanciaAuxilio :-
         (
             searchPath(Position, FinalNode, Energy, [], 0)
         )
-    ),
-    writeln(5), !.
+    ), !.
     
 setDistanciaAuxilio.

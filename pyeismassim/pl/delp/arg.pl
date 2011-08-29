@@ -25,14 +25,14 @@ doNotFail(_).
 % Realiza todo el ciclo de argumentación, teniendo previamente todo lo que necesita asertado.
    
 meta(X) :-     
-    assert(mejorMeta(_, -1000)), !, writeln('Meta 1'), % meta con "menos infinito"
-    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !, writeln('Meta 2'),
-    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !, writeln('Meta 3'),
-    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, writeln('Meta 4'),
-    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !, writeln('Meta 5'),
+    assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
+    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
+    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
+    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
+    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
     
     myPosition(Position),
-    doNotFail(calcMeta(quedarse(Position))), !, writeln('Meta quedarse'),
+    doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
     
@@ -42,12 +42,13 @@ meta(X) :-
     retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    writeln(X),
+
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
-    writeln(Answer), 
+    % writeln(Answer), 
     Answer = yes, !,
+    writeln(X),
     writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,

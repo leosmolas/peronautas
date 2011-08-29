@@ -31,12 +31,10 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 
 ucsAux(_Frontier, _Visited, [Position | Path], Actions, PathCost, Energy) :-
     b(ucsNode(Position, Energy, Path, Actions, PathCost)),
-    isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)), !,
-    writeln('corte camino').
+    isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)), !.
     
 ucsAux(_Frontier, _Visited, Path, Actions, PathCost, Energy) :-
     b(lastUcs(Frontier1, Visited)), !,
-    writeln('recomienzo ucs'),
     ucs(Frontier1, Visited, Path, Actions, PathCost, Energy).
     
 ucsAux(Frontier, Visited, Path, Actions, PathCost, Energy) :-
@@ -121,16 +119,13 @@ calcUcsNodes(_Position, _Path, _Actions, _PathCost, [], []).
 calcUcsNodes(Position, Path, Actions, PathCost, [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions], Neighbors2) :-
     append(Actions, ListOfActions, NewActions),
     NewPathCost is PathCost + Turns,
-    % writeln('calcUcsNodes'),
     calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, ucsNode(Neigh, RemainingEnergy, [Position | Path], NewActions, NewPathCost), Neighbors2).
 
 calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode, Neighbors) :-
     isFail(UcsNode), !,
-    % writeln('isFail'),
     calcUcsNodes(Position, Path, Actions, PathCost, ListOfListOfActions, Neighbors).
     
 calcUcsNodesAux(Position, Path, Actions, PathCost, ListOfListOfActions, UcsNode, [UcsNode | Neighbors]) :-
-    % writeln('calcUcsNodesAux'),
     calcUcsNodes(Position, Path, Actions, PathCost, ListOfListOfActions, Neighbors).
     
 % calcActions(-Pos, -Energy, -NeighborsList, +ListOfActions)
@@ -142,13 +137,8 @@ calcActions(_Pos, _Energy, [], []).
 
 	
 calcActions(Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions]) :-
-    % writeln('calcActions'),
-    % writeln('1'),
-    % writeln((Pos, Energy, [Neigh | Neighs], [[Neigh, Turns, RemainingEnergy, ListOfActions] | ListOfListOfActions])),
     k(edge(Pos, Neigh, Value)),
-    % writeln('2'),
     calcRecharge(Energy, Value, [[goto, Neigh]], ListOfActions, 1, Turns, RemainingEnergy), !,
-    % writeln('3'),
     calcActions(Pos, Energy, Neighs, ListOfListOfActions).
     
 calcActions(Pos, Energy, [_Neigh | Neighs], ListOfListOfActions) :-
@@ -164,28 +154,20 @@ calcActions(Pos, Energy, [_Neigh | Neighs], ListOfListOfActions) :-
 % NewTurns: turnos usados por todas las acciones.
 % RemainingEnergy: Energia restante al terminar de ejecutar las acciones.
 calcRecharge(Energy, _Value, _OldList, _OldList2, _Turns, _Turns2, _RemainingEnergy) :- 
-    % writeln('calcRecharge'),nl,
-    % writeln('1'),nl,
     currentStep(Step),
     myName(Name),
-    % writeln('2'),nl,
     maxEnergy(Step, Name, Max),
     Energy > Max, !,
-    % writeln('Energy > Max'),writeln(Energy), write(Max),nl,
     fail.
 
 calcRecharge(Energy, Value, OldList, OldList, Turns, Turns, RemainingEnergy) :-
-    % writeln('3'),nl,
     Energy >= Value, !,
-    % writeln('4'),nl,
     RemainingEnergy is Energy - Value.
 
 calcRecharge(Energy, Value, OldList, NewList, OldTurns, NewTurns2, RemainingEnergy) :-
     myRechargeEnergy(RechargeEnergy),
-    % writeln('5'),nl,
     NewTurns is OldTurns + 1,
     NewEnergy is Energy + RechargeEnergy,
-    % writeln('6'),nl,
     calcRecharge(NewEnergy, Value, [[recharge] | OldList], NewList, NewTurns, NewTurns2, RemainingEnergy).
 
 	
@@ -197,12 +179,9 @@ breadthFirst(InitialNode, FinalNode, Path, Cost) :-
     bfs([bfsNode(InitialNode, [InitialNode], 0)], [InitialNode], bfsNode(FinalNode, Path, Cost)).
 
 bfs([bfsNode(Node, Path, Cost) | _RestOfFrontier], _Visited, bfsNode(Node, Path, Cost)) :- 
-    % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, _RestOfFrontier),
     isGoal(Node, Cost).
     
 bfs([bfsNode(Node, Path, Cost) | RestOfFrontier], Visited, Result) :- 
-    % remove_from_queue(bfsNode(Node, Path, Cost), Frontier, RestOfFrontier),
-    %(bagof(Child, moves(Next_record, Open, Closed, Child), Children);Children = []),
     findall(Neighbor,
             k(edge(Node, Neighbor, _)),
             Neighbors),
@@ -229,10 +208,7 @@ add_list_to_queue([H|T], Path, Cost, Queue, NewQueue) :-
     add_to_queue(bfsNode(H, [H | Path], NewCost), Queue, TempQueue),
     add_list_to_queue(T, Path, Cost, TempQueue, NewQueue).
 
-% add_to_queue(E, [], [E]).
-% add_to_queue(E, [H|T], [H|Tnew]) :- add_to_queue(E, T, Tnew).
-
-add_to_queue(E, L, [E|L]).
+    add_to_queue(E, L, [E|L]).
 
 remove_from_queue(E, [E|T], T).
 
@@ -241,8 +217,3 @@ append_queue(First, Second, Concatenation) :-
 	
 add_to_set(X, S, S) :- member(X, S), !.
 add_to_set(X, S, [X|S]).	
-
-
-testBfs(R) :-
-    assert((isGoal(_Node2, Cost) :- !, myVisionRange(Range), Cost < Range)),
-	bfs([bfsNode(vertex0, [vertex0], 0)], [], R).
