@@ -37,6 +37,8 @@
     utils, 
     beliefs].
     
+% :- use_module(library(time)).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -509,8 +511,25 @@ checkLastAction :-
 %                                      Run                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-run(Action) :-
-
+% TimeLimit in seconds
+run(TimeLimit, Action) :-
+    write('time limit: '),writeln(TimeLimit),
+    catch( % try
+        call_with_time_limit(TimeLimit, run2(Action)), 
+        % run2(Action),
+        E, 
+        ( % except :
+            write('ERROR!!!!!!!!!!!!: '),
+            print_message(K, E), 
+            writeln('Executing dummy now:'),
+            retractall(b(_)),
+            retractall(b(_) <- true),
+            execDummy(Action)
+        )
+    ).
+    
+    
+run2(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     checkLastAction,
@@ -540,7 +559,7 @@ run(Action) :-
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 
-run(Action) :-	
+run2(Action) :-	
     intention(Meta),
     writeln(Meta),
 	cutCondition(Meta), !, 
@@ -557,7 +576,7 @@ run(Action) :-
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 	    
-run(Action) :-	
+run2(Action) :-	
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(6)),
     intention(Meta),
@@ -568,7 +587,7 @@ run(Action) :-
     toogleOffVisibleNodes.	
 
 	
-run(Action) :-	
+run2(Action) :-	
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(argumentation(Meta)), !,

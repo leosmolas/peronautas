@@ -150,6 +150,7 @@ def parse_request_action(xml, output = 'dict'):
             'type'                : 'request-action'             ,
             'timestamp'           : message_tag['timestamp']     ,
             'deadline'            : perception_tag['deadline']   ,
+            'total_time'          : int(perception_tag['deadline']) - int(message_tag['timestamp']),
             'id'                  : perception_tag['id']         ,
             'step'                : simulation_tag['step']       ,
             'energy'              : self_tag['energy']           ,
@@ -166,6 +167,7 @@ def parse_request_action(xml, output = 'dict'):
             'money'               : team_tag['money']            ,
             'score'               : team_tag['score']            
             }
+        print 'deadline',perception_tag['deadline']
         result_public = { 
             'position'  : [{ 
                 u'name'     : u'self'              , 
