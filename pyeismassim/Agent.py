@@ -12,11 +12,12 @@ from pyswip.easy                    import *
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy):
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, verbose):
         self.username = USER
         self.password = PASS
         self.useLog   = useLog
         self.dummy    = dummy
+        self.verbose  = verbose
         if useLog:
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
@@ -141,6 +142,8 @@ class PrologAgent(Agent):
         self.prolog.consult("pl/agent.pl")
         if (log):
             self.prolog.query("redirect_output('logs/%s-kb%d.xml')" % (self.username, self.currentLoop)).next()
+        if self.verbose:
+            self.prolog.query("assert(verbose)").next()
         print "done"
 
 
@@ -353,10 +356,11 @@ if (__name__== "__main__"):
     parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
     parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
     parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
+    parser.add_argument('-v',                                            help="verbose mode",                                  action='store_const', const=True, dest='verbose')
     
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy, args.verbose)
     agent.mainLoop()
 
