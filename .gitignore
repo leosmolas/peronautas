@@ -3,12 +3,11 @@
 *.BAK
 *.db
 *.py~
+*.log
 massim/scripts/.tmp_serverconfig.xml
 pyeismassim/run.sh
 *~
-pyeismassim/*-kb*.txt
-pyeismassim/*-log*.txt
-pyeismassim/logs/*-kb*.txt
+pyeismassim/logs/*-kb*.xml
 pyeismassim/logs/*-log*.txt
 pyeismassim/logs/*.pl
 pyeismassim/runw.sh
