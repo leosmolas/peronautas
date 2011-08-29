@@ -803,6 +803,11 @@ cutCondition(atacar(Agent)) :-
 cutCondition(auxilio(_Agent)) :-
 	countTurns(5),
     writeln('pasaron 5 turnos y no consegui ayuda').
+    
+cutCondition(auxilio(_Agent)) :-
+	myMaxHealth(Health),
+    myHealth(Health),
+    writeln('me curaron :D').
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
