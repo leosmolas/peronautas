@@ -100,10 +100,13 @@ class Agent():
         while (not quitPerceiveActLoop):
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
-            time.sleep(0.5)
+            # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
+                if msg_dict_private['step'] == '0':
+                    # print 'position', msg_dict_public['position']
+                    msg_dict_public['position'][0]['role'] = self.role
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
@@ -280,6 +283,8 @@ class PrologAgent(Agent):
                                                                                   p['health'], 
                                                                                   p['max_health'], 
                                                                                   p['vis_range'])).next()
+                if 'role' in p:
+                    self.prolog.query("assertOnce(k(agentRole(%s, %s)))" % (p['name'], p['role'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
@@ -320,14 +325,13 @@ class PrologAgent(Agent):
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        #print "\n@PrologAgent: PERCEPTION:"
-        #print_message(msg_dict_public)
-        #print ""
+        # print "\n@PrologAgent: PERCEPTION:"
+        # print_message(msg_dict_public)
+        # print 
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        
-        # self.prolog.query("argumentation").next()
+
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
         else:
