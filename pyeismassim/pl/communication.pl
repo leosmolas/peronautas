@@ -9,43 +9,40 @@ communicateAndResolveConflicts(MyAction, _NewAction) :-
     writeln('    Comm: Setting priorities'),
     phase(Phase),
     setPriorities(Phase),                
-    write(  '    Comm: Solving conflicts with '),writeln(IntentionActionList),
-    solveConflicts(IntentionActionList),
-    writeln('    Comm: Done :D').
+    writeln('    Comm: Ordering ActionList using priorities... original IntentionActionList is:'),writeln(IntentionActionList),
+    sort(IntentionActionList, OrderedIAList),
+    write(  '    Comm: Solving conflicts with '),writeln(OrderedIAList),
+    solveConflicts(IntentionActionList, MyNewAction),
+    write(  '    Comm: Done resolving conflicts; my action is now '), writeln(MyNewAction).
 
 setPriorities(exploracion) :-
     retractall(valorDeMeta(_,_)),
     assert(valorDeMeta(1,  probear      )),
     assert(valorDeMeta(2,  explorar     )),
     assert(valorDeMeta(3,  aumento      )),
-    assert(valorDeMeta(4,  expandirse   )),
+    assert(valorDeMeta(4,  expansion    )),
     assert(valorDeMeta(5,  atacar       )),
     assert(valorDeMeta(6,  reparar      )),
-    assert(valorDeMeta(7,  inspectar    )),
-    assert(valorDeMeta(8,  bloquear     )),
-    assert(valorDeMeta(9,  defender     )),
-    assert(valorDeMeta(10, romperzonas  )).
-
-setPriorities(expansion) :-
-    retractall(valorDeMeta(_,_)),
-    assert(valorDeMeta(1,  aumento      )),
-    assert(valorDeMeta(2,  expandirse   )),
-    assert(valorDeMeta(3,  romperzonas  )),
-    assert(valorDeMeta(4,  defender     )),
-    assert(valorDeMeta(5,  probear      )),
-    assert(valorDeMeta(6,  explorar     )),
-    assert(valorDeMeta(7,  atacar       )),
-    assert(valorDeMeta(8,  reparar      )),
+    assert(valorDeMeta(7,  defender     )),
+    assert(valorDeMeta(8,  auxilio      )),
     assert(valorDeMeta(9,  inspectar    )),
-    assert(valorDeMeta(10, bloquear     )).
+    assert(valorDeMeta(10, bloquear     )),
+    assert(valorDeMeta(11, romperzonas  )),
+    assert(valorDeMeta(12, quedarse     )).
 
 solveConflicts([]) :- 
     writeln('End of IntentionActionList.').
 
-solveConflicts([[Agent, Intention, Action] | T]) :-
-    write('Agent:         '), writeln(Agent),
-    write('    Intention: '), writeln(Intention), 
-    write('    Action:    '), writeln(Action),
+solveConflicts([[Intention, Action, Agent] | T]) :-
+    member([Intention, OtherAction, OtherAgent], T),
+    (
+        Intention = probear(X)
+        ;
+        Intention = reparar(X)
+        ;
+        Intention = inspectar(X)
+    ),
+    writeln('    Comm: two agents are trying to do the same!'),
     solveConflicts(T).
 
 
