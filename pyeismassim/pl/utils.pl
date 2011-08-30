@@ -29,21 +29,25 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 % Actions: lista de acciones necesarias para llegar al nodo.
 % Path_Cost: costo del camino encontrado.
 
-ucsAux(_Frontier, _Visited, [Position | Path], Actions, PathCost, Energy) :-
-    b(ucsNode(Position, Energy, Path, Actions, PathCost)),
+ucsAux(_Frontier, _Visited, [Position | Path], Actions, PathCost, Energy) :-    b(ucsNode(Position, Energy, Path, Actions, PathCost)),
     isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)), !.
+    
+ucsAux(_Frontier, _Visited, _Path, _Actions, _PathCost, _Energy) :-
+    b(lastUcs(Frontier1, _)),
+    empty_heap(Frontier1), !,
+    fail.
     
 ucsAux(_Frontier, _Visited, Path, Actions, PathCost, Energy) :-
     b(lastUcs(Frontier1, Visited)), !,
     ucs(Frontier1, Visited, Path, Actions, PathCost, Energy).
     
 ucsAux(Frontier, Visited, Path, Actions, PathCost, Energy) :-
-    ucs(Frontier, Visited, Path, Actions, PathCost, Energy).
+    ucs(Frontier, Visited, Path, Actions, PathCost, Energy), !.
 
 ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
-    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier1),
+    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
     retractall(b(lastUcs(_, _))),
-    assert(b(lastUcs(Frontier1, [ucsNode(Position, Energy, Path, Actions, Path_Cost) | Visited]))),
+    assert(b(lastUcs(Frontier, Visited))),
     assert(b(ucsNode(Position, Energy, Path, Actions, Path_Cost))),
     isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)), !.
 	
@@ -54,12 +58,7 @@ ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
-minEnergy(Energy1, Energy2, Energy1) :-
-    Energy1 < Energy2, !.
 
-minEnergy(_Energy1, Energy2, Energy2).
-        
-        
 ucsSelect(OldFrontier, Visited, Node, NewFrontier) :-
     get_from_heap(OldFrontier, _P, Node2, Frontier),
     ucsSelectAux(Node2, Frontier, Visited, Node, NewFrontier).

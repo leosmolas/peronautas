@@ -10,12 +10,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rolMetas:-
-    writeln(1),
     foreach(
         b(posibleProbear(N)), 
         doNotFail(calcMeta(probear(N)))
-    ),
-    writeln(2).
+    ).
 
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

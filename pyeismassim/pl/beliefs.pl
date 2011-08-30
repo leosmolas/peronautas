@@ -23,6 +23,7 @@ setBeliefs :-
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
+    printFindAll('difPuntosSinMi', b(difPuntosSinMi(_)) <- true),
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
@@ -386,7 +387,8 @@ setPosibleAumentoDistancia :-
     myPosition(Position),
     foreach(
         (
-            b(posibleAumento(Node1))
+            b(posibleAumento(Node1)),
+            not(b(distancia(Node1, [], _, _))<-true)
         ),
         (
             searchPath(Position, Node1, Energy, [], 0)

@@ -37,7 +37,11 @@
     utils, 
     beliefs].
     
+
 % :- use_module(library(time)).
+
+% :- set_prolog_flag(debug_on_error, false).
+
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -550,7 +554,14 @@ run2(Action) :-
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(8)),
-    calcTime(argumentation(Meta)), !,
+    catch(
+        calcTime(argumentation(Meta)),
+        E,
+        (
+            writeln(E),
+            a<a
+        )
+    ), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
     exec(Action),
@@ -584,6 +595,7 @@ run2(Action) :-
     exec(Action),
     writeln(Action),
     retractall(b(_)),
+    retractall(b(_) <- true),
     toogleOffVisibleNodes.	
 
 	
