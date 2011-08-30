@@ -21,7 +21,10 @@ rolMetas.
 
 rolSetBeliefs :-
     myStatus(normal), !,
-    calcTime(setPosibleInspectar).
+    calcTime(setPosibleInspectar),
+    rolSetDistancia,
+    setDifPuntosSinMi,
+    printFindAll('beliefs inspector', b(posibleInspectar(Agent, PosicionAgente))).
 
 rolSetBeliefs.
 
@@ -87,7 +90,8 @@ setPosibleInspectar :-
             ,(
               buscarEnemigos(Vecino, CantEnemigosVecino),
               CantEnemigosConAgenteVecino is CantEnemigosVecino + 1,
-              assert(b(posibleInspectar(Agent, Vecino, CantEnemigosConAgenteVecino)))
+              assert(b(posibleInspectar(Agent, Vecino))),
+              assert(b(posibleInspectarConEnemigos(Agent, Vecino, CantEnemigosConAgenteVecino))<-true)
             )
         ),
         assert(b(posibleInspectar(Agent, PosicionAgente, CantEnemigosConAgenteVisible)))
@@ -109,6 +113,21 @@ enemigosPosicion(Step, Posiciones):-
     ,
       Posiciones
     ).
+
+rolSetDistancia :-
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, Position),
+    energy(Step, Name, Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    foreach(
+        b(posibleInspectar(_Enemy, Node)),
+        (
+            searchPath(Position, Node, Energy, [[inspect]], 2)
+        )
+    ),
+    printFindAll('paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
 
 %------------------------------  Attack  --------------------------------%
 
