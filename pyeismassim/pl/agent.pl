@@ -486,20 +486,20 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    Recharge is round(MaxEnergy * 0.5). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
     status(Step, Agent, disabled), !,
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2).
+    Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -531,8 +531,15 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
-    
+    ), !.
+   
+run(TimeLimit, _) :- 
+	retractall(b(_)),
+    retractall(b(_) <- true),
+    retractall(intention(_)),
+    assert(intention(quedarse(_))),
+	writeln('Run: caso de stop iteration'),
+	planning(quedarse(_)).
     
 run2(Action) :-
     currentStep(Step),

@@ -45,6 +45,16 @@ aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
     
 is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
+reagruparse(Value) -< 
+    b(distanciaAZona(DistaciaZona)),
+	b(agentesEnZona(AgentesEnZona)),
+    phaseCoef(reagruparse, Coef),
+    reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value).
+
+reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value) :-
+    Value is (DistaciaZona * 10 + ((10 - AgentesEnZona) ** 2) * 2) * Coef. 
+    
+is_a_built_in(reagruparseValue(_DistaciaZona, _AgentesEnZona, _Coef, _Value)).	   
 	   
 auxilio(Value, Repairer) -<
 	position(Repairer, Nodo),

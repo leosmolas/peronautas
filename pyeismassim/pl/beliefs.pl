@@ -23,6 +23,7 @@ setBeliefs :-
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
+	calcTime(setReagruparse), !,
     printFindAll('difPuntosSinMi', b(difPuntosSinMi(_)) <- true),
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
@@ -324,7 +325,7 @@ setAumento :-
             currentStep(Step),
             k(nodeTeam(Step, Node, none)),
             b(nodeAtDistance(Node, Distance)),
-            Distance < 6
+            Distance < 4
     )),
 	assert((
         isFail(_, Cost2) :- 
@@ -370,8 +371,12 @@ posibleAumento(X, Aumento, Nodo) :-
     Dist < NewCost.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
-    b(frontera(Node)),	
-    b(nodeAtDistance(Node, _)),
+    currentStep(Step),	
+	b(frontera(Node)),	
+	position(Step, Agent, Node),
+	team(Agent, MyTeam),
+    b(nodeAtDistance(Node, Distance)),
+	Distance =< 5,
     breadthFirst(Node, FinalNode, _Path, _Cost),
     k(nodeTeam(Step, FinalNode, Team)), 
     Team \= MyTeam.
@@ -553,3 +558,64 @@ assertAuxilioIsFail :-
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)), !.
     
 assertAuxilioIsFail.
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reagruparse
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+setReagruparse :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	setAgentesEnZona.
+	
+setReagruparse.
+
+% Hay alguna zona, el goal es un nodo de mi color.
+assertReagruparseGoal :- 
+	currentStep(Step),
+	myTeam(MyTeam),
+	k(nodeTeam(Step, _Node, MyTeam)), !,
+	retractall(isGoal(_)),
+    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
+		currentStep(Step),
+		myTeam(MyTeam),
+		k(nodeTeam(Step, FinalNode, MyTeam))
+	)).
+
+% No hay ninguna zona, el goal es un agente de mi equipo.
+assertReagruparseGoal :- 
+	retractall(isGoal(_)),
+    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
+		currentStep(Step),
+		myName(MyName),
+		myTeam(MyTeam),
+		position(Step, Agent, FinalNode),
+		Agent \= MyName,
+		team(Agent, MyTeam)		
+	)).
+	
+setPathReagruparse :-
+	myPosition(InitialNode),
+	myEnergy(Energy),
+    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    write('pathSearchReagruparse'),
+    ucsAux(InitialFrontier, [], Path, Actions, PathCost, RemainingEnergy),     
+	assert(b(distanciaAZona(PathCost)) <- true),
+    assert(b(pathReagruparse(InitialNode, Energy, Path, Actions, PathCost, RemainingEnergy))).    
+
+setAgentesEnZona :-
+	currentStep(Step),
+	myTeam(MyTeam),
+	findall(
+		Agent,
+		(
+			team(Agent, MyTeam),
+			position(Step, Agent, Node),
+			k(nodeTeam(Step, Node, MyTeam))
+		),
+		AgentesEnZona
+	),
+	length(AgentesEnZona, Cantidad),
+	assert(b(agentesEnZona(Cantidad)) <- true).
+	
