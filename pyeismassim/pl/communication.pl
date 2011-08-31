@@ -1,18 +1,40 @@
 :- dynamic valorDeMeta/2.
 
+dummy(IntentionActionList, ValuedIntentionList) :-
+    findall(
+        [Value, Agent, Action, Intention],
+        (
+            % Intention = [quedarse, vertex0]
+            member([Intention, Agent, Action], IntentionActionList),
+            [IntentionHead | _] = Intention,
+            valorDeMeta(Value, IntentionHead)
+        ),
+        ValuedIntentionList
+    ).
+
 communicateAndResolveConflicts(MyAction, _NewAction) :-
     intention(Intention),
     write(  '    Comm: Broadcasting intention:'),write(Intention), write(' and action: '), writeln(MyAction),
     broadcast(d3lp0r, mapc, [Intention, MyAction]),
-    writeln('    Comm: Receiving teammate action list'),
     recibirTodoSimple(IntentionActionList, 1),
+    write(  '    Comm: Received teammate list: '),writeln(IntentionActionList),
     writeln('    Comm: Setting priorities'),
     phase(Phase),
     setPriorities(Phase),                
-    writeln('    Comm: Ordering ActionList using priorities... original IntentionActionList is:'),writeln(IntentionActionList),
-    sort(IntentionActionList, OrderedIAList),
-    write(  '    Comm: Solving conflicts with '),writeln(OrderedIAList),
-    solveConflicts(IntentionActionList, MyNewAction),
+    findall(
+        [Value, Agent, Intention, Action],
+        (
+            member([Intention, Agent, Action], IntentionActionList),
+            [IntentionHead | _] = Intention,
+            valorDeMeta(Value, IntentionHead)
+        ),
+        ValuedIntentionList
+    ),
+    write(  '    Comm: List: '),writeln(ValuedIntentionList),
+    sort(ValuedIntentionList, OrderedIntentionList),
+    write(  '    Comm: Ordered list: '),writeln(OrderedIntentionList),
+    write(  '    Comm: Solving conflicts with '),writeln(OrderedIntentionList),
+    solveConflicts(OrderedIntentionList, MyNewAction),
     write(  '    Comm: Done resolving conflicts; my action is now '), writeln(MyNewAction).
 
 setPriorities(exploracion) :-
@@ -29,27 +51,29 @@ setPriorities(exploracion) :-
     assert(valorDeMeta(9,  inspectar    )),
     assert(valorDeMeta(11, romperzonas  )),
     assert(valorDeMeta(12, quedarse     )).
+setPriorities(_) :-
+    writeln('NO SE EN QUE FASE ESTOY.').
 
-solveConflicts([], NewAction) :- 
+solveConflicts([], _NewAction) :- 
     writeln('End of IntentionActionList.').
 
-solveConflicts([[Intention, Action, Agent] | T], NewAction) :-
+solveConflicts([[Value, Agent, Intention, Action] | T], NewAction) :-
     writeln('Checking member...'),
-    write('Intention is...'), writeln(Intention),
-    write('Action is...'), writeln(Action),
-    write('Agent is...'), writeln(Agent),
-    member([Intention, OtherAction, OtherAgent], T),
+    write('Intention is... '), writeln(Intention),
+    write('Action is... '), writeln(Action),
+    write('Agent is... '), writeln(Agent),
+    member([[Value, Intention], _OtherAction, _OtherAgent], T),
     (
-        Intention = probear(X)
+        Intention = [probear, X]
         ;
-        Intention = reparar(X)
+        Intention = [reparar, X]
         ;
-        Intention = inspectar(X)
+        Intention = [inspectar, X]
     ),
     writeln('    Comm: two agents are trying to do the same!'),
     solveConflicts(T, NewAction).
 
-solveConflicts([[Intention, Action, Agent] | T], NewAction) :-
+solveConflicts([_ | T], NewAction) :-
     solveConflicts(T, NewAction).
 
 

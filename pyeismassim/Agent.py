@@ -154,7 +154,7 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
-        if (self.log):
+        if (self.logToFile):
             self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
         print "done"
 

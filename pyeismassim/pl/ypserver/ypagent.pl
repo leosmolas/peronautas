@@ -116,7 +116,7 @@ recibirTodoSimple(ListaDeMensajes, TimeOut):-
             IntentionFunctor =.. IntentionList,
             ActionFunctor =.. ActionList,
             recibirTodoSimple(ListaDeMensajesNuevos, TimeOut),
-            ListaDeMensajes = [[IntentionList, ActionList, Emisor] | ListaDeMensajesNuevos]
+            ListaDeMensajes = [[IntentionList, Emisor, ActionList] | ListaDeMensajesNuevos]
         )
     ).
 
