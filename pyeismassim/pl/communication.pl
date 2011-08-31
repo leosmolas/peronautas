@@ -1,10 +1,10 @@
 :- dynamic valorDeMeta/2.
 
-dummy(IntentionActionList, ValuedIntentionList) :-
+calcIntentionValues(IntentionActionList, ValuedIntentionList) :-
+    write('Valuing list: '), writeln(IntentionActionList),
     findall(
-        [Value, Agent, Action, Intention],
+        [Value, Intention, Agent, Action],
         (
-            % Intention = [quedarse, vertex0]
             member([Intention, Agent, Action], IntentionActionList),
             [IntentionHead | _] = Intention,
             valorDeMeta(Value, IntentionHead)
@@ -21,15 +21,10 @@ communicateAndResolveConflicts(MyAction, _NewAction) :-
     writeln('    Comm: Setting priorities'),
     phase(Phase),
     setPriorities(Phase),                
-    findall(
-        [Value, Agent, Intention, Action],
-        (
-            member([Intention, Agent, Action], IntentionActionList),
-            [IntentionHead | _] = Intention,
-            valorDeMeta(Value, IntentionHead)
-        ),
-        ValuedIntentionList
-    ),
+    MyAction =.. ActionToInsert,
+    Intention =.. IntentionToInsert,
+    myName(AgentName),
+    calcIntentionValues([[IntentionToInsert, AgentName, ActionToInsert] | IntentionActionList], ValuedIntentionList),
     write(  '    Comm: List: '),writeln(ValuedIntentionList),
     sort(ValuedIntentionList, OrderedIntentionList),
     write(  '    Comm: Ordered list: '),writeln(OrderedIntentionList),
@@ -38,6 +33,8 @@ communicateAndResolveConflicts(MyAction, _NewAction) :-
     write(  '    Comm: Done resolving conflicts; my action is now '), writeln(MyNewAction).
 
 setPriorities(exploracion) :-
+    !,
+    writeln('Setting priorities for EXPLORATION'),
     retractall(valorDeMeta(_,_)),
     assert(valorDeMeta(0,  bloquear     )),
     assert(valorDeMeta(1,  probear      )),
@@ -57,18 +54,20 @@ setPriorities(_) :-
 solveConflicts([], _NewAction) :- 
     writeln('End of IntentionActionList.').
 
-solveConflicts([[Value, Agent, Intention, Action] | T], NewAction) :-
+solveConflicts([[Value, Intention, Agent, Action] | T], NewAction) :-
     writeln('Checking member...'),
     write('Intention is... '), writeln(Intention),
     write('Action is... '), writeln(Action),
     write('Agent is... '), writeln(Agent),
-    member([[Value, Intention], _OtherAction, _OtherAgent], T),
+    member([Value, _OtherAgent, Intention, _OtherAction], T),
     (
         Intention = [probear, X]
         ;
         Intention = [reparar, X]
         ;
         Intention = [inspectar, X]
+        ;
+        Intention = [explorar, X]
     ),
     writeln('    Comm: two agents are trying to do the same!'),
     solveConflicts(T, NewAction).
