@@ -313,6 +313,8 @@ class PrologAgent(Agent):
         self.prolog.query("updateScore(%s)"             % msg_dict_private['score']).next()
         self.prolog.query("updateZoneScore(%s)"         % msg_dict_private['zone_score']).next()
         self.prolog.query("updateLastStepScore(%s)"     % msg_dict_private['last_step_score']).next()
+        
+        print_message(msg_dict_private)
 
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
@@ -338,7 +340,7 @@ class PrologAgent(Agent):
         # print "turn time:", msg_dict_private['total_time'], "ms"
         self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
         # print "percept processing time: ", self.processingTime, "ms"
-        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
+        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 100) / 1000 #100 ms para la ejecucion del dummy
         # print "remaining time: ", self.remainingTime, "segs"
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()

@@ -248,14 +248,14 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-	asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
-    asserta( k(agentStatus(Agent,      Step, Status))       ).
+	assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    assertOnce( k(agentStatus(Agent,      Step, Status))       ).
 
 
 
@@ -264,41 +264,41 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-    asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
+    assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
 %------------------------------------------------------------------------------%
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -524,6 +524,7 @@ run(TimeLimit, Action) :-
         E, 
         ( % except :
             write('ERROR!!!!!!!!!!!!: '),
+            writeln(E),
             print_message(K, E), 
             writeln('Executing dummy now:'),
             retractall(b(_)),
@@ -550,18 +551,19 @@ run2(Action) :-
     % writeln(File),
     % saveMap(File),
     
+    currentStep(Step),
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '.pl', File),
+    writeln(File),
+    saveMap(File),
+    
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(8)),
-    catch(
-        calcTime(argumentation(Meta)),
-        E,
-        (
-            writeln(E),
-            a<a
-        )
-    ), !,
+	calcTime(setNodesAtDistance(7)), !,
+    calcTime(argumentation(Meta)),
+
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
     exec(Action),
@@ -577,7 +579,7 @@ run2(Action) :-
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(6)),
+	calcTime(setNodesAtDistance(7)), !,
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
@@ -589,7 +591,7 @@ run2(Action) :-
 	    
 run2(Action) :-	
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(6)),
+	calcTime(setNodesAtDistance(7)), !,
     intention(Meta),
 	calcTime(replanning(Meta)), !,
     exec(Action),

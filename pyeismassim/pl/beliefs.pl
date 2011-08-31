@@ -19,7 +19,7 @@ setBeliefs :-
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
-    calcTime(setPosibleExpansion), !,
+    % calcTime(setPosibleExpansion), !,
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
@@ -159,18 +159,24 @@ setExploredAndVisibleAux2(Node) :-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setFrontera :-
-    currentStep(Step),
-    myTeam(T),
+    
     foreach(
-        (
-            k(nodeTeam(Step, Node, T)),
-            
-            k(edge(Node, Neigh, _V)),
-            k(nodeTeam(Step, Neigh, T2)),
-            T2 \= T
-        ),
+        esFrontera(Node),
         assertOnce(b(frontera(Node)))
     ).
+    
+esFrontera(Node) :-
+    currentStep(Step),
+    myTeam(T),
+    k(nodeTeam(Step, Node, T)),
+    esFrontera2(Node).
+    
+esFrontera2(Node) :-
+    currentStep(Step),
+    myTeam(T),
+    k(edge(Node, Neigh, _V)),
+    k(nodeTeam(Step, Neigh, T2)),
+    T2 \= T, !.
 
 setEstoyEnLaFrontera :-
     setFrontera,
@@ -180,11 +186,11 @@ setEstoyEnLaFrontera :-
     
 setEstoyEnLaFrontera.
 
-chequearFrontera(Neigh, T) :-
-	currentStep(Step),
-    member(Y, Neigh),
-    k(nodeTeam(Step, Y, Other)), 
-	Other \= T, !.
+% chequearFrontera(Neigh, T) :-
+	% currentStep(Step),
+    % member(Y, Neigh),
+    % k(nodeTeam(Step, Y, Other)), 
+	% Other \= T, !.
 
 setPosibleExpansion :-
     b(estoyEnLaFrontera),
@@ -310,7 +316,26 @@ setAumento :-
 	currentStep(Step),
     retractall(isGoal(_, _)),
 	retractall(isFail(_, _)),
-	assert((isGoal(_Node, Cost) :- !, Cost =< 2, Cost > 0)),
+    assert((
+        isGoal(Node, Cost) :- 
+            !, 
+            Cost =< 2, 
+            Cost > 0, 
+            currentStep(Step),
+            k(nodeTeam(Step, Node, none)),
+            b(nodeAtDistance(Node, Distance)),
+            Distance < 6
+    )),
+	assert((
+        isFail(_, Cost2) :- 
+            Cost2 > 2
+    )),
+    assert((
+        isFail(Node, _) :- 
+            currentStep(Step),
+            myTeam(MyTeam),
+            k(nodeTeam(Step, Node, MyTeam))
+    )),
     setof(
         FinalNode,
         setPosibleAumentoAux(FinalNode, Step, Team),
@@ -346,8 +371,8 @@ posibleAumento(X, Aumento, Nodo) :-
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
     b(frontera(Node)),	
+    b(nodeAtDistance(Node, _)),
     breadthFirst(Node, FinalNode, _Path, _Cost),
-    b(nodeAtDistance(FinalNode, _)),
     k(nodeTeam(Step, FinalNode, Team)), 
     Team \= MyTeam.
     
@@ -382,7 +407,7 @@ setPosibleAumentoDistancia :-
         )
     ),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     myEnergy(Energy),
     myPosition(Position),
     foreach(
@@ -469,7 +494,7 @@ setDistanciaExplorar :-
         )
     ),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     foreach(
         (
             b(posibleExplorar(Node))
@@ -511,6 +536,7 @@ setDistanciaAuxilio :-
     myPosition(Position),
     myEnergy(Energy),
     retractall(isFail(_)),
+    assertAuxilioIsFail,
     foreach(
         (
             currentStep(Step),
@@ -521,3 +547,9 @@ setDistanciaAuxilio :-
             searchPath(Position, FinalNode, Energy, [], 0)
         )
     ).
+    
+assertAuxilioIsFail :-
+    myStatus(normal),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)), !.
+    
+assertAuxilioIsFail.

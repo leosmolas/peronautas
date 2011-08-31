@@ -24,9 +24,10 @@ doNotFail(_).
 % Calcula la mejor meta con el mundo actual.
 % Realiza todo el ciclo de argumentación, teniendo previamente todo lo que necesita asertado.
    
-meta(X) :-     
+meta(X) :- 
+    retractall(mejorMeta(_, _)),
     assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
-    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
+    % foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
     foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
     foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
     foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
@@ -38,8 +39,7 @@ meta(X) :-
     
     % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     
-    mejorMeta(X, _),
-    retractall(mejorMeta(_, _)).
+    mejorMeta(X, _).
     
 calcMeta(X) :-
 

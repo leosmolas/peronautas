@@ -74,7 +74,7 @@ setEnemyDistance :-
     position(Step, Name, Position),
     energy(Step, Name, Energy),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     foreach(
         b(enemyPosition(Agent, Node)),
         (
