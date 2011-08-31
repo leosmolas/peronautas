@@ -17,6 +17,7 @@ communicateAndResolveConflicts(MyAction, _NewAction) :-
 
 setPriorities(exploracion) :-
     retractall(valorDeMeta(_,_)),
+    assert(valorDeMeta(0,  bloquear     )),
     assert(valorDeMeta(1,  probear      )),
     assert(valorDeMeta(2,  explorar     )),
     assert(valorDeMeta(3,  aumento      )),
@@ -26,14 +27,17 @@ setPriorities(exploracion) :-
     assert(valorDeMeta(7,  defender     )),
     assert(valorDeMeta(8,  auxilio      )),
     assert(valorDeMeta(9,  inspectar    )),
-    assert(valorDeMeta(10, bloquear     )),
     assert(valorDeMeta(11, romperzonas  )),
     assert(valorDeMeta(12, quedarse     )).
 
-solveConflicts([]) :- 
+solveConflicts([], NewAction) :- 
     writeln('End of IntentionActionList.').
 
-solveConflicts([[Intention, Action, Agent] | T]) :-
+solveConflicts([[Intention, Action, Agent] | T], NewAction) :-
+    writeln('Checking member...'),
+    write('Intention is...'), writeln(Intention),
+    write('Action is...'), writeln(Action),
+    write('Agent is...'), writeln(Agent),
     member([Intention, OtherAction, OtherAgent], T),
     (
         Intention = probear(X)
@@ -43,7 +47,10 @@ solveConflicts([[Intention, Action, Agent] | T]) :-
         Intention = inspectar(X)
     ),
     writeln('    Comm: two agents are trying to do the same!'),
-    solveConflicts(T).
+    solveConflicts(T, NewAction).
+
+solveConflicts([[Intention, Action, Agent] | T], NewAction) :-
+    solveConflicts(T, NewAction).
 
 
     % ordenar la lista de acciones de acuerdo al orden de prioridad, que va a depender de la fase del juego
