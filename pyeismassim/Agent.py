@@ -12,20 +12,24 @@ from pyswip.easy                    import *
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, communication):
+    def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, communication):
         self.username      = USER
         self.password      = PASS
-        self.useLog        = useLog
+        self.logToFile     = logToFile
+        if massimHost:
+            self.massimHost = massimHost
+        else:
+            self.massimHost = '127.0.0.1'
         self.dummy         = dummy
         self.communication = communication
-        if useLog:
+        if self.logToFile:
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
             pass
         self.log = sys.stdout
 
         print "Basic initialization",
-        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
+        self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         if (perceptServerPort and perceptServerHost):
             self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:
@@ -136,7 +140,7 @@ class Agent():
             self.initializationHook()
             self.perceiveActLoop()
             self.finalizationHook()
-        if not self.useLog:
+        if not self.logToFile:
             raw_input("Finished. Press ENTER to continue...")
         agent.disconnect()
 
@@ -150,7 +154,7 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
-        if (log):
+        if (self.log):
             self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
         print "done"
 
@@ -368,15 +372,23 @@ if (__name__== "__main__"):
     parser = argparse.ArgumentParser(description="Pyeismassim agent initializer")
     parser.add_argument('user',     metavar='USER',                      help="the agent's username")
     parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
-    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
-    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
+    parser.add_argument('-ms',      metavar='MASSIM_SERVER_HOST',        help="the massim server host",                                                          dest='massimHost')
+    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                  dest='perceptServerHost')
+    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                  dest='perceptServerPort')
     parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
     parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
     parser.add_argument('-c',                                            help="use communication after decision making",       action='store_const', const=True, dest='communication')
     
     args = parser.parse_args()
-    user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
-
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy, args.communication)
+    
+    agent = PrologAgent( args.user
+                       , args.password
+                       , args.log
+                       , args.massimHost
+                       , args.perceptServerHost
+                       , args.perceptServerPort
+                       , args.dummy
+                       , args.communication
+                       )
     agent.mainLoop()
 
