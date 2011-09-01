@@ -33,6 +33,7 @@ meta(X) :-
     foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
     
     myPosition(Position),
+	doNotFail(calcMeta(reagruparse)),
     doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol

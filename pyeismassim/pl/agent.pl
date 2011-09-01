@@ -656,6 +656,17 @@ planning(explorar(Node)) :-
 
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
+	
+planning(reagruparse) :-
+	b(pathReagruparse([])), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+	
+planning(reagruparse) :-
+	b(pathReagruparse(Actions)),
+	retract(plan(_)),
+    assert(plan(Actions)).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -724,7 +735,12 @@ replanning(explorar(Node)) :-
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
-    
+	
+replanning(reagruparse) :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	planning(reagruparse).
+
 replanning(atacar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -830,6 +846,17 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+	
+cutCondition(reagruparse):-
+	countTurns(3),
+    writeln('pasaron 3 turnos y no llegue a la zona').
+	
+cutCondition(reagruparse):-
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(Team),
+	k(nodeTeam(Step, MyPos, Team)),
+    writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-
 	countTurns(5),

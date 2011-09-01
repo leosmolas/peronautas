@@ -565,6 +565,12 @@ assertAuxilioIsFail.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setReagruparse :-
+	not(b(posibleAumento(_))),
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(MyTeam),
+	k(nodeTeam(Step, MyPos, Team)),
+	MyTeam \= Team, 
 	assertReagruparseGoal,
 	setPathReagruparse,
 	setAgentesEnZona.
@@ -602,7 +608,8 @@ setPathReagruparse :-
     write('pathSearchReagruparse'),
     ucsAux(InitialFrontier, [], Path, Actions, PathCost, RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),
-    assert(b(pathReagruparse(InitialNode, Energy, Path, Actions, PathCost, RemainingEnergy))).    
+	write('distaciaAZona:'), writeln(PathCost),
+    assert(b(pathReagruparse(Actions))).    
 
 setAgentesEnZona :-
 	currentStep(Step),
@@ -617,5 +624,6 @@ setAgentesEnZona :-
 		AgentesEnZona
 	),
 	length(AgentesEnZona, Cantidad),
+	write('Agentes en zona:'), writeln(Cantidad),
 	assert(b(agentesEnZona(Cantidad)) <- true).
 	

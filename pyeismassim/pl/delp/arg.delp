@@ -52,7 +52,7 @@ reagruparse(Value) -<
     reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value).
 
 reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value) :-
-    Value is (DistaciaZona * 10 + ((10 - AgentesEnZona) ** 2) * 2) * Coef. 
+    Value is (DistaciaZona * 12 + ((10 - AgentesEnZona) ** 2) * 3) * Coef. 
     
 is_a_built_in(reagruparseValue(_DistaciaZona, _AgentesEnZona, _Coef, _Value)).	   
 	   
