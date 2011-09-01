@@ -520,7 +520,7 @@ run(TimeLimit, Action) :-
         E, 
         ( % except :
             write('ERROR!!!!!!!!!!!!: '),
-            print_message(K, E), 
+            writeln(E),
             writeln('Executing dummy now:'),
             retractall(b(_)),
             retractall(b(_) <- true),
