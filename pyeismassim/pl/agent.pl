@@ -614,10 +614,16 @@ calcTime(Exec) :-
     write('<predicate name="'),write(Exec), writeln('">'),
     get_time(Before),
     call(Exec),
-    get_time(After),
-    Time is (After - Before) * 1000,
-    write('<time value="'),write(Time), writeln('"/>'),
-    writeln('</predicate>').
+    write(hello2),nl.
+
+%calcTime(Message, Exec) :-
+%    write('<predicate name="'),write(Message), writeln('">'),
+%    get_time(Before),
+%    call(Exec),
+%    get_time(After),
+%    Time is (After - Before) * 1000,
+%    write('<time value="'),write(Time), writeln('"/>'),
+%    writeln('</predicate>').
     
 calcTime(Exec) :- call(Exec).
     
