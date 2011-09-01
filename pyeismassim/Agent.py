@@ -21,6 +21,7 @@ class Agent():
         else:
             self.massimHost = '127.0.0.1'
         self.dummy         = dummy
+        self.massimDelays = []
         # self.communication = communication
         self.verbose  = verbose
         if self.logToFile:
@@ -104,7 +105,11 @@ class Agent():
             quitPerceiveActLoop = True
 
         while (not quitPerceiveActLoop):
+            t0 = time.time()
             xml = self.massimConnection.receive()
+            t1 = time.time()
+            self.massimDelays.append(t1 - t0)
+            print "CONNECTION WALL CLOCK TIME:", t1 - t0
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
