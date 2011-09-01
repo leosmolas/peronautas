@@ -17,7 +17,7 @@ probeoYGanoZona(Value, X) -<
     
 ~probeoYGanoZona(_Value, X) <-
     b(distancia(X, [[probe]], Dist, _EnergyLeft)),
-    less(Dist, 3).
+    greater(Dist, 3).
     
 probeoSinPerderMucho(Value, X) -<
     b(distancia(X, [[probe]], Dist, EnergyLeft)),
@@ -29,7 +29,7 @@ probeoSinPerderMucho(Value, X) -<
     
 ~probeoSinPerderMucho(_Value, X)  <-
     b(distancia(X, [[probe]], Dist, _EnergyLeft)),
-    greaterEq(Dist, 3).    
+    lessEq(Dist, 3).    
     
         
 probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value) :-

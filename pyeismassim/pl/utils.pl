@@ -10,6 +10,7 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
     retractall(isGoal(_)),	
     assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    %write('pathSearch, final node:'), writeln(FinalNode),
     ucsAux(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, CostOfAction, ActionToBeDone, NewActions, NewTurns, NewTurns2, RemainingEnergy1),
@@ -31,35 +32,47 @@ pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, P
 
 ucsAux(_Frontier, _Visited, [Position | Path], Actions, PathCost, Energy) :-
     b(ucsNode(Position, Energy, Path, Actions, PathCost)),
-    isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)), !.
+    isGoal(ucsNode(Position, Energy, Path, Actions, PathCost)),
+    %writeln('ucsAux 1: el camino estaba guardado'), writeln(Position),
+    !.
+    
+ucsAux(_Frontier, _Visited, _Path, _Actions, _PathCost, _Energy) :-
+    b(lastUcs(Frontier1, _)),
+    empty_heap(Frontier1), !, 
+    %writeln('ucsAux 2: empty heap'),
+    fail.
     
 ucsAux(_Frontier, _Visited, Path, Actions, PathCost, Energy) :-
-    b(lastUcs(Frontier1, Visited)), !,
+    b(lastUcs(Frontier1, Visited)), !, 
+    %writeln('cut en ucsAux 3: despues de lastUcs'),
     ucs(Frontier1, Visited, Path, Actions, PathCost, Energy).
     
 ucsAux(Frontier, Visited, Path, Actions, PathCost, Energy) :-
-    ucs(Frontier, Visited, Path, Actions, PathCost, Energy).
+    %writeln('ucsAux 4'),
+    ucs(Frontier, Visited, Path, Actions, PathCost, Energy), !.
 
 ucs(Frontier, Visited, [Position | Path], Actions, Path_Cost, Energy) :-
-    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), Frontier1),
-    retractall(b(lastUcs(_, _))),
-    assert(b(lastUcs(Frontier1, [ucsNode(Position, Energy, Path, Actions, Path_Cost) | Visited]))),
-    assert(b(ucsNode(Position, Energy, Path, Actions, Path_Cost))),
-    isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)), !.
+    ucsSelect(Frontier, Visited, ucsNode(Position, Energy, Path, Actions, Path_Cost), _Frontier1),
+    retractall(b(lastUcs(_, _))),    
+    isGoal(ucsNode(Position, Energy, Path, Actions, Path_Cost)), !,
+    ucsNeighbors(ucsNode(Position, Energy, Path, Actions, Path_Cost), Neighbors),
+    addToFrontier(Neighbors, Frontier, FrontierNew, Visited, NewVisited), %
+    assert(b(lastUcs(FrontierNew, NewVisited))), 
+    %write('assert lastUcs 1:'), writeln(lastUcs(Frontier, Visited)),
+    assert(b(ucsNode(Position, Energy, Path, Actions, Path_Cost))).
+    %write('assert ucsNode 1:'), writeln(ucsNode(Position, Energy, Path, Actions, Path_Cost)).
 	
 ucs(Frontier, Visited, SolutionPath, SolutionActions, Cost, Energy) :-
     ucsSelect(Frontier, Visited, SelectedNode, Frontier1),
-
     ucsNeighbors(SelectedNode, Neighbors),
     addToFrontier(Neighbors, Frontier1, FrontierNew, Visited, NewVisited), % !,
+    assert(b(lastUcs(FrontierNew, NewVisited))), 
+    %write('assert lastUcs 2:'), writeln(lastUcs(FrontierNew, NewVisited)),
+    assert(b(SelectedNode)),
+    %write('assert ucsNode 2:'), writeln(SelectedNode),
     ucs(FrontierNew, [SelectedNode | NewVisited], SolutionPath, SolutionActions, Cost, Energy).
 
-minEnergy(Energy1, Energy2, Energy1) :-
-    Energy1 < Energy2, !.
 
-minEnergy(_Energy1, Energy2, Energy2).
-        
-        
 ucsSelect(OldFrontier, Visited, Node, NewFrontier) :-
     get_from_heap(OldFrontier, _P, Node2, Frontier),
     ucsSelectAux(Node2, Frontier, Visited, Node, NewFrontier).
