@@ -24,7 +24,11 @@ rolSetBeliefs :-
     calcTime(setPosibleInspectar),
     rolSetDistancia,
     setDifPuntosSinMi,
-    printFindAll('beliefs inspector', b(posibleInspectar(Agent, PosicionAgente))).
+    printFindAll('beliefs inspector', b(posibleInspectar(_Agent, _PosicionAgente))),
+	printFindAll(
+		'(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true)', 
+		(b(posibleInspectarConEnemigos(_, _)) <- true)
+	).
 
 rolSetBeliefs.
 
@@ -49,31 +53,34 @@ reachableNode(Node, [_ | T]) :-
 
 vecinos(Node,Vecinos):-
   findall(
-  NuevoVecino,
-  k(edge(Node, NuevoVecino, _Valor)),
-  Vecinos
+	  NuevoVecino,
+	  k(edge(Node, NuevoVecino, _Valor)),
+	  Vecinos
   ).    
 
 buscarEnemigos(Posicion, CantEnemigos):-
   currentStep(Step),
   myTeam(MyTeam),
   findall(
-  NuevoVecino
-  ,(
-    k(edge(Posicion, NuevoVecino, _Valor))
-    position(Step, Agent, Posicion),
-    team(Agent, Team),
-    MyTeam \= Team
-  ),
-  Vecinos
+	  Agent,
+	  (
+		buscarEnemigosAux(Posicion, NuevoVecino),
+		position(Step, Agent, NuevoVecino),
+		team(Agent, Team),
+		MyTeam \= Team
+	  ),
+	  Vecinos
   ),
   length(Vecinos, CantEnemigos).
 
+buscarEnemigosAux(Posicion, Posicion).
 
+buscarEnemigosAux(Posicion, NuevoVecino) :-
+	k(edge(Posicion, NuevoVecino, _Valor)).
+  
 %-----------------------------------------------------------------------%
 
 setPosibleInspectar :-
-    myStatus(normal),
     currentStep(Step),
     enemigosPosicion(Step, Posiciones),
     foreach(
@@ -81,37 +88,40 @@ setPosibleInspectar :-
         member(par(PosicionAgente, Agent), Posiciones)
       )
       ,
-      (
-        vecinos(PosicionAgente, LVecinosPosicion),
-        buscarEnemigos(PosicionAgente, CantEnemigos),
-        CantEnemigosConAgenteVisible is CantEnemigos + 1,
-        foreach(
-            member(Vecino, LVecinosPosicion)
-            ,(
-              buscarEnemigos(Vecino, CantEnemigosVecino),
-              CantEnemigosConAgenteVecino is CantEnemigosVecino + 1,
-              assert(b(posibleInspectar(Agent, Vecino))),
-              assert(b(posibleInspectarConEnemigos(Agent, Vecino, CantEnemigosConAgenteVecino))<-true)
-            )
-        ),
-        assert(b(posibleInspectar(Agent, PosicionAgente, CantEnemigosConAgenteVisible)))
-      )
+		calcTime(setPosibleInspectarAux(PosicionAgente, Agent))
     ).
     
 setPosibleInspectar.
 
+setPosibleInspectarAux(PosicionAgente, Agent) :-
+	vecinos(PosicionAgente, LVecinosPosicion),
+	buscarEnemigos(PosicionAgente, CantEnemigos),
+
+	foreach(
+		member(Vecino, LVecinosPosicion),
+		calcTime(setPosibleInspectarAux2(Agent, Vecino))
+	),
+	assert(b(posibleInspectar(Agent, PosicionAgente))),
+	assertOnce(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true).
+    
+setPosibleInspectarAux2(Agent, Vecino) :-
+	
+	buscarEnemigos(Vecino, CantEnemigosVecino),
+	assert(b(posibleInspectar(Agent, Vecino))),
+	assertOnce(b(posibleInspectarConEnemigos(Vecino, CantEnemigosVecino))<-true).
+		
 enemigosPosicion(Step, Posiciones):-
     myTeam(MyTeam),
     findall(
-      par(Position, Agent)
-    ,
-    (
-      team(Agent, Team),
-      MyTeam \= Team,
-      position(Step, Agent, Position)
-    )
-    ,
-      Posiciones
+		  par(Position, Agent)
+		,
+		(
+		  team(Agent, Team),
+		  MyTeam \= Team,
+		  position(Step, Agent, Position)
+		)
+		,
+		  Posiciones
     ).
 
 rolSetDistancia :-

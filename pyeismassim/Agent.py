@@ -330,7 +330,7 @@ class PrologAgent(Agent):
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
         else:
-            query_result = self.prolog.query("run(X)").next()
+            query_result = self.prolog.query("catch(run(X), E, (writeln(E), fail))").next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
