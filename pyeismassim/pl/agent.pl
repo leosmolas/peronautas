@@ -92,7 +92,9 @@
 % k(agentStrength(Agent, Step, Strength))
 % k(agentVisualRange(Agent, Step, VisualRange))
 
-
+% ASSERTAR Y BORRAR ESTO
+team(a).
+team(b).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Percept Processing                               %
@@ -236,6 +238,22 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
+updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
+    currentStep(Step),
+    asserta( k(agentTeam(Agent,        Team))               ),
+    asserta( k(agentRole(Agent,        Role))               ),
+    asserta( k(agentPosition(Agent,    Step, Position))     ),
+    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
+    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    asserta( k(agentHealth(Agent,      Step, Health))       ),
+    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    asserta( k(agentStrength(Agent,    Step, Strength))     ),
+    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    asserta( k(agentStatus(Agent,      Step, Status))       ).
+
+
+
+%------------------------------------------------------------------------------%
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
     asserta( k(agentTeam(Agent,        Team))               ),
@@ -249,18 +267,32 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
-
 %------------------------------------------------------------------------------%
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
-    k(agentTeam(Agent, Team)),
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
+    k(agentTeam(Agent, Team)), !,
     currentStep(Step),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
-updateTeammateEntity(Agent, Team, Position, VisualRange) :-
+updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
     asserta( k(agentTeam(        Agent, Team) )),
     asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentHealth(      Agent, Step, Health) )),
+    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
     asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
+    k(agentTeam(Agent, Team)), !,
+    currentStep(Step),
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
+updateEntityTeamPosition(Agent, Team, Position, Status) :-
+    currentStep(Step),
+    asserta( k(agentTeam(        Agent, Team) )),
+    asserta( k(agentPosition(    Agent, Step, Position    ) )),
+    asserta( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -344,90 +376,135 @@ myVisualRange(VisualRange) :-
     myName(Agent),
     currentStep(Step),
     k(agentVisualRange(Agent, Step, VisualRange)).
+myStatus(Status) :-
+    myName(Agent),
+    currentStep(Step),
+    k(agentStatus(Agent, Step, Status)).
 
 
 
 % X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
-    lastKnownInfo(team, Step, Agent, Team).
+    lastKnownInfo(agentTeam, Step, Agent, Team).
+    
 position(Step, Agent, Position) :-
-    lastKnownInfo(position, Step, Agent, Position).
+    lastKnownInfo(agentPosition, Step, Agent, Position).
 role(Step, Agent, Role) :-
-    lastKnownInfo(role, Step, Agent, Role).
+    lastKnownInfo(agentRole, Step, Agent, Role).
 energy(Step, Agent, Energy) :-
-    lastKnownInfo(energy, Step, Agent, Energy).
+    lastKnownInfo(agentEnergy, Step, Agent, Energy).
 maxEnergy(Step, Agent, MaxEnergy) :-
-    lastKnownInfo(maxEnergy, Step, Agent, MaxEnergy).
+    lastKnownInfo(agentMaxEnergy, Step, Agent, MaxEnergy).
 health(Step, Agent, Health) :- 
-    lastKnownInfo(health, Step, Agent, Health).
+    lastKnownInfo(agentHealth, Step, Agent, Health).
 maxHealth(Step, Agent, MaxHealth) :-
-    lastKnownInfo(maxHealth, Step, Agent, MaxHealth).
+    lastKnownInfo(agentMaxHealth, Step, Agent, MaxHealth).
 strength(Step, Agent, Strength) :-
-    lastKnownInfo(strength, Step, Agent, Strength).
+    lastKnownInfo(agentStrength, Step, Agent, Strength).
 visualRange(Step, Agent, VisualRange) :-
-    lastKnownInfo(visualRange, Step, Agent, VisualRange).
+    lastKnownInfo(agentVisualRange, Step, Agent, VisualRange).
+status(Step, Agent, Status) :-
+    lastKnownInfo(agentStatus, Step, Agent, VisualRange).
 
-
+team(Agent, Team) :-
+    lastKnownInfo(team, _Step, Agent, Team).
+role(Agent, Role) :-
+    lastKnownInfo(role, _Step, Agent, Role).
+    
 
 %------------------------------------------------------------------------------%
-% lastKnownInfo(+Field, -Step, +Agent, -Position) :-
+% lastKnownInfo(+Field, -Step, +Agent, -Value) :-
+lastKnownInfo(team, _Step, Agent, Value) :-
+    k(agentTeam(Agent, Value)).
+    
+lastKnownInfo(role, _Step, Agent, Value) :-
+    k(agentRole(Agent, Value)).
+    
+    
+% El step viene instanciado, por lo que no tiene sentido ponerse a buscar para atras
 lastKnownInfo(Field, Step, Agent, Value) :-
-    currentStep(InitialStep),
-    lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
+    nonvar(Step),
+    Field \= team,
+    Field \= role,
+    A =.. [Field, Agent, Step, Value],
+    Q =.. [k, A],
+    call(Q).
+    
+
+% lastKnownInfo(Field, Step, Agent, Value) :-
+    % var(Step),
+    % currentStep(InitialStep),
+    % lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
 
 
 
 %------------------------------------------------------------------------------%
 % Condicion de corte, exito.
 lastKnownInfo1(Field, Step, Step, Agent, Value) :-
-    getInfo(Field, Step, Agent, Value),
-    !.
+    getInfo(Field, Step, Agent, Value).
+    % !.
 
 % Condicion de corte, sin exito.
 lastKnownInfo1(_Field, 0, 0, _Agent, unknown) :-
-    !.
+    !, fail.
 
 % Recursion.
 lastKnownInfo1(Field, CurrentStep, Step, Agent, Position) :-
     NextStep is CurrentStep - 1,
-    lastKnownInfo(Field, NextStep, Step, Agent, Position),
+    lastKnownInfo1(Field, NextStep, Step, Agent, Position),
     !.
 
 %------------------------------------------------------------------------------%
-getInfo(team, Step, Agent, Team) :-
-    k(agentTeam(Agent, Step, Team)).
-getInfo(position, Step, Agent, Position) :-
+getInfo(agentTeam, _Step, Agent, Team) :-
+    k(agentTeam(Agent, Team)).
+getInfo(agentPosition, Step, Agent, Position) :-
     k(agentPosition(Agent, Step, Position)).
-getInfo(role, Step, Agent, Role) :-
-    k(agentRole(Agent, Step, Role)).
-getInfo(energy, Step, Agent, Energy) :-
+getInfo(agentRole, _Step, Agent, Role) :-
+    k(agentRole(Agent, Role)).
+getInfo(agentEnergy, Step, Agent, Energy) :-
     k(agentEnergy(Agent, Step, Energy)).
-getInfo(maxEnergy, Step, Agent, MaxEnergy) :-
+getInfo(agentMaxEnergy, Step, Agent, MaxEnergy) :-
     k(agentMaxEnergy(Agent, Step, MaxEnergy)).
-getInfo(health, Step, Agent, Health) :-
+getInfo(agentHealth, Step, Agent, Health) :-
     k(agentHealth(Agent, Step, Health)).
-getInfo(maxHealth, Step, Agent, MaxHealth) :-
+getInfo(agentMaxHealth, Step, Agent, MaxHealth) :-
     k(agentMaxHealth(Agent, Step, MaxHealth)).
-getInfo(strength, Step, Agent, Strength) :-
+getInfo(agentStrength, Step, Agent, Strength) :-
     k(agentStrength(Step, Agent, Strength)).
-getInfo(visualRange, Step, Agent, VisualRange) :-
+getInfo(agentVisualRange, Step, Agent, VisualRange) :-
     k(agentVisualRange(Agent, Step, VisualRange)).
 
 
-
-rechargeEnergy(Step, Agent, unknown) :-
-    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  unknown, _Health, _MaxHealth, _Strength, _VisualRange)).
+myRechargeEnergy(Recharge) :-
+    myStatus(disabled), !,
+    myMaxEnergy(MaxEnergy),
+    Recharge is round(MaxEnergy * 0.1).
+    
+myRechargeEnergy(Recharge) :-
+    myMaxEnergy(MaxEnergy),
+    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
-    k(agent(Step, Agent, _Team, _Node, _Role, _Energy,  MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange)),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto
+    status(Step, Agent, disabled), !,
+	maxEnergy(Step, Agent, MaxEnergy),
+    Recharge is round(MaxEnergy * 0.1).
     
-rechargeEnergy(Recharge) :-
-    myName(N),
-    currentStep(S),
-    rechargeEnergy(S, N, Recharge).
+rechargeEnergy(Step, Agent, Recharge) :-
+	maxEnergy(Step, Agent, MaxEnergy),
+    Recharge is round(MaxEnergy * 0.2).
 
+checkLastAction :-
+	lastActionResult(failed), !.
+
+checkLastAction :-
+	plan([]), !.
+	
+checkLastAction :-
+	retract(plan([_Action | Actions])),
+	assert(plan(Actions)).
+	
 run(Action) :-
+
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     plan([]), !,
@@ -441,6 +518,7 @@ run(Action) :-
     toogleOffVisibleNodes.
     
 run(Action) :-
+	
     setExploredAndVisible,
     exec(Action),
     toogleOffVisibleNodes.
@@ -503,26 +581,17 @@ calcTime(_Message, Exec) :-
 %    assert(  plan([recharge]) ).
 
 planning(explorar(Node)) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, InitialPosition),
-    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    assertPlan(Node, [[survey]]).
 
 planning(probear(Node)) :-
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, InitialPosition),
-    b(path(InitialPosition, Node, _, _, Actions, _, _RemainingEnergy)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    assertPlan(Node, [[probe]]).
+    
+planning(aumento(Node)) :-
+    assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-
-    currentStep(Step),
-    myName(Name),
-    energy(Step, Name, Energy),
-    maxEnergy(Step, Name, Max),
+    myEnergy(Energy),
+    myMaxEnergy(Max),
     Energy < Max, !,
     retractall(plan(_)),
     assert(plan([[recharge]])).
@@ -531,15 +600,19 @@ planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
     
-
+assertPlan(Node, FinalActions) :-
+    myPosition(InitialPosition),
+    % myEnergy(Energy),
+    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
+    retract(plan(_)),
+    assert(plan(Actions)).
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 exec(Action) :-
-    plan([Action | Actions]),
-    retract(plan(_)),
-    assert(plan(Actions)).
+    plan([Action | _Actions]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %
@@ -600,9 +673,32 @@ redirect_output(Filename) :-
 
 
 %------------------------------------------------------------------------------%
+% saveMap(+Filename)
+% Guarda en Filename en forma de un source de prolog. Terminado todo, vuelve el output a su Stream original
+saveMap(Filename) :-
+    current_output(Current),
+    open(Filename, write, S),
+    set_output(S),
+    dumpMap,
+    set_output(Current),
+    close(S).
+    
+dumpMap :-
+    printFindAll('% step', currentStep(_)),
+    printFindAll('% k', k(_)),
+    % printFindAll('% b', b(_)),
+    printFindAll('% myName', myName(_)),
+    printFindAll('% visible', visibleNode(_)),
+    printFindAll('% not visible', notVisible(_)),
+    printFindAll('% explored', explored(_)),
+    printFindAll('% not explored', notExplored(_)),
+    printFindAll('% inRange', inRange(_)).
+    % printFindAll('% k', k(_)),
+
+%------------------------------------------------------------------------------%
 printList([]).
 printList([H | T]) :-
-    write('    '),write(H),nl,
+    write('    '), write(H), write('.'), nl,
     printList(T).
 
 
@@ -611,10 +707,10 @@ printList([H | T]) :-
 
 printFindAll(Title, WhatToFind) :-
     findall(WhatToFind, WhatToFind, L),
-    sort(L, SL),
+    % sort(L, SL),
     write(Title),
     nl,
-    printList(SL).
+    printList(L).
 
 
 
@@ -636,6 +732,7 @@ dumpKB :-
     printFindAll('AGENT HEALTH:',       k(agentHealth(      _X25, _X26, _X27 ))),
     printFindAll('AGENT MAX HEALTH:',   k(agentMaxHealth(   _X28, _X29, _X30 ))),
     printFindAll('AGENT STRENGTH:',     k(agentStrength(    _X31, _X32, _X33 ))),
+    printFindAll('AGENT STATUS:',       k(agentStatus(      _,    _,    _ ))),
     printFindAll('AGENT VISUAL RANGE:', k(agentVisualRange( _X34, _X35, _X36 ))).
 
 

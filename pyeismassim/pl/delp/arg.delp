@@ -52,7 +52,7 @@ explorar(Value, X) -<
     % sust(Add, NegPow, Value).
                
 explorarValue(Dist, Positivo, Negativo, Value) :-
-    Value is ((10 - Dist) ** 2) * 2 + Positivo - Negativo **2.
+    Value is 20 + ((10 - Dist) ** 2) * 2 + Positivo - Negativo **2.
 
 
 % X instanciado con todos los nodos a distancia máxima 2 de la zona

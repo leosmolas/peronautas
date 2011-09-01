@@ -39,6 +39,7 @@ setPosibleProbear :-
     % writeln('2'),
 	foreach(
         (
+            % writeln('2.5'),
             breadthFirst(Position, FinalNode, _Path, _Cost)
         ), 
         assert(b(posibleProbear(FinalNode)))
@@ -53,18 +54,18 @@ chequearPosibleProbear(X) :-
     currentStep(Step),
     myName(Name),
     position(Step, Name, Position),
-    % writeln('4'),
+    writeln('4'),
     retractall(isGoal(_, _)),
     NewCost is X + 2,
     assert((isGoal(Node, Cost) :- k(nodeValue(Node, unknown)), Cost >= X, Cost < NewCost)),
-    % writeln('5'),
+    writeln('5'),
 	foreach(
         (
             breadthFirst(Position, FinalNode, _Path, _Cost)
         ), 
         assert(b(posibleProbear(FinalNode)))
     ),
-    % writeln('6'),
+    writeln('6'),
     chequearPosibleProbear(NewCost).
 
 	
@@ -76,28 +77,17 @@ setInZone :-
 rolSetDifPuntos:-
     myName(A),
     myTeam(T),
+
     teamPoints(T, ActualPoints),
     writeLenght(
         'posibleProbear', 
         Node1, 
-        (
-            b(posibleProbear(Node1))
-        )
+        b(posibleProbear(Node1))
     ),
+
     foreach(
         b(posibleProbear(Node)),
-        (
-            doNotFail(
-                (
-                    setHypotheticalMap,
-                    moveAgent(A, Node),
-                    coloringAlgorithm,
-                    teamHPoints(T, Points),
-                    DifPuntos is Points - ActualPoints,
-                    assert(b(difPuntosZona(Node, DifPuntos)) <- true)
-                )
-            )
-        )
+        setDifPuntosNode(Node, ActualPoints, A, T)
     ).
     
 rolSetDistancia :-
