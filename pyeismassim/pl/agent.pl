@@ -38,7 +38,9 @@
     beliefs].
     
 
-% :- use_module(library(time)).
+:- use_module(library(time)).
+
+:- use_module(library(heaps)).
 
 % :- set_prolog_flag(debug_on_error, false).
 
