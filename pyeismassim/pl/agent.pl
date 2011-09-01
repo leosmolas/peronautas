@@ -1,4 +1,4 @@
-﻿:- dynamic 
+:- dynamic 
            % Private
            myName/1,           %
            myTeam/1,           %
@@ -526,7 +526,12 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
+    ), !.
+    
+run(_TimeLimit, Action) :-
+    retractall(intention(_)),
+    assert(intention(quedarse(_InitialPosition))),
+    planning(quedarse(_InitialPosition)).
     
     
 run2(Action) :-
@@ -604,10 +609,11 @@ plan([]).
 
 argumentation(Meta) :-
     calcTime(setBeliefs),
-    calcTime(meta(Meta)),
+    calcTime(meta(MetaConValue)),
     retractall(intention(_)),
-    assert(intention(Meta)),
-    write('ARG: Asserting intention:'),writeln(Meta).
+    MetaConValue =.. [M, Value | Args],
+    Meta =.. [M | Args],
+    assert(intention(MetaConValue)).
 
 calcTime(Exec) :-
     verbose, !,

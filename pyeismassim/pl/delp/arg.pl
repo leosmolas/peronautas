@@ -1,4 +1,4 @@
-﻿:- dynamic mejorMeta/2.
+:- dynamic mejorMeta/2.
 
 :- [interpreter/delp]. % interprete
 
@@ -40,7 +40,6 @@ meta(X) :-
     retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
-
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
@@ -51,7 +50,7 @@ calcMeta(X) :-
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),
-    assert(mejorMeta(X, Value)).
+    assert(mejorMeta(Query, Value)).
 
 % todos los predicados que siguen son operaciones aritmeticas y de comparacion, para que los use delp.
 is_a_built_in(mult(_X,_Y,_Z)).
