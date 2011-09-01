@@ -13,14 +13,14 @@ from pyswip.easy                    import *
 class Agent():
     
     def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, communication, verbose):
-        self.username      = USER
-        self.password      = PASS
-        self.logToFile     = logToFile
+        self.username = USER
+        self.password = PASS
+        self.logToFile = logToFile
         if massimHost:
             self.massimHost = massimHost
         else:
             self.massimHost = '127.0.0.1'
-        self.dummy         = dummy
+        self.dummy = dummy
         self.auxTimeDummy = 10 #10 milisegundos para ejecutar dummy
         self.communication = communication
         self.verbose  = verbose
@@ -42,8 +42,12 @@ class Agent():
 
     def connect(self):
         # Connect and authenticate.
-        self.massimConnection.connect()
-        self.perceptConnection.connect()
+        try:
+            self.massimConnection.connect()
+            self.perceptConnection.connect()
+        except:
+            print "@Agent:connect() Error during connection attempt"
+            quit()
 
 
 
@@ -128,9 +132,10 @@ class Agent():
                 print_message(msg_dict_private)
                 quitPerceiveActLoop = True
             else:
-                print "@Agent: en area 51"
+                print "@Agent: in area 51"
                 print_message(msg_dict_private)
                 self.quit = True
+                quit()
 
 
 

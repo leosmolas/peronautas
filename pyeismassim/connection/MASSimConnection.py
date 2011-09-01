@@ -20,11 +20,11 @@ class MASSimConnection:
         code = self.sock.connect_ex((self.host, self.port))
         if (code == 0):
             self.connected = True
+            self.authenticate(self.username, self.password)
         else:
             self.connected = False
             print "@Connection: failed. error:", code
-        #time.sleep(2)
-        self.authenticate(self.username, self.password)
+            raise Exception
 
     def disconnect(self):
         self.sock.shutdown(socket.SHUT_RDWR)
@@ -75,10 +75,11 @@ class MASSimConnection:
     def connectionValid(self):
         i = 0
         while (not self.connected) and (i < MAX_CONNECTION_TRIES):
-            self.connect(self.host, self.port, self.username, self.password)
+            print "@Connection: attempt", i + 1
+            self.connect()
             i += 1
             # Si no logramos conectarnos, hacemos espera progresiva.
-            sleep(i)
+            time.sleep(i)
         return self.connected
             
     def authenticate(self, username, password):
