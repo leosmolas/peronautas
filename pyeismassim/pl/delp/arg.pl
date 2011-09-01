@@ -1,4 +1,4 @@
-﻿:- dynamic mejorMeta/2.
+:- dynamic mejorMeta/2.
 
 :- [interpreter/delp]. % interprete
 
@@ -45,8 +45,8 @@ meta(X) :-
     
 calcMeta(X) :-
     writeln(X),
-    X =.. [Meta, Nodo | _],
-    Query =.. [Meta, Value, Nodo],
+    X =.. [Meta | Args],
+    Query =.. [Meta, Value | Args],
     answer(Query, Answer),
     writeln(Answer), 
     Answer = yes, !,
@@ -54,7 +54,7 @@ calcMeta(X) :-
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
     retract(mejorMeta(_, CurrentValue)),
-    assert(mejorMeta(X, Value)).
+    assert(mejorMeta(Query, Value)).
     
 
 % todos los predicados que siguen son operaciones aritméticas y de comparación, para que los use delp.

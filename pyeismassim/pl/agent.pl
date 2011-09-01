@@ -1,4 +1,4 @@
-﻿:- dynamic 
+:- dynamic 
            % Private
            myName/1,           %
            myTeam/1,           %
@@ -554,9 +554,11 @@ argumentation(Meta) :-
 
     calcTime('setBeliefs', setBeliefs),
 
-    calcTime('meta', meta(Meta)),
+    calcTime('meta', meta(MetaConValue)),
     retractall(intention(_)),
-    assert(intention(Meta)).
+    MetaConValue =.. [M, Value | Args],
+    Meta =.. [M | Args],
+    assert(intention(MetaConValue)).
 
 calcTime(Message, Exec) :-
     write('<predicate name="'),write(Message), writeln('">'),
