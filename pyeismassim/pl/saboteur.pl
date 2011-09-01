@@ -1,8 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Actions (priority order):
+:- ['delp/saboteur.delp'].
+
+% Actions (priority order):
 %                   -attack
 %                   -survey
 %                   -goto
@@ -16,14 +18,86 @@
 execDummy(Action) :- 
     action(Action).
     
+% rolMetas.
+
+% rolSetBeliefs.
+
+rolMetas :-
+    foreach(
+        b(enemyPosition(Agent, _Node)),
+        doNotFail(calcMeta(atacar(Agent)))
+    ).
 
 
-rolMetas.
 
-
-
+rolSetBeliefs :-
+    myStatus(normal), !,
+    calcTime(setEnemyPosition),
+    calcTime(setEnemyDistance),
+	calcTime(setAttackDifPuntos).
+    
 rolSetBeliefs.
+    
+setAttackDifPuntos :-
+	myPosition(MyPosition),
+	b(enemyPosition(Agent, Node)),
+	(b(distancia(Node, [[attack, Agent]], _C, _E)) <- true),
+	Node \= MyPosition, !,
+	setDifPuntosSinMi.
+	
+setAttackDifPuntos.
+	
+setEnemyPosition :-
+    myTeam(MyTeam),
+    currentStep(Step),
+    foreach(
+        (
+            team(Agent, Team),
+            Team \= MyTeam,
+            status(Step, Agent, normal)
+        ),
+        assertEnemyPosition(Step, Agent)
+    ).
+    
+assertEnemyPosition(Step, Agent) :-
+    writeln(assertEnemyPosition),
+    position(Step, Agent, Position),
+    write(Agent),writeln(Position),
+    assert(b(enemyPosition(Agent, Position))),
+    assert(b(enemyPosition(Agent, Position)) <- true).
+	
+assertEnemyPosition(_Step, _Agent).
+    
+setEnemyDistance :-
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, Position),
+    energy(Step, Name, Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    foreach(
+        b(enemyPosition(Agent, Node)),
+        (
+            searchPathSaboteur(Position, Node, Agent, Energy)
+        )
+    ),
+    printFindAll('attack paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
 
+searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
+    retractall(isGoal(_)),	
+    assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
+    singleton_heap(InitialFrontier, ucsNode(Position, Energy, [], [], 0), 0),
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
+    NewTurns is PathCost + 1,
+    calcRecharge(NewEnergy, 2, [[attack, Agent]], NewActions, NewTurns, NewTurns2, RemainingEnergy1),
+    append(Actions, NewActions, Plan),
+    not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
+    assert(b(path(Position, FinalNode, [[attack, Agent]], Energy, Path, Plan, NewTurns2, RemainingEnergy1))),
+    assert(b(distancia(FinalNode, [[attack, Agent]], NewTurns2, RemainingEnergy1)) <- true).
+    
+searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
+
+    
 %------------------------------  Attack  --------------------------------%
 
 action([attack, Enemy]):-
@@ -34,6 +108,7 @@ action([attack, Enemy]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    myName(Name),
     Enemy \= Name,
     write(1.3),nl,
     myTeam(Team),
@@ -79,7 +154,6 @@ action([goto, NeighborNode]) :-
 
 action([goto, X]) :-
     write(4.1),nl,
-    currentStep(Step),
     myPosition(Position),
     write(4.2),nl,
     myEnergy(Energy),

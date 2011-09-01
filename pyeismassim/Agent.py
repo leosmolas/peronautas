@@ -12,11 +12,13 @@ from pyswip.easy                    import *
 ####################################################################################################
 class Agent():
     
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy):
+    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, verbose):
         self.username = USER
         self.password = PASS
         self.useLog   = useLog
         self.dummy    = dummy
+        self.verbose  = verbose
+        self.auxTimeDummy = 10 #10 milisegundos para ejecutar dummy
         if useLog:
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
@@ -99,8 +101,9 @@ class Agent():
         while (not quitPerceiveActLoop):
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
-            time.sleep(0.5)
+            # time.sleep(0.5)
             if (msg_type == 'request-action'):
+                self.turnStartTime = time.time()
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
@@ -140,7 +143,9 @@ class PrologAgent(Agent):
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (log):
-            self.prolog.query("redirect_output('logs/%s-kb%d.txt')" % (self.username, self.currentLoop)).next()
+            self.prolog.query("redirect_output('logs/%s-kb%d.xml')" % (self.username, self.currentLoop)).next()
+        if self.verbose:
+            self.prolog.query("assert(verbose)").next()
         print "done"
 
 
@@ -240,7 +245,6 @@ class PrologAgent(Agent):
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
             # if (vis_ent['name'] in inspected_entity_names):
-            print vis_ent
             self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
         # Proceso las entidades en la percepcion compartida.
@@ -281,16 +285,16 @@ class PrologAgent(Agent):
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
-                                                                                  e['team'], 
-                                                                                  e['node'], 
-                                                                                  e['role'], 
-                                                                                  e['energy'], 
-                                                                                  e['max_energy'], 
-                                                                                  e['health'], 
-                                                                                  e['max_health'], 
-                                                                                  e['strength'], 
-                                                                                  e['vis_range'])).next()
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
+                                                                               e['team'], 
+                                                                               e['node'], 
+                                                                               e['role'], 
+                                                                               e['energy'], 
+                                                                               e['max_energy'], 
+                                                                               e['health'], 
+                                                                               e['max_health'], 
+                                                                               e['strength'], 
+                                                                               e['vis_range'])).next()
 
 
     def processPerception(self, msg_dict_private, msg_dict_public):
@@ -326,10 +330,16 @@ class PrologAgent(Agent):
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # self.prolog.query("argumentation").next()
+        self.startRunTime = time.time()
+        # print "turn time:", msg_dict_private['total_time'], "ms"
+        self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
+        # print "percept processing time: ", self.processingTime, "ms"
+        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
+        # print "remaining time: ", self.remainingTime, "segs"
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
         else:
-            query_result = self.prolog.query("run(X)").next()
+            query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
         if   len(actionList) == 1:
             action_xml = action(action_id, actionList[0])
@@ -354,10 +364,11 @@ if (__name__== "__main__"):
     parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
     parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
     parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
+    parser.add_argument('-v',                                            help="verbose mode",                                  action='store_const', const=True, dest='verbose')
     
     args = parser.parse_args()
     user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy)
+    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy, args.verbose)
     agent.mainLoop()
 
