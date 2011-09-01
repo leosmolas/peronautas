@@ -526,7 +526,12 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
+    ), !.
+    
+run(_TimeLimit, Action) :-
+    retractall(intention(_)),
+    assert(intention(quedarse(_InitialPosition))),
+    planning(quedarse(_InitialPosition)).
     
     
 run2(Action) :-
