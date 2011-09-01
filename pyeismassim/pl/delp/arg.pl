@@ -25,26 +25,28 @@ doNotFail(_).
 % Realiza todo el ciclo de argumentacion, teniendo previamente todo lo que necesita asertado.
    
 meta(X) :-     
-    assert(mejorMeta(_, -1000)), % meta con "menos infinito"
-    % foreach(b(posibleExpansion(N)), doNotFail(calcMeta(expansion(N)))),
-    foreach(b(posibleExplorar(N)), doNotFail(calcMeta(explorar(N)))),
-    % foreach(b(posibleAumento(N)), doNotFail(calcMeta(aumento(N)))),
-    currentStep(Step),
-    myName(Name),
-    position(Step, Name, Position),
-    doNotFail(calcMeta(quedarse(Position))),
+    assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
+    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
+    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
+    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
+    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
+    
+    myPosition(Position),
+    doNotFail(calcMeta(quedarse(Position))), !,
+    
     rolMetas, % predicado definido en cada rol
     % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     mejorMeta(X, _),
-    retract(mejorMeta(_, _)).
+    retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    writeln(X),
-    X =.. [Meta, Nodo | _],
-    Query =.. [Meta, Value, Nodo],
+
+    X =.. [Meta | Args],
+    Query =.. [Meta, Value | Args],
     answer(Query, Answer),
-    writeln(Answer), 
+    % writeln(Answer), 
     Answer = yes, !,
+    writeln(X),
     writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
@@ -62,35 +64,52 @@ is_a_built_in(greaterEq(_X,_Y)).
 is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
-is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _Value)).
-is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _Value2)).
-is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _Value3) ).
 
-% Operaciones aritmeticas
-mult(X,Y,Z)    :- Z is X * Y.
-add(X,Y,Z)     :- Z is X + Y.
-sust(X,Y,Z)    :- Z is X - Y.
+is_a_built_in(phase(_)). % delp revisara las fases
+
+is_a_built_in(role(_, _)).
+
+is_a_built_in(position(_, _)).
+
+position(Agent, Position) :-
+    currentStep(Step),
+    position(Step, Agent, Position).
+
+% Para poner banderas
+is_a_built_in(w(_)).
+
+w(X) :- writeln(X).
+
+% Operaciones aritméticas
+% DEPRECATED
+% Conviene usar una sola fórmula para las metas
+mult(X,Y,Z)    :- Z is X *  Y.
+add(X,Y,Z)     :- Z is X +  Y.
+sust(X,Y,Z)    :- Z is X -  Y.
 power(X,Y,Z)   :- Z is X ** Y.
-greater(X,Y)   :- X > Y.
-less(X,Y)      :- X < Y.
-greaterEq(X,Y) :- X >= Y.
-lessEq(X,Y)    :- X =< Y.
-equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, solo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
-notEqual(X,Y)  :- X \= Y.
+greater(X,Y)   :- X >   Y.
+less(X,Y)      :- X <   Y.
+greaterEq(X,Y) :- X >=  Y.
+lessEq(X,Y)    :- X =<  Y.
+equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sólo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
+notEqual(X,Y)  :- X \=  Y.
 
+
+
+% Por cuestiones históricas y emocionales, todo lo que sigue va a quedar. (El criterio de comparación).
 
 % posibleMeta(+Meta, -Prioridad)
-% La Meta tendra una prioridad unica, que le dara su orden de importancia
-% Valor mas alto => mayor prioridad.
-posibleMeta(explorar(_), 2).
-posibleMeta(expansion(_), 1).
+% La Meta tendrá una prioridad única, que le dará su orden de importancia
+% Valor más alto => mayor prioridad.
+% posibleMeta(explorar(_), 2).
+% posibleMeta(expansion(_), 1).
 
 % posibleMetaNeg(+Meta)
-% Chequea que el parametro ingresado sea una meta, asi este negada.
-posibleMetaNeg(explorar(_)).
-posibleMetaNeg(expansion(_)).
-posibleMetaNeg(~explorar(_)).
-posibleMetaNeg(~expansion(_)).
+% Chequea que el parámetro ingresado sea una meta, así esté negada.
+% posibleMetaNeg(explorar(_)).
+% posibleMetaNeg(expansion(_)).
+% posibleMetaNeg(~explorar(_)).
+% posibleMetaNeg(~expansion(_)).
 
 % criterio de comparacion greaterArgValue
 % greaterArgValue(arg([Ac | Acs], _), arg([Bc | Bcs], _)) :-

@@ -1,0 +1,26 @@
+﻿atacar(Value, Agent) -<
+    b(enemyPosition(Agent, Position)),
+    b(distancia(Position,[[attack, Agent]], Turns, EnergyLeft)),
+	b(difPuntosSinMi(DifPuntos)),
+    role(Agent, Role),
+	agentRolePoints(atacar, Role, RolePoints),
+	attackOrDie(Points),
+    atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value).
+    
+atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value) :-
+    Value is (10 - Turns) ** 2 * 3 - DifPuntos ** 2 + EnergyLeft + RolePoints + Points.
+    
+is_a_built_in(atacarValue(_Turns, _EnergyLeft, _, _RolePoints, _, _Value)).
+
+agentRolePoints(atacar, saboteur, 40) <- true.
+agentRolePoints(atacar, repairer, 40) <- true.
+
+esSeguro(_) <- true. % soy el saboteador
+
+attackOrDie(0) <- 
+	b(myPosition(MyPosition)),
+	esSeguro(MyPosition).
+
+attackOrDie(100) <- 
+	b(myPosition(MyPosition)),
+	~esSeguro(MyPosition).	

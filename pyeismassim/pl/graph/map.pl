@@ -1,4 +1,11 @@
-﻿:- dynamic neighborOwner/2.
+﻿:- dynamic h/1.
+
+:- [
+        'nodes.pl', 
+        'agents.pl'
+   ].
+
+:- dynamic neighborOwner/2.
 
 % paths(+Start, +Finish, -Path)
 % Pretty obvius actually but returns a path in Path with start point at node Start and endpoint in node Finish.
@@ -58,10 +65,6 @@ teamsInNode(Node, Teams) :-
     ).
 
 
-
-% doNotFail(X) :- call(X), !.
-% doNotFail(_).              ._.
-
 % teamsInNeighbors(+Neighbors, -TeamsNeighborsCount)
 % returns in TeamsNeighborsCount a list of pairs (Owner, Count), representing count of neighbor nodes owned by the teams.
 teamsInNeighbors([], TeamsNeighborsCount) :- 
@@ -104,30 +107,21 @@ teamsInNeighbors([ _ | Neighbors ], TeamsNeighborsCount) :-
 % appears(+Team, +List, -CountTeam, -CountOtherTeam)
 % returns in Count the number of times that Team appears in the List, and in CountOtherTeam the number of times the other team appears.
 
-appears(_, [], 0, 0).
-appears(Head, [Head|Tail], CountTeam, CountOtherTeam) :- 
-    appears(Head, Tail, Aux, CountOtherTeam), 
+appears(_, [], 0, 0, _).
+appears(Head, [Head|Tail], CountTeam, CountOtherTeam, OtherTeam) :- 
+    appears(Head, Tail, Aux, CountOtherTeam, OtherTeam), 
     CountTeam is Aux + 1, 
     !.
-appears(Element, [_ | Tail], CountTeam, CountOtherTeam) :- 
-    appears(Element, Tail, CountTeam, Aux), 
+appears(Element, [OtherTeam | Tail], CountTeam, CountOtherTeam, OtherTeam) :- 
+	Element \= OtherTeam,
+    appears(Element, Tail, CountTeam, Aux, OtherTeam), 
     CountOtherTeam is Aux + 1.
 
-
-% checkMajyorityInNode(+Node, +Team)
-% checks if the number of agents of team Team are majority in node Node.
-
-% checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
-%                                    appears(Team, Teams, TeamInNode), 
-%                                    length(Teams, TeamsInNode), 
-%                                    Majority is floor(TeamsInNode / 2), 
-%                                    TeamInNode > Majority,
-%                                    setOwner([Node], Team).
-% checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
-    listOfTeams([Team1 | [Team2 | []]]),
-    appears(Team1, Teams, Team1InNode, Team2InNode), 
+	myTeam(Team1),
+    % listOfTeams([Team1 | [Team2 | []]]),
+    appears(Team1, Teams, Team1InNode, Team2InNode, Team2), 
     length(Teams, TeamsInNode), 
     Majority is floor(TeamsInNode / 2), 
     checkMajorityInNodeAux(Team1, Team1InNode, Team2, Team2InNode, Majority, Team),
@@ -265,7 +259,10 @@ setHypotheticalMap :-
     retractall(h(nodeTeam(_, _))),
     currentStep(Step),
     foreach(
-        position(Step, A, N),
+        (
+            position(Step, A, N),
+            status(Step, A, normal)
+        ),
         assert(h(position(Step, A, N)))
     ),
     foreach(
@@ -278,78 +275,6 @@ moveAgent(Agent, Node) :-
     retractall(h(position(_Step, Agent, _))),
     assert(h(position(Step, Agent, Node))).
 
-visibleNode(N) :-
-    explored(N),
-    inRange(N),
-    foreach(
-        k(edge(N, N1, _)),
-        inRange(N1)
-    ), !,
-    retract(notVisible(N)),
-    asserta(visibleNode(N)).
-    
-    
-% toogleOnVisibleNode(+Node)
-% si el nodo ya estÃ¡ marcado como visible, no hace nada
-% sino, hace el toogle
-toogleOnVisibleNode(Node) :-
-    visibleNode(Node), !.
-    
-toogleOnVisibleNode(Node) :-
-    retractall(notVisible(Node)),
-    % write('1.3 retract '),write(Agent),nl,
-    asserta(visibleNode(Node)).
-    % write('1.4 asserta '),write(Agent),nl.
-    
-toogleOffVisibleNodes :-
-    foreach(
-                visibleNode(N),
-                (
-                    retract(visibleNode(N)),
-                    assert(notVisible(N))
-                )
-           ).
-    
-agentsRangeVision(Step, MyTeam, Range, Position) :-
-    team(Agent, MyTeam),
-    visualRange(Step, Agent, Range),
-    position(Step, Agent, Position),
-    write(position(Step, Agent, Position)),nl,
-    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
-    
-% setExploredAndVisible
-% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
-% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
-setExploredAndVisible :-
-    currentStep(Step),
-    myTeam(MyTeam),
-    foreach(
-        (
-            agentsRangeVision(Step, MyTeam, Range, Position)
-        ),
-        (
-            setExploredAndVisibleAux1(Range, Position)
-            % writeln(Range),
-            % writeln(Position)
-        )
-    ).
-
-setExploredAndVisibleAux1(Range, Position) :-   
-    write('setExploredAndVisibleAux1:'), write(Range), write(','), write(Position), nl,
-    retractall(isGoal(_, _)),
-    assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-    foreach(
-        breadthFirst(Position, Node, _Path, _Cost),
-        (
-            setExploredAndVisibleAux2(Node)
-        )
-    ).
-    
-setExploredAndVisibleAux2(Node) :- 
-    retractall(notExplored(Node)),
-    assertOnce(explored(Node)),
-    toogleOnVisibleNode(Node).
-    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
@@ -435,24 +360,12 @@ checkHNeighbors(Node, Team) :-
     
 % Algoritmo para calcular los puntos de un equipo.
 teamPoints(Team, Points) :-
-
-    setHypotheticalMap,
-    calcTime('coloringAlgorithm', coloringAlgorithm),
-    teamHPoints(Team, Points).
-
-/*
-teamPoints(Team, Points) :-
-    currentStep(Step),
-    findall(
-        [Node, Team, Value],
-        (
-            k(nodeTeam(Step, Node, Team)), 
-            k(nodeValue(Node, Value))
-        ), 
-        ListOfNodes),
-    calcPoints(ListOfNodes, 0, Points).
-*/
-    
+	setHypotheticalMap,
+    calcTime(coloringAlgorithm),
+    teamHPoints(Team, Points),
+    write(actualPoints),write(': '),
+    writeln(Points).
+	
 calcPoints([], Points, Points).
 
 calcPoints([[Node, Team, unknown] | Nodes], Points1, Points3):-

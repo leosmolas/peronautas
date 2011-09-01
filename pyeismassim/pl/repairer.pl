@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Repairer                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -13,16 +13,77 @@
 
 %-----------------------------------------------------------------------%
 
+:- ['delp/repairer.delp'].
+
 execDummy(Action) :- 
     action(Action).
     
 
         
-rolMetas.
+% rolMetas.
 
 
 
-rolSetBeliefs.
+% rolSetBeliefs.
+
+
+rolMetas :-
+    foreach(
+        b(teammatePosition(Agent, _Node)),
+        doNotFail(calcMeta(reparar(Agent)))
+    ).
+
+
+
+rolSetBeliefs :-
+    setTeammatePosition, !,
+    setTeammateDistance.
+    
+
+injuredAgent(Agent) :-
+    myTeam(MyTeam),
+    currentStep(Step),
+    myName(Self),
+    team(Agent, MyTeam),
+    Agent \= Self,
+    health(Step, Agent, Health),
+    maxHealth(Step, Agent, Max),
+    Health < Max.
+
+setTeammatePosition :-
+    foreach(
+        injuredAgent(Agent),
+        assertTeammatePosition(Agent)
+    ).
+    
+assertTeammatePosition(Agent) :-
+	currentStep(Step),
+    writeln(assertTeamMatePosition),
+    write(Agent),writeln(Position),
+    position(Step, Agent, Position), !,
+	health(Step, Agent, Health), !, 
+	maxHealth(Step, Agent, MaxHealth), !,
+    assert(b(teammateHealthInfo(Agent, Health, MaxHealth)) <- true),
+    assert(b(teammatePosition(Agent, Position))).
+    
+assertTeammatePosition(_Step, _Agent).
+    
+setTeammateDistance :-
+    myName(Name),
+    currentStep(Step),
+    position(Step, Name, Position),
+    energy(Step, Name, Energy),
+    retractall(isFail(_)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    foreach(
+        b(teammatePosition(Agent, Node)),
+        (
+
+            searchPath(Position, Node, Energy, [[repair, Agent]], 2)
+        )
+    ),
+    printFindAll('repair paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
+
 
 %------------------------------  Repair  --------------------------------%
 

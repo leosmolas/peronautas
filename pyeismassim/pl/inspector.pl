@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,7 +40,7 @@ reachableNode(Node, [_ | T]) :-
 
 %------------------------------  Attack  --------------------------------%
 
-action([inspect, Enemy]):-
+action([inspect]):-
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -111,24 +111,3 @@ action([goto, X]) :-
     
 action([recharge]) :-
     write(5),nl.
-
-%-------------------------------  Old Code  ------------------------------%
-
-% exec(Action) :- action(Action).
-
-% action(inspect(Agent)) :-
-   % energy(X),
-   % X > 1,
-   % my_name(Name),
-   % k(position(Name,  Position)),
-   % k(position(Agent, Position)),
-   % teamOfAgent(Agent, Team),
-   % Team \= d3lp0r, !.
-
-% action(goto(Vertex)) :-
-   % % Random walking
-   % % select a neighbouring vertex
-   % Vertex = something.
-
-% action(recharge).
-
