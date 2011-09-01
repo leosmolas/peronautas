@@ -566,11 +566,11 @@ assertAuxilioIsFail.
 
 setReagruparse :-
 	not(b(posibleAumento(_))),
-	myPosition(MyPos),
-	currentStep(Step),
-	myTeam(MyTeam),
-	k(nodeTeam(Step, MyPos, Team)),
-	MyTeam \= Team, 
+	% myPosition(MyPos),
+	% currentStep(Step),
+	% myTeam(MyTeam),
+	% k(nodeTeam(Step, MyPos, Team)),
+	% MyTeam \= Team, 
 	assertReagruparseGoal,
 	setPathReagruparse,
 	setAgentesEnZona.
