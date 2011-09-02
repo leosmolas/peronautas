@@ -26,7 +26,7 @@ class Agent():
         self.log = sys.stdout
 
         print "Basic initialization",
-        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
+        self.massimConnection = MASSimConnection('192.168.1.102', 12300, USER, PASS)
         if (perceptServerPort and perceptServerHost):
             self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:

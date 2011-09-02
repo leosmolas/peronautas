@@ -855,7 +855,8 @@ cutCondition(reagruparse):-
 	myPosition(MyPos),
 	currentStep(Step),
 	myTeam(Team),
-	k(nodeTeam(Step, MyPos, Team)),
+	myName(Agent),
+	agenteEnZona(Step, Agent, Team),	
     writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-

@@ -564,11 +564,22 @@ assertAuxilioIsFail.
 % Reagruparse
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+equipoVecino(Step, MyPos, Team) :-
+	k(edge(MyPos, Neigh, _)),
+	k(nodeTeam(Step, Neigh, Team)).
+
+setReagruparse :-
+	currentStep(0), !.
+	
 setReagruparse :-
 	not(b(posibleAumento(_))),
-	% myPosition(MyPos),
-	% currentStep(Step),
-	% myTeam(MyTeam),
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(MyTeam),
+	foreach(
+		equipoVecino(Step, MyPos, Team),
+		Team \= MyTeam
+	),
 	% k(nodeTeam(Step, MyPos, Team)),
 	% MyTeam \= Team, 
 	assertReagruparseGoal,
@@ -586,7 +597,8 @@ assertReagruparseGoal :-
     assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
 		currentStep(Step),
 		myTeam(MyTeam),
-		k(nodeTeam(Step, FinalNode, MyTeam))
+		k(nodeTeam(Step, FinalNode, MyTeam)),
+		equipoVecino(Step, FinalNode, MyTeam)
 	)).
 
 % No hay ninguna zona, el goal es un agente de mi equipo.
@@ -616,14 +628,19 @@ setAgentesEnZona :-
 	myTeam(MyTeam),
 	findall(
 		Agent,
-		(
-			team(Agent, MyTeam),
-			position(Step, Agent, Node),
-			k(nodeTeam(Step, Node, MyTeam))
-		),
+		agenteEnZona(Step, Agent, MyTeam),
 		AgentesEnZona
 	),
 	length(AgentesEnZona, Cantidad),
 	write('Agentes en zona:'), writeln(Cantidad),
 	assert(b(agentesEnZona(Cantidad)) <- true).
+
+agenteEnZona(Step, Agent, MyTeam) :-
+	team(Agent, MyTeam),
+	position(Step, Agent, Node),
+	k(nodeTeam(Step, Node, MyTeam)),
+	agenteEnZonaAux(Step, Node, MyTeam).
 	
+agenteEnZonaAux(Step, Node, MyTeam) :-
+	equipoVecino(Step, Node, MyTeam), !.
+		
