@@ -488,20 +488,20 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    Recharge is round(MaxEnergy * 0.5). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
     status(Step, Agent, disabled), !,
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2).
+    Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -533,8 +533,15 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
-    
+    ), !.
+   
+run(TimeLimit, _) :- 
+	retractall(b(_)),
+    retractall(b(_) <- true),
+    retractall(intention(_)),
+    assert(intention(quedarse(_))),
+	writeln('Run: caso de stop iteration'),
+	planning(quedarse(_)).
     
 run2(Action) :-
     currentStep(Step),
@@ -651,6 +658,17 @@ planning(explorar(Node)) :-
 
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
+	
+planning(reagruparse) :-
+	b(pathReagruparse([])), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+	
+planning(reagruparse) :-
+	b(pathReagruparse(Actions)),
+	retract(plan(_)),
+    assert(plan(Actions)).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -719,7 +737,12 @@ replanning(explorar(Node)) :-
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
-    
+	
+replanning(reagruparse) :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	planning(reagruparse).
+
 replanning(atacar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -825,6 +848,18 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+	
+cutCondition(reagruparse):-
+	countTurns(3),
+    writeln('pasaron 3 turnos y no llegue a la zona').
+	
+cutCondition(reagruparse):-
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(Team),
+	myName(Agent),
+	agenteEnZona(Step, Agent, Team),	
+    writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-
 	countTurns(5),
