@@ -34,6 +34,7 @@ meta(X) :-
     
     myPosition(Position),
 	doNotFail(calcMeta(reagruparse)),
+    doNotFail(calcMeta(bloquear)),
     doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
@@ -74,6 +75,10 @@ is_a_built_in(role(_, _)).
 is_a_built_in(position(_, _)).
 is_a_built_in(myMaxHealth(_)).
 is_a_built_in(myHealth(_)).
+is_a_built_in(myRole(_)).
+is_a_built_in(myEnergy(_)).
+is_a_built_in(myPosition(_)).
+is_a_built_in(myStatus(_)).
 
 position(Agent, Position) :-
     currentStep(Step),

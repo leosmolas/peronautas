@@ -16,6 +16,7 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
+    calcTime(setHaySaboteador), !,
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
@@ -24,10 +25,8 @@ setBeliefs :-
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
 	calcTime(setReagruparse), !,
-    printFindAll('difPuntosSinMi', b(difPuntosSinMi(_)) <- true),
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
-    printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
+    printFindAll('b <- true', b(_) <- true).
     
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,12 +44,12 @@ setNodesAtDistance(Distance) :-
 		assert(b(nodeAtDistance(Dest, Cost3)))
 	).
     
-saboteurPosition(Position) :-
+notSecurePosition(Position) :-
 	myTeam(MyTeam),
 	currentStep(Step),
-	position(Step, Agent, Position),
 	team(Agent, Team),
 	Team \= MyTeam,
+	position(Step, Agent, Position),
 	(
 		role(Agent, saboteur) ;
 		role(Agent, unknown)
@@ -58,8 +57,26 @@ saboteurPosition(Position) :-
 	
 setEsSeguro :-
 	foreach(
+		notSecurePosition(Position),
+		assertOnce(b(~esSeguro(Position)) <-  true) 
+	).
+    
+saboteurPosition(Position) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+    team(Agent, Team),
+	Team \= MyTeam,
+	position(Step, Agent, Position),
+    (
+		role(Agent, saboteur) ;
+		role(Agent, unknown)
+	).
+    % role(Agent, saboteur).
+	
+setHaySaboteador:-
+	foreach(
 		saboteurPosition(Position),
-		assert(b(~esSeguro(Position)) -<  true) 
+		assertOnce(b(haySaboteador(Position)) <-  true) 
 	).
 	
     
@@ -618,7 +635,7 @@ setPathReagruparse :-
 	myEnergy(Energy),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
     write('pathSearchReagruparse'),
-    ucsAux(InitialFrontier, [], Path, Actions, PathCost, RemainingEnergy),     
+    ucsAux(InitialFrontier, [], _Path, Actions, PathCost, _RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),
 	write('distaciaAZona:'), writeln(PathCost),
     assert(b(pathReagruparse(Actions))).    

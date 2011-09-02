@@ -69,6 +69,27 @@ auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
 	Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
 	
 is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
+
+bloquear(1000) -<
+    myStatus(normal),
+    puedoHacerParry,
+    myPosition(MyPos),
+    haySaboteador(MyPos).
+    
+    
+puedoHacerParry -<
+    myRole(repairer).
+    
+puedoHacerParry -<
+    myRole(saboteur).
+    
+puedoHacerParry -<
+    myRole(sentinel).
+    
+~puedoHacerParry <-
+    myEnergy(Energy),
+    less(Energy,2).
+    
 	   
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
@@ -76,9 +97,14 @@ quedarse(20, _) -< true.
 ~estoyEnLaFrontera -< true.
 
 esSeguro(_) -< true.
+~esSeguro(_) <- ~b(esSeguro).
+
+~haySaboteador(_Position) -<  true.
+haySaboteador(Position) <-  b(haySaboteador(Position)).
 
 phaseCoef(_, 1.0) -< true.
 ~phaseCoef(X, 1.0) <- phaseCoef(X, V), notEqual(V, 1.0).
+
 
 
 phaseCoef(expansion, 0.8) <- phase(exploration).

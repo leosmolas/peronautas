@@ -527,7 +527,7 @@ run(TimeLimit, Action) :-
         ( % except :
             write('ERROR!!!!!!!!!!!!: '),
             writeln(E),
-            print_message(K, E), 
+            % print_message(K, E), 
             writeln('Executing dummy now:'),
             retractall(b(_)),
             retractall(b(_) <- true),
@@ -535,7 +535,7 @@ run(TimeLimit, Action) :-
         )
     ), !.
    
-run(TimeLimit, _) :- 
+run(_TimeLimit, _) :- 
 	retractall(b(_)),
     retractall(b(_) <- true),
     retractall(intention(_)),
@@ -685,6 +685,10 @@ planning(aumento(Node)) :-
     
 planning(expansion(Node)) :-
     assertPlan(Node, []).
+    
+planning(bloquear) :-
+    retractall(plan(_)),
+    assert(plan([[parry]])).
     
 planning(auxilio(Repairer)) :-
     currentStep(Step),
@@ -854,7 +858,7 @@ cutCondition(reagruparse):-
     writeln('pasaron 3 turnos y no llegue a la zona').
 	
 cutCondition(reagruparse):-
-	myPosition(MyPos),
+	% myPosition(MyPos),
 	currentStep(Step),
 	myTeam(Team),
 	myName(Agent),
