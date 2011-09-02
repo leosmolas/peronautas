@@ -2,6 +2,8 @@
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+:- ['delp/inspector.delp'].
+
 %Actions (priority order):
 %                   -inspect
 %                   -survey
@@ -16,9 +18,16 @@ execDummy(Action) :-
     write(1),nl,
     action(Action).
 
-        
-rolMetas.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parte de argumentacion
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rolMetas:-
+    foreach(b(posibleInspectar(Agent, PosicionAgente)), 
+    doNotFail(calcMeta(inspectar(Agent, PosicionAgente)))).
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rolSetBeliefs :-
     myStatus(normal), !,
     calcTime(setPosibleInspectar),
