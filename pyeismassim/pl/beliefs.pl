@@ -5,6 +5,27 @@
     
 :- dynamic b/1.
 
+setBeliefs :-
+    calcTime(setHaySaboteador),
+    not(myRole(saboteur)),
+    estoyEnPeligro, 
+    writeln('estoy en Peligro!!!! :O'), !,
+    myTeam(T),
+    teamPoints(T, ActualPoints),
+    assert(b(actualPoints(ActualPoints))),
+    myPosition(Pos),
+    myName(A),
+    myTeam(T),
+    myEnergy(Energy),
+    foreach(
+        k(edge(Pos, Neigh, _)),
+        (
+            calcTime(setDifPuntosNode(Neigh, A, T)),
+            searchPath(Pos, Neigh, Energy, [], 0)
+        )
+    ),
+    printFindAll('b', b(_)),
+    printFindAll('b <- true', b(_) <- true).
     
 setBeliefs :-
     
@@ -16,7 +37,7 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
-    calcTime(setHaySaboteador), !,
+    
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
@@ -32,6 +53,24 @@ setBeliefs :-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Utils
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+estoyEnPeligro :-
+    myStatus(disabled), !, fail.
+
+estoyEnPeligro :-
+    myPosition(Position),
+    b(haySaboteador(Position)).
+    
+estoyEnPeligro :-
+    mePegaron.
+
+mePegaron :-
+    b(meBajaronLaVida),
+    not((
+        lastAction(goto(_)),
+        lastActionResult(successful)
+    )),
+    writeln(mePegaron).
     
 setNodesAtDistance(Distance) :-
 	myPosition(Node),
@@ -67,16 +106,13 @@ saboteurPosition(Position) :-
     team(Agent, Team),
 	Team \= MyTeam,
 	position(Step, Agent, Position),
-    (
-		role(Agent, saboteur) ;
-		role(Agent, unknown)
-	).
-    % role(Agent, saboteur).
-	
+
+	role(Agent, saboteur).
+
 setHaySaboteador:-
 	foreach(
 		saboteurPosition(Position),
-		assertOnce(b(haySaboteador(Position)) <-  true) 
+		assertOnce(b(haySaboteador(Position))) 
 	).
 	
     
@@ -254,26 +290,13 @@ setDistanciaExpansion.
 
 setDifPuntosNode(Node, A, T) :-
     
-    % write('Node: '), writeln(Node),
-    
-
-    % currentStep(Step),
-    % myName(Name),
-    % concat('logs/', Name, S2),
-    % concat(S2, '-', S3),
-    % concat(S3, Step, S0),
-    % concat(S0, Node, S1),
-    % concat(S1, '.pl', File),
-    % writeln(File),
-    % saveMap(File),
     b(actualPoints(ActualPoints)),
-
+    
     setHypotheticalMap,
     moveAgent(A, Node),
     coloringAlgorithm,
     teamHPoints(T, Points),
     DifPuntos is Points - ActualPoints,                    
-    % write('Points: '), writeln(Points),
     assert(b(difPuntosZona(Node, DifPuntos)) <- true).
     
 setDifPuntosNode(_Node, _A, _T).
@@ -661,3 +684,46 @@ agenteEnZona(Step, Agent, MyTeam) :-
 agenteEnZonaAux(Step, Node, MyTeam) :-
 	equipoVecino(Step, Node, MyTeam), !.
 		
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defensa
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+checkLife :-
+    currentStep(Step),
+    PreviousStep is Step - 1,
+    myName(MyName),
+    myHealth(HealthNow),
+    health(PreviousStep, MyName, HealthBefore),
+    HealthNow < HealthBefore,
+    assert(b(meBajaronLaVida)),
+    assertSaboteurs.
+    
+checkLife.
+
+assertSaboteurs :-  
+    lastActionResult(successful),
+    lastAction(goto(_)), !.
+    % Action \= goto(_), !.
+
+assertSaboteurs :-  
+    myPosition(Pos),
+    currentStep(Step),
+    position(Step, Saboteur, Pos),
+    role(Saboteur, saboteur), !.
+    
+assertSaboteurs :-
+    myPosition(Pos),
+    currentStep(Step),
+    findall(
+        Agent,
+        (
+            position(Step, Agent, Pos),
+            role(Agent, Role),
+            Role = unknown
+        ),
+        Potential
+    ),
+    length(Potential, 1),
+    assertOnce(k(agentRole(Agent, saboteur))).
+    

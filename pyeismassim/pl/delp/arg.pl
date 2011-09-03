@@ -34,12 +34,14 @@ meta(X) :-
     
     myPosition(Position),
 	doNotFail(calcMeta(reagruparse)),
-    doNotFail(calcMeta(bloquear)),
+    doNotFail(calcMeta(defensaPropia(Position))),
+    foreach(
+        k(edge(Position, Neigh, _)),
+        doNotFail(calcMeta(defensaPropia(Neigh)))
+    ),
     doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
-    
-    % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     
     mejorMeta(X, _).
     
@@ -79,6 +81,9 @@ is_a_built_in(myRole(_)).
 is_a_built_in(myEnergy(_)).
 is_a_built_in(myPosition(_)).
 is_a_built_in(myStatus(_)).
+
+is_a_built_in(b(_)).
+is_a_built_in(mePegaron).
 
 position(Agent, Position) :-
     currentStep(Step),

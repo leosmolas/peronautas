@@ -535,17 +535,19 @@ run(TimeLimit, Action) :-
         )
     ), !.
    
-run(_TimeLimit, _) :- 
+run(_TimeLimit, Action) :- 
 	retractall(b(_)),
     retractall(b(_) <- true),
     retractall(intention(_)),
     assert(intention(quedarse(_))),
 	writeln('Run: caso de stop iteration'),
-	planning(quedarse(_)).
+	planning(quedarse(_)),
+    exec(Action).
     
 run2(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
+    checkLife,
     checkLastAction,
     plan([]),
     % dumpKB, 
@@ -686,9 +688,13 @@ planning(aumento(Node)) :-
 planning(expansion(Node)) :-
     assertPlan(Node, []).
     
-planning(bloquear) :-
+planning(defensaPropia(MyPos)) :-
+    myPosition(MyPos), !,
     retractall(plan(_)),
     assert(plan([[parry]])).
+    
+planning(defensaPropia(Node)) :-
+    assertPlan(Node, []).
     
 planning(auxilio(Repairer)) :-
     currentStep(Step),
@@ -741,7 +747,7 @@ replanning(explorar(Node)) :-
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
-	
+    
 replanning(reagruparse) :-
 	assertReagruparseGoal,
 	setPathReagruparse,
@@ -838,6 +844,12 @@ cutCondition(Meta) :-
     writeln('hay un enemigo saboteador en mi nodo').
     
 cutCondition(Meta) :-
+    Meta \= atacar(_),
+    
+    mePegaron,
+    writeln('hay un enemigo saboteador en mi nodo y me bajo la vida').
+    
+cutCondition(Meta) :-
     Meta \= reparar(_),
     Meta \= auxilio(_),
     myStatus(disabled),
@@ -852,6 +864,10 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+    
+cutCondition(defensaPropia(_)):-
+	countTurns(1), !,
+    writeln('estoy defendiendome (y paso un turno)').
 	
 cutCondition(reagruparse):-
 	countTurns(3),
