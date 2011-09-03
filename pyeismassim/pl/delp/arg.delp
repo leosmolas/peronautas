@@ -55,6 +55,16 @@ aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
     
 is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
        
+reagruparse(Value) -< 
+    b(distanciaAZona(DistaciaZona)),
+	b(agentesEnZona(AgentesEnZona)),
+    phaseCoef(reagruparse, Coef),
+    reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value).
+
+reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value) :-
+    Value is (DistaciaZona * 12 + ((10 - AgentesEnZona) ** 2) * 3) * Coef. 
+    
+is_a_built_in(reagruparseValue(_DistaciaZona, _AgentesEnZona, _Coef, _Value)).	   
 	   
 auxilio(Value, Repairer) -<
 	position(Repairer, Nodo),
@@ -69,6 +79,51 @@ auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
 	Value is (20 - (20 * (Health/Max))) ** 2 - Dist + EnergyLeft - Negativo ** 2.
 	
 is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
+
+	   
+% DESIRE defensaPropia(Nodo)
+defensaPropia(1000, Node) -<
+    myStatus(normal),
+    
+    puedoHacerParry,
+    myPosition(Node),
+    haySaboteador(Node).
+
+defensaPropia(Value, Node) -<
+    w(2),
+    myStatus(normal),
+    w(3),
+    myPosition(MyPos),
+    w(4),
+    haySaboteador(MyPos),
+    w(5),
+    b(difPuntosZona(Node, DifPuntos)),
+    w(6),
+    b(distancia(Node, [], Dist, EnergyLeft)),
+    w(7),
+    defensaPropiaValue(DifPuntos, Dist, EnergyLeft, Value).
+    
+defensaPropiaValue(DifPuntos, Dist, EnergyLeft, Value) :-
+    Value is 1000 - (Dist - 1) * 200 + DifPuntos + EnergyLeft.
+    
+is_a_built_in(defensaPropiaValue(_DifPuntos, _Dist, _EnergyLeft, _Value)).
+    
+~bloquear(_) <- 
+    myRole(saboteur).
+    
+puedoHacerParry -<
+    myRole(repairer).
+    
+puedoHacerParry -<
+    myRole(saboteur).
+    
+puedoHacerParry -<
+    myRole(sentinel).
+    
+~puedoHacerParry <-
+    myEnergy(Energy),
+    less(Energy,2).
+    
 	   
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
@@ -76,9 +131,17 @@ quedarse(20, _) -< true.
 ~estoyEnLaFrontera -< true.
 
 esSeguro(_) -< true.
+~esSeguro(_) <- ~b(esSeguro).
+
+~haySaboteador(_Position) -<  true.
+haySaboteador(Position) <-  b(haySaboteador(Position)).
+haySaboteador(Position) <-  
+    myPosition(Position),
+    mePegaron.
 
 phaseCoef(_, 1.0) -< true.
 ~phaseCoef(X, 1.0) <- phaseCoef(X, V), notEqual(V, 1.0).
+
 
 
 phaseCoef(expansion, 0.8) <- phase(exploration).

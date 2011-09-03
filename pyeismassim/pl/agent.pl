@@ -488,20 +488,20 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    Recharge is round(MaxEnergy * 0.5). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
     status(Step, Agent, disabled), !,
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2).
+    Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -532,12 +532,21 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
-    
+    ), !.
+   
+run(_TimeLimit, Action) :- 
+	retractall(b(_)),
+    retractall(b(_) <- true),
+    retractall(intention(_)),
+    assert(intention(quedarse(_))),
+	writeln('Run: caso de stop iteration'),
+	planning(quedarse(_)),
+    exec(Action).
     
 run2(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
+    checkLife,
     checkLastAction,
     plan([]),
     % dumpKB, 
@@ -650,6 +659,17 @@ planning(explorar(Node)) :-
 
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
+	
+planning(reagruparse) :-
+	b(pathReagruparse([])), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+	
+planning(reagruparse) :-
+	b(pathReagruparse(Actions)),
+	retract(plan(_)),
+    assert(plan(Actions)).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -665,6 +685,14 @@ planning(aumento(Node)) :-
     assertPlan(Node, []).
     
 planning(expansion(Node)) :-
+    assertPlan(Node, []).
+    
+planning(defensaPropia(MyPos)) :-
+    myPosition(MyPos), !,
+    retractall(plan(_)),
+    assert(plan([[parry]])).
+    
+planning(defensaPropia(Node)) :-
     assertPlan(Node, []).
     
 planning(auxilio(Repairer)) :-
@@ -719,6 +747,11 @@ replanning(explorar(Node)) :-
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
     
+replanning(reagruparse) :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	planning(reagruparse).
+
 replanning(atacar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -810,6 +843,12 @@ cutCondition(Meta) :-
     writeln('hay un enemigo saboteador en mi nodo').
     
 cutCondition(Meta) :-
+    Meta \= atacar(_),
+    
+    mePegaron,
+    writeln('hay un enemigo saboteador en mi nodo y me bajo la vida').
+    
+cutCondition(Meta) :-
     Meta \= reparar(_),
     Meta \= auxilio(_),
     myStatus(disabled),
@@ -824,6 +863,22 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+    
+cutCondition(defensaPropia(_)):-
+	countTurns(1), !,
+    writeln('estoy defendiendome (y paso un turno)').
+	
+cutCondition(reagruparse):-
+	countTurns(3),
+    writeln('pasaron 3 turnos y no llegue a la zona').
+	
+cutCondition(reagruparse):-
+	% myPosition(MyPos),
+	currentStep(Step),
+	myTeam(Team),
+	myName(Agent),
+	agenteEnZona(Step, Agent, Team),	
+    writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-
 	countTurns(5),
