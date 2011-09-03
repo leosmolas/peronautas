@@ -1,4 +1,4 @@
-﻿:-  [utils], 
+:-  [utils], 
     % [kmap], 
     [graph/map], 
     [delp/arg].
@@ -435,7 +435,7 @@ setPosibleExplorar :-
     
 setPosibleExplorar. 
     
-chequearPosibleExplorar(6) :- !.
+chequearPosibleExplorar(4) :- !.
     
 chequearPosibleExplorar(_) :-
     b(posibleExplorar(_Node)), !.
@@ -470,17 +470,24 @@ setDifPuntosExplorar :-
         Node3, 
         (
             b(posibleExplorar(Node3)),
-            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
+            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true),
+            (b(distancia(Node3, [[survey]], _PathCost, _E)) <- true)
         )
     ),
     foreach(
         (
             b(posibleExplorar(Node1)),
             not(b(difPuntosZona(Node1, _DifPuntos2)) <- true),
-            (b(distancia(Node1, [[survey]], _PathCost, _E)) <- true)
+            (b(distancia(Node1, [[survey]], Cost, _E2)) <- true),
+            Cost < 3
         ),
         setDifPuntosNode(Node1, A, T)
-    ).
+    ),
+    (b(distancia(_Node, [[survey]], Cost2, _E3)) <- true),
+    Cost2 >= 3,
+    setDifPuntosSinMi.
+
+setDifPuntosExplorar.
     
 
 setDistanciaExplorar :-
