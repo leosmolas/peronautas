@@ -1,4 +1,4 @@
-﻿
+
 % DESIRE expansión(Nodo)
 expansion(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
@@ -17,7 +17,17 @@ is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _E, _Coef, _Value2)).
 
 explorar(Value, X) -< 
     b(distancia(X, [[survey]], Dist, EnergyLeft)),
+    less(Dist, 3),
     b(difPuntosZona(X, DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(explorar, Coef),
+    explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value).
+
+
+explorar(Value, X) -<
+    b(distancia(X, [[survey]], Dist, EnergyLeft)),
+    greaterEq(Dist, 3),
+    b(difPuntosSinMi(DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),
     phaseCoef(explorar, Coef),
     explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value).
