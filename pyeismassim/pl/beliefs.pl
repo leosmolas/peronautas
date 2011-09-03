@@ -478,12 +478,12 @@ setDifPuntosExplorar :-
         (
             b(posibleExplorar(Node1)),
             not(b(difPuntosZona(Node1, _DifPuntos2)) <- true),
-            (b(distancia(Node1, [[survey]], Cost, _E)) <- true),
+            (b(distancia(Node1, [[survey]], Cost, _E2)) <- true),
             Cost < 3
         ),
         setDifPuntosNode(Node1, A, T)
     ),
-    (b(distancia(_Node, [[survey]], Cost2, _E)) <- true),
+    (b(distancia(_Node, [[survey]], Cost2, _E3)) <- true),
     Cost2 >= 3,
     setDifPuntosSinMi.
 
