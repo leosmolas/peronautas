@@ -16,16 +16,12 @@
 :- ['delp/repairer.delp'].
 
 execDummy(Action) :- 
-    action(Action).
-    
-
+    action(Action),
+    nl.
         
 % rolMetas.
 
-
-
 % rolSetBeliefs.
-
 
 rolMetas :-
     foreach(
@@ -33,12 +29,9 @@ rolMetas :-
         doNotFail(calcMeta(reparar(Agent)))
     ).
 
-
-
 rolSetBeliefs :-
     setTeammatePosition, !,
     setTeammateDistance.
-    
 
 injuredAgent(Agent) :-
     myTeam(MyTeam),
@@ -59,7 +52,6 @@ setTeammatePosition :-
 assertTeammatePosition(Agent) :-
 	currentStep(Step),
     writeln(assertTeamMatePosition),
-    write(Agent),writeln(Position),
     position(Step, Agent, Position), !,
 	health(Step, Agent, Health), !, 
 	maxHealth(Step, Agent, MaxHealth), !,
@@ -88,32 +80,32 @@ setTeammateDistance :-
 %------------------------------  Repair  --------------------------------%
 
 action([repair, Ally]):-
-    write(1.1),nl,
+    write(1.1),write(', '),
     myEnergy(Energy),
     Energy > 1,
-    write(1.2),nl,
+    write(1.2),write(', '),
     currentStep(Step),
     myPosition(Position),
     position(Step, Ally, Position),
-    write(1.3),nl,
+    write(1.3),write(', '),
     myName(Name),
     Ally \= Name,
-    write(1.4),nl,
+    write(1.4),write(', '),
     myTeam(Team),
     team(Step, Ally, Team),
-    write(1.5),nl,
+    write(1.5),
     !.
     
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
-    write(2.1),nl,
+    write(2.1),write(', '),
     myEnergy(Energy),
     Energy > 0,
-    write(2.2),nl,
+    write(2.2),write(', '),
     myPosition(Position),
     hasAtLeastOneUnsurveyedEdge(Position), 
-    write(2.3),nl,
+    write(2.3),
     !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -121,18 +113,18 @@ action([survey, Position]) :-
 %-- First Node Goto --%
 
 action([goto, X]) :-
-    write(3.1),nl,
+    write(3.1),write(', '),
     myPosition(Position),
     k(edge(Position, X, Cost)),
     Cost \= unknown,
-    write(3.2),nl,
+    write(3.2),write(', '),
     myEnergy(Energy),
     Energy >= Cost, 
-    write(3.3),nl,
+    write(3.3),
     !.
 
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-
-    write(4),nl.
+    write(4).
 

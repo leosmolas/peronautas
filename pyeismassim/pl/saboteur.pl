@@ -16,7 +16,8 @@
 %-----------------------------------------------------------------------%
 
 execDummy(Action) :- 
-    action(Action).
+    action(Action),
+    nl.
     
 % rolMetas.
 
@@ -27,8 +28,6 @@ rolMetas :-
         b(enemyPosition(Agent, _Node)),
         doNotFail(calcMeta(atacar(Agent)))
     ).
-
-
 
 rolSetBeliefs :-
     myStatus(normal), !,
@@ -62,7 +61,6 @@ setEnemyPosition :-
 assertEnemyPosition(Step, Agent) :-
     writeln(assertEnemyPosition),
     position(Step, Agent, Position),
-    write(Agent),writeln(Position),
     assert(b(enemyPosition(Agent, Position))),
     assert(b(enemyPosition(Agent, Position)) <- true).
 	
@@ -97,36 +95,35 @@ searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
     
 searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
 
-    
 %------------------------------  Attack  --------------------------------%
 
 action([attack, Enemy]):-
-    write(1.1),nl,
+    write(1.1),write(', '),
     myEnergy(Energy),
     Energy > 1,
-    write(1.2),nl,
+    write(1.2),write(', '),
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
     myName(Name),
     Enemy \= Name,
-    write(1.3),nl,
+    write(1.3),write(', '),
     myTeam(Team),
     team(Step, Enemy, EnemyTeam),
     EnemyTeam \= Team,
-    write(1.4),nl,
+    write(1.4),
     !.
     
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
-    write(2.1),nl,
+    write(2.1),write(', '),
     myEnergy(Energy),
     Energy > 0,
-    write(2.2),nl,
+    write(2.2),write(', '),
     myPosition(Position),
     hasAtLeastOneUnsurveyedEdge(Position), 
-    write(2.3),nl,
+    write(2.3),
     !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -134,38 +131,39 @@ action([survey, Position]) :-
 %-- Barbarian Goto --%
 
 action([goto, NeighborNode]) :-
-    write(3.1),nl,
+    write(3.1),write(', '),
     myPosition(Position),
     k(edge(Position, NeighborNode, Cost)), 
     Cost \= unknown, 
-    write(3.2),nl,
+    write(3.2),write(', '),
     myEnergy(Energy),
     Cost < Energy, 
-    write(3.3),nl,
+    write(3.3),write(', '),
     currentStep(Step),
     position(Step, EnemyAgent, NeighborNode),
-    write(3.4),nl,
+    write(3.4),write(', '),
     myTeam(Team),
     team(Step, EnemyAgent, EnemyTeam),
     EnemyTeam \= Team,
+    write(3.5),
     !.
 
 %-- First Node Goto --%
 
 action([goto, X]) :-
-    write(4.1),nl,
+    write(4.1),write(', '),
     myPosition(Position),
-    write(4.2),nl,
+    write(4.2),write(', '),
     myEnergy(Energy),
     k(edge(Position, X, Cost)),
     Cost \= unknown,
-    write(4.3),nl,
+    write(4.3),write(', '),
     Energy >= Cost, 
-    write(4.4),nl,
+    write(4.4),
     !.
 
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-
-    write(5),nl.
+    write(5).
 

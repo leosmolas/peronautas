@@ -11,7 +11,8 @@
 %                   -skip   (no implemented)
 
 execDummy(Action) :- 
-    action(Action).
+    action(Action),
+    nl.
 
 
         
@@ -41,13 +42,13 @@ reachableNode(Node, [_ | T]) :-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
-    write(1.1),nl,
+    write(1.1),write(', '),
     myEnergy(Energy),
     Energy > 0,
-    write(1.2),nl,
+    write(1.2),write(', '),
     myPosition(Position),
     hasAtLeastOneUnsurveyedEdge(Position), 
-    write(1.3),nl,
+    write(1.3),
     !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -55,19 +56,19 @@ action([survey, Position]) :-
 %-- First Node Goto --%
 
 action([goto, X]) :-
-    write(2.1),nl,
+    write(2.1),write(', '),
     position(Step, Name, Position),
     k(edge(Position, X, Cost)),
-    write(2.2),nl,
+    write(2.2),write(', '),
     Cost \= unknown,
-    write(2.3),nl,
+    write(2.3),write(', '),
     energy(Step, Name, Energy),
     Energy >= Cost, 
-    write(2.4),nl,
+    write(2.4),
     !.
 
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-
-    write(3),nl.
+    write(3).
 

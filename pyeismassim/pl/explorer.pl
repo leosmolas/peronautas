@@ -4,24 +4,19 @@
 
 :- ['delp/explorer.delp'].
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parte de argumentacion
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rolMetas:-
-    writeln(1),
     foreach(
         b(posibleProbear(N)), 
         doNotFail(calcMeta(probear(N)))
-    ),
-    writeln(2).
-
+    ).
     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Probear
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 rolSetBeliefs :-
     myStatus(normal), !,
@@ -49,7 +44,6 @@ chequearPosibleProbear(X) :-
     chequearPosibleProbear(NewCost).
 
 posibleProbear(X, NewCost, FinalNode) :-
-    
     b(nodeAtDistance(FinalNode, Cost)),
     k(nodeValue(FinalNode, unknown)), 
     Cost >= X, 
@@ -111,73 +105,52 @@ rolSetDistancia :-
 %----------------------------------------------------------------------%
 
 execDummy(Action) :- 
-    action(Action).
+    action(Action),
+    nl.
 
 %------------------------------  Probe  --------------------------------%
 
 % si tenemos suficiente energia y 
 % no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
-    write(1.1),nl,
+    write(1.1),write(', '),
     myEnergy(Energy),
     Energy > 0,
-    write(1.2),nl,
+    write(1.2),write(', '),
     myPosition(Position),
     k(nodeValue(Position, unknown)), 
+    write(1.3),
     !.
 
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
-    write(2.1),nl,
+    write(2.1),write(', '),
     myEnergy(Energy),
     Energy > 0,
-    write(2.2),nl,
+    write(2.2),write(', '),
     myPosition(Position),
-    hasAtLeastOneUnsurveyedEdge(Position), 
+    hasAtLeastOneUnsurveyedEdge(Position),
+    write(2.3),
     !.
 
 %-------------------------------  Goto  ---------------------------------%
-
-%-- Goto First Reachable Node --%
-
-%action([goto, X]) :-
-%    write(3.1),nl,
-%    myPosition(Position),
-%    k(nodeValue(Position, Cost)),
-%    write(3.2),nl,
-%    myEnergy(Energy),
-%    write([myEnergy,Energy,cost,Cost]),nl,
-%    Energy >= Cost,
-%    write(3.3),nl,
-%    findall(
-%        [Node, Cost], 
-%        (
-%            k(edge(Position, Node, Cost)), 
-%            k(nodeValue(Node, unknown))
-%        ), 
-%        Nodes),
-%    write(3.4),nl,
-%    reachableNode(X, Nodes), 
-%    write(3.5),nl,
-%    !.
-     
 %-- Goto First Node --%
 
 action([goto, X]) :-
-    write(4.1),nl,
+    write(4.1),write(', '),
     myEnergy(Energy),
     myPosition(Position),
     k(edge(Position, X, Cost)),
-    write(4.2),nl,
+    write(4.2),write(', '),
     Cost \= unknown,
-    write(4.3),nl,
+    write(4.3),write(', '),
     Energy >= Cost, 
-    write(4.4),nl,
+    write(4.4),
     !.
 
 %-------------------------------  Recharge  ------------------------------%
 
 action([recharge]) :-
-    write(5),nl.
+    write(5).
 

@@ -528,10 +528,10 @@ run(TimeLimit, Action) :-
         )
     ), !.
     
-run(_TimeLimit, Action) :-
+run(_TimeLimit, _Action) :-
     retractall(intention(_)),
-    assert(intention(quedarse(_InitialPosition))),
-    planning(quedarse(_InitialPosition)).
+    assert(intention(quedarse)),
+    planning(quedarse(unknown)).
     
     
 run2(Action) :-
@@ -611,26 +611,16 @@ argumentation(Meta) :-
     calcTime(setBeliefs),
     calcTime(meta(MetaConValue)),
     retractall(intention(_)),
-    MetaConValue =.. [M, Value | Args],
+    MetaConValue =.. [M, _Value | Args],
     Meta =.. [M | Args],
     assert(intention(MetaConValue)).
 
 calcTime(Exec) :-
     verbose, !,
-    write('<predicate name="'),write(Exec), writeln('">'),
-    get_time(Before),
-    call(Exec),
-    write(hello2),nl.
+    write('<predicate name="'),write(Exec), writeln('">'),nl,
+    get_time(_Before),
+    call(Exec).
 
-%calcTime(Message, Exec) :-
-%    write('<predicate name="'),write(Message), writeln('">'),
-%    get_time(Before),
-%    call(Exec),
-%    get_time(After),
-%    Time is (After - Before) * 1000,
-%    write('<time value="'),write(Time), writeln('"/>'),
-%    writeln('</predicate>').
-    
 calcTime(Exec) :- call(Exec).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

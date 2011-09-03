@@ -3,34 +3,48 @@
 import sys
 import time
 import argparse
-from connection.MASSimConnection    import MASSimConnection
-from connection.MessageHandling     import *
-from perceptServer.PerceptServer    import PerceptConnection, VortexPerceptConnection
-from pyswip.prolog                  import Prolog
-from pyswip.easy                    import *
+import cProfile
+import cPickle
+from connection.MASSimConnection import MASSimConnection
+from connection.MessageHandling  import *
+from perceptServer.PerceptServer import PerceptConnection, VortexPerceptConnection
+from pyswip.prolog               import Prolog
+from pyswip.easy                 import *
 
 ####################################################################################################
 class Agent():
     
+    #----------------------------------------------------------------------------------------------#
     def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, communication, verbose):
         self.username = USER
         self.password = PASS
-        self.logToFile = logToFile
-        if massimHost:
-            self.massimHost = massimHost
-        else:
-            self.massimHost = '127.0.0.1'
+        
         self.dummy = dummy
+        if (dummy):
+            print "@Agent: Running in dummy mode."
         self.auxTimeDummy = 10 #10 milisegundos para ejecutar dummy
+        
         self.communication = communication
-        self.verbose  = verbose
-        if self.logToFile:
+        if (communication):
+            print "@Agent: Running with communication protocol activated."
+        
+        self.verbose = verbose
+        if (verbose):
+            print "@Agent: Running in verbose mode."
+        
+        self.logToFile = logToFile
+        if (logToFile):
+            print "@Agent: Logging to file."
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
             pass
         self.log = sys.stdout
 
-        print "Basic initialization",
+        self.massimHost = '127.0.0.1'
+        if (massimHost):
+            self.massimHost = massimHost
+
+        print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         if (perceptServerPort and perceptServerHost):
             self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
@@ -40,17 +54,23 @@ class Agent():
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def connect(self):
         # Connect and authenticate.
         try:
             self.massimConnection.connect()
-            self.perceptConnection.connect()
         except:
-            print "@Agent:connect() Error during connection attempt"
+            print "@Agent: Error during connection attempt to the MASSim server."
+            quit()
+        try:
+            self.perceptConnection.connect(self.username)
+        except:
+            print "@Agent: Error during connection attempt to the percept server."
             quit()
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def disconnect(self):
         self.log.close()
         self.log = sys.__stdout__
@@ -60,106 +80,9 @@ class Agent():
 
 
 
-    def initializationHook():
-        pass
-
-
-
-    def finalizationHook():
-        pass
-
-
-
-    def processSimulationStart(self, msg_dict):
-        pass
-
-
-
-    def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "@Agent: received request-action. id: %s" % action_id
-        action_xml = action(action_id, "skip")
-        return action_xml
-
-
-
-    def processBye(self, msg_dict):
-        pass
-
-
-
-    def perceiveActLoop(self):
-        # Receive simulation start notification.
-        print "@Agent: waiting for simulation start notification."
-
-        xml = self.massimConnection.receive()
-        msg_type, _, msg_dict, _ = parse_as_dict(xml)
-
-        if (msg_type == 'sim-start'):
-            print "\n\n===== NEW SIMULATION =====\n\n"
-            print "@Agent: received simulation start notification."
-            print_message(msg_dict)
-            print "@Agent: processing simulation start"
-            self.processSimulationStart(msg_dict)
-            print "@Agent: finished simulation start"
-            quitPerceiveActLoop = False
-        elif (msg_type == 'bye'):
-            print "@Agent: received bye"
-            print_message(msg_dict)
-            self.processBye(msg_dict)
-            self.quit = True
-            quitPerceiveActLoop = True
-
-        while (not quitPerceiveActLoop):
-            print "@Agent: Receiving perception from server...\n"
-            xml = self.massimConnection.receive()
-            msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
-            # time.sleep(0.5)
-            if (msg_type == 'request-action'):
-                self.turnStartTime = time.time()
-                print "\n"
-                print "@Agent: step: %s" % msg_dict_private['step']
-
-                # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
-                action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
-
-                # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
-                if (self.communication):
-                    print "@Agent: calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
-                    self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
-                self.massimConnection.send(action_xml)
-            elif (msg_type == 'sim-end'):
-                print "@Agent: received sim-end"
-                print_message(msg_dict_private)
-                quitPerceiveActLoop = True
-            else:
-                print "@Agent: in area 51"
-                print_message(msg_dict_private)
-                self.quit = True
-                quit()
-
-
-
-    def mainLoop(self):
-        self.quit = False
-        agent.connect()
-        self.currentLoop = 0
-        while (not self.quit):
-            self.currentLoop += 1
-            self.initializationHook()
-            self.perceiveActLoop()
-            self.finalizationHook()
-        if not self.logToFile:
-            raw_input("Finished. Press ENTER to continue...")
-        agent.disconnect()
-
-
-
-####################################################################################################
-class PrologAgent(Agent):
-
-    def initializationHook(self):
-        print "Prolog initialization",
-        # Creo una conexion con SWI.
+    #----------------------------------------------------------------------------------------------#
+    def prologInitialization(self):
+        print "@Agent: Prolog initialization",
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (self.logToFile):
@@ -170,20 +93,22 @@ class PrologAgent(Agent):
 
 
 
-    def finalizationHook(self):
-        #self.prolog.query("dumpKB").next()
+    #----------------------------------------------------------------------------------------------#
+    def prologFinalization(self):
+        print "@Agent: Prolog finalization",
         self.prolog.query("close_output").next()
         self.prolog = None
+        print "done"
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def processSimulationStart(self, msg_dict):
-        defaultVisionRange = {
-                                'explorer' : 2,
-                                'repairer' : 1,
-                                'saboteur' : 1,
-                                'sentinel' : 3,
-                                'inspector': 1
+        defaultVisionRange = { 'explorer' : 2
+                             , 'repairer' : 1
+                             , 'saboteur' : 1
+                             , 'sentinel' : 3
+                             , 'inspector': 1
                              }
 
         self.role = msg_dict['role'].lower()
@@ -198,20 +123,20 @@ class PrologAgent(Agent):
         elif (self.role == 'inspector'):
             self.prolog_role_file = 'pl/inspector.pl'
         else:
-            print "@PrologAgent: error: unknown role"
+            print "@Agent: Error: unknown role"
+            quit()
         self.prolog.consult(self.prolog_role_file)
 
-        # Guardo mi nombre en la KB.
         self.prolog.query("updateMyName(%s)" % self.username).next()
         if (self.communication):
             self.prolog.query("conectar(%s)" % self.username).next()
             self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
-        print "@PrologAgent: Guardando el rango de vision de %s: %s" % (self.role, defaultVisionRange[self.role])
+        print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
-        
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def merge_percepts(self, msg_dict_public, msg_dict_difference):
         msg_dict_public['position'].extend(       msg_dict_difference.get('position',       []))
         msg_dict_public['vis_verts'].extend(      msg_dict_difference.get('vis_verts',      []))
@@ -223,6 +148,7 @@ class PrologAgent(Agent):
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def processNodes(self, msg_dict):
         # Obtenemos todos los vertices sondeados.
         # Despues, para cada vertice visible, nos fijamos si
@@ -249,25 +175,23 @@ class PrologAgent(Agent):
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def processEdges(self, msg_dict):
         # Actualizamos el estado del mapa con los arcos.
         for e in msg_dict.get('vis_edges', []):
-            # print "@Agent: visible edge: %s" % e
             self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
-
         for e in msg_dict.get('surveyed_edges', []):
             self.prolog.query("updateEdge(%s,%s,%s)" % (e['node1'], e['node2'], e['weight'])).next()
 
 
 
+    #----------------------------------------------------------------------------------------------#
     def processEntities(self, msg_dict_private, msg_dict_public):
-
-        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']]) # esto es necesario?
+        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']])
         inspected_entity_names = frozenset([e['name'] for e in msg_dict_public['inspected_ents']])
 
         # Proceso el resto de las entidades visibles.
         for vis_ent in msg_dict_public['vis_ents']:
-            # if (vis_ent['name'] in inspected_entity_names):
             self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
         # Proceso las entidades en la percepcion compartida.
@@ -282,48 +206,49 @@ class PrologAgent(Agent):
 
             # Caso especial: cuando soy yo mismo.
             if (p['name'] == 'self'):
-                energy     = msg_dict_private['energy']
-                max_energy = msg_dict_private['max_energy']
-                health     = msg_dict_private['health']
-                max_health = msg_dict_private['max_health']
-                strength   = msg_dict_private['strength']
-                vis_range  = msg_dict_private['vis_range']
-                self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (self.username, 
-                                                                                      team, 
-                                                                                      p['node'],
-                                                                                      self.role,
-                                                                                      energy,
-                                                                                      max_energy,
-                                                                                      health,
-                                                                                      max_health,
-                                                                                      strength,
-                                                                                      vis_range)).next()
+                parameters = ( self.username
+                             , team
+                             , p['node']
+                             , self.role
+                             , msg_dict_private['energy']
+                             , msg_dict_private['max_energy']
+                             , msg_dict_private['health']
+                             , msg_dict_private['max_health']
+                             , msg_dict_private['strength']
+                             , msg_dict_private['vis_range']
+                             )
+                self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % parameters).next()
             else:
-                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s,%s,%s)" % (p['name'], 
-                                                                                  team, 
-                                                                                  p['node'], 
-                                                                                  p['health'], 
-                                                                                  p['max_health'], 
-                                                                                  p['vis_range'])).next()
+                parameters = ( p['name']
+                             , team
+                             , p['node']
+                             , p['health']
+                             , p['max_health']
+                             , p['vis_range']
+                             )
+                self.prolog.query("updateTeammateEntity(%s,%s,%s,%s,%s,%s)" % parameters).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
-            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % (e['name'], 
-                                                                               e['team'], 
-                                                                               e['node'], 
-                                                                               e['role'], 
-                                                                               e['energy'], 
-                                                                               e['max_energy'], 
-                                                                               e['health'], 
-                                                                               e['max_health'], 
-                                                                               e['strength'], 
-                                                                               e['vis_range'])).next()
+            parameters = ( e['name']
+                         , e['team']
+                         , e['node']
+                         , e['role']
+                         , e['energy']
+                         , e['max_energy']
+                         , e['health']
+                         , e['max_health']
+                         , e['strength']
+                         , e['vis_range']
+                         )
+            self.prolog.query("updateEntity(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" % parameters).next()
 
 
+
+    #----------------------------------------------------------------------------------------------#
     def processPerception(self, msg_dict_private, msg_dict_public):
         # Actualizamos cada uno de los campos individuales del agente.
         self.prolog.query("updateStep(%s)"              % msg_dict_private['step']).next()
-
         self.prolog.query("updateMaxEnergyDisabled(%s)" % msg_dict_private['max_energy_disabled']).next()
         self.prolog.query("updateLastAction(%s)"        % msg_dict_private['last_action']).next()
         self.prolog.query("updateLastActionResult(%s)"  % msg_dict_private['last_action_result']).next()
@@ -331,54 +256,126 @@ class PrologAgent(Agent):
         self.prolog.query("updateScore(%s)"             % msg_dict_private['score']).next()
         self.prolog.query("updateZoneScore(%s)"         % msg_dict_private['zone_score']).next()
         self.prolog.query("updateLastStepScore(%s)"     % msg_dict_private['last_step_score']).next()
-
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
         self.processEntities(msg_dict_private, msg_dict_public)
         self.prolog.query("updatePhase").next()
 
+
+
+    #----------------------------------------------------------------------------------------------#
     def processActionRequest(self, action_id, msg_dict_private, msg_dict_public):
-        print "@PrologAgent: received request-action. id: %s" % action_id
+        print "@Agent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
         self.perceptConnection.send(self.username, msg_dict_public)
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        #print "\n@PrologAgent: PERCEPTION:"
-        #print_message(msg_dict_public)
-        #print ""
-
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
         
-        # self.prolog.query("argumentation").next()
+        # Decide action.
         self.startRunTime = time.time()
-        # print "turn time:", msg_dict_private['total_time'], "ms"
         self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
-        # print "percept processing time: ", self.processingTime, "ms"
         self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
-        # print "remaining time: ", self.remainingTime, "segs"
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
         else:
             query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
 
-        if   len(actionList) == 1:
+        if   (len(actionList) == 1):
             action_xml = action(action_id, actionList[0])
             action_str = actionList[0]
-            print "@PrologAgent: action: %s" % actionList[0]
-        elif len(actionList) == 2:
-            print "@PrologAgent: action: %s %s" % (actionList[0], actionList[1])
+            print "@Agent: action: %s" % actionList[0]
+        elif (len(actionList) == 2):
+            print "@Agent: action: %s %s" % (actionList[0], actionList[1])
             action_str = '%s(%s)' % (actionList[0], actionList[1])
             action_xml = action(action_id, actionList[0], actionList[1])
         else:
-            print "@PrologAgent: error in returned action."
-            print "@PrologAgent: return value: %s" % actionList
+            print "@Agent: error in returned action."
+            print "@Agent: return value: %s" % actionList
             action_xml = action(action_id, "skip")
             action_str = 'skip'
         return (action_xml, action_str)
+
+
+
+    #----------------------------------------------------------------------------------------------#
+    def processBye(self, msg_dict):
+        print_message(msg_dict)
+
+
+
+    #----------------------------------------------------------------------------------------------#
+    def perceiveActLoop(self):
+        # Receive simulation start notification.
+        print "@Agent: Waiting for simulation start notification."
+
+        xml = self.massimConnection.receive()
+        msg_type, _, msg_dict, _ = parse_as_dict(xml)
+        
+        if (msg_type == 'sim-start'):
+            print "\n\n===== NEW SIMULATION =====\n\n"
+            print "@Agent: Received simulation start notification."
+            print_message(msg_dict)
+            print "@Agent: Processing simulation start"
+            self.processSimulationStart(msg_dict)
+            print "@Agent: Finished simulation start"
+            quitPerceiveActLoop = False
+        elif (msg_type == 'bye'):
+            print "@Agent: Received bye"
+            self.processBye(msg_dict)
+            self.quit = True
+            quitPerceiveActLoop = True
+        else:
+            self.quit = True
+            quitPerceiveActLoop = True
+
+        while (not quitPerceiveActLoop):
+            print "@Agent: Receiving perception from server..."
+            xml = self.massimConnection.receive()
+            msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
+            # time.sleep(0.5)
+            if (msg_type == 'request-action'):
+                self.turnStartTime = time.time()
+                print ""
+                print "@Agent: Step: %s" % msg_dict_private['step']
+
+                # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
+                action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
+
+                # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
+                if (self.communication):
+                    print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
+                    self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
+                self.massimConnection.send(action_xml)
+            elif (msg_type == 'sim-end'):
+                print "@Agent: Received sim-end"
+                print_message(msg_dict_private)
+                quitPerceiveActLoop = True
+            else:
+                print "@Agent: In area 51."
+                print_message(msg_dict_private)
+                self.quit = True
+                quit()
+
+
+
+    #----------------------------------------------------------------------------------------------#
+    def mainLoop(self):
+        self.quit = False
+        agent.connect()
+        self.currentLoop = 0
+        while (not self.quit):
+            self.currentLoop += 1
+            self.prologInitialization()
+            self.perceiveActLoop()
+            self.prologFinalization()
+        if not self.logToFile:
+            raw_input("\nFinished. Press ENTER to continue...")
+        agent.disconnect()
 
 
 
@@ -397,15 +394,15 @@ if (__name__== "__main__"):
     
     args = parser.parse_args()
     
-    agent = PrologAgent( args.user
-                       , args.password
-                       , args.log
-                       , args.massimHost
-                       , args.perceptServerHost
-                       , args.perceptServerPort
-                       , args.dummy
-                       , args.communication
-                       , args.verbose
-                       )
+    agent = Agent( args.user
+                 , args.password
+                 , args.log
+                 , args.massimHost
+                 , args.perceptServerHost
+                 , args.perceptServerPort
+                 , args.dummy
+                 , args.communication
+                 , args.verbose
+                 )
     agent.mainLoop()
 
