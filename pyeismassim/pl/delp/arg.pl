@@ -25,14 +25,14 @@ doNotFail(_).
 % Realiza todo el ciclo de argumentación, teniendo previamente todo lo que necesita asertado.
    
 meta(X) :-     
-    assert(mejorMeta(_, -1000)), !, writeln('Meta 1'), % meta con "menos infinito"
-    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !, writeln('Meta 2'),
-    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !, writeln('Meta 3'),
-    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, writeln('Meta 4'),
-    
+    assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
+    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
+    foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
+    foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
+    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
     
     myPosition(Position),
-    doNotFail(calcMeta(quedarse(Position))), !, writeln('Meta quedarse'),
+    doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
     
@@ -42,12 +42,13 @@ meta(X) :-
     retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
-    writeln(X),
+
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
-    writeln(Answer), 
+    % writeln(Answer), 
     Answer = yes, !,
+    writeln(X),
     writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,
@@ -69,6 +70,19 @@ is_a_built_in(notEqual(_X,_Y)).
 
 is_a_built_in(phase(_)). % delp revisara las fases
 
+is_a_built_in(role(_, _)).
+
+is_a_built_in(position(_, _)).
+
+position(Agent, Position) :-
+    currentStep(Step),
+    position(Step, Agent, Position).
+
+% Para poner banderas
+is_a_built_in(w(_)).
+
+w(X) :- writeln(X).
+
 % Operaciones aritméticas
 % DEPRECATED
 % Conviene usar una sola fórmula para las metas
@@ -82,6 +96,8 @@ greaterEq(X,Y) :- X >=  Y.
 lessEq(X,Y)    :- X =<  Y.
 equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sólo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
 notEqual(X,Y)  :- X \=  Y.
+
+
 
 % Por cuestiones históricas y emocionales, todo lo que sigue va a quedar. (El criterio de comparación).
 

@@ -1,8 +1,6 @@
 ﻿:- dynamic h/1.
 
 :- [
-        % 'edges.pl', 
-		% '../kmap.pl',
         'nodes.pl', 
         'agents.pl'
    ].
@@ -119,17 +117,6 @@ appears(Element, [OtherTeam | Tail], CountTeam, CountOtherTeam, OtherTeam) :-
     appears(Element, Tail, CountTeam, Aux, OtherTeam), 
     CountOtherTeam is Aux + 1.
 
-
-% checkMajyorityInNode(+Node, +Team)
-% checks if the number of agents of team Team are majority in node Node.
-
-% checkMajorityInNode(Node, Team) :-  teamsInNode(Node, Teams), 
-%                                    appears(Team, Teams, TeamInNode), 
-%                                    length(Teams, TeamsInNode), 
-%                                    Majority is floor(TeamsInNode / 2), 
-%                                    TeamInNode > Majority,
-%                                    setOwner([Node], Team).
-% checkMajorityInNode(_, _).
 checkMajorityInNode(Node) :-  
     teamsInNode(Node, Teams), 
 	myTeam(Team1),
@@ -288,79 +275,6 @@ moveAgent(Agent, Node) :-
     retractall(h(position(_Step, Agent, _))),
     assert(h(position(Step, Agent, Node))).
 
-visibleNode(N) :-
-    explored(N),
-    inRange(N),
-    foreach(
-        k(edge(N, N1, _)),
-        inRange(N1)
-    ), !,
-    retract(notVisible(N)),
-    asserta(visibleNode(N)).
-    
-    
-% toogleOnVisibleNode(+Node)
-% si el nodo ya estÃ¡ marcado como visible, no hace nada
-% sino, hace el toogle
-toogleOnVisibleNode(Node) :-
-    visibleNode(Node), !.
-    
-toogleOnVisibleNode(Node) :-
-    retractall(notVisible(Node)),
-    % write('1.3 retract '),write(Agent),nl,
-    asserta(visibleNode(Node)).
-    % write('1.4 asserta '),write(Agent),nl.
-    
-toogleOffVisibleNodes :-
-    foreach(
-                visibleNode(N),
-                (
-                    retract(visibleNode(N)),
-                    assert(notVisible(N))
-                )
-           ).
-    
-agentsRangeVision(Step, MyTeam, Range, Position) :-
-    team(Agent, MyTeam),
-    visualRange(Step, Agent, Range),
-    position(Step, Agent, Position),
-    write(position(Step, Agent, Position)),nl,
-    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
-    
-% setExploredAndVisible
-% predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
-% y como visibleNode(Node) a los nodos a los que marque como explorados ESTE TURNO.
-setExploredAndVisible :-
-    currentStep(Step),
-    myTeam(MyTeam),
-    foreach(
-        (
-            agentsRangeVision(Step, MyTeam, Range, Position)
-        ),
-        (
-            setExploredAndVisibleAux1(Range, Position)
-            % writeln(Range),
-            % writeln(Position)
-        )
-    ).
-
-setExploredAndVisibleAux1(Range, Position) :-	
-	
-	retractall(isGoal(_, _)),
-	assert((isGoal(_Node2, Cost) :- !, Cost < Range)),
-	
-	foreach(
-		breadthFirst(Position, Node, _Path, _Cost),
-		setExploredAndVisibleAux2(Node)		
-	).
-	% write('termine agente '),write(Agent),nl	
-	
-setExploredAndVisibleAux2(Node) :- 
-	% write(' Marking node as explored: '),write(Node),nl,
-	retractall(notExplored(Node)),
-	assertOnce(explored(Node)),
-	toogleOnVisibleNode(Node).
-    
 % coloringAlgorithm
 % clears the owner of all teams and runs the 3 steps of the coloring algorithm.
 
@@ -455,19 +369,6 @@ teamPoints(Team, Points) :-
     teamHPoints(Team, Points),
     write(actualPoints),write(': '),
     writeln(Points).
-
-/*
-teamPoints(Team, Points) :-
-    currentStep(Step),
-    findall(
-        [Node, Team, Value],
-        (
-            k(nodeTeam(Step, Node, Team)), 
-            k(nodeValue(Node, Value))
-        ), 
-        ListOfNodes),
-    calcPoints(ListOfNodes, 0, Points).
-*/
 	
 calcPoints([], Points, Points).
 
