@@ -28,13 +28,23 @@
            notExplored/1,
            explored/1,
            plan/1,
+		   ultimaCompra/1,
            intention/1,
            countTurns/1,
+           verbose/0,
            myVisionRange/1.
 
 :- [graph/map, 
     utils, 
     beliefs].
+    
+
+:- use_module(library(time)).
+
+:- use_module(library(heaps)).
+
+% :- set_prolog_flag(debug_on_error, false).
+
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -241,14 +251,14 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-	asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
-    asserta( k(agentStatus(Agent,      Step, Status))       ).
+	assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    assertOnce( k(agentStatus(Agent,      Step, Status))       ).
 
 
 
@@ -257,41 +267,41 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-    asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
+    assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
 %------------------------------------------------------------------------------%
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -479,20 +489,20 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    Recharge is round(MaxEnergy * 0.5). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
     status(Step, Agent, disabled), !,
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2).
+    Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -502,17 +512,63 @@ checkLastAction :-
 	
 checkLastAction :-
 	retract(plan([_Action | Actions])),
-	assert(plan(Actions)).
+	assert(plan(Actions)), !.
+	
+setBuyCount :-
+	currentStep(0), !,
+	assert(buyCount(sensor, 0)),
+	assert(buyCount(shield, 0)),
+	assert(buyCount(sabotageDevice, 0)).
+	
+setBuyCount :-
+	lastAction(buy),
+	lastActionResult(successful),
+	ultimaCompra(Item),
+	retract(buyCount(Item, CurrentCount)),
+	NewCount is CurrentCount + 1,
+	assert(buyCount(Item, NewCount)), !.
+	
+setBuyCount :- !.
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                      Run                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-run(Action) :-
-
+% TimeLimit in seconds
+run(TimeLimit, Action) :-
+    write('time limit: '),writeln(TimeLimit),
+    catch( % try
+        call_with_time_limit(TimeLimit, run2(Action)), 
+        % run2(Action),
+        E, 
+        ( % except :
+            write('ERROR!!!!!!!!!!!!: '),
+            writeln(E),
+            writeln('Executing dummy now:'),
+            retractall(b(_)),
+            retractall(b(_) <- true),
+            execDummy(Action)
+        )
+    ), !.
+   
+run(_TimeLimit, Action) :- 
+	retractall(b(_)),
+    retractall(b(_) <- true),
+    retractall(intention(_)),
+    assert(intention(quedarse(_))),
+	writeln('Run: caso de stop iteration'),
+	planning(quedarse(_)),
+    exec(Action).
+    
+run2(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
+    checkLife,
+	calcTime(setMuertos),
+   	printFindAll('muertos:', muertos(_, _)),
     checkLastAction,
+	calcTime(setBuyCount),
+  	printFindAll('buyCount:', buyCount(_, _)),
     plan([]),
     % dumpKB, 
     !,
@@ -525,51 +581,58 @@ run(Action) :-
     % concat(S0, '.pl', File),
     % writeln(File),
     % saveMap(File),
+    
+    currentStep(Step),
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '.pl', File),
+    writeln(File),
+    saveMap(File),
+    
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-    calcTime(argumentation(Meta)), !,
+	calcTime(setNodesAtDistance(7)), !,
+    calcTime(argumentation(Meta)),
+
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
-    % writeln(1),
     exec(Action),
-    % writeln(1),
     writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 
-run(Action) :-	
+run2(Action) :-	
     intention(Meta),
     writeln(Meta),
 	cutCondition(Meta), !, 
-	writeln('Condicion de corte!'),
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
+	calcTime(setNodesAtDistance(7)), !,
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
-    % writeln(1),
     exec(Action),
-    % writeln(1),
     writeln(Action),
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 	    
-run(Action) :-	
+run2(Action) :-	
     calcTime(setExploredAndVisible),
+	calcTime(setNodesAtDistance(7)), !,
     intention(Meta),
-    writeln(Meta),
-	replanning(Meta), !,
+	calcTime(replanning(Meta)), !,
     exec(Action),
     writeln(Action),
     retractall(b(_)),
+    retractall(b(_) <- true),
     toogleOffVisibleNodes.	
 
 	
-run(Action) :-	
+run2(Action) :-	
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(argumentation(Meta)), !,
@@ -596,6 +659,7 @@ argumentation(Meta) :-
     assert(intention(Meta)).
 
 calcTime(Exec) :-
+    verbose, !,
     write('<predicate name="'),write(Exec), writeln('">'),
     get_time(Before),
     call(Exec),
@@ -604,30 +668,35 @@ calcTime(Exec) :-
     write('<time value="'),write(Time), writeln('"/>'),
     writeln('</predicate>').
     
-% calcTime(Exec) :-
-    % call(Exec).
+calcTime(Exec) :- call(Exec).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-% planning :- 
-%    intention(explore),
-%    searchNeigh(N),
-%    retract( plan(_)         ),
-%    assert(  plan([goto(N)]) ).
-% planning :- 
-%    intention(recharge),
-%    retract( plan(_)          ),
-%    assert(  plan([recharge]) ).
-
 planning(explorar(Node)) :-
     assertPlan(Node, [[survey]]).
 
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
+	
+planning(reagruparse) :-
+	b(pathReagruparse([])), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+	
+planning(reagruparse) :-
+	b(pathReagruparse(Actions)),
+	retract(plan(_)),
+    assert(plan(Actions)).
+	
+planning(comprar(Item)) :-
+	retractall(ultimaCompra(_)),
+	assert(ultimaCompra(Item)),
+	retract(plan(_)),
+    assert(plan([[buy, Item]])).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -644,6 +713,19 @@ planning(aumento(Node)) :-
     
 planning(expansion(Node)) :-
     assertPlan(Node, []).
+    
+planning(defensaPropia(MyPos)) :-
+    myPosition(MyPos), !,
+    retractall(plan(_)),
+    assert(plan([[parry]])).
+    
+planning(defensaPropia(Node)) :-
+    assertPlan(Node, []).
+    
+planning(auxilio(Repairer)) :-
+    currentStep(Step),
+    position(Step, Repairer, Node),
+    assertPlan(Node, []).
 
 planning(quedarse(_Node)) :-
     myEnergy(Energy),
@@ -655,7 +737,36 @@ planning(quedarse(_Node)) :-
 planning(quedarse(_Node)) :-
     retractall(plan(_)),
     assert(plan([[skip]])).
+
+assertPlan(_Node, _FinalActions) :-
+    myPosition(InitialPosition),
+    not(b(path(_, _, _, _, _, _, _, _))), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
   
+assertPlan(Node, FinalActions) :-
+    myPosition(InitialPosition),
+    
+    b(path(InitialPosition, Node, FinalActions, _, _, [], _, _)), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+  
+assertPlan(Node, FinalActions) :-
+    myPosition(InitialPosition),
+    
+    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
+    retract(plan(_)),
+    assert(plan(Actions)).
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  Replanning                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Calcula un nuevo plan todos los turnos. No genera problemas porque sobra el tiempo.
+% Genera el nuevo plan, y llama a planning para que lo ejecute.
+
 replanning(explorar(Node)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -663,23 +774,37 @@ replanning(explorar(Node)) :-
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
     
+replanning(reagruparse) :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	planning(reagruparse).
+
 replanning(atacar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
     currentStep(Step),
     position(Step, Agent, EnemyPosition),
     retractall(isFail(_, _)),
-    searchPath(Position, EnemyPosition, Energy, [[attack, Agent]], 2),
+    searchPathSaboteur(Position, EnemyPosition, Agent, Energy),
     planning(atacar(Agent)).
     
 replanning(reparar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
     currentStep(Step),
-    position(Step, Agent, EnemyPosition),
+    position(Step, Agent, Position2),
     retractall(isFail(_, _)),
-    searchPath(Position, EnemyPosition, Energy, [[repair, Agent]], 2),
+    searchPath(Position, Position2, Energy, [[repair, Agent]], 2),
     planning(reparar(Agent)).
+    
+replanning(auxilio(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, Position2),
+    retractall(isFail(_, _)),
+    searchPath(Position, Position2, Energy, [], 0),
+    planning(auxilio(Agent)).
     
 replanning(probear(Node)) :-
     myPosition(Position),
@@ -702,23 +827,21 @@ replanning(expansion(Node)) :-
     searchPath(Position, Node, Energy, [], 0),
     planning(expansion(Node)).
     
-replanning(_) :-
-    writeln('aca no deberia pasar').
-  
-assertPlan(Node, _FinalActions) :-
-    myPosition(InitialPosition),
-    % myEnergy(Energy),
+replanning(atacar(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, EnemyPosition),
+    retractall(isFail(_, _)),
+    searchPathSaboteur(Position, EnemyPosition, Agent, Energy),
+    planning(atacar(Agent)).
     
-    b(path(InitialPosition, Node, _, _, _, [], _, _)),
+%si algun camino no se encontro, se planea quedarse
+replanning(_) :- 
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
-  
-assertPlan(Node, FinalActions) :-
-    myPosition(InitialPosition),
-    % myEnergy(Energy),
-    
-    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
-    retract(plan(_)),
-    assert(plan(Actions)).
+
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -739,48 +862,72 @@ cutCondition(Meta) :-
     myPosition(MyPos),
     currentStep(Step),
     position(Step, Agent, MyPos),
+    status(Step, Agent, normal),
     myTeam(MyTeam),
     team(Agent, Team),
     Team \= MyTeam,
-    role(Agent, saboteur).
+    role(Agent, saboteur),
+    writeln('hay un enemigo saboteador en mi nodo').
+    
+cutCondition(Meta) :-
+    Meta \= atacar(_),
+    
+    mePegaron,
+    writeln('hay un enemigo saboteador en mi nodo y me bajo la vida').
+    
+cutCondition(Meta) :-
+    Meta \= reparar(_),
+    Meta \= auxilio(_),
+    myStatus(disabled),
+    writeln('me mataron :(').
 
 cutCondition(explorar(Node)) :-
 	explored(Node),
 	not(hasAtLeastOneUnsurveyedEdge(Node)), 
 	writeln('el nodo ya fue explorado').
 	
-cutCondition(explorar(Node)) :-
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
+cutCondition(comprar(_)).
+
+cutCondition(quedarse(_)).
 	
 cutCondition(probe(Node)) :- 
 	nodeValue(Node, Value),
-	Value \= unknown.
+	Value \= unknown,
+    writeln('el nodo ya fue probeado').
+    
+cutCondition(defensaPropia(_)):-
+	countTurns(1), !,
+    writeln('estoy defendiendome (y paso un turno)').
 	
-cutCondition(probe(Node)) :- 
-	myTeam(MyTeam),
+cutCondition(reagruparse):-
+	countTurns(3),
+    writeln('pasaron 3 turnos y no llegue a la zona').
+	
+cutCondition(reagruparse):-
+	% myPosition(MyPos),
 	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
+	myTeam(Team),
+	myName(Agent),
+	agenteEnZona(Step, Agent, Team),	
+    writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-
-	countTurns(5).
+	countTurns(5),
+    writeln('pasaron 5 turnos y no le pegue').
 	
 cutCondition(atacar(Agent)) :-
 	currentStep(Step),
-	status(Step, Agent, disabled).
+	status(Step, Agent, disabled),
+    writeln('moli a palos al agente enemigo').
+    
+cutCondition(auxilio(_Agent)) :-
+	countTurns(5),
+    writeln('pasaron 5 turnos y no consegui ayuda').
+    
+cutCondition(auxilio(_Agent)) :-
+	myMaxHealth(Health),
+    myHealth(Health),
+    writeln('me curaron :D').
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
@@ -797,37 +944,18 @@ cutCondition(atacar(Agent)) :-
 	( 
 		role(Agent2, unknown);
 		role(Agent2, saboteur)
-	).
-	
-cutCondition(aumento(Node)) :- 
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
-	
-cutCondition(expansion(Node)) :- 
-	myTeam(MyTeam),
-	currentStep(Step),
-	position(Step, Agent, Node),
-	team(Agent, Team),
-	MyTeam \= Team,
-	( 
-		role(Agent, unknown);
-		role(Agent, saboteur)
-	).
+	),
+    writeln('estoy por ser atacado por dos saboteadores').
 
 cutCondition(reparar(_Agent)) :-
-	countTurns(5).
+	countTurns(5),
+    writeln('pase 5 turnos sin reparar a mi amigo').
     
 cutCondition(reparar(Agent)) :-
 	currentStep(Step),
 	health(Step, Agent, Value),
-	maxHealth(Step, Agent, Value).
+	maxHealth(Step, Agent, Value),
+    writeln('ya repare a mi amigo').
 	
 cutCondition(reparar(Agent)) :-
 	myTeam(MyTeam),
@@ -835,7 +963,8 @@ cutCondition(reparar(Agent)) :-
 	status(Step, Agent, normal),
 	status(Step, Agent2, disabled),
 	Agent \= Agent2,
-	team(Agent2, MyTeam).
+	team(Agent2, MyTeam),
+    writeln('hay otro agente que necesita mas ayuda').
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
@@ -881,24 +1010,6 @@ hasAtLeastOneUnsurveyedEdgeAux(Node) :-
 
 
 %------------------------------------------------------------------------------%
-%makeAdjacencyList(Graph) :-
-%    findall(
-%        Node,
-%        k(nodeValue(Node, Cost)),
-%        Nodes
-%    ),
-%    findall(
-%        edge(Node, Node2, Value),
-%        k(edge(Node1, Node2, Value)),
-%        Edges
-%    ),
-%    makeAdjacencyList(Nodes, Edges, Graph).
-%
-%makeAdjacencyList(Nodes, Edges, Graph1) :-
-%    addNodes(Nodes, Graph0),
-%    addEdges(Edges, Graph1).
-
-%------------------------------------------------------------------------------%
 redirect_output(Filename) :-
     write('Prolog redirecting output to: '),write(Filename),nl,
     open(Filename, write, S),
@@ -938,13 +1049,14 @@ printList([H | T]) :-
 %------------------------------------------------------------------------------%
 
 printFindAll(Title, WhatToFind) :-
+    verbose,
     findall(WhatToFind, WhatToFind, L),
     % sort(L, SL),
     write(Title),
     nl,
     printList(L).
 
-
+printFindAll(_Title, _WhatToFind).
 
 %------------------------------------------------------------------------------%
 dumpKB :-

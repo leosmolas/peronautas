@@ -1,6 +1,13 @@
 ﻿% se instancia con lo que no esta probeado
 % DESIRE explorar(Nodo)
 probear(Value, X) -< 
+    probeoYGanoZona(Value, X).
+
+probear(Value, X) -< 
+    probeoSinPerderMucho(Value, X).
+    
+probeoYGanoZona(Value, X) -<
+
     b(distancia(X, [[probe]], Dist, EnergyLeft)),
     notProbedInZone(X, InZone),
     b(difPuntosZona(X, DifPuntos)),
@@ -8,6 +15,23 @@ probear(Value, X) -<
     phaseCoef(probear, Coef),
     probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value).
     
+~probeoYGanoZona(_Value, X) <-
+    b(distancia(X, [[probe]], Dist, _EnergyLeft)),
+    greater(Dist, 3).
+    
+probeoSinPerderMucho(Value, X) -<
+    b(distancia(X, [[probe]], Dist, EnergyLeft)),
+    notProbedInZone(X, InZone),
+    b(difPuntosSinMi(DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(probear, Coef),
+    probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value).
+    
+~probeoSinPerderMucho(_Value, X)  <-
+    b(distancia(X, [[probe]], Dist, _EnergyLeft)),
+    lessEq(Dist, 3).    
+    
+        
 probearValue(Dist, EnergyLeft, InZone, Positivo, Negativo, Coef, Value) :-
     Value is ((10 - Dist) ** 2 * 2 + Positivo - Negativo ** 2 + InZone + EnergyLeft) * Coef.
     

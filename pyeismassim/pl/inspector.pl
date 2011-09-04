@@ -2,6 +2,8 @@
 %                               Inspector                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+:- ['delp/inspector.delp'].
+
 %Actions (priority order):
 %                   -inspect
 %                   -survey
@@ -16,19 +18,23 @@ execDummy(Action) :-
     write(1),nl,
     action(Action).
 
-        
-rolMetas.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parte de argumentacion
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+rolMetas:-
+    foreach(
+        b(posibleInspectar(Agent, PosicionAgente)), 
+        doNotFail(calcMeta(inspectar(Agent, PosicionAgente)))
+    ).
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rolSetBeliefs :-
     myStatus(normal), !,
     calcTime(setPosibleInspectar),
     rolSetDistancia,
-    setDifPuntosSinMi,
-    printFindAll('beliefs inspector', b(posibleInspectar(_Agent, _PosicionAgente))),
-	printFindAll(
-		'(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true)', 
-		(b(posibleInspectarConEnemigos(_, _)) <- true)
-	).
+    setDifPuntosSinMi.
 
 rolSetBeliefs.
 
@@ -56,7 +62,7 @@ setPosibleInspectar :-
     enemigosPosicion(Step, Posiciones),
     foreach(
 		member(par(PosicionAgente, Agent), Posiciones),
-		calcTime(setPosibleInspectarAux(PosicionAgente, Agent))
+		setPosibleInspectarAux(PosicionAgente, Agent)
     ).
     
 setPosibleInspectar.
@@ -78,7 +84,7 @@ setPosibleInspectarAux(PosicionAgente, Agent) :-
 	buscarEnemigos(PosicionAgente, CantEnemigos),
 	foreach(
 		member(Vecino, LVecinosPosicion),
-		calcTime(setPosibleInspectarAux2(Agent, Vecino))
+		setPosibleInspectarAux2(Agent, Vecino)
 	),
 	assert(b(posibleInspectar(Agent, PosicionAgente))),
 	assertOnce(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true).
@@ -123,7 +129,10 @@ rolSetDistancia :-
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 6)),
     foreach(
-        b(posibleInspectar(_Enemy, Node)),
+        (
+            b(posibleInspectar(_Enemy, Node)),
+            not(b(distancia(Node,[[inspect]],_,_))<-true)
+        ),
         (
             searchPath(Position, Node, Energy, [[inspect]], 2)
         )
@@ -203,24 +212,3 @@ action([goto, X]) :-
     
 action([recharge]) :-
     write(5),nl.
-
-%-------------------------------  Old Code  ------------------------------%
-
-% exec(Action) :- action(Action).
-
-% action(inspect(Agent)) :-
-   % energy(X),
-   % X > 1,
-   % my_name(Name),
-   % k(position(Name,  Position)),
-   % k(position(Agent, Position)),
-   % teamOfAgent(Agent, Team),
-   % Team \= d3lp0r, !.
-
-% action(goto(Vertex)) :-
-   % % Random walking
-   % % select a neighbouring vertex
-   % Vertex = something.
-
-% action(recharge).
-

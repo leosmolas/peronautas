@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -74,17 +74,28 @@ setEnemyDistance :-
     position(Step, Name, Position),
     energy(Step, Name, Energy),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     foreach(
         b(enemyPosition(Agent, Node)),
         (
-			
-            searchPath(Position, Node, Energy, [[attack, Agent]], 2)
+            searchPathSaboteur(Position, Node, Agent, Energy)
         )
     ),
     printFindAll('attack paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
 
+searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
+    retractall(isGoal(_)),	
+    assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
+    singleton_heap(InitialFrontier, ucsNode(Position, Energy, [], [], 0), 0),
+    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
+    NewTurns is PathCost + 1,
+    calcRecharge(NewEnergy, 2, [[attack, Agent]], NewActions, NewTurns, NewTurns2, RemainingEnergy1),
+    append(Actions, NewActions, Plan),
+    not(isFail(ucsNode(FinalNode, RemainingEnergy1, Path, Plan, NewTurns2))), !,
+    assert(b(path(Position, FinalNode, [[attack, Agent]], Energy, Path, Plan, NewTurns2, RemainingEnergy1))),
+    assert(b(distancia(FinalNode, [[attack, Agent]], NewTurns2, RemainingEnergy1)) <- true).
     
+searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
 
     
 %------------------------------  Attack  --------------------------------%

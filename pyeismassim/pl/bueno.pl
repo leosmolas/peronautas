@@ -1,4 +1,4 @@
-:- ['delp/delp.pl'].
+﻿:- ['delp/delp.pl'].
 
 :- consult('bueno.delp').
 
