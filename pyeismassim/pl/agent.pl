@@ -37,7 +37,13 @@
     utils, 
     beliefs].
     
-% :- use_module(library(time)).
+
+:- use_module(library(time)).
+
+:- use_module(library(heaps)).
+
+% :- set_prolog_flag(debug_on_error, false).
+
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -244,14 +250,14 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-	asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ),
-    asserta( k(agentStatus(Agent,      Step, Status))       ).
+	assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ),
+    assertOnce( k(agentStatus(Agent,      Step, Status))       ).
 
 
 
@@ -260,41 +266,41 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
-    asserta( k(agentPosition(Agent,    Step, Position))     ),
-    asserta( k(agentEnergy(Agent,      Step, Energy))       ),
-    asserta( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
-    asserta( k(agentHealth(Agent,      Step, Health))       ),
-    asserta( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
-    asserta( k(agentStrength(Agent,    Step, Strength))     ),
-    asserta( k(agentVisualRange(Agent, Step, VisualRange))  ).
+    assertOnce( k(agentPosition(Agent,    Step, Position))     ),
+    assertOnce( k(agentEnergy(Agent,      Step, Energy))       ),
+    assertOnce( k(agentMaxEnergy(Agent,   Step, MaxEnergy))    ),
+    assertOnce( k(agentHealth(Agent,      Step, Health))       ),
+    assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
+    assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
+    assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
 
 %------------------------------------------------------------------------------%
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentHealth(      Agent, Step, Health) )),
-    asserta( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
-    asserta( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
-    asserta( k(agentTeam(        Agent, Team) )),
-    asserta( k(agentPosition(    Agent, Step, Position    ) )),
-    asserta( k(agentStatus(      Agent, Step, Status) )).
+    assertOnce( k(agentTeam(        Agent, Team) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status) )).
 
 
 
@@ -482,20 +488,20 @@ getInfo(agentVisualRange, Step, Agent, VisualRange) :-
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 myRechargeEnergy(Recharge) :-
     myMaxEnergy(MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2). % TODO: testear si esto es correcto -> DONE: es correcto
+    Recharge is round(MaxEnergy * 0.5). % TODO: testear si esto es correcto -> DONE: es correcto
     
 rechargeEnergy(Step, Agent, Recharge) :-
     status(Step, Agent, disabled), !,
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.1).
+    Recharge is round(MaxEnergy * 0.3).
     
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
-    Recharge is round(MaxEnergy * 0.2).
+    Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -520,14 +526,22 @@ run(TimeLimit, Action) :-
         E, 
         ( % except :
             write('ERROR!!!!!!!!!!!!: '),
+            writeln(E),
             print_message(K, E), 
             writeln('Executing dummy now:'),
             retractall(b(_)),
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ).
-    
+    ), !.
+   
+run(TimeLimit, _) :- 
+	retractall(b(_)),
+    retractall(b(_) <- true),
+    retractall(intention(_)),
+    assert(intention(quedarse(_))),
+	writeln('Run: caso de stop iteration'),
+	planning(quedarse(_)).
     
 run2(Action) :-
     currentStep(Step),
@@ -546,11 +560,19 @@ run2(Action) :-
     % writeln(File),
     % saveMap(File),
     
+    currentStep(Step),
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '.pl', File),
+    writeln(File),
+    saveMap(File),
+    
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(8)),
-    calcTime(argumentation(Meta)), !,
+	calcTime(setNodesAtDistance(7)), !,
+    calcTime(argumentation(Meta)),
+
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
     exec(Action),
@@ -566,7 +588,7 @@ run2(Action) :-
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(6)),
+	calcTime(setNodesAtDistance(7)), !,
 	calcTime(argumentation(MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
@@ -578,12 +600,13 @@ run2(Action) :-
 	    
 run2(Action) :-	
     calcTime(setExploredAndVisible),
-	calcTime(setNodesAtDistance(6)),
+	calcTime(setNodesAtDistance(7)), !,
     intention(Meta),
 	calcTime(replanning(Meta)), !,
     exec(Action),
     writeln(Action),
     retractall(b(_)),
+    retractall(b(_) <- true),
     toogleOffVisibleNodes.	
 
 	
@@ -635,6 +658,17 @@ planning(explorar(Node)) :-
 
 planning(probear(Node)) :-
     assertPlan(Node, [[probe]]).
+	
+planning(reagruparse) :-
+	b(pathReagruparse([])), !,
+    retractall(intention(_)),
+    assert(intention(quedarse(InitialPosition))),
+    planning(quedarse(InitialPosition)).
+	
+planning(reagruparse) :-
+	b(pathReagruparse(Actions)),
+	retract(plan(_)),
+    assert(plan(Actions)).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -675,10 +709,10 @@ assertPlan(_Node, _FinalActions) :-
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
   
-assertPlan(Node, _FinalActions) :-
+assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
     
-    b(path(InitialPosition, Node, _, _, _, [], _, _)), !,
+    b(path(InitialPosition, Node, FinalActions, _, _, [], _, _)), !,
     retractall(intention(_)),
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
@@ -703,7 +737,12 @@ replanning(explorar(Node)) :-
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
-    
+	
+replanning(reagruparse) :-
+	assertReagruparseGoal,
+	setPathReagruparse,
+	planning(reagruparse).
+
 replanning(atacar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
@@ -717,10 +756,19 @@ replanning(reparar(Agent)) :-
     myPosition(Position),
     myEnergy(Energy),
     currentStep(Step),
-    position(Step, Agent, EnemyPosition),
+    position(Step, Agent, Position2),
     retractall(isFail(_, _)),
-    searchPath(Position, EnemyPosition, Energy, [[repair, Agent]], 2),
+    searchPath(Position, Position2, Energy, [[repair, Agent]], 2),
     planning(reparar(Agent)).
+    
+replanning(auxilio(Agent)) :-
+    myPosition(Position),
+    myEnergy(Energy),
+    currentStep(Step),
+    position(Step, Agent, Position2),
+    retractall(isFail(_, _)),
+    searchPath(Position, Position2, Energy, [], 0),
+    planning(auxilio(Agent)).
     
 replanning(probear(Node)) :-
     myPosition(Position),
@@ -800,6 +848,18 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+	
+cutCondition(reagruparse):-
+	countTurns(3),
+    writeln('pasaron 3 turnos y no llegue a la zona').
+	
+cutCondition(reagruparse):-
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(Team),
+	myName(Agent),
+	agenteEnZona(Step, Agent, Team),	
+    writeln('llegue a la zona :D').
 
 cutCondition(atacar(_Agent)) :-
 	countTurns(5),
@@ -809,6 +869,15 @@ cutCondition(atacar(Agent)) :-
 	currentStep(Step),
 	status(Step, Agent, disabled),
     writeln('moli a palos al agente enemigo').
+    
+cutCondition(auxilio(_Agent)) :-
+	countTurns(5),
+    writeln('pasaron 5 turnos y no consegui ayuda').
+    
+cutCondition(auxilio(_Agent)) :-
+	myMaxHealth(Health),
+    myHealth(Health),
+    writeln('me curaron :D').
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),

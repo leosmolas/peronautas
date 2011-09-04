@@ -58,8 +58,6 @@ setTeammatePosition :-
     
 assertTeammatePosition(Agent) :-
 	currentStep(Step),
-    writeln(assertTeamMatePosition),
-    write(Agent),writeln(Position),
     position(Step, Agent, Position), !,
 	health(Step, Agent, Health), !, 
 	maxHealth(Step, Agent, MaxHealth), !,
@@ -75,15 +73,21 @@ setTeammateDistance :-
     energy(Step, Name, Energy),
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    repairCost(Cost),
     foreach(
         b(teammatePosition(Agent, Node)),
         (
 
-            searchPath(Position, Node, Energy, [[repair, Agent]], 2)
+            searchPath(Position, Node, Energy, [[repair, Agent]], Cost)
         )
     ),
     printFindAll('repair paths', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1, _))).
 
+repairCost(2) :-
+    myStatus(normal).
+    
+repairCost(3) :-
+    myStatus(disabled).
 
 %------------------------------  Repair  --------------------------------%
 

@@ -24,22 +24,23 @@ doNotFail(_).
 % Calcula la mejor meta con el mundo actual.
 % Realiza todo el ciclo de argumentación, teniendo previamente todo lo que necesita asertado.
    
-meta(X) :-     
+meta(X) :- 
+    retractall(mejorMeta(_, _)),
     assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
-    foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
+    % foreach(b(posibleExpansion(N )), doNotFail(calcMeta(expansion(N )))), !,
     foreach(b(posibleExplorar( N1)), doNotFail(calcMeta(explorar( N1)))), !,
     foreach(b(posibleAumento(  N2)), doNotFail(calcMeta(aumento(  N2)))), !, 
-    % foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
+    foreach(b(posibleAuxilio(  N3)), doNotFail(calcMeta(auxilio(  N3)))), !,
     
     myPosition(Position),
+	doNotFail(calcMeta(reagruparse)),
     doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
     
     % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     
-    mejorMeta(X, _),
-    retractall(mejorMeta(_, _)).
+    mejorMeta(X, _).
     
 calcMeta(X) :-
 
@@ -69,10 +70,10 @@ is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
 
 is_a_built_in(phase(_)). % delp revisara las fases
-
 is_a_built_in(role(_, _)).
-
 is_a_built_in(position(_, _)).
+is_a_built_in(myMaxHealth(_)).
+is_a_built_in(myHealth(_)).
 
 position(Agent, Position) :-
     currentStep(Step),

@@ -44,14 +44,26 @@ class PerceptConnection():
             position      = position_list[0]
             node          = position.get('node')
             vis_range     = position.get('vis_range')
-            result = [    (0,
-                            username,
-                            node,
-                            vis_range,
-                            position['health'],
-                            position['max_health'],
-                          )
-                     ]
+            if 'role' in position:
+                result = [    (0,
+                                username,
+                                node,
+                                vis_range,
+                                position['health'],
+                                position['max_health'],
+                                position['role']
+                              )
+                         ]
+
+            else:
+                result = [    (0,
+                                username,
+                                node,
+                                vis_range,
+                                position['health'],
+                                position['max_health'],
+                              )
+                         ]
             for v in dictionary.get('vis_verts', []):
                 result.append((1, 
                             v['name'],
@@ -114,12 +126,22 @@ class PerceptConnection():
                        }
             for p in stringlist:
                 if   (p[0] == 0):
-                    result['position'].append(      { 'name' : p[1],
-                                                      'node' : p[2],
-                                                      'vis_range' : p[3],
-                                                      'health' : p[4],
-                                                      'max_health' : p[5]
-                                                    })
+                    if len(p) == 6:
+                        result['position'].append(      { 'name'       : p[1],
+                                                          'node'       : p[2],
+                                                          'vis_range'  : p[3],
+                                                          'health'     : p[4],
+                                                          'max_health' : p[5]
+                                                        })
+                    else:
+                        result['position'].append(      { 'name'       : p[1],
+                                                          'node'       : p[2],
+                                                          'vis_range'  : p[3],
+                                                          'health'     : p[4],
+                                                          'max_health' : p[5],
+                                                          'role'       : p[6]
+                                                        })
+
                 elif (p[0] == 1):
                     result['vis_verts'].append(     { 'name' : p[1],
                                                       'team' : p[2] 

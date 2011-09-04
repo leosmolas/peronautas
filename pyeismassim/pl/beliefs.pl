@@ -19,10 +19,12 @@ setBeliefs :-
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
-    calcTime(setPosibleExpansion), !,
+    % calcTime(setPosibleExpansion), !,
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
-    % calcTime(setPosibleAuxilio), !,
+    calcTime(setPosibleAuxilio), !,
+	calcTime(setReagruparse), !,
+    printFindAll('difPuntosSinMi', b(difPuntosSinMi(_)) <- true),
     printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
     printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
@@ -158,18 +160,24 @@ setExploredAndVisibleAux2(Node) :-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setFrontera :-
-    currentStep(Step),
-    myTeam(T),
+    
     foreach(
-        (
-            k(nodeTeam(Step, Node, T)),
-            
-            k(edge(Node, Neigh, _V)),
-            k(nodeTeam(Step, Neigh, T2)),
-            T2 \= T
-        ),
+        esFrontera(Node),
         assertOnce(b(frontera(Node)))
     ).
+    
+esFrontera(Node) :-
+    currentStep(Step),
+    myTeam(T),
+    k(nodeTeam(Step, Node, T)),
+    esFrontera2(Node).
+    
+esFrontera2(Node) :-
+    currentStep(Step),
+    myTeam(T),
+    k(edge(Node, Neigh, _V)),
+    k(nodeTeam(Step, Neigh, T2)),
+    T2 \= T, !.
 
 setEstoyEnLaFrontera :-
     setFrontera,
@@ -179,11 +187,11 @@ setEstoyEnLaFrontera :-
     
 setEstoyEnLaFrontera.
 
-chequearFrontera(Neigh, T) :-
-	currentStep(Step),
-    member(Y, Neigh),
-    k(nodeTeam(Step, Y, Other)), 
-	Other \= T, !.
+% chequearFrontera(Neigh, T) :-
+	% currentStep(Step),
+    % member(Y, Neigh),
+    % k(nodeTeam(Step, Y, Other)), 
+	% Other \= T, !.
 
 setPosibleExpansion :-
     b(estoyEnLaFrontera),
@@ -253,13 +261,17 @@ setDifPuntosNode(Node, A, T) :-
     
 setDifPuntosNode(_Node, _A, _T).
 
+
 setDifPuntosSinMi :-
 	(b(difPuntosSinMi(_DifPuntos)) <- true), !.
 
 setDifPuntosSinMi :-
+    myStatus(disabled), !,
+    assert(b(difPuntosSinMi(0)) <- true).
+
+setDifPuntosSinMi :-
     
     b(actualPoints(ActualPoints)),
-
     setHypotheticalMap,
 	currentStep(Step),
     myName(Agent),
@@ -305,7 +317,26 @@ setAumento :-
 	currentStep(Step),
     retractall(isGoal(_, _)),
 	retractall(isFail(_, _)),
-	assert((isGoal(_Node, Cost) :- !, Cost =< 2, Cost > 0)),
+    assert((
+        isGoal(Node, Cost) :- 
+            !, 
+            Cost =< 2, 
+            Cost > 0, 
+            currentStep(Step),
+            k(nodeTeam(Step, Node, none)),
+            b(nodeAtDistance(Node, Distance)),
+            Distance < 4
+    )),
+	assert((
+        isFail(_, Cost2) :- 
+            Cost2 > 2
+    )),
+    assert((
+        isFail(Node, _) :- 
+            currentStep(Step),
+            myTeam(MyTeam),
+            k(nodeTeam(Step, Node, MyTeam))
+    )),
     setof(
         FinalNode,
         setPosibleAumentoAux(FinalNode, Step, Team),
@@ -340,9 +371,13 @@ posibleAumento(X, Aumento, Nodo) :-
     Dist < NewCost.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
-    b(frontera(Node)),	
+    currentStep(Step),	
+	b(frontera(Node)),	
+	position(Step, Agent, Node),
+	team(Agent, MyTeam),
+    b(nodeAtDistance(Node, Distance)),
+	Distance =< 5,
     breadthFirst(Node, FinalNode, _Path, _Cost),
-    b(nodeAtDistance(FinalNode, _)),
     k(nodeTeam(Step, FinalNode, Team)), 
     Team \= MyTeam.
     
@@ -377,12 +412,13 @@ setPosibleAumentoDistancia :-
         )
     ),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     myEnergy(Energy),
     myPosition(Position),
     foreach(
         (
-            b(posibleAumento(Node1))
+            b(posibleAumento(Node1)),
+            not(b(distancia(Node1, [], _, _))<-true)
         ),
         (
             searchPath(Position, Node1, Energy, [], 0)
@@ -463,7 +499,7 @@ setDistanciaExplorar :-
         )
     ),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)),
     foreach(
         (
             b(posibleExplorar(Node))
@@ -480,35 +516,32 @@ setDistanciaExplorar.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setPosibleAuxilio :-
+
     myHealth(Health),
     myMaxHealth(Max),
     Health < Max,
     foreach(
-        (
-            myTeam(MyTeam),
-            team(Agent, MyTeam),
-            role(Agent, repairer)
-        ),
+        posibleAuxilio(Agent),
         assert(b(posibleAuxilio(Agent)))
     ),
-    writeLenght(
-        'posibleAuxilio', 
-        Agent1, 
-        (
-            b(posibleAuxilio(Agent1))
-        )
-    ),
     b(posibleAuxilio(_)), !,
-    setDifPuntosSinMi,
-    setDistanciaAuxilio.
+    calcTime(setDifPuntosSinMi),
+    calcTime(setDistanciaAuxilio).
     
 setPosibleAuxilio.
+
+posibleAuxilio(Agent) :-
+    myName(MyName),
+    myTeam(MyTeam),
+    role(Agent, repairer),
+    team(Agent, MyTeam),    
+    Agent \= MyName.
     
 setDistanciaAuxilio :-
     myPosition(Position),
     myEnergy(Energy),
     retractall(isFail(_)),
-    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)), !,
+    assertAuxilioIsFail,
     foreach(
         (
             currentStep(Step),
@@ -518,6 +551,96 @@ setDistanciaAuxilio :-
         (
             searchPath(Position, FinalNode, Energy, [], 0)
         )
-    ), !.
+    ).
     
-setDistanciaAuxilio.
+assertAuxilioIsFail :-
+    myStatus(normal),
+    assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 7)), !.
+    
+assertAuxilioIsFail.
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reagruparse
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+equipoVecino(Step, MyPos, Team) :-
+	k(edge(MyPos, Neigh, _)),
+	k(nodeTeam(Step, Neigh, Team)).
+
+setReagruparse :-
+	currentStep(0), !.
+	
+setReagruparse :-
+	not(b(posibleAumento(_))),
+	myPosition(MyPos),
+	currentStep(Step),
+	myTeam(MyTeam),
+	foreach(
+		equipoVecino(Step, MyPos, Team),
+		Team \= MyTeam
+	),
+	% k(nodeTeam(Step, MyPos, Team)),
+	% MyTeam \= Team, 
+	assertReagruparseGoal,
+	setPathReagruparse,
+	setAgentesEnZona.
+	
+setReagruparse.
+
+% Hay alguna zona, el goal es un nodo de mi color.
+assertReagruparseGoal :- 
+	currentStep(Step),
+	myTeam(MyTeam),
+	k(nodeTeam(Step, _Node, MyTeam)), !,
+	retractall(isGoal(_)),
+    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
+		currentStep(Step),
+		myTeam(MyTeam),
+		k(nodeTeam(Step, FinalNode, MyTeam)),
+		equipoVecino(Step, FinalNode, MyTeam)
+	)).
+
+% No hay ninguna zona, el goal es un agente de mi equipo.
+assertReagruparseGoal :- 
+	retractall(isGoal(_)),
+    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
+		currentStep(Step),
+		myName(MyName),
+		myTeam(MyTeam),
+		position(Step, Agent, FinalNode),
+		Agent \= MyName,
+		team(Agent, MyTeam)		
+	)).
+	
+setPathReagruparse :-
+	myPosition(InitialNode),
+	myEnergy(Energy),
+    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    write('pathSearchReagruparse'),
+    ucsAux(InitialFrontier, [], Path, Actions, PathCost, RemainingEnergy),     
+	assert(b(distanciaAZona(PathCost)) <- true),
+	write('distaciaAZona:'), writeln(PathCost),
+    assert(b(pathReagruparse(Actions))).    
+
+setAgentesEnZona :-
+	currentStep(Step),
+	myTeam(MyTeam),
+	findall(
+		Agent,
+		agenteEnZona(Step, Agent, MyTeam),
+		AgentesEnZona
+	),
+	length(AgentesEnZona, Cantidad),
+	write('Agentes en zona:'), writeln(Cantidad),
+	assert(b(agentesEnZona(Cantidad)) <- true).
+
+agenteEnZona(Step, Agent, MyTeam) :-
+	team(Agent, MyTeam),
+	position(Step, Agent, Node),
+	k(nodeTeam(Step, Node, MyTeam)),
+	agenteEnZonaAux(Step, Node, MyTeam).
+	
+agenteEnZonaAux(Step, Node, MyTeam) :-
+	equipoVecino(Step, Node, MyTeam), !.
+		

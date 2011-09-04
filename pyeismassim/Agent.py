@@ -11,22 +11,28 @@ from pyswip.easy                    import *
 
 ####################################################################################################
 class Agent():
-    
-    def __init__(self, USER, PASS, useLog, perceptServerHost, perceptServerPort, dummy, verbose):
-        self.username = USER
-        self.password = PASS
-        self.useLog   = useLog
-        self.dummy    = dummy
+
+    def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, verbose):
+        self.username      = USER
+        self.password      = PASS
+        self.logToFile     = logToFile
+        if massimHost:
+            self.massimHost = massimHost
+        else:
+            self.massimHost = '127.0.0.1'
+        self.dummy         = dummy
+        self.massimDelays = []
+        # self.communication = communication
         self.verbose  = verbose
-        self.auxTimeDummy = 10 #10 milisegundos para ejecutar dummy
-        if useLog:
+        if self.logToFile:
+
             sys.stdout = open('logs/%s-log.txt' % USER, 'w')
         else:
             pass
         self.log = sys.stdout
 
         print "Basic initialization",
-        self.massimConnection = MASSimConnection('127.0.0.1', 12300, USER, PASS)
+        self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         if (perceptServerPort and perceptServerHost):
             self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
         else:
@@ -99,13 +105,20 @@ class Agent():
             quitPerceiveActLoop = True
 
         while (not quitPerceiveActLoop):
+            t0 = time.time()
             xml = self.massimConnection.receive()
+            t1 = time.time()
+            self.massimDelays.append(t1 - t0)
+            print "CONNECTION WALL CLOCK TIME:", t1 - t0
             msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
                 print "\n"
                 print "@Agent: step: %s" % msg_dict_private['step']
+                if msg_dict_private['step'] == '0':
+                    # print 'position', msg_dict_public['position']
+                    msg_dict_public['position'][0]['role'] = self.role
                 action_xml = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
                 self.massimConnection.send(action_xml)
             elif (msg_type == 'sim-end'):
@@ -128,7 +141,7 @@ class Agent():
             self.initializationHook()
             self.perceiveActLoop()
             self.finalizationHook()
-        if not self.useLog:
+        if not self.logToFile:
             raw_input("Finished. Press ENTER to continue...")
         agent.disconnect()
 
@@ -142,7 +155,7 @@ class PrologAgent(Agent):
         # Creo una conexion con SWI.
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
-        if (log):
+        if (self.log):
             self.prolog.query("redirect_output('logs/%s-kb%d.xml')" % (self.username, self.currentLoop)).next()
         if self.verbose:
             self.prolog.query("assert(verbose)").next()
@@ -282,6 +295,8 @@ class PrologAgent(Agent):
                                                                                   p['health'], 
                                                                                   p['max_health'], 
                                                                                   p['vis_range'])).next()
+                if 'role' in p:
+                    self.prolog.query("assertOnce(k(agentRole(%s, %s)))" % (p['name'], p['role'])).next()
 
         # Proceso las entidades inspeccionadas.
         for e in msg_dict_public['inspected_ents']:
@@ -308,6 +323,8 @@ class PrologAgent(Agent):
         self.prolog.query("updateScore(%s)"             % msg_dict_private['score']).next()
         self.prolog.query("updateZoneScore(%s)"         % msg_dict_private['zone_score']).next()
         self.prolog.query("updateLastStepScore(%s)"     % msg_dict_private['last_step_score']).next()
+        
+        print_message(msg_dict_private)
 
         self.processNodes(msg_dict_public)
         self.processEdges(msg_dict_public)
@@ -322,19 +339,18 @@ class PrologAgent(Agent):
         msg_dict_difference = self.perceptConnection.recv()
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
-        #print "\n@PrologAgent: PERCEPTION:"
-        #print_message(msg_dict_public)
-        #print ""
+        # print "\n@PrologAgent: PERCEPTION:"
+        # print_message(msg_dict_public)
+        # print 
 
         # Process perception.
         self.processPerception(msg_dict_private, msg_dict_public)
-        
         # self.prolog.query("argumentation").next()
         self.startRunTime = time.time()
         # print "turn time:", msg_dict_private['total_time'], "ms"
         self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
         # print "percept processing time: ", self.processingTime, "ms"
-        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
+        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 100) / 1000 #100 ms para la ejecucion del dummy
         # print "remaining time: ", self.remainingTime, "segs"
         if self.dummy:
             query_result = self.prolog.query("execDummy(X)").next()
@@ -360,15 +376,24 @@ if (__name__== "__main__"):
     parser = argparse.ArgumentParser(description="Pyeismassim agent initializer")
     parser.add_argument('user',     metavar='USER',                      help="the agent's username")
     parser.add_argument('password', metavar='PASSWORD',                  help="the agent's password")
-    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                   dest='perceptServerHost')
-    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                   dest='perceptServerPort')
+    parser.add_argument('-ms',      metavar='MASSIM_SERVER_HOST',        help="the massim server host",                                                          dest='massimHost')
+    parser.add_argument('-sh',      metavar='SH_PERCEPTION_SERVER_HOST', help="use shared perception server on specified host",                                  dest='perceptServerHost')
+    parser.add_argument('-sp',      metavar='SH_PERCEPTION_SERVER_PORT', help="use shared perception server on specified port",                                  dest='perceptServerPort')
     parser.add_argument('-l',                                            help="write-to-log mode",                             action='store_const', const=True, dest='log')
     parser.add_argument('-d',                                            help="dummy mode",                                    action='store_const', const=True, dest='dummy')
     parser.add_argument('-v',                                            help="verbose mode",                                  action='store_const', const=True, dest='verbose')
     
     args = parser.parse_args()
-    user, password, log, perceptServerHost, perceptServerPort = args.user, args.password, args.log, args.perceptServerHost, args.perceptServerPort
 
-    agent = PrologAgent(user, password, log, perceptServerHost, perceptServerPort, args.dummy, args.verbose)
+    agent = PrologAgent( args.user
+                       , args.password
+                       , args.log
+                       , args.massimHost
+                       , args.perceptServerHost
+                       , args.perceptServerPort
+                       , args.dummy
+                       # , args.communication
+                       , args.verbose
+                       )
     agent.mainLoop()
 
