@@ -5,25 +5,18 @@ import sys
 import cProfile
 import cPickle
 
-# - si se cae, que se pueda reconectar
-#   el server tendra identificar quien es quien
-#   agregar fase de autenticacion
-# - si se cae, que el PS se de cuenta, el socket, para poder renovarlo
 # - si se cae, que el PS no incluya la percepcion del agente caido en los demas
 
 ####################################################################################################
 class VortexPerceptConnection():
 
-    def connect(self, name):
+    def __init__(self):
         pass
 
     def disconnect(self):
         pass
 
-    def send(self, user, data):
-        pass
-
-    def recv(self):
+    def send_and_recv(self, data):
         return dict([])
 
 ####################################################################################################
@@ -32,23 +25,21 @@ class PerceptConnection():
     This is the client's connection to the shared percept server.
     """
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, name):
         self.host    = host
         self.port    = port
         self.bufsize = 4096
-        self.socket  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    def connect(self, name):
-        print "@PerceptConnection: Connecting to %s:%s" % (self.host, self.port)
-        self.socket.connect((self.host, self.port))
-        self.socket.send(name + '\0')
-        print "@PerceptConnection: succesfully connected."
+        self.name    = name
 
     def disconnect(self):
-        self.socket.send('EOF\0')
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((self.host, self.port))
+        #msg = repr(frozenset([ (-1, ), (0, self.name) ]))
+        msg = cPickle.dumps(frozenset([ (-1, ), (0, self.name) ]), cPickle.HIGHEST_PROTOCOL)
+        self.socket.send(''.join([msg, '\0']))
         self.socket.close()
 
-    def send(self, username, dictionary):
+    def send_and_recv(self, dictionary):
 
         def dict2list(username, dictionary):
             position_list = dictionary.get('position')
@@ -115,14 +106,6 @@ class PerceptConnection():
                                ) )
             return result
 
-        lst    = dict2list(username, dictionary)
-        fset   = frozenset(lst)
-        string = repr(fset)
-        self.socket.send(string)
-        self.socket.send('\0')
-
-    def recv(self):
-
         def list2dict(stringlist):
             result = { 'position'       : []
                      , 'vis_verts'      : []
@@ -188,8 +171,31 @@ class PerceptConnection():
                     print "@PerceptServerConnection: decode error: ", p
             return result
 
+        # Send
+        print "@PerceptConnection: Connecting to %s:%s" % (self.host, self.port)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((self.host, self.port))
+        print "@PerceptConnection: succesfully connected."
+        lst    = dict2list(self.name, dictionary)
+        fset   = frozenset(lst)
+        #string = repr(fset)
+        string = cPickle.dumps(fset, cPickle.HIGHEST_PROTOCOL)
+        self.socket.send(''.join([string, '\0']))
+        print "@PerceptConnection: sent data."
+
+        # Receive
         stop = False
         msg  = ''
+
+        #bytes_received = ''
+        #while (not stop):
+        #    bytes_received = self.socket.recv(self.bufsize)
+        #    print "DEBUG: received", len(bytes_received), "bytes"
+        #    if (len(bytes_received) == 0):
+        #        stop = True
+        #    else:
+        #        msg += bytes_received
+
         while (not stop):
             msg += self.socket.recv(self.bufsize)
             if (len(msg) > 0):
@@ -198,29 +204,58 @@ class PerceptConnection():
                 print "@PerceptConnection: the message received was empty!"
                 stop = True
 
-        lst = eval(msg[:-1])
+        self.socket.close()
+        #lst = eval(msg[:-1])
+        lst = cPickle.loads(msg)
         return list2dict(lst)
 
 ####################################################################################################
 
 def signal_handler(signal, frame):
-        print ''
-        print 'You pressed Ctrl+C!'
-        serverSocket.close()
-        print 'Socket closed successfully'
-        print "Percept server shutdown."
-        sys.exit(0)
+    serverSocket.close()
+    print ""
+    print "Socket closed successfully"
+    print "Percept server shutdown."
+    sys.exit(0)
+
+class LogFile():
+
+    def __init__(self, path, mode):
+        self.fileobj = open(path, mode)
+
+    def write(self, string):
+        print string
+        self.fileobj.write(string)
+        self.fileobj.write("\n")
+
+    def close(self):
+        self.fileobj.close()
+
+    def writeStatistics(self, agentlist, turn, reception, send, total):
+        agentstring = ''
+        agentdict = {}
+        for agent in agentlist:
+            agentdict[agent.name] = ((agent.rE - agent.rS), (agent.sE - agent.sS), (agent.sE - agent.rS), agent.bS, agent.bR)
+        for key in sorted(agentdict.keys()):
+            agentdata = agentdict[key]
+            agentstring += "%s,%s,%s,%s,%s," % agentdata
+        # format is: turn, reception time, send time, total time, agent1 reception time, agent1 send time, agent1 total time, agent2 ...
+        self.fileobj.write("%s,%s,%s,%s,%s\n" % (turn, reception, send, total, agentstring))
 
 class AgentConnection():
 
     def __init__(self):
-        self.name      = ""
+        self.name      = ''
         self.connected = False
         self.socket    = None
         self.percept   = None
-        self.t0        = 0
-        self.t1        = 0
-
+        self.rS        = 0 # reception start
+        self.rE        = 0 # reception end
+        self.sS        = 0 # send start
+        self.sE        = 0 # send end
+        self.bS        = 0 # bytes sent
+        self.bR        = 0 # bytes received
+    
 ####################################################################################################
 if (__name__ == "__main__"):
 
@@ -228,8 +263,9 @@ if (__name__ == "__main__"):
         CONNECTIONS = int(sys.argv[1])
         HOST        =     sys.argv[2]
         PORT        = int(sys.argv[3])
+        logFile        = LogFile('log.txt',   'w')
+        statisticsFile = LogFile('stats.csv', 'w')
     else:
-        print ""
         print ""
         print "         Usage: python PerceptServer.py NUMBER_CONNECTIONS HOST_IP PORT_NUMBER"
         print "                                 Port 10000 is recommended."
@@ -238,88 +274,135 @@ if (__name__ == "__main__"):
         print ""
         sys.exit()
 
-    ADDR = (HOST, PORT)
+    signal.signal(signal.SIGINT, signal_handler)
+
+    ADDR    = (HOST, PORT)
     BUFSIZE = 4096
+    agents  = [AgentConnection() for i in range(CONNECTIONS)]
 
-    agents = [AgentConnection() for x in range(CONNECTIONS)]
-
-    # Accept CONNECTION client sockets.
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((ADDR))
     serverSocket.listen(CONNECTIONS)
 
-    signal.signal(signal.SIGINT, signal_handler)
+    logFile.write( "" )
+    logFile.write( "Percept server started." )
+    logFile.write( "Listening on: %s : %s" % (HOST, PORT) )
+    logFile.write( "The Computer Name is: %s" % socket.gethostname() )
+    logFile.write( "" )
 
-    print ""
-    print "Percept server started."
-    print "Listening on: %s : %s" % (HOST, PORT)
-    print "The Computer Name is: %s" % socket.gethostname()
-    print ""
-
-    for i in range(CONNECTIONS):
-        socket, address = serverSocket.accept()
-        agents[i].connected = True
-        agents[i].socket = socket
-        agents[i].name = agents[i].socket.recv(BUFSIZE)
-        print "Server: received a connection from %s at address %s" % (address, agents[i].name)
+    #for i in range(CONNECTIONS):
+    #    socket, address = serverSocket.accept()
+    #    agents[i].connected = True
+    #    agents[i].socket = socket
+    #    agents[i].name = agents[i].socket.recv(BUFSIZE)
+    #    print          "Server: received a connection from %s at address %s" % (address, agents[i].name)
+    #    logFile.write( "Server: received a connection from %s at address %s" % (address, agents[i].name) )
     
-    j = 0
+    turn = 0
     quit = False
     while (not quit):
-        print "Iteration: %s" % j
+        logFile.write( "Iteration: %s" % turn )
+
         # Initialize the global percept to an empty frozenset.
         globalPercept = frozenset([])
 
-        print "    Reception phase."
+        #----------------------------------------------------------------------#
+        logFile.write( "    Reception phase." )
         receptionStart = time.time()
-        for i in range(CONNECTIONS):
-            if (agents[i].connected):
-                agents[i].t0 = time.time()
-                stop = False
-                msg  = ''
-                while (not stop):
-                    msg += agents[i].socket.recv(BUFSIZE)
-                    if (len(msg) > 0):
-                        stop = (msg[-1] == '\0')
-                    else:
-                        print "        Agent %s: The message received was empty!" % (agents[i].name)
-                        stop = True
-                percept = msg[:-1]
-                
-                if (percept[:3] == 'EOF'):
-                    print "        Agent %s: Client sent EOF, closing its socket." % (agents[i].name)
-                    agents[i].socket.close()
-                    agents[i].connected = False
-                else:
-                    agents[i].percept = eval(percept)
-                    globalPercept = globalPercept.union(agents[i].percept)
-                agents[i].t1 = time.time()
-                print "        Agent %s: time: %s" % (agents[i].name, agents[i].t1 - agents[i].t0)
-        receptionEnd = time.time()
-        print "        Reception time: %s" % (receptionEnd - receptionStart)
 
-        print "    Sending phase."
-        sendingStart = time.time()
         for i in range(CONNECTIONS):
-            # For each socket, calculate the difference between the accumulator
+
+            socket, address = serverSocket.accept()
+            agents[i].connected = True
+            agents[i].socket = socket
+            agents[i].rS = time.time()
+            
+            # Receive perception.
+
+            #stop = False
+            #msg  = ''
+            #bytes_received = ''
+            #while (not stop):
+            #    bytes_received += agents[i].socket.recv(BUFSIZE)
+            #    print "DEBUG: received", len(bytes_received), "bytes"
+            #    if (len(bytes_received) == 0):
+            #        stop = True
+            #    else:
+            #        msg += bytes_received
+
+            stop = False
+            msg  = ''
+            while (not stop):
+                msg += agents[i].socket.recv(BUFSIZE)
+                if (len(msg) > 0):
+                    stop = (msg[-1] == '\0')
+                else:
+                    logFile.write( "        Agent %s: the message received was empty!" % (agents[i].name) )
+                    stop = True
+
+            #agents[i].percept = eval(msg[:-1])
+            agents[i].percept = cPickle.loads(msg)
+            
+            # Get the agent's name.
+            for x in agents[i].percept:
+                if (x[0] == 0):
+                    agents[i].name = x[1]
+                    break
+            # Check whether it was a goodbye message.
+            if ((-1, ) in agents[i].percept):
+                logFile.write( "        Agent %s: sent goodbye message." % (agents[i].name) )
+                agents[i].socket.close()
+                agents[i].connected = False
+            else:
+                globalPercept = globalPercept.union(agents[i].percept)
+
+            agents[i].rE = time.time()
+            agents[i].bS = len(agents[i].percept)
+            logFile.write( "        Server: received a connection from %s at address %s" % (agents[i].name, address) )
+            logFile.write( "        Agent %s received %s bytes" % (agents[i].name, agents[i].bS) )
+            logFile.write( "        Agent %s reception time: %s" % (agents[i].name, agents[i].rE - agents[i].rS) )
+                
+        receptionEnd = time.time()
+        logFile.write( "        Total reception time: %s" % (receptionEnd - receptionStart) )
+        #----------------------------------------------------------------------#
+
+        #----------------------------------------------------------------------#
+        logFile.write( "    Sending phase." )
+        sendingStart = time.time()
+
+        for i in range(CONNECTIONS):
+            # For each agent, calculate the difference between the global percept accumulator
             # and the original percept and send the difference.
+            agents[i].sS = time.time()
+
             if (agents[i].connected):
                 difference = globalPercept.difference(agents[i].percept)
-                # print "CONNECTION:", i
-                # print "DIFFERENCE:", difference
-                agents[i].socket.send(repr(difference))
-                agents[i].socket.send('\0')
+                #returnmsg = repr(difference)
+                returnmsg = cPickle.dumps(difference, cPickle.HIGHEST_PROTOCOL)
+                agents[i].bR = len(returnmsg)
+                logFile.write( "        Agent %s: sending %s bytes." % (agents[i].name, agents[i].bR) )
+                agents[i].socket.send(''.join([returnmsg, '\0']))
+
+            agents[i].sE = time.time()
+            logFile.write( "        Agent %s sending time: %s" % (agents[i].name, agents[i].sE - agents[i].sS))
+            agents[i].socket.close()
+
         sendingEnd = time.time()
-        print "        Sending time: %s" % (sendingEnd - sendingStart)
+        logFile.write( "        Sending time: %s" % (sendingEnd - sendingStart) )
+        #----------------------------------------------------------------------#
 
-        print "Total turn time: %s" % (sendingEnd - receptionStart)
+        logFile.write( "Total turn time: %s" % (sendingEnd - receptionStart) )
+        statisticsFile.writeStatistics(agents, turn, (receptionEnd - receptionStart), (sendingEnd - sendingStart), (sendingEnd - receptionStart))
 
-        j += 1
+        turn += 1
         # If at least one agent is connected, don't quit.
-        connectedAgents = len([0 for agent in agents if agent.connected])
-        if (connectedAgents == 0):
-            print "Time to quit."
+        connectedAgents = [agent.name for agent in agents if agent.connected]
+        print "Connected agents:", connectedAgents
+        if (len(connectedAgents) == 0):
+            logFile.write( "Time to quit." )
             quit = True
             
     serverSocket.close()
+    logFile.close()
+    statisticsFile.close()
 

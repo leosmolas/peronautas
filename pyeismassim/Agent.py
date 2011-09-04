@@ -46,8 +46,11 @@ class Agent():
 
         print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
+        
+        self.perceptServerHost = perceptServerHost
+        self.perceptServerPort = perceptServerPort  
         if (perceptServerPort and perceptServerHost):
-            self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort))
+            self.perceptConnection = PerceptConnection(perceptServerHost, int(perceptServerPort), USER)
         else:
             self.perceptConnection = VortexPerceptConnection()
         print "done"
@@ -62,11 +65,11 @@ class Agent():
         except:
             print "@Agent: Error during connection attempt to the MASSim server."
             quit()
-        try:
-            self.perceptConnection.connect(self.username)
-        except:
-            print "@Agent: Error during connection attempt to the percept server."
-            quit()
+        #try:
+        #    self.perceptConnection.connect(self.username)
+        #except:
+        #    print "@Agent: Error during connection attempt to the percept server."
+        #    quit()
 
 
 
@@ -268,8 +271,7 @@ class Agent():
         print "@Agent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
-        self.perceptConnection.send(self.username, msg_dict_public)
-        msg_dict_difference = self.perceptConnection.recv()
+        msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public)
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
         # Process perception.
