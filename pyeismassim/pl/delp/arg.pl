@@ -50,11 +50,10 @@ meta(X) :-
     mejorMeta(X, _).
     
 calcMeta(X) :-
-
+    
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
-    % writeln(Answer), 
     Answer = yes, !,
     writeln(X),
     writeln(Value),

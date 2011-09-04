@@ -24,20 +24,17 @@ execDummy(Action) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 rolMetas:-
-    foreach(b(posibleInspectar(Agent, PosicionAgente)), 
-    doNotFail(calcMeta(inspectar(Agent, PosicionAgente)))).
+    foreach(
+        b(posibleInspectar(Agent, PosicionAgente)), 
+        doNotFail(calcMeta(inspectar(Agent, PosicionAgente)))
+    ).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 rolSetBeliefs :-
     myStatus(normal), !,
     calcTime(setPosibleInspectar),
     rolSetDistancia,
-    setDifPuntosSinMi,
-    printFindAll('beliefs inspector', b(posibleInspectar(_Agent, _PosicionAgente))),
-	printFindAll(
-		'(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true)', 
-		(b(posibleInspectarConEnemigos(_, _)) <- true)
-	).
+    setDifPuntosSinMi.
 
 rolSetBeliefs.
 
@@ -97,7 +94,7 @@ setPosibleInspectar :-
         member(par(PosicionAgente, Agent), Posiciones)
       )
       ,
-		calcTime(setPosibleInspectarAux(PosicionAgente, Agent))
+		setPosibleInspectarAux(PosicionAgente, Agent)
     ).
     
 setPosibleInspectar.
@@ -108,7 +105,7 @@ setPosibleInspectarAux(PosicionAgente, Agent) :-
 
 	foreach(
 		member(Vecino, LVecinosPosicion),
-		calcTime(setPosibleInspectarAux2(Agent, Vecino))
+		setPosibleInspectarAux2(Agent, Vecino)
 	),
 	assert(b(posibleInspectar(Agent, PosicionAgente))),
 	assertOnce(b(posibleInspectarConEnemigos(PosicionAgente, CantEnemigos)) <- true).
@@ -141,7 +138,10 @@ rolSetDistancia :-
     retractall(isFail(_)),
     assert((isFail(ucsNode(_, _, _, _, Path_Cost)) :- Path_Cost > 10)),
     foreach(
-        b(posibleInspectar(_Enemy, Node)),
+        (
+            b(posibleInspectar(_Enemy, Node)),
+            not(b(distancia(Node,[[inspect]],_,_))<-true)
+        ),
         (
             searchPath(Position, Node, Energy, [[inspect]], 2)
         )

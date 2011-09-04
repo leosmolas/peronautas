@@ -1,10 +1,10 @@
-﻿inspectar(Value, Agent, Position) -<
+﻿inspectar(Value, _Agent, Position) -<
     b(distancia(Position,[[inspect]], Turns, EnergyLeft)),
     b(difPuntosSinMi(DifPuntos)),
     b(posibleInspectarConEnemigos(Position, CantEnemies)),
     inspectarValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies).
     
-inspectValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies) :-
+inspectarValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies) :-
     Value is (10 - Turns) ** 2 * 2 - DifPuntos ** 2 + EnergyLeft + 25 * CantEnemies.
     
-is_a_built_in(atacarValue(_Turns, _EnergyLeft, _, _Value, CantEnemies)).
+is_a_built_in(inspectarValue(_Turns, _EnergyLeft, _, _Value, _CantEnemies)).
