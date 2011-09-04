@@ -1,10 +1,31 @@
-﻿:-  [utils], 
+:-  [utils], 
     % [kmap], 
     [graph/map], 
     [delp/arg].
     
 :- dynamic b/1.
 
+setBeliefs :-
+    calcTime(setHaySaboteador),
+    not(myRole(saboteur)),
+    estoyEnPeligro, 
+    writeln('estoy en Peligro!!!! :O'), !,
+    myTeam(T),
+    teamPoints(T, ActualPoints),
+    assert(b(actualPoints(ActualPoints))),
+    myPosition(Pos),
+    myName(A),
+    myTeam(T),
+    myEnergy(Energy),
+    foreach(
+        k(edge(Pos, Neigh, _)),
+        (
+            calcTime(setDifPuntosNode(Neigh, A, T)),
+            searchPath(Pos, Neigh, Energy, [], 0)
+        )
+    ),
+    printFindAll('b', b(_)),
+    printFindAll('b <- true', b(_) <- true).
     
 setBeliefs :-
     
@@ -16,6 +37,7 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
+		
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
@@ -24,15 +46,31 @@ setBeliefs :-
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
 	calcTime(setReagruparse), !,
-    printFindAll('difPuntosSinMi', b(difPuntosSinMi(_)) <- true),
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     printFindAll('b', b(_)),
-    printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost, _)) <- true).
+    printFindAll('b <- true', b(_) <- true).
     
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Utils
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+estoyEnPeligro :-
+    myStatus(disabled), !, fail.
+
+estoyEnPeligro :-
+    myPosition(Position),
+    b(haySaboteador(Position)).
+    
+estoyEnPeligro :-
+    mePegaron.
+
+mePegaron :-
+    b(meBajaronLaVida),
+    not((
+        lastAction(goto(_)),
+        lastActionResult(successful)
+    )),
+    writeln(mePegaron).
     
 setNodesAtDistance(Distance) :-
 	myPosition(Node),
@@ -45,12 +83,12 @@ setNodesAtDistance(Distance) :-
 		assert(b(nodeAtDistance(Dest, Cost3)))
 	).
     
-saboteurPosition(Position) :-
+notSecurePosition(Position) :-
 	myTeam(MyTeam),
 	currentStep(Step),
-	position(Step, Agent, Position),
 	team(Agent, Team),
 	Team \= MyTeam,
+	position(Step, Agent, Position),
 	(
 		role(Agent, saboteur) ;
 		role(Agent, unknown)
@@ -58,9 +96,74 @@ saboteurPosition(Position) :-
 	
 setEsSeguro :-
 	foreach(
-		saboteurPosition(Position),
-		assert(b(~esSeguro(Position)) -<  true) 
+		notSecurePosition(Position),
+		assertOnce(b(~esSeguro(Position)) <-  true) 
 	).
+    
+saboteurPosition(Position) :-
+	myTeam(MyTeam),
+	currentStep(Step),
+    team(Agent, Team),
+	Team \= MyTeam,
+	position(Step, Agent, Position),
+
+	role(Agent, saboteur).
+
+setHaySaboteador:-
+	foreach(
+		saboteurPosition(Position),
+		assertOnce(b(haySaboteador(Position))) 
+	).
+
+setMuertos :-
+	currentStep(0),
+	myTeam(MyTeam),
+	assert(muertos(MyTeam, 0)),
+	assert(muertos(enemigo, 0)), !.	
+	
+% setMuertos :-
+	% currentStep(Step),
+	% TotalMuertosEnemigos is Step // 5,
+	% TotalMuertos is TotalMuertosEnemigos * 2,
+	% myTeam(MyTeam),
+	% retract(muertos(MyTeam, _MuertosActuales)),
+	% retract(muertos(enemigo, _MuertosActualesEnemigos)),
+	% assert(muertos(MyTeam, TotalMuertos)),
+	% assert(muertos(enemigo, TotalMuertosEnemigos)), !.
+	
+	
+setMuertos :-
+	currentStep(Step),
+	PreviousStep is Step - 1,
+	myTeam(MyTeam),
+	findall(
+		Muerto,
+		(
+			team(Muerto, MyTeam),
+			status(Step, Muerto, disabled),
+			status(PreviousStep, Muerto, normal)			
+		),
+		Muertos
+	),
+	findall(
+		MuertoEnemigo,
+		(
+			team(MuertoEnemigo, Team),
+			Team \= MyTeam,
+			status(Step, MuertoEnemigo, disabled),
+			status(PreviousStep, MuertoEnemigo, normal)			
+		),
+		MuertosEnemigos
+	),
+	length(Muertos, MuertosEsteTurno),
+	retract(muertos(MyTeam, MuertosActuales)),
+	TotalMuertos is MuertosActuales + MuertosEsteTurno,
+	assert(muertos(MyTeam, TotalMuertos)),
+	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
+	retract(muertos(enemigo, MuertosActualesEnemigos)),
+	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
+	assert(muertos(enemigo, TotalMuertosEnemigos)).
+
 	
     
 % searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
@@ -237,26 +340,13 @@ setDistanciaExpansion.
 
 setDifPuntosNode(Node, A, T) :-
     
-    % write('Node: '), writeln(Node),
-    
-
-    % currentStep(Step),
-    % myName(Name),
-    % concat('logs/', Name, S2),
-    % concat(S2, '-', S3),
-    % concat(S3, Step, S0),
-    % concat(S0, Node, S1),
-    % concat(S1, '.pl', File),
-    % writeln(File),
-    % saveMap(File),
     b(actualPoints(ActualPoints)),
-
+    
     setHypotheticalMap,
     moveAgent(A, Node),
     coloringAlgorithm,
     teamHPoints(T, Points),
     DifPuntos is Points - ActualPoints,                    
-    % write('Points: '), writeln(Points),
     assert(b(difPuntosZona(Node, DifPuntos)) <- true).
     
 setDifPuntosNode(_Node, _A, _T).
@@ -440,7 +530,7 @@ setPosibleExplorar :-
     
 setPosibleExplorar. 
     
-chequearPosibleExplorar(6) :- !.
+chequearPosibleExplorar(4) :- !.
     
 chequearPosibleExplorar(_) :-
     b(posibleExplorar(_Node)), !.
@@ -475,17 +565,24 @@ setDifPuntosExplorar :-
         Node3, 
         (
             b(posibleExplorar(Node3)),
-            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true)
+            not(b(difPuntosZona(Node3, _DifPuntos1)) <- true),
+            (b(distancia(Node3, [[survey]], _PathCost, _E)) <- true)
         )
     ),
     foreach(
         (
             b(posibleExplorar(Node1)),
             not(b(difPuntosZona(Node1, _DifPuntos2)) <- true),
-            (b(distancia(Node1, [[survey]], _PathCost, _E)) <- true)
+            (b(distancia(Node1, [[survey]], Cost, _E2)) <- true),
+            Cost < 3
         ),
         setDifPuntosNode(Node1, A, T)
-    ).
+    ),
+    (b(distancia(_Node, [[survey]], Cost2, _E3)) <- true),
+    Cost2 >= 3,
+    setDifPuntosSinMi.
+
+setDifPuntosExplorar.
     
 
 setDistanciaExplorar :-
@@ -618,7 +715,7 @@ setPathReagruparse :-
 	myEnergy(Energy),
     singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
     write('pathSearchReagruparse'),
-    ucsAux(InitialFrontier, [], Path, Actions, PathCost, RemainingEnergy),     
+    ucsAux(InitialFrontier, [], _Path, Actions, PathCost, _RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),
 	write('distaciaAZona:'), writeln(PathCost),
     assert(b(pathReagruparse(Actions))).    
@@ -644,3 +741,46 @@ agenteEnZona(Step, Agent, MyTeam) :-
 agenteEnZonaAux(Step, Node, MyTeam) :-
 	equipoVecino(Step, Node, MyTeam), !.
 		
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defensa
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+checkLife :-
+    currentStep(Step),
+    PreviousStep is Step - 1,
+    myName(MyName),
+    myHealth(HealthNow),
+    health(PreviousStep, MyName, HealthBefore),
+    HealthNow < HealthBefore,
+    assert(b(meBajaronLaVida)),
+    assertSaboteurs, !.
+    
+checkLife :- !.
+
+assertSaboteurs :-  
+    lastActionResult(successful),
+    lastAction(goto(_)), !.
+    % Action \= goto(_), !.
+
+assertSaboteurs :-  
+    myPosition(Pos),
+    currentStep(Step),
+    position(Step, Saboteur, Pos),
+    role(Saboteur, saboteur), !.
+    
+assertSaboteurs :-
+    myPosition(Pos),
+    currentStep(Step),
+    findall(
+        Agent,
+        (
+            position(Step, Agent, Pos),
+            role(Agent, Role),
+            Role = unknown
+        ),
+        Potential
+    ),
+    length(Potential, 1),
+    assertOnce(k(agentRole(Agent, saboteur))).
+    

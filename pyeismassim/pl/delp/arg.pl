@@ -34,11 +34,18 @@ meta(X) :-
     
     myPosition(Position),
 	doNotFail(calcMeta(reagruparse)),
+    doNotFail(calcMeta(defensaPropia(Position))),
+    foreach(
+        k(edge(Position, Neigh, _)),
+        doNotFail(calcMeta(defensaPropia(Neigh)))
+    ),
+	foreach(
+        member(X, [shield, sabotageDevice, sensor]),
+        doNotFail(calcMeta(comprar(X)))
+    ),
     doNotFail(calcMeta(quedarse(Position))), !,
     
     rolMetas, % predicado definido en cada rol
-    
-    % % foreach(posibleProbear(N), doNotFail(calcMeta(probear(N)))),
     
     mejorMeta(X, _).
     
@@ -74,6 +81,16 @@ is_a_built_in(role(_, _)).
 is_a_built_in(position(_, _)).
 is_a_built_in(myMaxHealth(_)).
 is_a_built_in(myHealth(_)).
+is_a_built_in(myRole(_)).
+is_a_built_in(myEnergy(_)).
+is_a_built_in(myPosition(_)).
+is_a_built_in(myStatus(_)).
+is_a_built_in(myTeam(_)).
+is_a_built_in(b(_)).
+is_a_built_in(mePegaron).
+is_a_built_in(money(_)).
+is_a_built_in(currentStep(_)).
+is_a_built_in(buyCount(_, _)).
 
 position(Agent, Position) :-
     currentStep(Step),
@@ -91,6 +108,7 @@ mult(X,Y,Z)    :- Z is X *  Y.
 add(X,Y,Z)     :- Z is X +  Y.
 sust(X,Y,Z)    :- Z is X -  Y.
 power(X,Y,Z)   :- Z is X ** Y.
+div(X,Y,Z)     :- Z is X / Y.
 greater(X,Y)   :- X >   Y.
 less(X,Y)      :- X <   Y.
 greaterEq(X,Y) :- X >=  Y.

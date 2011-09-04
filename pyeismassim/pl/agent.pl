@@ -27,7 +27,8 @@
            notVisible/1,
            notExplored/1,
            explored/1,
-           plan/1,
+           plan/1,,
+		   ultimaCompra/1,
            intention/1,
            countTurns/1,
            verbose/0,
@@ -511,7 +512,23 @@ checkLastAction :-
 	
 checkLastAction :-
 	retract(plan([_Action | Actions])),
-	assert(plan(Actions)).
+	assert(plan(Actions)), !.
+	
+setBuyCount :-
+	currentStep(0), !,
+	assert(buyCount(sensor, 0)),
+	assert(buyCount(shield, 0)),
+	assert(buyCount(sabotageDevice, 0)).
+	
+setBuyCount :-
+	lastAction(buy),
+	lastActionResult(successful),
+	ultimaCompra(Item),
+	retract(buyCount(Item, CurrentCount)),
+	NewCount is CurrentCount + 1,
+	assert(buyCount(Item, NewCount)), !.
+	
+setBuyCount :- !.
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                      Run                                     %
@@ -527,7 +544,6 @@ run(TimeLimit, Action) :-
         ( % except :
             write('ERROR!!!!!!!!!!!!: '),
             writeln(E),
-            print_message(K, E), 
             writeln('Executing dummy now:'),
             retractall(b(_)),
             retractall(b(_) <- true),
@@ -535,18 +551,24 @@ run(TimeLimit, Action) :-
         )
     ), !.
    
-run(TimeLimit, _) :- 
+run(_TimeLimit, Action) :- 
 	retractall(b(_)),
     retractall(b(_) <- true),
     retractall(intention(_)),
     assert(intention(quedarse(_))),
 	writeln('Run: caso de stop iteration'),
-	planning(quedarse(_)).
+	planning(quedarse(_)),
+    exec(Action).
     
 run2(Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
+    checkLife,
+	calcTime(setMuertos),
+   	printFindAll('muertos:', muertos(_, _)),
     checkLastAction,
+	calcTime(setBuyCount),
+  	printFindAll('buyCount:', buyCount(_, _)),
     plan([]),
     % dumpKB, 
     !,
@@ -669,6 +691,12 @@ planning(reagruparse) :-
 	b(pathReagruparse(Actions)),
 	retract(plan(_)),
     assert(plan(Actions)).
+	
+planning(comprar(Item)) :-
+	retractall(ultimaCompra(_)),
+	assert(ultimaCompra(Item)),
+	retract(plan(_)),
+    assert(plan([[buy, Item]])).
     
 planning(atacar(Agent)) :-
     currentStep(Step),
@@ -684,6 +712,14 @@ planning(aumento(Node)) :-
     assertPlan(Node, []).
     
 planning(expansion(Node)) :-
+    assertPlan(Node, []).
+    
+planning(defensaPropia(MyPos)) :-
+    myPosition(MyPos), !,
+    retractall(plan(_)),
+    assert(plan([[parry]])).
+    
+planning(defensaPropia(Node)) :-
     assertPlan(Node, []).
     
 planning(auxilio(Repairer)) :-
@@ -737,7 +773,7 @@ replanning(explorar(Node)) :-
     retractall(isFail(_, _)),
     searchPath(Position, Node, Energy, [[survey]], 1),
     planning(explorar(Node)).
-	
+    
 replanning(reagruparse) :-
 	assertReagruparseGoal,
 	setPathReagruparse,
@@ -834,27 +870,41 @@ cutCondition(Meta) :-
     writeln('hay un enemigo saboteador en mi nodo').
     
 cutCondition(Meta) :-
+    Meta \= atacar(_),
+    
+    mePegaron,
+    writeln('hay un enemigo saboteador en mi nodo y me bajo la vida').
+    
+cutCondition(Meta) :-
     Meta \= reparar(_),
     Meta \= auxilio(_),
     myStatus(disabled),
-    writeln('me mataron').
+    writeln('me mataron :(').
 
 cutCondition(explorar(Node)) :-
 	explored(Node),
 	not(hasAtLeastOneUnsurveyedEdge(Node)), 
 	writeln('el nodo ya fue explorado').
 	
+cutCondition(comprar(_)).
+
+cutCondition(quedarse(_)).
+	
 cutCondition(probe(Node)) :- 
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+    
+cutCondition(defensaPropia(_)):-
+	countTurns(1), !,
+    writeln('estoy defendiendome (y paso un turno)').
 	
 cutCondition(reagruparse):-
 	countTurns(3),
     writeln('pasaron 3 turnos y no llegue a la zona').
 	
 cutCondition(reagruparse):-
-	myPosition(MyPos),
+	% myPosition(MyPos),
 	currentStep(Step),
 	myTeam(Team),
 	myName(Agent),
