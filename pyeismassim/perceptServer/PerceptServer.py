@@ -4,8 +4,44 @@ import socket
 import sys
 import cProfile
 import cPickle
+import base64
 
-# - si se cae, que el PS no incluya la percepcion del agente caido en los demas
+BUFSIZE = 4096
+
+# mechear chequeo de tiempo en agent.py, reduciendo el tiempo que queda, pasandole el cutoff a prolog
+# timeout del receive del servidor
+#       si se cae, que el PS no incluya la percepcion del agente caido en los demas
+#       mensaje por defecto para asumir para los demas?
+#       se bardean los demas si no saben algo de otro agente?
+#       que se le envia al agente que llego tarde?
+#       que se hace con el mensaje que llegara del agente ? descartarlo?
+# sockets no bloqueantes
+
+def recv_data(socket):
+    stop = False
+    buf  = ''
+
+    #bytes_received = ''
+    #while (not stop):
+    #    bytes_received = self.socket.recv(BUFSIZE)
+    #    print "DEBUG: received", len(bytes_received), "bytes"
+    #    if (len(bytes_received) == 0):
+    #        stop = True
+    #    else:
+    #        msg += bytes_received
+    while (not stop):
+        buf += socket.recv(BUFSIZE)
+        if (len(buf) > 0):
+            stop = (buf[-1] == '\0')
+        else:
+            print "@PerceptConnection: the message received was empty!"
+            stop = True
+    data = base64.b64decode(buf[:-1])
+    return data
+
+def send_data(socket, data):
+    safe_data = base64.b64encode(data)
+    socket.send(''.join([safe_data, '\0']))
 
 ####################################################################################################
 class VortexPerceptConnection():
@@ -28,7 +64,6 @@ class PerceptConnection():
     def __init__(self, host, port, name):
         self.host    = host
         self.port    = port
-        self.bufsize = 4096
         self.name    = name
 
     def disconnect(self):
@@ -36,7 +71,7 @@ class PerceptConnection():
         self.socket.connect((self.host, self.port))
         #msg = repr(frozenset([ (-1, ), (0, self.name) ]))
         msg = cPickle.dumps(frozenset([ (-1, ), (0, self.name) ]), cPickle.HIGHEST_PROTOCOL)
-        self.socket.send(''.join([msg, '\0']))
+        send_data(self.socket, msg)
         self.socket.close()
 
     def send_and_recv(self, dictionary):
@@ -178,35 +213,24 @@ class PerceptConnection():
         print "@PerceptConnection: succesfully connected."
         lst    = dict2list(self.name, dictionary)
         fset   = frozenset(lst)
-        #string = repr(fset)
-        string = cPickle.dumps(fset, cPickle.HIGHEST_PROTOCOL)
-        self.socket.send(''.join([string, '\0']))
+        try:
+            #string = repr(fset)
+            string = cPickle.dumps(fset, cPickle.HIGHEST_PROTOCOL)
+        except cPickle.PickleError as e:
+            string = ""
+            print "@PerceptConnection: error serializing:", e
+        send_data(self.socket, string)
         print "@PerceptConnection: sent data."
 
         # Receive
-        stop = False
-        msg  = ''
-
-        #bytes_received = ''
-        #while (not stop):
-        #    bytes_received = self.socket.recv(self.bufsize)
-        #    print "DEBUG: received", len(bytes_received), "bytes"
-        #    if (len(bytes_received) == 0):
-        #        stop = True
-        #    else:
-        #        msg += bytes_received
-
-        while (not stop):
-            msg += self.socket.recv(self.bufsize)
-            if (len(msg) > 0):
-                stop = (msg[-1] == '\0')
-            else:
-                print "@PerceptConnection: the message received was empty!"
-                stop = True
-
+        msg = recv_data(self.socket)
         self.socket.close()
-        #lst = eval(msg[:-1])
-        lst = cPickle.loads(msg)
+        try:
+            #lst = eval(msg[:-1])
+            lst = cPickle.loads(msg)
+        except cPickle.PickleError as e:
+            lst = []
+            print "@PerceptConnection: error deserializing:", e
         return list2dict(lst)
 
 ####################################################################################################
@@ -277,7 +301,6 @@ if (__name__ == "__main__"):
     signal.signal(signal.SIGINT, signal_handler)
 
     ADDR    = (HOST, PORT)
-    BUFSIZE = 4096
     agents  = [AgentConnection() for i in range(CONNECTIONS)]
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -318,27 +341,7 @@ if (__name__ == "__main__"):
             agents[i].rS = time.time()
             
             # Receive perception.
-
-            #stop = False
-            #msg  = ''
-            #bytes_received = ''
-            #while (not stop):
-            #    bytes_received += agents[i].socket.recv(BUFSIZE)
-            #    print "DEBUG: received", len(bytes_received), "bytes"
-            #    if (len(bytes_received) == 0):
-            #        stop = True
-            #    else:
-            #        msg += bytes_received
-
-            stop = False
-            msg  = ''
-            while (not stop):
-                msg += agents[i].socket.recv(BUFSIZE)
-                if (len(msg) > 0):
-                    stop = (msg[-1] == '\0')
-                else:
-                    logFile.write( "        Agent %s: the message received was empty!" % (agents[i].name) )
-                    stop = True
+            msg = recv_data(agents[i].socket)
 
             #agents[i].percept = eval(msg[:-1])
             agents[i].percept = cPickle.loads(msg)
@@ -381,7 +384,7 @@ if (__name__ == "__main__"):
                 returnmsg = cPickle.dumps(difference, cPickle.HIGHEST_PROTOCOL)
                 agents[i].bR = len(returnmsg)
                 logFile.write( "        Agent %s: sending %s bytes." % (agents[i].name, agents[i].bR) )
-                agents[i].socket.send(''.join([returnmsg, '\0']))
+                send_data(agents[i].socket, returnmsg)
 
             agents[i].sE = time.time()
             logFile.write( "        Agent %s sending time: %s" % (agents[i].name, agents[i].sE - agents[i].sS))

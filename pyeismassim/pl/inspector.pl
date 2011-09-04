@@ -13,7 +13,7 @@
 %-----------------------------------------------------------------------%
 
 execDummy(Action) :- 
-    action(Action)
+    action(Action),
     nl.
 
 rolMetas.
