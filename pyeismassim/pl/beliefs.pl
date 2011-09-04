@@ -37,7 +37,7 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
 	calcTime(setEsSeguro), !,
-    
+		
     % printFindAll('b', b(_)),
     calcTime(rolSetBeliefs), !,
     calcTime(setEstoyEnLaFrontera), !,
@@ -114,6 +114,56 @@ setHaySaboteador:-
 		saboteurPosition(Position),
 		assertOnce(b(haySaboteador(Position))) 
 	).
+
+setMuertos :-
+	currentStep(0),
+	myTeam(MyTeam),
+	assert(muertos(MyTeam, 0)),
+	assert(muertos(enemigo, 0)), !.	
+	
+% setMuertos :-
+	% currentStep(Step),
+	% TotalMuertosEnemigos is Step // 5,
+	% TotalMuertos is TotalMuertosEnemigos * 2,
+	% myTeam(MyTeam),
+	% retract(muertos(MyTeam, _MuertosActuales)),
+	% retract(muertos(enemigo, _MuertosActualesEnemigos)),
+	% assert(muertos(MyTeam, TotalMuertos)),
+	% assert(muertos(enemigo, TotalMuertosEnemigos)), !.
+	
+	
+setMuertos :-
+	currentStep(Step),
+	PreviousStep is Step - 1,
+	myTeam(MyTeam),
+	findall(
+		Muerto,
+		(
+			team(Muerto, MyTeam),
+			status(Step, Muerto, disabled),
+			status(PreviousStep, Muerto, normal)			
+		),
+		Muertos
+	),
+	findall(
+		MuertoEnemigo,
+		(
+			team(MuertoEnemigo, Team),
+			Team \= MyTeam,
+			status(Step, MuertoEnemigo, disabled),
+			status(PreviousStep, MuertoEnemigo, normal)			
+		),
+		MuertosEnemigos
+	),
+	length(Muertos, MuertosEsteTurno),
+	retract(muertos(MyTeam, MuertosActuales)),
+	TotalMuertos is MuertosActuales + MuertosEsteTurno,
+	assert(muertos(MyTeam, TotalMuertos)),
+	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
+	retract(muertos(enemigo, MuertosActualesEnemigos)),
+	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
+	assert(muertos(enemigo, TotalMuertosEnemigos)).
+
 	
     
 % searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
@@ -704,9 +754,9 @@ checkLife :-
     health(PreviousStep, MyName, HealthBefore),
     HealthNow < HealthBefore,
     assert(b(meBajaronLaVida)),
-    assertSaboteurs.
+    assertSaboteurs, !.
     
-checkLife.
+checkLife :- !.
 
 assertSaboteurs :-  
     lastActionResult(successful),
