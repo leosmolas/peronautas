@@ -13,8 +13,7 @@
     % currentStep(0), !.
     
     
-setBeliefs :-
-    
+setBeliefs :-    
     write('setBeliefs'),nl,
     myTeam(T),
     teamPoints(T, ActualPoints),
