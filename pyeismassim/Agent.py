@@ -271,11 +271,7 @@ class Agent():
         print "@Agent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
-        t0 = time.time()
         msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public)
-        t1 = time.time()
-        print "@Agent: percept server duration:", t1 - t0
-
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
         # Process perception.
@@ -341,11 +337,7 @@ class Agent():
 
         while (not quitPerceiveActLoop):
             print "@Agent: Receiving perception from server..."
-            t0 = time.time()
             xml = self.massimConnection.receive()
-            t1 = time.time()
-            print "@Agent: massim time duration", t1 - t0
-
             msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
