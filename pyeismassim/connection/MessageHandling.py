@@ -259,9 +259,9 @@ def parse_request_action(xml, output = 'dict'):
                         'health'     : inspected_ents_tag.contents[i]['health']       ,
                         'max_energy' : inspected_ents_tag.contents[i]['maxenergy']   ,
                         'max_health' : inspected_ents_tag.contents[i]['maxhealth']   ,
-                        'name'       : inspected_ents_tag.contents[i]['name']         ,
+                        'name'       : inspected_ents_tag.contents[i]['name'].lower()         ,
                         'node'       : inspected_ents_tag.contents[i]['node']         ,
-                        'role'       : inspected_ents_tag.contents[i]['role']         ,
+                        'role'       : inspected_ents_tag.contents[i]['role'].lower()         ,
                         'strength'   : inspected_ents_tag.contents[i]['strength']     ,
                         'team'       : inspected_ents_tag.contents[i]['team'].lower() ,
                         'vis_range'  : inspected_ents_tag.contents[i]['visrange']    })

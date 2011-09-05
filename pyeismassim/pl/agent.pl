@@ -596,7 +596,7 @@ run2(Action) :-
     calcTime(argumentation(Meta)),
 
     write('Meta: '), writeln(Meta),
-    calcTime(planning(Meta)),
+    calcTime(planning(Meta)), !,
     exec(Action),
     writeln(Action),
     retractall(b(_)),
@@ -722,6 +722,12 @@ planning(defensaPropia(MyPos)) :-
 planning(defensaPropia(Node)) :-
     assertPlan(Node, []).
     
+planning(inspectar(_Agent, Node)) :-
+    retractall(plan(_)),
+	writeln('planning de inspectar'),
+    assertPlan(Node, [[inspect]]),
+	writeln('afuera de assertPlan').
+	
 planning(auxilio(Repairer)) :-
     currentStep(Step),
     position(Step, Repairer, Node),
@@ -739,6 +745,7 @@ planning(quedarse(_Node)) :-
     assert(plan([[skip]])).
 
 assertPlan(_Node, _FinalActions) :-
+	writeln('assertPlan caso 1'),
     myPosition(InitialPosition),
     not(b(path(_, _, _, _, _, _, _, _))), !,
     retractall(intention(_)),
@@ -746,18 +753,20 @@ assertPlan(_Node, _FinalActions) :-
     planning(quedarse(InitialPosition)).
   
 assertPlan(Node, FinalActions) :-
-    myPosition(InitialPosition),
-    
+	writeln('assertPlan caso 2'),
+    myPosition(InitialPosition),    
     b(path(InitialPosition, Node, FinalActions, _, _, [], _, _)), !,
     retractall(intention(_)),
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
   
 assertPlan(Node, FinalActions) :-
-    myPosition(InitialPosition),
-    
-    b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
-    retract(plan(_)),
+	writeln('assertPlan caso 3'),
+    myPosition(InitialPosition),    
+	b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
+	write('path'), writeln(b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _))),
+    retractall(plan(_)),
+	write('plan'), writeln(plan(Actions)),
     assert(plan(Actions)).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -836,7 +845,7 @@ replanning(atacar(Agent)) :-
     searchPathSaboteur(Position, EnemyPosition, Agent, Energy),
     planning(atacar(Agent)).
     
-%si algun camino no se encontro, se planea quedarse
+% si algun camino no se encontro, se planea quedarse
 replanning(_) :- 
     retractall(intention(_)),
     assert(intention(quedarse(InitialPosition))),
@@ -965,6 +974,10 @@ cutCondition(reparar(Agent)) :-
 	Agent \= Agent2,
 	team(Agent2, MyTeam),
     writeln('hay otro agente que necesita mas ayuda').
+	
+cutCondition(inspectar(_, _)):-
+	countTurns(1), !,
+    writeln('estoy inspectando y paso un turno').
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %

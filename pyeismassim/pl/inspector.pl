@@ -74,6 +74,8 @@ enemigosPosicion(Step, Posiciones):-
 		(
 		  team(Agent, Team),
 		  MyTeam \= Team,
+		  role(Agent, Role),
+		  Role = unknown,
 		  position(Step, Agent, Position)
 		),
 		Posiciones
@@ -101,7 +103,7 @@ vecinos(Node, Vecinos):-
 		Vecinos
 	).  
 
-buscarEnemigos(Posicion, CantEnemigos):-
+buscarEnemigos(Posicion, CantEnemigos) :-
 	currentStep(Step),
 	myTeam(MyTeam),
 	findall(
@@ -110,7 +112,9 @@ buscarEnemigos(Posicion, CantEnemigos):-
 			buscarEnemigosAux(Posicion, NuevoVecino),
 			position(Step, Agent, NuevoVecino),
 			team(Agent, Team),
-			MyTeam \= Team
+			MyTeam \= Team,
+			role(Agent, Role),
+			Role = unknown
 		),
 		Vecinos
 	),

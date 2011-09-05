@@ -1,10 +1,17 @@
 ﻿atacar(Value, Agent) -<
+	w(1),
     b(enemyPosition(Agent, Position)),
+	w(2),
     b(distancia(Position,[[attack, Agent]], Turns, EnergyLeft)),
+	w(3),
 	b(difPuntosSinMi(DifPuntos)),
+	w(4),
     role(Agent, Role),
+	w(5),
 	agentRolePoints(atacar, Role, RolePoints),
+	w(6),
 	attackOrDie(Points),
+	w(7),
     atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value).
     
 atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value) :-

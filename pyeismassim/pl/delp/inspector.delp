@@ -1,5 +1,5 @@
 ﻿inspectar(Value, _Agent, Position) -<
-    b(distancia(Position,[[inspect]], Turns, EnergyLeft)),
+    b(distancia(Position, [[inspect]], Turns, EnergyLeft)),
     b(difPuntosSinMi(DifPuntos)),
     b(posibleInspectarConEnemigos(Position, CantEnemies)),
     inspectarValue(Turns, EnergyLeft, DifPuntos, Value, CantEnemies).
