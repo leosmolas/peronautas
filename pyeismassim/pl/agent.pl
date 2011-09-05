@@ -724,9 +724,7 @@ planning(defensaPropia(Node)) :-
     
 planning(inspectar(_Agent, Node)) :-
     retractall(plan(_)),
-	writeln('planning de inspectar'),
-    assertPlan(Node, [[inspect]]),
-	writeln('afuera de assertPlan').
+    assertPlan(Node, [[inspect]]).
 	
 planning(auxilio(Repairer)) :-
     currentStep(Step),
@@ -745,7 +743,6 @@ planning(quedarse(_Node)) :-
     assert(plan([[skip]])).
 
 assertPlan(_Node, _FinalActions) :-
-	writeln('assertPlan caso 1'),
     myPosition(InitialPosition),
     not(b(path(_, _, _, _, _, _, _, _))), !,
     retractall(intention(_)),
@@ -753,7 +750,6 @@ assertPlan(_Node, _FinalActions) :-
     planning(quedarse(InitialPosition)).
   
 assertPlan(Node, FinalActions) :-
-	writeln('assertPlan caso 2'),
     myPosition(InitialPosition),    
     b(path(InitialPosition, Node, FinalActions, _, _, [], _, _)), !,
     retractall(intention(_)),
@@ -761,12 +757,11 @@ assertPlan(Node, FinalActions) :-
     planning(quedarse(InitialPosition)).
   
 assertPlan(Node, FinalActions) :-
-	writeln('assertPlan caso 3'),
     myPosition(InitialPosition),    
 	b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
-	write('path'), writeln(b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _))),
+	write('path: '), writeln(b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _))),
     retractall(plan(_)),
-	write('plan'), writeln(plan(Actions)),
+	write('plan: '), writeln(plan(Actions)),
     assert(plan(Actions)).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
