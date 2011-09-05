@@ -856,6 +856,9 @@ cutCondition(_) :-
 	retractall(countTurns(_)),
 	assert(countTurns(V2)),
 	fail.
+    
+cutCondition(_) :-
+    countTurns(10).
 	
 cutCondition(Meta) :-
     Meta \= atacar(_),

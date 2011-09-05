@@ -124,7 +124,7 @@ def parse_request_action(xml):
             }],
         
         }
-
+    print result_private
     if (achievements_tag != None):
         # This check is done because if the xml has no visible vertices tag, it will be None.
         achievements_list = []
