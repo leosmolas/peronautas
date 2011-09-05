@@ -8,40 +8,51 @@ import base64
 
 BUFSIZE = 4096
 
-# mechear chequeo de tiempo en agent.py, reduciendo el tiempo que queda, pasandole el cutoff a prolog
-# timeout del receive del servidor
+# [x] uso de shutdown
+# [x] get rid of base64 encoding
+# [ ] mechear chequeo de tiempo en agent.py, reduciendo el tiempo que queda, pasandole el cutoff a prolog
+# [ ] timeout del receive del servidor
 #       si se cae, que el PS no incluya la percepcion del agente caido en los demas
 #       mensaje por defecto para asumir para los demas?
 #       se bardean los demas si no saben algo de otro agente?
 #       que se le envia al agente que llego tarde?
 #       que se hace con el mensaje que llegara del agente ? descartarlo?
-# sockets no bloqueantes
+# [ ] sockets no bloqueantes
 
-def recv_data(socket):
+####################################################################################################
+def recv_data(sckt):
+
+    # Protocol Version 3
     stop = False
-    buf  = ''
-
-    #bytes_received = ''
-    #while (not stop):
-    #    bytes_received = self.socket.recv(BUFSIZE)
-    #    print "DEBUG: received", len(bytes_received), "bytes"
-    #    if (len(bytes_received) == 0):
-    #        stop = True
-    #    else:
-    #        msg += bytes_received
+    buf = ''
+    msg = ''
     while (not stop):
-        buf += socket.recv(BUFSIZE)
+        buf = sckt.recv(BUFSIZE)
         if (len(buf) > 0):
-            stop = (buf[-1] == '\0')
+            msg += buf
         else:
-            print "@PerceptConnection: the message received was empty!"
             stop = True
-    data = base64.b64decode(buf[:-1])
-    return data
 
-def send_data(socket, data):
-    safe_data = base64.b64encode(data)
-    socket.send(''.join([safe_data, '\0']))
+    # Deserialize
+    # REPR
+    #lst = eval(msg)
+
+    # PICKLE
+    #data = base64.b64decode(msg)
+    lst  = cPickle.loads(msg)
+    return lst
+
+####################################################################################################
+def send_data(sckt, data):
+    # Serialize
+    # REPR
+    #string = repr(data)
+
+    # PICKLE
+    msg        = cPickle.dumps(data, cPickle.HIGHEST_PROTOCOL)
+    #safe_data  = base64.b64encode(msg)
+    bytes_sent = sckt.send(msg)
+    return bytes_sent
 
 ####################################################################################################
 class VortexPerceptConnection():
@@ -67,12 +78,11 @@ class PerceptConnection():
         self.name    = name
 
     def disconnect(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
-        #msg = repr(frozenset([ (-1, ), (0, self.name) ]))
-        msg = cPickle.dumps(frozenset([ (-1, ), (0, self.name) ]), cPickle.HIGHEST_PROTOCOL)
-        send_data(self.socket, msg)
-        self.socket.close()
+        self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sckt.connect((self.host, self.port))
+        msg = frozenset([ (-1, ), (0, self.name) ])
+        send_data(self.sckt, msg)
+        self.sckt.close()
 
     def send_and_recv(self, dictionary):
 
@@ -208,29 +218,18 @@ class PerceptConnection():
 
         # Send
         print "@PerceptConnection: Connecting to %s:%s" % (self.host, self.port)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
+        self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sckt.connect((self.host, self.port))
         print "@PerceptConnection: succesfully connected."
-        lst    = dict2list(self.name, dictionary)
-        fset   = frozenset(lst)
-        try:
-            #string = repr(fset)
-            string = cPickle.dumps(fset, cPickle.HIGHEST_PROTOCOL)
-        except cPickle.PickleError as e:
-            string = ""
-            print "@PerceptConnection: error serializing:", e
-        send_data(self.socket, string)
+        lst  = dict2list(self.name, dictionary)
+        fset = frozenset(lst)
+        send_data(self.sckt, fset)
+        self.sckt.shutdown(1)
         print "@PerceptConnection: sent data."
 
         # Receive
-        msg = recv_data(self.socket)
-        self.socket.close()
-        try:
-            #lst = eval(msg[:-1])
-            lst = cPickle.loads(msg)
-        except cPickle.PickleError as e:
-            lst = []
-            print "@PerceptConnection: error deserializing:", e
+        lst = recv_data(self.sckt)
+        self.sckt.close()
         return list2dict(lst)
 
 ####################################################################################################
@@ -263,7 +262,7 @@ class LogFile():
         for key in sorted(agentdict.keys()):
             agentdata = agentdict[key]
             agentstring += "%s,%s,%s,%s,%s," % agentdata
-        # format is: turn, reception time, send time, total time, agent1 reception time, agent1 send time, agent1 total time, agent2 ...
+        # format is: turn, reception time, send time, total time, agent1 reception time, agent1 send time, agent1 total time, agent1 bytes sent, agent1 bytes received, agent2 ...
         self.fileobj.write("%s,%s,%s,%s,%s\n" % (turn, reception, send, total, agentstring))
 
 class AgentConnection():
@@ -271,7 +270,7 @@ class AgentConnection():
     def __init__(self):
         self.name      = ''
         self.connected = False
-        self.socket    = None
+        self.sckt      = None
         self.percept   = None
         self.rS        = 0 # reception start
         self.rE        = 0 # reception end
@@ -314,10 +313,10 @@ if (__name__ == "__main__"):
     logFile.write( "" )
 
     #for i in range(CONNECTIONS):
-    #    socket, address = serverSocket.accept()
+    #    sckt, address = serverSocket.accept()
     #    agents[i].connected = True
-    #    agents[i].socket = socket
-    #    agents[i].name = agents[i].socket.recv(BUFSIZE)
+    #    agents[i].sckt = sckt
+    #    agents[i].name = agents[i].sckt.recv(BUFSIZE)
     #    print          "Server: received a connection from %s at address %s" % (address, agents[i].name)
     #    logFile.write( "Server: received a connection from %s at address %s" % (address, agents[i].name) )
     
@@ -335,17 +334,14 @@ if (__name__ == "__main__"):
 
         for i in range(CONNECTIONS):
 
-            socket, address = serverSocket.accept()
+            sckt, address = serverSocket.accept()
             agents[i].connected = True
-            agents[i].socket = socket
+            agents[i].sckt = sckt
             agents[i].rS = time.time()
             
             # Receive perception.
-            msg = recv_data(agents[i].socket)
+            agents[i].percept = recv_data(agents[i].sckt)
 
-            #agents[i].percept = eval(msg[:-1])
-            agents[i].percept = cPickle.loads(msg)
-            
             # Get the agent's name.
             for x in agents[i].percept:
                 if (x[0] == 0):
@@ -354,7 +350,8 @@ if (__name__ == "__main__"):
             # Check whether it was a goodbye message.
             if ((-1, ) in agents[i].percept):
                 logFile.write( "        Agent %s: sent goodbye message." % (agents[i].name) )
-                agents[i].socket.close()
+                agents[i].sckt.shutdown(socket.SHUT_RDWR)
+                agents[i].sckt.close()
                 agents[i].connected = False
             else:
                 globalPercept = globalPercept.union(agents[i].percept)
@@ -380,15 +377,13 @@ if (__name__ == "__main__"):
 
             if (agents[i].connected):
                 difference = globalPercept.difference(agents[i].percept)
-                #returnmsg = repr(difference)
-                returnmsg = cPickle.dumps(difference, cPickle.HIGHEST_PROTOCOL)
-                agents[i].bR = len(returnmsg)
+                agents[i].bR = send_data(agents[i].sckt, difference)
+                agents[i].sckt.shutdown(socket.SHUT_RDWR)
+                agents[i].sckt.close()
                 logFile.write( "        Agent %s: sending %s bytes." % (agents[i].name, agents[i].bR) )
-                send_data(agents[i].socket, returnmsg)
 
             agents[i].sE = time.time()
             logFile.write( "        Agent %s sending time: %s" % (agents[i].name, agents[i].sE - agents[i].sS))
-            agents[i].socket.close()
 
         sendingEnd = time.time()
         logFile.write( "        Sending time: %s" % (sendingEnd - sendingStart) )

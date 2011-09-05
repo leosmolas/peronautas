@@ -75,11 +75,11 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def disconnect(self):
+        self.massimConnection.disconnect()
+        self.perceptConnection.disconnect()
         self.log.close()
         self.log = sys.__stdout__
         sys.stdout = sys.__stdout__
-        self.massimConnection.disconnect()
-        self.perceptConnection.disconnect()
 
 
 

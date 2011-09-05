@@ -40,16 +40,17 @@ WD=$(pwd)
 
 echo Starting agents.
 #cd $AGT_DIR
-#$TRM_CMD -title 'AGENT_D1' -e sh runagent.sh d3lp0r1  RE3bz6
-#$TRM_CMD -title 'AGENT_D2' -e sh runagent.sh d3lp0r2  RE3bz6
-#$TRM_CMD -title 'AGENT_D3' -e sh runagent.sh d3lp0r3  RE3bz6
-#$TRM_CMD -title 'AGENT_D4' -e sh runagent.sh d3lp0r4  RE3bz6
-#$TRM_CMD -title 'AGENT_D5' -e sh runagent.sh d3lp0r5  RE3bz6
-#$TRM_CMD -title 'AGENT_D6' -e sh runagent.sh d3lp0r6  RE3bz6
-#$TRM_CMD -title 'AGENT_D7' -e sh runagent.sh d3lp0r7  RE3bz6
-#$TRM_CMD -title 'AGENT_D8' -e sh runagent.sh d3lp0r8  RE3bz6
-#$TRM_CMD -title 'AGENT_D9' -e sh runagent.sh d3lp0r9  RE3bz6
-#$TRM_CMD -title 'AGENT_D0' -e sh runagent.sh d3lp0r10 RE3bz6
+
+$TRM_CMD -title 'AGENT_B1' -e $PYTHON Agent.py b1  1 -d
+$TRM_CMD -title 'AGENT_B2' -e $PYTHON Agent.py b2  1 -d
+#$TRM_CMD -title 'AGENT_B3' -e $PYTHON Agent.py b3  1 -d
+#$TRM_CMD -title 'AGENT_B4' -e $PYTHON Agent.py b4  1 -d
+#$TRM_CMD -title 'AGENT_B5' -e $PYTHON Agent.py b5  1 -d
+#$TRM_CMD -title 'AGENT_B6' -e $PYTHON Agent.py b6  1 -d
+#$TRM_CMD -title 'AGENT_B7' -e $PYTHON Agent.py b7  1 -d
+#$TRM_CMD -title 'AGENT_B8' -e $PYTHON Agent.py b8  1 -d
+#$TRM_CMD -title 'AGENT_B9' -e $PYTHON Agent.py b9  1 -d
+#$TRM_CMD -title 'AGENT_B0' -e $PYTHON Agent.py b10 1 -d
 
 $TRM_CMD -title 'AGENT_D1' -e sh runagent.sh a1 1 
 $TRM_CMD -title 'AGENT_D2' -e sh runagent.sh a2 1 
@@ -64,14 +65,14 @@ $TRM_CMD -title 'AGENT_D2' -e sh runagent.sh a2 1
 #$TRM_CMD -title 'AGENT_A9' -e $PYTHON Agent.py a9  1 -d
 #$TRM_CMD -title 'AGENT_A0' -e $PYTHON Agent.py a10 1 -d
 
-$TRM_CMD -title 'AGENT_B1' -e $PYTHON Agent.py b1  1 -d
-$TRM_CMD -title 'AGENT_B2' -e $PYTHON Agent.py b2  1 -d
-#$TRM_CMD -title 'AGENT_B3' -e $PYTHON Agent.py b3  1 -d
-#$TRM_CMD -title 'AGENT_B4' -e $PYTHON Agent.py b4  1 -d
-#$TRM_CMD -title 'AGENT_B5' -e $PYTHON Agent.py b5  1 -d
-#$TRM_CMD -title 'AGENT_B6' -e $PYTHON Agent.py b6  1 -d
-#$TRM_CMD -title 'AGENT_B7' -e $PYTHON Agent.py b7  1 -d
-#$TRM_CMD -title 'AGENT_B8' -e $PYTHON Agent.py b8  1 -d
-#$TRM_CMD -title 'AGENT_B9' -e $PYTHON Agent.py b9  1 -d
-#$TRM_CMD -title 'AGENT_B0' -e $PYTHON Agent.py b10 1 -d
+#$TRM_CMD -title 'AGENT_D1' -e sh runagent.sh d3lp0r1  RE3bz6
+#$TRM_CMD -title 'AGENT_D2' -e sh runagent.sh d3lp0r2  RE3bz6
+#$TRM_CMD -title 'AGENT_D3' -e sh runagent.sh d3lp0r3  RE3bz6
+#$TRM_CMD -title 'AGENT_D4' -e sh runagent.sh d3lp0r4  RE3bz6
+#$TRM_CMD -title 'AGENT_D5' -e sh runagent.sh d3lp0r5  RE3bz6
+#$TRM_CMD -title 'AGENT_D6' -e sh runagent.sh d3lp0r6  RE3bz6
+#$TRM_CMD -title 'AGENT_D7' -e sh runagent.sh d3lp0r7  RE3bz6
+#$TRM_CMD -title 'AGENT_D8' -e sh runagent.sh d3lp0r8  RE3bz6
+#$TRM_CMD -title 'AGENT_D9' -e sh runagent.sh d3lp0r9  RE3bz6
+#$TRM_CMD -title 'AGENT_D0' -e sh runagent.sh d3lp0r10 RE3bz6
 #cd $WD
