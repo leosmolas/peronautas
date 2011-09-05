@@ -318,6 +318,45 @@ class Agent():
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
         
+        roledict = { 'd3lp0r1'  : 'explorer'
+                   , 'd3lp0r2'  : 'explorer'
+                   , 'd3lp0r3'  : 'repairer'
+                   , 'd3lp0r4'  : 'repairer'
+                   , 'd3lp0r5'  : 'saboteur'
+                   , 'd3lp0r6'  : 'saboteur'
+                   , 'd3lp0r7'  : 'sentinel'
+                   , 'd3lp0r8'  : 'sentinel'
+                   , 'd3lp0r9'  : 'inspector'
+                   , 'd3lp0r10' : 'inspector'
+                   }
+
+        self.role = roledict[self.username]
+        if   (self.role == 'explorer'):
+            self.prolog_role_file = 'pl/explorer.pl'
+        elif (self.role == 'repairer'):
+            self.prolog_role_file = 'pl/repairer.pl'
+        elif (self.role == 'sentinel'):
+            self.prolog_role_file = 'pl/sentinel.pl'
+        elif (self.role == 'saboteur'):
+            self.prolog_role_file = 'pl/saboteur.pl'
+        elif (self.role == 'inspector'):
+            self.prolog_role_file = 'pl/inspector.pl'
+        self.prolog.consult(self.prolog_role_file)
+
+        defaultVisionRange = { 'explorer' : 2
+                             , 'repairer' : 1
+                             , 'saboteur' : 1
+                             , 'sentinel' : 3
+                             , 'inspector': 1
+                             }
+
+        self.prolog.query("updateMyName(%s)" % self.username).next()
+        if (self.communication):
+            self.prolog.query("conectar(%s)" % self.username).next()
+            self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
+
+        print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
+        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: Received simulation start notification."
@@ -331,6 +370,25 @@ class Agent():
             self.processBye(msg_dict)
             self.quit = True
             quitPerceiveActLoop = True
+        elif (msg_type == 'request-action'):
+            quitPerceiveActLoop = False
+            print "@Agent: Receiving perception from server..."
+            xml = self.massimConnection.receive()
+            msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
+            # time.sleep(0.5)
+            if (msg_type == 'request-action'):
+                self.turnStartTime = time.time()
+                print ""
+                print "@Agent: Step: %s" % msg_dict_private['step']
+
+                # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
+                action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
+
+                # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
+                if (self.communication):
+                    print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
+                    self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
+                self.massimConnection.send(action_xml)
         else:
             self.quit = True
             quitPerceiveActLoop = True
