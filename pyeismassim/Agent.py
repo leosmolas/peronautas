@@ -318,19 +318,21 @@ class Agent():
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
         
-        roledict = { 'd3lp0r1'  : 'explorer'
-                   , 'd3lp0r2'  : 'explorer'
-                   , 'd3lp0r3'  : 'repairer'
-                   , 'd3lp0r4'  : 'repairer'
-                   , 'd3lp0r5'  : 'saboteur'
-                   , 'd3lp0r6'  : 'saboteur'
-                   , 'd3lp0r7'  : 'sentinel'
-                   , 'd3lp0r8'  : 'sentinel'
-                   , 'd3lp0r9'  : 'inspector'
-                   , 'd3lp0r10' : 'inspector'
+        number = self.username[-1:]
+        if (number == '0'):
+            number = '10'
+        roledict = { '1'  : 'explorer'
+                   , '2'  : 'explorer'
+                   , '3'  : 'repairer'
+                   , '4'  : 'repairer'
+                   , '5'  : 'saboteur'
+                   , '6'  : 'saboteur'
+                   , '7'  : 'sentinel'
+                   , '8'  : 'sentinel'
+                   , '9'  : 'inspector'
+                   , '10' : 'inspector'
                    }
-
-        self.role = roledict[self.username]
+        self.role = roledict[number]
         if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
         elif (self.role == 'repairer'):

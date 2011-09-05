@@ -124,7 +124,7 @@ def parse_request_action(xml):
             }],
         
         }
-    print result_private
+
     if (achievements_tag != None):
         # This check is done because if the xml has no visible vertices tag, it will be None.
         achievements_list = []
@@ -142,7 +142,7 @@ def parse_request_action(xml):
         for i in range(len(vis_verts_tag.contents)):
             if (vis_verts_tag.contents[i].__class__.__name__ == "Tag"):
                 vis_verts_list.append({ 
-                    'name' : vis_verts_tag.contents[i]['name']         ,
+                    'name' : vis_verts_tag.contents[i]['name'].lower()         ,
                     'team' : vis_verts_tag.contents[i]['team'].lower() })
         result_public['vis_verts'] = vis_verts_list
     else:
@@ -164,10 +164,10 @@ def parse_request_action(xml):
         for i in range(len(vis_ents_tag.contents)):
             if (vis_ents_tag.contents[i].__class__.__name__ == "Tag"):
                 vis_ents_list.append({ 
-                    'name'   : vis_ents_tag.contents[i]['name']        ,
-                    'node'   : vis_ents_tag.contents[i]['node']        ,
+                    'name'   : vis_ents_tag.contents[i]['name'].lower()        ,
+                    'node'   : vis_ents_tag.contents[i]['node'].lower()     ,
                     'team'   : vis_ents_tag.contents[i]['team'].lower(),
-                    'status' : vis_ents_tag.contents[i]['status']      }) # normal | disabled
+                    'status' : vis_ents_tag.contents[i]['status'].lower()      }) # normal | disabled
         result_public['vis_ents'] = vis_ents_list
     else:
         result_public['vis_ents'] = []
