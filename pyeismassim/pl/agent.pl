@@ -27,7 +27,7 @@
            notVisible/1,
            notExplored/1,
            explored/1,
-           plan/1,,
+           plan/1,
 		   ultimaCompra/1,
            intention/1,
            countTurns/1,
