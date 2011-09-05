@@ -40,12 +40,12 @@ meta(X) :-
     retractall(mejorMeta(_, _)).
     
 calcMeta(X) :-
+    writeln(X),
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
-    % writeln(Answer), 
+    writeln(Answer), 
     Answer = yes, !,
-    writeln(X),
     writeln(Value),
     mejorMeta(_, CurrentValue), !,
     Value > CurrentValue,

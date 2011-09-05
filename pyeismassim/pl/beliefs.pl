@@ -22,10 +22,12 @@ setBeliefs :-
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     % calcTime(setPosibleAuxilio), !,
-    printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
+    % printFindAll('setDifPuntos', b(difPuntosZona(_N, _D)) <- true),
     % printFindAll('edge', k(edge(N1, N2, V))),
-    printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
-    printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost)) <- true).
+    % printFindAll('b(path(InitialNode, FinalNode, Energy, Path, Plan, NewTurns2, RemainingEnergy1))', b(path(_InitialNode, _FinalNode, _Energy, _Path, _Plan, _NewTurns2, _RemainingEnergy1))),
+    % printFindAll('setDistancia', b(distancia(_Node, _A, _PathCost)) <- true).
+    printFindAll('b', b(_)),
+    printFindAll('b <- true', b(_) <- true).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Utils

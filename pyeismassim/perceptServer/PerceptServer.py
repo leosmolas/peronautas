@@ -10,13 +10,13 @@ BUFSIZE = 4096
 
 # [x] uso de shutdown
 # [x] get rid of base64 encoding
-# [ ] mechear chequeo de tiempo en agent.py, reduciendo el tiempo que queda, pasandole el cutoff a prolog
 # [ ] timeout del receive del servidor
 #       si se cae, que el PS no incluya la percepcion del agente caido en los demas
 #       mensaje por defecto para asumir para los demas?
 #       se bardean los demas si no saben algo de otro agente?
 #       que se le envia al agente que llego tarde?
 #       que se hace con el mensaje que llegara del agente ? descartarlo?
+# [ ] mechear chequeo de tiempo en agent.py, reduciendo el tiempo que queda, pasandole el cutoff a prolog
 # [ ] sockets no bloqueantes
 
 ####################################################################################################

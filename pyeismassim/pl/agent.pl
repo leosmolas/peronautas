@@ -619,7 +619,8 @@ calcTime(Exec) :-
     verbose, !,
     write('<predicate name="'),write(Exec), writeln('">'),nl,
     get_time(_Before),
-    call(Exec).
+    call(Exec),
+    write('</predicate>'),nl.
 
 calcTime(Exec) :- call(Exec).
     
