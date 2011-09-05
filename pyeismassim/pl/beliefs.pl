@@ -713,7 +713,7 @@ assertReagruparseGoal :-
 setPathReagruparse :-
 	myPosition(InitialNode),
 	myEnergy(Energy),
-    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    singleton_heap(InitialFrontier, 0, ucsNode(InitialNode, Energy, [], [], 0)),
     write('pathSearchReagruparse'),
     ucsAux(InitialFrontier, [], _Path, Actions, PathCost, _RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),

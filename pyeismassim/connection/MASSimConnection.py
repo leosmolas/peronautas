@@ -2,7 +2,7 @@ import socket
 import sys
 import time
 from MessageHandling import auth_request
-from MessageHandling import parse_as_dict
+from MessageHandling import parse
 
 MAX_CONNECTION_TRIES = 10
 
@@ -16,15 +16,15 @@ class MASSimConnection:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect(self):
-        print "@Connection: connecting to " + self.host + ":" + str(self.port)
+        print "@MASSimConnection: Connecting to " + self.host + ":" + str(self.port)
         code = self.sock.connect_ex((self.host, self.port))
         if (code == 0):
             self.connected = True
+            self.authenticate(self.username, self.password)
         else:
             self.connected = False
-            print "@Connection: failed. error:", code
-        #time.sleep(2)
-        self.authenticate(self.username, self.password)
+            print "@MASSimConnection: Failed with error:", code
+            raise RuntimeError("Connection failed.")
 
     def disconnect(self):
         self.sock.shutdown(socket.SHUT_RDWR)
@@ -44,7 +44,7 @@ class MASSimConnection:
             while (bytes_sent < msg_length):
                 sent = self.sock.send(msg[bytes_sent:])
                 bytes_sent += sent
-                #print "@Connection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
+                #print "@MASSimConnection: sent %s bytes: %s" % (sent, msg[:bytes_sent])
                 if (sent == 0):
                     self.connected = False
                     raise RuntimeError("Server connection lost!")
@@ -62,11 +62,11 @@ class MASSimConnection:
             stop = False
             msg  = ''
             while (not stop):
-                msg += self.sock.recv(2048)
+                msg += self.sock.recv(4096)
                 if (len(msg) > 0):
                     stop = (msg[-1] == '\0')
                 else:
-                    print "@Connection: the message received was empty!"
+                    print "@MASSimConnection: The message received was empty!"
                     stop = True
             return msg
         else:
@@ -75,26 +75,24 @@ class MASSimConnection:
     def connectionValid(self):
         i = 0
         while (not self.connected) and (i < MAX_CONNECTION_TRIES):
-            self.connect(self.host, self.port, self.username, self.password)
+            print "@MASSimConnection: Attempt", i + 1
+            self.connect()
             i += 1
             # Si no logramos conectarnos, hacemos espera progresiva.
-            sleep(i)
+            time.sleep(i)
         return self.connected
             
     def authenticate(self, username, password):
-        # TODO: validate reply message, and return True or False according 
-        # to result.
-        # arreglar el tema del header que queda horrendo asi, hay que usar la libreria de MessageHandling, hay que usar la libreria de MessageHandling
         if (self.connectionValid()):
-            print "@Connection: sending authentication message."
+            print "@MASSimConnection: Sending authentication message."
             self.send(auth_request(username, password))
-            print "@Connection: waiting for reply."
+            print "@MASSimConnection: Waiting for reply."
             auth_reply = self.receive()
-            _, _, result, _ = parse_as_dict(auth_reply)
+            _, _, result, _ = parse(auth_reply)
             if (result['result'] != 'ok'):
                 raise RuntimeError("Authentication failed.")
             else:
-                print "@Connection: succesfully authenticated."
+                print "@MASSimConnection: Succesfully authenticated."
         else:
             raise RuntimeError("Server connection lost")
 
