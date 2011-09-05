@@ -316,7 +316,7 @@ class Agent():
         print "@Agent: Waiting for simulation start notification."
 
         xml = self.massimConnection.receive()
-        msg_type, _, msg_dict, _ = parse_as_dict(xml)
+        msg_type, _, msg_dict, _ = parse(xml)
         
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
@@ -338,7 +338,7 @@ class Agent():
         while (not quitPerceiveActLoop):
             print "@Agent: Receiving perception from server..."
             xml = self.massimConnection.receive()
-            msg_type, action_id, msg_dict_private, msg_dict_public = parse_as_dict(xml)
+            msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
