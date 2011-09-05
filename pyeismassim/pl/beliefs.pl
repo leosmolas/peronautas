@@ -373,7 +373,7 @@ setDifPuntosSinMi :-
     % write('Points: '), writeln(Points),
     assert(b(difPuntosSinMi(DifPuntos)) <- true).
 	
-setDifPuntosSinMi(_A, _T).
+setDifPuntosSinMi.
 
     
 setDifPuntosExpansion :-

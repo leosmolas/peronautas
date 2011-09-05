@@ -75,7 +75,7 @@ rolSetDifPuntos:-
 rolSetDifPuntosSinMi :-
     b(posibleProbear(Node)),
     (b(distancia(Node, [[probe]], PathCost, _RemainingEnergy)) <- true),
-    PathCost >= 3, !,
+    PathCost >= 3, 
     setDifPuntosSinMi, !.
     
 rolSetDifPuntosSinMi.
