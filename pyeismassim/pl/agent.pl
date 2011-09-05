@@ -505,6 +505,25 @@ rechargeEnergy(Step, Agent, Recharge) :-
     Recharge is round(MaxEnergy * 0.5).
 
 checkLastAction :-
+    lastAction(probe),
+	lastActionResult(successful),
+    myPosition(MyPos),
+    retractall(k(nodeValue(MyPos, _Value))),
+    assert(k(nodeValue(MyPos, 5))),
+    fail.
+    
+    
+checkLastAction :-
+    lastAction(survey),
+	lastActionResult(successful),
+    myPosition(MyPos),
+    foreach(
+        k(edge(MyPos, Node2, _)),
+        updateEdge(MyPos, Node2, 5)
+    ),
+    fail.
+    
+checkLastAction :-
 	lastActionResult(failed), !.
 
 checkLastAction :-
@@ -856,6 +875,9 @@ cutCondition(_) :-
 	retractall(countTurns(_)),
 	assert(countTurns(V2)),
 	fail.
+    
+cutCondition(_) :-
+    countTurns(10).
 	
 cutCondition(Meta) :-
     Meta \= atacar(_),
