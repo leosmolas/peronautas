@@ -400,33 +400,34 @@ setDifPuntosExpansion :-
 
 setAumento :-
     myStatus(normal),
-    myTeam(Team),
-	currentStep(Step),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-    assert((
-        isGoal(Node, Cost) :- 
-            !, 
-            Cost =< 2, 
-            Cost > 0, 
-            currentStep(Step),
-            k(nodeTeam(Step, Node, none)),
-            b(nodeAtDistance(Node, Distance)),
-            Distance < 4
-    )),
-	assert((
-        isFail(_, Cost2) :- 
-            Cost2 > 2
-    )),
-    assert((
-        isFail(Node, _) :- 
-            currentStep(Step),
-            myTeam(MyTeam),
-            k(nodeTeam(Step, Node, MyTeam))
-    )),
+    % myTeam(Team),
+	% currentStep(Step),
+    % retractall(isGoal(_, _)),
+	% retractall(isFail(_, _)),
+    % assert((
+        % isGoal(Node, Cost) :- 
+            % !, 
+            % Cost =< 2, 
+            % Cost > 0, 
+            % currentStep(Step),
+            % k(nodeTeam(Step, Node, none)),
+            % b(nodeAtDistance(Node, Distance)),
+            % Distance < 4
+    % )),
+	% assert((
+        % isFail(_, Cost2) :- 
+            % Cost2 > 2
+    % )),
+    % assert((
+        % isFail(Node, _) :- 
+            % currentStep(Step),
+            % myTeam(MyTeam),
+            % k(nodeTeam(Step, Node, MyTeam))
+    % )),
+    % myPosition(MyPos),
     setof(
         FinalNode,
-        setPosibleAumentoAux(FinalNode, Step, Team),
+        k(edge(MyPos, FinalNode, _)),
         Aumento
     ),
     setPosibleAumento(0, Aumento),
