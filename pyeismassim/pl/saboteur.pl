@@ -100,7 +100,18 @@ searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
     
 %------------------------------  Attack  --------------------------------%
 
+action([buy, shield]):-
+    myStatus(normal),
+    currentStep(Step),
+    (Step = 20; Step = 50; Step = 100).
+    
+action([buy, sabotageDevice]):-
+    myStatus(normal),
+    currentStep(Step),
+    (Step = 10; Step = 35; Step = 40; Step = 60).
+
 action([attack, Enemy]):-
+    myStatus(normal),
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -108,6 +119,7 @@ action([attack, Enemy]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    status(Step, Enemy, normal),
     myName(Name),
     Enemy \= Name,
     write(1.3),nl,
@@ -120,6 +132,7 @@ action([attack, Enemy]):-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -134,6 +147,7 @@ action([survey, Position]) :-
 %-- Barbarian Goto --%
 
 action([goto, NeighborNode]) :-
+    myStatus(normal),
     write(3.1),nl,
     myPosition(Position),
     k(edge(Position, NeighborNode, Cost)), 
@@ -144,6 +158,7 @@ action([goto, NeighborNode]) :-
     write(3.3),nl,
     currentStep(Step),
     position(Step, EnemyAgent, NeighborNode),
+    status(Step, EnemyAgent, normal),
     write(3.4),nl,
     myTeam(Team),
     team(Step, EnemyAgent, EnemyTeam),
