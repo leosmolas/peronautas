@@ -41,6 +41,7 @@ reachableNode(Node, [_ | T]) :-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 0,

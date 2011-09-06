@@ -116,6 +116,7 @@ execDummy(Action) :-
 % si tenemos suficiente energia y 
 % no conocemos el valor del nodo, hacemos probe
 action([probe, Position]) :-
+    myStatus(normal),
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -127,6 +128,7 @@ action([probe, Position]) :-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,

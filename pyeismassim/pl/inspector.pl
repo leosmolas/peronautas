@@ -41,6 +41,7 @@ reachableNode(Node, [_ | T]) :-
 %------------------------------  Attack  --------------------------------%
 
 action([inspect]):-
+    myStatus(normal),
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -48,6 +49,7 @@ action([inspect]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    status(Step, Enemy, normal),
     write(1.3),nl,
     myName(Name),
     Enemy \= Name,
@@ -61,6 +63,7 @@ action([inspect]):-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -75,6 +78,7 @@ action([survey, Position]) :-
 %-- Barbarian Goto --%
 
 action([goto, NeighborNode]) :-
+    myStatus(normal),
     write(3.1),nl,
     myPosition(Position),
     k(edge(Position, NeighborNode, Cost)), 
