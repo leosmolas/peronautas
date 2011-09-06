@@ -44,7 +44,7 @@ class Agent():
         self.massimHost = '127.0.0.1'
         if (massimHost):
             self.massimHost = massimHost
-
+        self.deadline = 0
         print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         
