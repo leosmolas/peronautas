@@ -278,12 +278,12 @@ class Agent():
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # Decide action.
-        self.startRunTime = time.time()
-        self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
-        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
-        if self.dummy:
+        
+        now = time.time()
+        if self.dummy or (now > self.deadline):
             query_result = self.prolog.query("execDummy(X)").next()
         else:
+            self.remainingTime = self.deadline - now
             query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
 
@@ -402,7 +402,8 @@ class Agent():
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
-                print ""
+                self.deadline = self.massimConnection.messageReceived + 1.6
+                print 
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
                 # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
