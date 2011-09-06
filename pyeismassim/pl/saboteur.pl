@@ -100,15 +100,21 @@ searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
     
 %------------------------------  Attack  --------------------------------%
 
-action([buy, shield]):-
-    myStatus(normal),
-    currentStep(Step),
-    (Step = 20; Step = 50; Step = 100).
+% action([buy, shield]):-
+%     myStatus(normal),
+%     myEnergy(Energy),
+%     currentStep(Step),
+%     Energy >= 2,
+%     %0 is Step mod 10, % cada 10 turnos evaluamos si compramos shield
+%     money(X),
+%     X > 4, !.
     
-action([buy, sabotageDevice]):-
-    myStatus(normal),
-    currentStep(Step),
-    (Step = 10; Step = 35; Step = 40; Step = 60).
+% action([buy, sabotageDevice]):-
+%     myStatus(normal),
+%     currentStep(Step),
+%     5 is Step mod 10, % cada 10 turnos evaluamos si compramos shield
+%     money(X),
+%     X > 4, !.
 
 action([attack, Enemy]):-
     myStatus(normal),
@@ -129,6 +135,8 @@ action([attack, Enemy]):-
     write(1.4),nl,
     !.
     
+
+
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
@@ -141,6 +149,14 @@ action([survey, Position]) :-
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(2.3),nl,
     !.
+    
+
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
 
 %-------------------------------  Goto  ---------------------------------%
 
