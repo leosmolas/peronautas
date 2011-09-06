@@ -673,6 +673,7 @@ setReagruparse :-
 	writeln('setReagruparse: caso firstPerceivedStep'), !.
 	
 setReagruparse :-
+    myStatus(normal),
 	not(b(posibleAumento(_))),
 	myPosition(MyPos),
 	currentStep(Step),
