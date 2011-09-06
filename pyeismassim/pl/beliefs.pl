@@ -761,7 +761,6 @@ checkLife :- !.
 assertSaboteurs :-  
     lastActionResult(successful),
     lastAction(goto(_)), !.
-    % Action \= goto(_), !.
 
 assertSaboteurs :-  
     myPosition(Pos),
@@ -779,8 +778,8 @@ assertSaboteurs :-
             role(Agent, Role),
             Role = unknown
         ),
-        Potential
+        [Saboteur]
     ),
-    length(Potential, 1),
-    assertOnce(k(agentRole(Agent, saboteur))).
+    
+    assertOnce(k(agentRole(Saboteur, saboteur))).
     

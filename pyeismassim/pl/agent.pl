@@ -113,6 +113,11 @@
 
 %------------------------------------------------------------------------------%
 updateMyName(X) :- 
+    var(X), !,
+    fail.
+    
+
+updateMyName(X) :- 
    retractall( myName(_) ),
    asserta(    myName(X) ).
 
@@ -247,6 +252,14 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
+updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange, _Status) :-
+    ( 
+        var(Agent) ;
+        var(Team)  ;
+        var(Role)  
+    ), !,
+    writeln('ERROR!!!!!!!!!!!!!! updateEntity1: se intento asertar una variable').
+
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
@@ -263,6 +276,14 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 
 
 %------------------------------------------------------------------------------%
+updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange) :-
+    ( 
+        var(Agent);
+        var(Team);
+        var(Role)
+    ), !,
+    writeln('ERROR!!!!!!!!!!!!!! updateEntity2: se intento asertar una variable').
+
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
     assertOnce( k(agentTeam(Agent,        Team))               ),
@@ -277,6 +298,13 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
 
 
 %------------------------------------------------------------------------------%
+updateTeammateEntity(Agent, Team, _Position, _Health, _MaxHealth, _VisualRange) :-
+    ( 
+        var(Agent);
+        var(Team)
+    ), !,
+    writeln('ERROR!!!!!!!!!!!!!! updateTeammateEntity1: se intento asertar una variable').
+
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
@@ -291,6 +319,13 @@ updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     assertOnce( k(agentHealth(      Agent, Step, Health) )),
     assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
     assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
+    
+updateEntityTeamPosition(Agent, Team, _Position, _Status) :-
+    ( 
+        var(Agent);
+        var(Team)
+    ), !,
+    writeln('ERROR!!!!!!!!!!!!!! updateEntityTeamPosition: se intento asertar una variable').
 
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
@@ -556,8 +591,9 @@ setBuyCount :- !.
 % TimeLimit in seconds
 run(TimeLimit, Action) :-
     write('time limit: '),writeln(TimeLimit),
+    SetBeliefsTimeLimit is TimeLimit - 0.2,
     catch( % try
-        call_with_time_limit(TimeLimit, run2(Action)), 
+        call_with_time_limit(TimeLimit, run2(SetBeliefsTimeLimit, Action)), 
         % run2(Action),
         E, 
         ( % except :
@@ -568,7 +604,9 @@ run(TimeLimit, Action) :-
             retractall(b(_) <- true),
             execDummy(Action)
         )
-    ), !.
+    ),
+    saveKB,    
+    !.
    
 run(_TimeLimit, Action) :- 
 	retractall(b(_)),
@@ -579,7 +617,7 @@ run(_TimeLimit, Action) :-
 	planning(quedarse(_)),
     exec(Action).
     
-run2(Action) :-
+run2(SetBeliefsTimeLimit, Action) :-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     checkLife,
@@ -588,31 +626,13 @@ run2(Action) :-
     checkLastAction,
 	calcTime(setBuyCount),
   	printFindAll('buyCount:', buyCount(_, _)),
-    plan([]),
-    % dumpKB, 
-    !,
-    
-    % currentStep(Step),
-    % myName(Name),
-    % concat('logs/', Name, S2),
-    % concat(S2, '-', S3),
-    % concat(S3, Step, S0),
-    % concat(S0, '.pl', File),
-    % writeln(File),
-    % saveMap(File),
-    
-    currentStep(Step),
-    myName(Name),
-    concat('logs/', Name, S2),
-    concat(S2, '.pl', File),
-    writeln(File),
-    saveMap(File),
+    plan([]), !,
     
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(7)), !,
-    calcTime(argumentation(Meta)),
+    calcTime(argumentation(SetBeliefsTimeLimit, Meta)),
 
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
@@ -622,7 +642,7 @@ run2(Action) :-
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 
-run2(Action) :-	
+run2(SetBeliefsTimeLimit, Action) :-	
     intention(Meta),
     writeln(Meta),
 	cutCondition(Meta), !, 
@@ -630,7 +650,7 @@ run2(Action) :-
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(7)), !,
-	calcTime(argumentation(MetaNueva)), !,
+	calcTime(argumentation(SetBeliefsTimeLimit, MetaNueva)), !,
     write('Meta Nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
     exec(Action),
@@ -639,7 +659,7 @@ run2(Action) :-
     retractall(b(_) <- true),
     toogleOffVisibleNodes.
 	    
-run2(Action) :-	
+run2(_SetBeliefsTimeLimit, Action) :-	
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(7)), !,
     intention(Meta),
@@ -651,10 +671,10 @@ run2(Action) :-
     toogleOffVisibleNodes.	
 
 	
-run2(Action) :-	
+run2(SetBeliefsTimeLimit, Action) :-	
 	retractall(countTurns(_)),
 	assert(countTurns(0)),
-    calcTime(argumentation(Meta)), !,
+    calcTime(argumentation(SetBeliefsTimeLimit, Meta)), !,
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
     exec(Action),
@@ -664,15 +684,28 @@ run2(Action) :-
     toogleOffVisibleNodes.
     
 plan([]).
+
+saveKB :-
+    verbose,
+    
+    myName(Name),
+    concat('logs/', Name, S2),
+    concat(S2, '.pl', File),
+    writeln(File),
+    saveMap(File).
+    
+saveKB.
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-argumentation(Meta) :-
-
-    calcTime(setBeliefs),
-
+argumentation(SetBeliefsTimeLimit, Meta) :-
+    catch(
+        call_with_time_limit(SetBeliefsTimeLimit, calcTime(setBeliefs)),
+        time_limit_exceeded,
+        writeln('\tWARNING!!!!!: set beliefs limit time exceeded, delping now')
+    ),
     calcTime(meta(Meta)),
     retractall(intention(_)),
     assert(intention(Meta)).
@@ -684,7 +717,7 @@ calcTime(Exec) :-
     call(Exec),
     get_time(After),
     Time is (After - Before) * 1000,
-    write('<time value="'),write(Time), writeln('"/>'),
+    write('\t<time value="'),write(Time), writeln('"/>'),
     writeln('</predicate>').
     
 calcTime(Exec) :- call(Exec).

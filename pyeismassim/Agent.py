@@ -358,7 +358,7 @@ class Agent():
             self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
 
         print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
-        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: Received simulation start notification."
@@ -402,7 +402,7 @@ class Agent():
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
-                self.deadline = self.massimConnection.messageReceived + 1.6
+                self.deadline = self.massimConnection.messageReceived + msg_dict_private['total_time'] / 1000 - 0.2 # VALOR A CAMBIAR
                 print 
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
