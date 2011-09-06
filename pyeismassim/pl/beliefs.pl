@@ -424,7 +424,7 @@ setAumento :-
             % myTeam(MyTeam),
             % k(nodeTeam(Step, Node, MyTeam))
     % )),
-    % myPosition(MyPos),
+    myPosition(MyPos),
     setof(
         FinalNode,
         k(edge(MyPos, FinalNode, _)),

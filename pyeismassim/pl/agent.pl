@@ -938,12 +938,12 @@ cutCondition(probe(Node)) :-
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
     
-cutCondition(aumento(Node)) :- 
+cutCondition(aumento(_Node)) :- 
     currentStep(Step),
     myName(Agent),
     myTeam(MyTeam),
 	agenteEnZona(Step, Agent, MyTeam),
-    writeln('ya llegue a la zona').
+    writeln('aumente la zona :)').
     
 cutCondition(defensaPropia(_)):-
 	countTurns(1), !,
