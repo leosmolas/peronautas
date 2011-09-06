@@ -114,15 +114,10 @@ setHaySaboteador:-
 		saboteurPosition(Position),
 		assertOnce(b(haySaboteador(Position))) 
 	).
+    
+muertos(miEquipo, 0).
+muertos(enemigo, 0).
 
-setMuertos :-
-	currentStep(Step),
-	firstPerceivedStep(Step),
-	writeln('setMuertos: caso firstPerceivedStep'),
-	myTeam(MyTeam),
-	assert(muertos(MyTeam, 0)),
-	assert(muertos(enemigo, 0)), !.	
-	
 % setMuertos :-
 	% currentStep(Step),
 	% TotalMuertosEnemigos is Step // 5,
@@ -160,7 +155,7 @@ setMuertos :-
 	length(Muertos, MuertosEsteTurno),
 	retract(muertos(MyTeam, MuertosActuales)),
 	TotalMuertos is MuertosActuales + MuertosEsteTurno,
-	assert(muertos(MyTeam, TotalMuertos)),
+	assert(muertos(miEquipo, TotalMuertos)),
 	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
 	retract(muertos(enemigo, MuertosActualesEnemigos)),
 	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
@@ -668,8 +663,7 @@ equipoVecino(Step, MyPos, Team) :-
 	k(nodeTeam(Step, Neigh, Team)).
 
 setReagruparse :-
-	currentStep(Step),
-	firstPerceivedStep(Step), 
+	currentStep(0),
 	writeln('setReagruparse: caso firstPerceivedStep'), !.
 	
 setReagruparse :-

@@ -34,6 +34,8 @@
            countTurns/1,
            saveMap/0,
            verbose/0,
+           muertos/2,
+           buyCount/2,
            myVisionRange/1.
 
 :- [graph/map, 
@@ -574,14 +576,10 @@ checkLastAction :-
 checkLastAction :-
 	retract(plan([_Action | Actions])),
 	assert(plan(Actions)), !.
-	
-setBuyCount :-
-	currentStep(Step),
-	firstPerceivedStep(Step), 
-	writeln('setBuyCount: caso firstPerceivedStep'), !,
-	assert(buyCount(sensor, 0)),
-	assert(buyCount(shield, 0)),
-	assert(buyCount(sabotageDevice, 0)).
+    
+buyCount(sensor, 0).
+buyCount(shield, 0).
+buyCount(sabotageDevice, 0).
 	
 setBuyCount :-
 	lastAction(buy),
