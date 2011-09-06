@@ -116,7 +116,9 @@ setHaySaboteador:-
 	).
 
 setMuertos :-
-	currentStep(0),
+	currentStep(Step),
+	firstPerceivedStep(Step),
+	writeln('setMuertos: caso firstPerceivedStep'),
 	myTeam(MyTeam),
 	assert(muertos(MyTeam, 0)),
 	assert(muertos(enemigo, 0)), !.	
@@ -164,7 +166,7 @@ setMuertos :-
 	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
 	assert(muertos(enemigo, TotalMuertosEnemigos)).
 
-	
+setMuertos.
     
 % searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
     % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
@@ -666,7 +668,9 @@ equipoVecino(Step, MyPos, Team) :-
 	k(nodeTeam(Step, Neigh, Team)).
 
 setReagruparse :-
-	currentStep(0), !.
+	currentStep(Step),
+	firstPerceivedStep(Step), 
+	writeln('setReagruparse: caso firstPerceivedStep'), !.
 	
 setReagruparse :-
 	not(b(posibleAumento(_))),

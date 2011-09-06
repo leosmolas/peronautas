@@ -18,6 +18,7 @@
            % Public
            phase/1,
            currentStep/1,      %
+		   firstPerceivedStep/1,
            h/1,                %
            k/1,                %
            b/1,
@@ -125,11 +126,16 @@ updateMyName(X) :-
 
 %------------------------------------------------------------------------------%
 updateStep(X) :-
-    retractall( currentStep(_) ),
-    asserta(    currentStep(X) ).
+	firstPerceivedStep(_), !,
+    retract( currentStep(_) ),
+    asserta( currentStep(X) ),
+	write('Update step 1: '), writeln(X).
 
-
-
+updateStep(X) :-
+	assert(firstPerceivedStep(X)),
+    asserta( currentStep(X) ),
+	write('Update step 2: '), writeln(X).
+	
 %------------------------------------------------------------------------------%
 updateMaxEnergyDisabled(X) :- 
     retractall( maxEnergyDisabled(_) ),
@@ -569,7 +575,9 @@ checkLastAction :-
 	assert(plan(Actions)), !.
 	
 setBuyCount :-
-	currentStep(0), !,
+	currentStep(Step),
+	firstPerceivedStep(Step), 
+	writeln('setBuyCount: caso firstPerceivedStep'), !,
 	assert(buyCount(sensor, 0)),
 	assert(buyCount(shield, 0)),
 	assert(buyCount(sabotageDevice, 0)).
