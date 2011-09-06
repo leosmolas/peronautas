@@ -2,6 +2,7 @@
 
 import sys
 import time
+import socket
 import argparse
 import cProfile
 import cPickle
@@ -99,6 +100,7 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
+        self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("close_output").next()
         self.prolog = None
         print "done"
@@ -435,7 +437,11 @@ class Agent():
         while (not self.quit):
             self.currentLoop += 1
             self.prologInitialization()
-            self.perceiveActLoop()
+            try:
+                self.perceiveActLoop()
+            except:
+                self.prolog.query("catch(saveKB('-fin-%d'),E,writeln(E))" % self.currentLoop).next()
+                sys.exit(0)
             self.prologFinalization()
         if not self.logToFile:
             raw_input("\nFinished. Press ENTER to continue...")

@@ -32,6 +32,7 @@
 		   ultimaCompra/1,
            intention/1,
            countTurns/1,
+           saveMap/0,
            verbose/0,
            myVisionRange/1.
 
@@ -613,7 +614,6 @@ run(TimeLimit, Action) :-
             execDummy(Action)
         )
     ),
-    saveKB,    
     !.
    
 run(_TimeLimit, Action) :- 
@@ -693,16 +693,17 @@ run2(SetBeliefsTimeLimit, Action) :-
     
 plan([]).
 
-saveKB :-
-    verbose,
+saveKB(Append) :-
+
     
     myName(Name),
     concat('logs/', Name, S2),
-    concat(S2, '.pl', File),
+    concat(S2, Append, S3),
+    concat(S3, '.pl', File),
     writeln(File),
     saveMap(File).
     
-saveKB.
+saveKB(_Append).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 Argumentacion                                %
@@ -1087,7 +1088,10 @@ saveMap(Filename) :-
     current_output(Current),
     open(Filename, write, S),
     set_output(S),
+    write('% '), writeln(Filename),
+    assert(saveMap),
     dumpMap,
+    retract(saveMap),
     set_output(Current),
     close(S).
     
@@ -1112,7 +1116,10 @@ printList([H | T]) :-
 %------------------------------------------------------------------------------%
 
 printFindAll(Title, WhatToFind) :-
-    verbose,
+    (
+        verbose;
+        saveMap
+    ),
     findall(WhatToFind, WhatToFind, L),
     % sort(L, SL),
     write(Title),
