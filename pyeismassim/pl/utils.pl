@@ -9,7 +9,7 @@
 pathSearch(InitialNode, FinalNode, Energy, ActionToBeDone, CostOfAction, Path, Plan, NewTurns2, RemainingEnergy1) :-
     retractall(isGoal(_)),	
     assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
-    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    singleton_heap(InitialFrontier, 0, ucsNode(InitialNode, Energy, [], [], 0)),
     %write('pathSearch, final node:'), writeln(FinalNode),
     ucsAux(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     length(ActionToBeDone, ActionToBeDoneTurns),

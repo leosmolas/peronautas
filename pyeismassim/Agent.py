@@ -278,9 +278,10 @@ class Agent():
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # Decide action.
-        
+
         now = time.time()
         if self.dummy or (now > self.deadline):
+
             query_result = self.prolog.query("execDummy(X)").next()
         else:
             self.remainingTime = self.deadline - now
@@ -317,7 +318,7 @@ class Agent():
 
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
-        
+
         number = self.username[-1:]
         if (number == '0'):
             number = '10'
