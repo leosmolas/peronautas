@@ -315,27 +315,31 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def perceiveActLoop(self):
+        def roleHardCode(username):
+            roledict = { '1'  : 'explorer'
+                       , '2'  : 'explorer'
+                       , '3'  : 'repairer'
+                       , '4'  : 'repairer'
+                       , '5'  : 'saboteur'
+                       , '6'  : 'saboteur'
+                       , '7'  : 'sentinel'
+                       , '8'  : 'sentinel'
+                       , '9'  : 'inspector'
+                       , '10' : 'inspector'
+                       }
+            number = username[-1:]
+            if (number == '0'):
+                number = '10'
+            return roledict[number]
+            
         # Receive simulation start notification.
         print "@Agent: Waiting for simulation start notification."
 
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
 
-        number = self.username[-1:]
-        if (number == '0'):
-            number = '10'
-        roledict = { '1'  : 'explorer'
-                   , '2'  : 'explorer'
-                   , '3'  : 'repairer'
-                   , '4'  : 'repairer'
-                   , '5'  : 'saboteur'
-                   , '6'  : 'saboteur'
-                   , '7'  : 'sentinel'
-                   , '8'  : 'sentinel'
-                   , '9'  : 'inspector'
-                   , '10' : 'inspector'
-                   }
-        self.role = roledict[number]
+        
+        self.role = roleHardCode(self.username)
         if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
         elif (self.role == 'repairer'):
@@ -354,6 +358,12 @@ class Agent():
                              , 'sentinel' : 3
                              , 'inspector': 1
                              }
+        if self.username[-1] == '0':
+            team = self.username[:-2]
+        else:
+            team = self.username[:-1]
+        for x in range(1,11):
+            self.prolog.query("assertOnce(k(agentRole(%s%d, %s)))" % (team, x, roleHardCode(str(x)))).next()
 
         self.prolog.query("updateMyName(%s)" % self.username).next()
         if (self.communication):
@@ -439,7 +449,8 @@ class Agent():
             self.prologInitialization()
             try:
                 self.perceiveActLoop()
-            except:
+            except socket.error:
+                print "holas"
                 self.prolog.query("catch(saveKB('-fin-%d'),E,writeln(E))" % self.currentLoop).next()
                 sys.exit(0)
             self.prologFinalization()

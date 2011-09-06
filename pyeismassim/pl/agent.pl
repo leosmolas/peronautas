@@ -464,6 +464,18 @@ team(Agent, Team) :-
 role(Agent, Role) :-
     lastKnownInfo(agentRole, _Step, Agent, Role).
     
+roleNumber(1, explorer).
+roleNumber(2, explorer).
+roleNumber(3, repairer).
+roleNumber(4, repairer).
+roleNumber(5, saboteur).
+roleNumber(6, saboteur).
+roleNumber(7, sentinel).
+roleNumber(8, sentinel).
+roleNumber(9, inspector).
+roleNumber(0, inspector).
+
+    
 
 %------------------------------------------------------------------------------%
 % lastKnownInfo(+Field, -Step, +Agent, -Value) :-
@@ -472,6 +484,12 @@ lastKnownInfo(agentTeam, _Step, Agent, Value) :-
     
 lastKnownInfo(agentRole, _Step, Agent, Value) :-
     k(agentRole(Agent, Value)), !.
+    
+lastKnownInfo(agentRole, _Step, Agent, Value) :-
+    k(agentTeam(Agent, _T)),
+    atom_chars(Agent, String),
+    append(_X, [Y], String),
+    roleNumber(Y, Value), !.
 	
 lastKnownInfo(agentRole, _Step, _Agent, unknown).
     
@@ -623,7 +641,7 @@ run(_TimeLimit, Action) :-
 	planning(quedarse(_)),
     exec(Action).
     
-run2(SetBeliefsTimeLimit, Action) :-
+runInitialization:-
     currentStep(Step),
     nl, nl, nl, write('Current Step: '), writeln(Step),
     checkLife,
@@ -631,7 +649,10 @@ run2(SetBeliefsTimeLimit, Action) :-
    	printFindAll('muertos:', muertos(_, _)),
     checkLastAction,
 	calcTime(setBuyCount),
-  	printFindAll('buyCount:', buyCount(_, _)),
+  	printFindAll('buyCount:', buyCount(_, _)), !.
+    
+run2(SetBeliefsTimeLimit, Action) :-
+    runInitialization,
     plan([]), !,
     
     retractall(countTurns(_)),
