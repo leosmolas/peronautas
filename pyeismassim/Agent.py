@@ -2,6 +2,7 @@
 
 import sys
 import time
+import socket
 import argparse
 import cProfile
 import cPickle
@@ -99,6 +100,7 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
+        self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("close_output").next()
         self.prolog = None
         print "done"
@@ -278,12 +280,13 @@ class Agent():
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # Decide action.
-        self.startRunTime = time.time()
-        self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
-        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
-        if self.dummy:
+
+        now = time.time()
+        if self.dummy or (now > self.deadline):
+
             query_result = self.prolog.query("execDummy(X)").next()
         else:
+            self.remainingTime = self.deadline - now
             query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
 
@@ -317,7 +320,7 @@ class Agent():
 
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
-        
+
         number = self.username[-1:]
         if (number == '0'):
             number = '10'
@@ -358,7 +361,7 @@ class Agent():
             self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
 
         print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
-        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: Received simulation start notification."
@@ -402,7 +405,8 @@ class Agent():
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
-                print ""
+                self.deadline = self.massimConnection.messageReceived + msg_dict_private['total_time'] / 1000 - 0.2 # VALOR A CAMBIAR
+                print 
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
                 # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
@@ -433,7 +437,11 @@ class Agent():
         while (not self.quit):
             self.currentLoop += 1
             self.prologInitialization()
-            self.perceiveActLoop()
+            try:
+                self.perceiveActLoop()
+            except:
+                self.prolog.query("catch(saveKB('-fin-%d'),E,writeln(E))" % self.currentLoop).next()
+                sys.exit(0)
             self.prologFinalization()
         if not self.logToFile:
             raw_input("\nFinished. Press ENTER to continue...")
