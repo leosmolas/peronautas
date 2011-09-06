@@ -6,6 +6,25 @@ import cProfile
 import cPickle
 import base64
 
+
+# [ ] timeout del receive del servidor
+#       si se cae, que el PS no incluya la percepcion del agente caido en los demas
+#       mensaje por defecto para asumir para los demas?
+#       se bardean los demas si no saben algo de otro agente?
+#       que se le envia al agente que llego tarde?
+#       que se hace con el mensaje que llegara del agente ? descartarlo?
+# [ ] threads
+
+# aki
+# - probar reconectarnos y llegar tarde¶
+# - que el percept server sincronize el comienzo?¶
+# ¶
+# LIMPIAR AGENT.PY
+#     make the agent send a connect messsage to the percept server
+# TESTEAR LA RECONEXION
+# TESTEAR LA HISTORY PERCEPT
+# TESTEAR TIMEOUT
+# TESTEAR TIMEOUT PERPCET SERVER RECEIVE DEL LADO DEL AGENTE
 BUFSIZE = 4096
 
 ####################################################################################################
@@ -78,19 +97,33 @@ class PerceptConnection():
         dictionary['name']         = self.name
         dictionary['message_type'] = 'percept'
 
-        # Send
-        print "@PerceptConnection: Connecting to %s:%s" % (self.host, self.port)
         self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sckt.connect((self.host, self.port))
-        print "@PerceptConnection: succesfully connected,", 
-        send_data(self.sckt, dictionary)
-        self.sckt.shutdown(socket.SHUT_WR)
-        print "sent data,",
+        try:
+            # Send
+            print "@PerceptConnection: Connecting to %s:%s" % (self.host, self.port)
+            self.sckt.settimeout(1)
+            self.sckt.connect((self.host, self.port))
+            print "@PerceptConnection: succesfully connected,", 
+            send_data(self.sckt, dictionary)
+            self.sckt.shutdown(socket.SHUT_WR)
+            print "sent data,",
 
-        # Receive
-        _, percept = recv_data(self.sckt)
+            # Receive
+            stop = False
+            buf = ''
+            msg = ''
+            while (not stop):
+                buf = self.sckt.recv(BUFSIZE)
+                if (len(buf) > 0):
+                    msg += buf
+                else:
+                    stop = True
+            percept = cPickle.loads(msg)
+            print "and received data."
+        except:
+            print "@PerceptServerConnection: receive from percept server timed out!"
+            percept = {}
         self.sckt.close()
-        print "and received data."
         return percept
 
 ####################################################################################################
