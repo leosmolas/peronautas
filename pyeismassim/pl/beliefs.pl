@@ -114,13 +114,10 @@ setHaySaboteador:-
 		saboteurPosition(Position),
 		assertOnce(b(haySaboteador(Position))) 
 	).
+    
+muertos(miEquipo, 0).
+muertos(enemigo, 0).
 
-setMuertos :-
-	currentStep(0),
-	myTeam(MyTeam),
-	assert(muertos(MyTeam, 0)),
-	assert(muertos(enemigo, 0)), !.	
-	
 % setMuertos :-
 	% currentStep(Step),
 	% TotalMuertosEnemigos is Step // 5,
@@ -156,15 +153,15 @@ setMuertos :-
 		MuertosEnemigos
 	),
 	length(Muertos, MuertosEsteTurno),
-	retract(muertos(MyTeam, MuertosActuales)),
+	retract(muertos(miEquipo, MuertosActuales)),
 	TotalMuertos is MuertosActuales + MuertosEsteTurno,
-	assert(muertos(MyTeam, TotalMuertos)),
+	assert(muertos(miEquipo, TotalMuertos)),
 	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
 	retract(muertos(enemigo, MuertosActualesEnemigos)),
 	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
 	assert(muertos(enemigo, TotalMuertosEnemigos)).
 
-	
+setMuertos.
     
 % searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
     % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
@@ -666,9 +663,11 @@ equipoVecino(Step, MyPos, Team) :-
 	k(nodeTeam(Step, Neigh, Team)).
 
 setReagruparse :-
-	currentStep(0), !.
+	currentStep(0),
+	writeln('setReagruparse: caso firstPerceivedStep'), !.
 	
 setReagruparse :-
+    myStatus(normal),
 	not(b(posibleAumento(_))),
 	myPosition(MyPos),
 	currentStep(Step),
@@ -713,7 +712,7 @@ assertReagruparseGoal :-
 setPathReagruparse :-
 	myPosition(InitialNode),
 	myEnergy(Energy),
-    singleton_heap(InitialFrontier, ucsNode(InitialNode, Energy, [], [], 0), 0),
+    singleton_heap(InitialFrontier, 0, ucsNode(InitialNode, Energy, [], [], 0)),
     write('pathSearchReagruparse'),
     ucsAux(InitialFrontier, [], _Path, Actions, PathCost, _RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),
@@ -761,7 +760,6 @@ checkLife :- !.
 assertSaboteurs :-  
     lastActionResult(successful),
     lastAction(goto(_)), !.
-    % Action \= goto(_), !.
 
 assertSaboteurs :-  
     myPosition(Pos),
@@ -779,8 +777,8 @@ assertSaboteurs :-
             role(Agent, Role),
             Role = unknown
         ),
-        Potential
+        [Saboteur]
     ),
-    length(Potential, 1),
-    assertOnce(k(agentRole(Agent, saboteur))).
+    
+    assertOnce(k(agentRole(Saboteur, saboteur))).
     

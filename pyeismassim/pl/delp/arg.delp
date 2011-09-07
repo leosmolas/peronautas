@@ -149,8 +149,7 @@ puedoComprar(Item) <-
 	greater(Sust, 0).
 	
 difMuertos(DifMuertos) <-
-	myTeam(MyTeam),
-	muertos(MyTeam, Muertos),
+	muertos(miEquipo, Muertos),
 	greaterEq(Muertos, 5),
 	muertos(enemigo, MuertosEnemigos),
 	coefMuertos(Muertos, MuertosEnemigos, DifMuertos),

@@ -2,6 +2,7 @@
 
 import sys
 import time
+import socket
 import argparse
 import cProfile
 import cPickle
@@ -44,7 +45,7 @@ class Agent():
         self.massimHost = '127.0.0.1'
         if (massimHost):
             self.massimHost = massimHost
-
+        self.deadline = 0
         print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         
@@ -87,6 +88,7 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologInitialization(self):
         print "@Agent: Prolog initialization",
+        #from pyswip.prolog               import Prolog
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (self.logToFile):
@@ -100,8 +102,15 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
-        self.prolog.query("close_output").next()
-        self.prolog = None
+        self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
+        self.prolog.query("retractall(k(_))").next()
+        self.prolog.query("retractall(myName(_))").next()
+        self.prolog.query("retractall(visibleNode(_))").next()
+        self.prolog.query("retractall(notVisible(_))").next()
+        self.prolog.query("retractall(explored(_))").next()
+        self.prolog.query("retractall(notExplored(_))").next()
+        self.prolog.query("retractall(inRange(_))").next()
+        #self.prolog = None
         print "done"
 
 
@@ -284,12 +293,13 @@ class Agent():
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # Decide action.
-        self.startRunTime = time.time()
-        self.processingTime = (self.startRunTime - self.turnStartTime) * 1000
-        self.remainingTime = (msg_dict_private['total_time'] - self.processingTime - 15) / 1000 #15 ms para la ejecucion del dummy
-        if self.dummy:
+
+        now = time.time()
+        if self.dummy or (now > self.deadline):
+
             query_result = self.prolog.query("execDummy(X)").next()
         else:
+            self.remainingTime = self.deadline - now
             query_result = self.prolog.query("run(%s, X)" % self.remainingTime).next()
         actionList   = query_result['X']
 
@@ -318,27 +328,31 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def perceiveActLoop(self):
+        def roleHardCode(username):
+            roledict = { '1'  : 'explorer'
+                       , '2'  : 'explorer'
+                       , '3'  : 'repairer'
+                       , '4'  : 'repairer'
+                       , '5'  : 'saboteur'
+                       , '6'  : 'saboteur'
+                       , '7'  : 'sentinel'
+                       , '8'  : 'sentinel'
+                       , '9'  : 'inspector'
+                       , '10' : 'inspector'
+                       }
+            number = username[-1:]
+            if (number == '0'):
+                number = '10'
+            return roledict[number]
+            
         # Receive simulation start notification.
         print "@Agent: Waiting for simulation start notification."
 
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
+
         
-        number = self.username[-1:]
-        if (number == '0'):
-            number = '10'
-        roledict = { '1'  : 'explorer'
-                   , '2'  : 'explorer'
-                   , '3'  : 'repairer'
-                   , '4'  : 'repairer'
-                   , '5'  : 'saboteur'
-                   , '6'  : 'saboteur'
-                   , '7'  : 'sentinel'
-                   , '8'  : 'sentinel'
-                   , '9'  : 'inspector'
-                   , '10' : 'inspector'
-                   }
-        self.role = roledict[number]
+        self.role = roleHardCode(self.username)
         if   (self.role == 'explorer'):
             self.prolog_role_file = 'pl/explorer.pl'
         elif (self.role == 'repairer'):
@@ -357,6 +371,12 @@ class Agent():
                              , 'sentinel' : 3
                              , 'inspector': 1
                              }
+        if self.username[-1] == '0':
+            team = self.username[:-2]
+        else:
+            team = self.username[:-1]
+        for x in range(1,11):
+            self.prolog.query("assertOnce(k(agentRole(%s%d, %s)))" % (team, x, roleHardCode(str(x)))).next()
 
         self.prolog.query("updateMyName(%s)" % self.username).next()
         if (self.communication):
@@ -364,7 +384,7 @@ class Agent():
             self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
 
         print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
-        self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: Received simulation start notification."
@@ -408,7 +428,8 @@ class Agent():
             # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
-                print ""
+                self.deadline = self.massimConnection.messageReceived + msg_dict_private['total_time'] / 1000 - 0.2 # VALOR A CAMBIAR
+                print 
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
                 # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
@@ -440,7 +461,12 @@ class Agent():
         while (not self.quit):
             self.currentLoop += 1
             self.prologInitialization()
-            self.perceiveActLoop()
+            try:
+                self.perceiveActLoop()
+            except socket.error:
+                print "holas"
+                self.prolog.query("catch(saveKB('-fin-%d'),E,writeln(E))" % self.currentLoop).next()
+                sys.exit(0)
             self.prologFinalization()
         if not self.logToFile:
             raw_input("\nFinished. Press ENTER to continue...")

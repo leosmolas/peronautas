@@ -14,6 +14,7 @@ class MASSimConnection:
         self.username = username
         self.password = password
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.messageReceived = 0
 
     def connect(self):
         print "@MASSimConnection: Connecting to " + self.host + ":" + str(self.port)
@@ -68,6 +69,7 @@ class MASSimConnection:
                 else:
                     print "@MASSimConnection: The message received was empty!"
                     stop = True
+            self.messageReceived = time.time()
             return msg
         else:
             raise RuntimeError("Server connection lost")
