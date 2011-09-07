@@ -459,6 +459,22 @@ posibleAumento(X, Aumento, Nodo) :-
     b(nodeAtDistance(Nodo, Dist)),
     Dist >= X,
     Dist < NewCost.
+    % aisladoConAmigo(Nodo).
+    
+% aisladoConAmigo(Nodo) :-
+    % myPosition(MyPos),
+    % currentStep(Step),
+    % position(Step, Agent, MyPos),
+    % team(Agent, MyTeam),
+    % myTeam(MyTeam),
+    % foreach(
+        % equipoVecino(Step, MyPos, TeamNeigh),
+        % TeamNeigh \= MyTeam
+    % ),
+    % b(nodeAtDistance(Nodo, 1)), !,
+    % fail.
+    
+% aisladoConAmigo.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
     currentStep(Step),	
@@ -605,8 +621,14 @@ setDistanciaExplorar :-
             searchPath(Position, Node, Energy, [[survey]], 1)
         )
     ), !.
-    
+
 setDistanciaExplorar.
+    
+average(List, Result) :- length(List, Len), sum(List, Sum), Result is Sum / Len.
+
+sum([], 0).
+sum([H|T], Sum) :- sum(T, Temp), Sum is Temp + H.
+    
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxilio
@@ -706,10 +728,11 @@ assertReagruparseGoal :-
 	myTeam(MyTeam),
 	retractall(isGoal(_)),
     assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
-		currentStep(Step),
-		myTeam(MyTeam),
-		k(nodeTeam(Step, FinalNode, MyTeam)),
-		equipoVecino(Step, FinalNode, MyTeam)
+		% currentStep(Step),
+		% myTeam(MyTeam),
+		% k(nodeTeam(Step, FinalNode, MyTeam)),
+		% equipoVecino(Step, FinalNode, MyTeam)
+        b(frontera(FinalNode))
 	)).
 
 	

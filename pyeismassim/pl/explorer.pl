@@ -26,7 +26,8 @@ rolSetBeliefs :-
     calcTime(setPosibleProbear),
     calcTime(setInZone),
     calcTime(rolSetDistancia),
-    calcTime(rolSetDifPuntos).
+    calcTime(rolSetDifPuntos),
+    calcTime(setPromedioValorVecinos).
     
 rolSetBeliefs.
 
@@ -95,6 +96,33 @@ rolSetDistancia :-
         searchPath(Position, Node, Energy, [[probe]], 1)
 
     ).
+
+
+setPromedioValorVecinos :-
+    foreach(
+        (
+            b(posibleProbear(Node)),
+            (b(distancia(Node, [[probe]], _Cost, _E2)) <- true)
+        ),
+        calcPromedioValor(Node)
+    ).
+    
+calcPromedioValor(Node) :-
+    findall(
+        Value,
+        (
+            k(edge(Node, Neigh, _)),
+            k(nodeValue(Neigh, Value)),
+            Value \= unknown
+        ),
+        [L | List]
+    ),
+    
+    average([L | List], Promedio),
+    assert(b(promedioValorVecinos(Node, Promedio)) <- true), !.
+    
+calcPromedioValor(_Node).
+            
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
