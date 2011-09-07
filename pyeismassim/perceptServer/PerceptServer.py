@@ -7,8 +7,6 @@ import cPickle
 import base64
 
 # ver que va a quedando en la kb turno a turno y que se puede sacar
-#
-    1
 # [ ] timeout del receive del servidor
 #       si se cae, que el PS no incluya la percepcion del agente caido en los demas
 #       mensaje por defecto para asumir para los demas?
@@ -17,10 +15,8 @@ import base64
 #       que se hace con el mensaje que llegara del agente ? descartarlo?
 # [ ] threads
 
-# aki
-# - probar reconectarnos y llegar tarde¶
-# - que el percept server sincronize el comienzo?¶
-# ¶
+# - probar reconectarnos y llegar tarde
+# - que el percept server sincronize el comienzo?
 # LIMPIAR AGENT.PY
 #     make the agent send a connect messsage to the percept server
 # TESTEAR LA RECONEXION
@@ -171,31 +167,31 @@ class AgentConnection():
     
 ####################################################################################################
 def dict2fset(dictionary):
-    position_list = dictionary.get('position')
-    position      = position_list[0]
-    node          = position.get('node')
-    vis_range     = position.get('vis_range')
-
     result = [ (0, dictionary['name'] ) ]
-    if ('role' in position):
-        t = ( 1
-            , dictionary['name']
-            , node
-            , vis_range
-            , position['health']
-            , position['max_health']
-            , position['role']
-            )
-        result.append(t)
-    else:
-        t = ( 1
-            , dictionary['name']
-            , node
-            , vis_range
-            , position['health']
-            , position['max_health']
-            )
-        result.append(t)
+    position_list = dictionary.get('position')
+    if (position_list):
+        position  = position_list[0]
+        node      = position.get('node')
+        vis_range = position.get('vis_range')
+        if ('role' in position):
+            t = ( 1
+                , dictionary['name']
+                , node
+                , vis_range
+                , position['health']
+                , position['max_health']
+                , position['role']
+                )
+            result.append(t)
+        else:
+            t = ( 1
+                , dictionary['name']
+                , node
+                , vis_range
+                , position['health']
+                , position['max_health']
+                )
+            result.append(t)
     for v in dictionary.get('vis_verts', []):
         t = ( 2 
             , v['name']
@@ -390,7 +386,7 @@ if (__name__ == "__main__"):
 
             # Check the message.
             if (agents[i].msg_type == 'goodbye'):
-                logFile.write( "          Agent %s: sent goodbye message." % (agents[i].name) )
+                logFile.write( "          Agent %s: received goodbye message." % (agents[i].name) )
                 agents[i].sckt.shutdown(socket.SHUT_RDWR)
                 agents[i].sckt.close()
                 agents[i].connected = False
@@ -427,10 +423,10 @@ if (__name__ == "__main__"):
                 logFile.write( "        Agent %s: sending %s bytes." % (agents[i].name, agents[i].bR) )
 
             agents[i].sE = time.time()
-            logFile.write( "        Agent %s sending time: %s" % (agents[i].name, agents[i].sE - agents[i].sS))
+            logFile.write( "        Agent %s: sending time: %s" % (agents[i].name, agents[i].sE - agents[i].sS))
 
         sendingEnd = time.time()
-        logFile.write( "        Sending time: %s" % (sendingEnd - sendingStart) )
+        logFile.write( "        Total sending time: %s" % (sendingEnd - sendingStart) )
         #----------------------------------------------------------------------#
 
         logFile.write( "Total turn time: %s" % (sendingEnd - receptionStart) )
