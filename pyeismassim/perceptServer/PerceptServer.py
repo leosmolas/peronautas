@@ -58,7 +58,7 @@ class VortexPerceptConnection():
     def disconnect(self):
         pass
 
-    def send_and_recv(self, data):
+    def send_and_recv(self, data, reconnect = False):
         return dict([])
 
 ####################################################################################################
@@ -91,9 +91,12 @@ class PerceptConnection():
         send_data(self.sckt, msg)
         self.sckt.close()
 
-    def send_and_recv(self, dictionary):
+    def send_and_recv(self, dictionary, reconnect = False):
         dictionary['name']         = self.name
-        dictionary['message_type'] = 'percept'
+        if (reconnect):
+            dictionary['message_type'] = 'percept'
+        else:
+            dictionary['message_type'] = 'reconnect'
 
         self.sckt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
@@ -330,18 +333,19 @@ if (__name__ == "__main__"):
         CONNECTIONS = int(sys.argv[1])
         HOST        =     sys.argv[2]
         PORT        = int(sys.argv[3])
-        logFile        = LogFile('log.txt',   'w')
-        statisticsFile = LogFile('stats.csv', 'w')
+        logFile        = LogFile('logs/log.txt',   'w')
+        statisticsFile = LogFile('logs/stats.csv', 'w')
         if (argc == 5):
             print "Loading percept history."
             loadfile = open('percept_history', 'rb')
             historyPercept = cPickle.load(loadfile)
     else:
         print ""
-        print "         Usage: python PerceptServer.py NUMBER_CONNECTIONS HOST_IP PORT_NUMBER"
+        print "         Usage: python PerceptServer.py NUMBER_CONNECTIONS HOST_IP PORT_NUMBER [-l]"
         print "                                 Port 10000 is recommended."
         print ""
         print "                 Example: python PerceptServer.py 10 192.168.0.10 10000"
+        print "                 Example: python PerceptServer.py 10 192.168.0.10 10000 -l"
         print ""
         sys.exit(1)
 

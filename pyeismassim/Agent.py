@@ -16,6 +16,7 @@ class Agent():
     
     #----------------------------------------------------------------------------------------------#
     def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, communication, verbose):
+        self.firstTurn = True
         self.username = USER
         self.password = PASS
         
@@ -271,7 +272,12 @@ class Agent():
         print "@Agent: received request-action. id: %s" % action_id
 
         # Synchronize perceptions with others.
-        msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public)
+        if (self.firstTurn):
+            msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public, True)
+            print "\nRECONNECTION!\n"
+            print_message(msg_dict_difference)
+        else:
+            msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public)
         self.merge_percepts(msg_dict_public, msg_dict_difference)
 
         # Process perception.
@@ -374,10 +380,9 @@ class Agent():
             quitPerceiveActLoop = True
         elif (msg_type == 'request-action'):
             quitPerceiveActLoop = False
-            print "@Agent: Receiving perception from server..."
+            print "@Agent: %s receiving perception from server..." % self.username
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
-            # time.sleep(0.5)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
                 print ""
@@ -391,12 +396,13 @@ class Agent():
                     print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
                 self.massimConnection.send(action_xml)
+                self.firstTurn = False
         else:
             self.quit = True
             quitPerceiveActLoop = True
 
         while (not quitPerceiveActLoop):
-            print "@Agent: Receiving perception from server..."
+            print "@Agent: %s receiving perception from server..." % self.username
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
             # time.sleep(0.5)
@@ -413,6 +419,7 @@ class Agent():
                     print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
                 self.massimConnection.send(action_xml)
+                self.firstTurn = False
             elif (msg_type == 'sim-end'):
                 print "@Agent: Received sim-end"
                 print_message(msg_dict_private)
