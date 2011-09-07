@@ -38,6 +38,20 @@ reachableNode(Node, [[Node, Cost] | _T]) :-
 reachableNode(Node, [_ | T]) :-
     reachableNode(Node, T).
     
+% %-------------------------------  Parry  --------------------------------%
+% action([parry]) :-
+%     myStatus(normal),
+%     myPosition(Position),
+%     myTeam(MyTeam),
+%     currentStep(Step),
+%     myEnergy(Energy),
+%     Energy >= 2,
+%     position(Step, Enemy, Position),
+%     team(Enemy, EnemyTeam),
+%     MyTeam \= EnemyTeam.
+% 
+    
+
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
@@ -50,6 +64,13 @@ action([survey, Position]) :-
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(1.3),nl,
     !.
+
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
 
 %-------------------------------  Goto  ---------------------------------%
 

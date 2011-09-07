@@ -137,30 +137,26 @@ action([survey, Position]) :-
     hasAtLeastOneUnsurveyedEdge(Position), 
     !.
 
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
+
 %-------------------------------  Goto  ---------------------------------%
 
 %-- Goto First Reachable Node --%
 
-%action([goto, X]) :-
-%    write(3.1),nl,
-%    myPosition(Position),
-%    k(nodeValue(Position, Cost)),
-%    write(3.2),nl,
-%    myEnergy(Energy),
-%    write([myEnergy,Energy,cost,Cost]),nl,
-%    Energy >= Cost,
-%    write(3.3),nl,
-%    findall(
-%        [Node, Cost], 
-%        (
-%            k(edge(Position, Node, Cost)), 
-%            k(nodeValue(Node, unknown))
-%        ), 
-%        Nodes),
-%    write(3.4),nl,
-%    reachableNode(X, Nodes), 
-%    write(3.5),nl,
-%    !.
+action([goto, X]) :-
+    myEnergy(Energy),
+    myPosition(Position),
+    k(edge(Position, X, Cost)),
+    Cost \= unknown,
+    Energy >= Cost,
+    k(nodeValue(X, unknown)),
+    write('Yendo al nodo '), write(X), writeln(' que esta sin probear.'),
+    !.
      
 %-- Goto First Node --%
 
