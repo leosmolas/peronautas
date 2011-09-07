@@ -109,22 +109,22 @@ action([repair, Ally]):-
     write(1.5),nl,
     !.
 
-# action([repair, Ally]):-
-    # write(1.1),nl,
-    # myEnergy(Energy),
-    # Energy > 1,
-    # write(1.2),nl,
-    # currentStep(Step),
-    # myPosition(Position),
-    # position(Step, Ally, Position),
-    # write(1.3),nl,
-    # myName(Name),
-    # Ally \= Name,
-    # write(1.4),nl,
-    # myTeam(Team),
-    # team(Step, Ally, Team),
-    # write(1.5),nl,
-    # !.
+% action([repair, Ally]):-
+    % write(1.1),nl,
+    % myEnergy(Energy),
+    % Energy > 1,
+    % write(1.2),nl,
+    % currentStep(Step),
+    % myPosition(Position),
+    % position(Step, Ally, Position),
+    % write(1.3),nl,
+    % myName(Name),
+    % Ally \= Name,
+    % write(1.4),nl,
+    % myTeam(Team),
+    % team(Step, Ally, Team),
+    % write(1.5),nl,
+    % !.
     
 %------------------------------  Survey  --------------------------------%
 

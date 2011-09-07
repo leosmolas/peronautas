@@ -122,7 +122,23 @@ puedoHacerParry -<
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
 
+quedarse(Value, _) -< 
+    b(difPuntosSinMi(SinMi)),
+    myName(Agent),
+    agenteEnZona(Agent),
+    quedarseValue(SinMi, Value).
+
 ~quedarse(_, _) -< comprar(_, _).
+
+~quedarse(Value, _) <-
+    quedarse(Value2, _),
+    greater(Value2, Value).
+
+quedarseValue(SinMi, Value) :-
+   
+    Value is -SinMi * 5.
+    
+is_a_built_in(quedarseValue(_SinMi, _Value)).
 
 % DESIRE comprar
 
@@ -183,15 +199,10 @@ phaseCoef(_, 1.0) -< true.
 ~phaseCoef(X, 1.0) <- phaseCoef(X, V), notEqual(V, 1.0).
 
 
-
-phaseCoef(expansion, 0.8) <- phase(exploration).
-phaseCoef(explorar,  1.2) <- phase(exploration).
-phaseCoef(aumento,   0.8) <- phase(exploration).
-
-b(difPuntosSinMi(0)) -< true.
-~b(difPuntosSinMi(0)) <- 
-	b(difPuntosSinMi(P)),
-	notEqual(P, 0).
+% b(difPuntosSinMi(0)) -< true.
+% ~b(difPuntosSinMi(0)) <- 
+	% b(difPuntosSinMi(P)),
+	% notEqual(P, 0).
 	
 agentRolePoints(_, _R, 0) -< true.
 	
