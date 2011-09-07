@@ -44,7 +44,7 @@ class Agent():
         self.massimHost = '127.0.0.1'
         if (massimHost):
             self.massimHost = massimHost
-
+        self.deadline = 0
         print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         
@@ -87,6 +87,7 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologInitialization(self):
         print "@Agent: Prolog initialization",
+        #from pyswip.prolog               import Prolog
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (self.logToFile):
@@ -101,8 +102,14 @@ class Agent():
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
         self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
-        self.prolog.query("close_output").next()
-        self.prolog = None
+        self.prolog.query("retractall(k(_))").next()
+        self.prolog.query("retractall(myName(_))").next()
+        self.prolog.query("retractall(visibleNode(_))").next()
+        self.prolog.query("retractall(notVisible(_))").next()
+        self.prolog.query("retractall(explored(_))").next()
+        self.prolog.query("retractall(notExplored(_))").next()
+        self.prolog.query("retractall(inRange(_))").next()
+        #self.prolog = None
         print "done"
 
 
