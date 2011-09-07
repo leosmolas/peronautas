@@ -110,19 +110,6 @@ action([repair, Ally]):-
     write(1.5),nl,
     !.
 
-%    
-%-------------------------------  Parry  --------------------------------%
-% action([parry]) :-
-%     myStatus(normal),
-%     myPosition(Position),
-%     myTeam(MyTeam),
-%     currentStep(Step),
-%     myEnergy(Energy),
-%     Energy >= 2,
-%     position(Step, Enemy, Position),
-%     team(Enemy, EnemyTeam),
-%     MyTeam \= EnemyTeam.
-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-

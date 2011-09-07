@@ -44,7 +44,7 @@ class Agent():
         self.massimHost = '127.0.0.1'
         if (massimHost):
             self.massimHost = massimHost
-
+        self.deadline = 0
         print "@Agent: Basic initialization",
         self.massimConnection = MASSimConnection(self.massimHost, 12300, USER, PASS)
         
@@ -100,7 +100,8 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
-        self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
+        if self.verbose:
+            self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("close_output").next()
         self.prolog = None
         print "done"
