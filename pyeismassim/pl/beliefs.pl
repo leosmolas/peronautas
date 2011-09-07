@@ -153,7 +153,7 @@ setMuertos :-
 		MuertosEnemigos
 	),
 	length(Muertos, MuertosEsteTurno),
-	retract(muertos(MyTeam, MuertosActuales)),
+	retract(muertos(miEquipo, MuertosActuales)),
 	TotalMuertos is MuertosActuales + MuertosEsteTurno,
 	assert(muertos(miEquipo, TotalMuertos)),
 	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
