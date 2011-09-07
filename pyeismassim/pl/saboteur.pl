@@ -87,7 +87,7 @@ searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
     retractall(isGoal(_)),	
     assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, 0, ucsNode(Position, Energy, [], [], 0)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
+    ucsAux(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, 2, [[attack, Agent]], NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
