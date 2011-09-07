@@ -19,28 +19,27 @@ echo Term command is: $TRM_CMD
 echo Python command:  $PYTHON
 
 # Run server
-echo Starting MASSIM server.
-cd $SER_DIR
-$TRM_CMD -title 'MASSIM' -e $SER_CMD
-cd $WD
-sleep 3
+#echo Starting MASSIM server.
+#cd $SER_DIR
+#$TRM_CMD -title 'MASSIM' -e $SER_CMD
+#cd $WD
+#sleep 3
 
 # Run monitor
-echo Starting monitor.
-cd $MON_DIR
-$TRM_CMD -title 'MONITOR' -e $MON_CMD
-sleep 3
+#echo Starting monitor.
+#cd $MON_DIR
+#$TRM_CMD -title 'MONITOR' -e $MON_CMD
+#sleep 3
 
 # Run percept server
-echo Starting percept server.
-cd $PER_DIR
-$TRM_CMD -title 'PERCEPT' -e $PYTHON $PER_CMD
-sleep 3
+#echo Starting percept server.
+#cd $PER_DIR
+#$TRM_CMD -title 'PERCEPT' -e $PYTHON $PER_CMD
+#sleep 3
 
 # Run agents
 
 echo Starting agents.
-cd $AGT_DIR
 $TRM_CMD -title 'AGENT_A1' -e sh runagent.sh a1  1
 $TRM_CMD -title 'AGENT_A2' -e sh runagent.sh a2  1
 $TRM_CMD -title 'AGENT_A3' -e sh runagent.sh a3  1
@@ -51,15 +50,13 @@ $TRM_CMD -title 'AGENT_A7' -e sh runagent.sh a7  1
 $TRM_CMD -title 'AGENT_A8' -e sh runagent.sh a8  1
 $TRM_CMD -title 'AGENT_A9' -e sh runagent.sh a9  1
 $TRM_CMD -title 'AGENT_A0' -e sh runagent.sh a10 1
-$TRM_CMD -title 'AGENT_B1' -e $PYTHON Agent.py b1  1
-$TRM_CMD -title 'AGENT_B2' -e $PYTHON Agent.py b2  1
-$TRM_CMD -title 'AGENT_B3' -e $PYTHON Agent.py b3  1
-$TRM_CMD -title 'AGENT_B4' -e $PYTHON Agent.py b4  1
-$TRM_CMD -title 'AGENT_B5' -e $PYTHON Agent.py b5  1
-$TRM_CMD -title 'AGENT_B6' -e $PYTHON Agent.py b6  1
-$TRM_CMD -title 'AGENT_B7' -e $PYTHON Agent.py b7  1
-$TRM_CMD -title 'AGENT_B8' -e $PYTHON Agent.py b8  1
-$TRM_CMD -title 'AGENT_B9' -e $PYTHON Agent.py b9  1
-$TRM_CMD -title 'AGENT_B0' -e $PYTHON Agent.py b10 1
-
-cd $WD
+$TRM_CMD -title 'AGENT_B1' -e $PYTHON Agent.py b1  1 -d
+$TRM_CMD -title 'AGENT_B2' -e $PYTHON Agent.py b2  1 -d
+$TRM_CMD -title 'AGENT_B3' -e $PYTHON Agent.py b3  1 -d
+$TRM_CMD -title 'AGENT_B4' -e $PYTHON Agent.py b4  1 -d
+$TRM_CMD -title 'AGENT_B5' -e $PYTHON Agent.py b5  1 -d
+$TRM_CMD -title 'AGENT_B6' -e $PYTHON Agent.py b6  1 -d
+$TRM_CMD -title 'AGENT_B7' -e $PYTHON Agent.py b7  1 -d
+$TRM_CMD -title 'AGENT_B8' -e $PYTHON Agent.py b8  1 -d
+$TRM_CMD -title 'AGENT_B9' -e $PYTHON Agent.py b9  1 -d
+$TRM_CMD -title 'AGENT_B0' -e $PYTHON Agent.py b10 1 -d

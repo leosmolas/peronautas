@@ -217,7 +217,8 @@ assertOnce(X) :- asserta(X).
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
-    asserta( k(nodeTeam(Step, Name, CurrentTeam)) ).
+    retractall( k(nodeTeam(_Step, Name, CurrentTeam)) ),
+    asserta(    k(nodeTeam( Step, Name, CurrentTeam)) ).
     % assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
 
 
@@ -261,6 +262,7 @@ updateEdge(Node1, Node2, Cost) :-
 
 
 %------------------------------------------------------------------------------%
+
 updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange, _Status) :-
     ( 
         var(Agent) ;
@@ -271,6 +273,14 @@ updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHea
 
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
     currentStep(Step),
+	retractall( k(agentPosition(Agent,    _Step, _Position))   ),
+    retractall( k(agentEnergy(Agent,      _Step, _Energy))     ),
+    retractall( k(agentMaxEnergy(Agent,   _Step, _MaxEnergy))  ),
+    retractall( k(agentHealth(Agent,      _Step, _Health))     ),
+    retractall( k(agentMaxHealth(Agent,   _Step, _MaxHealth))  ),
+    retractall( k(agentStrength(Agent,    _Step, _Strength))   ),
+    retractall( k(agentVisualRange(Agent, _Step, _VisualRange))),
+    retractall( k(agentStatus(Agent,      _Step, _Status))     ),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
 	assertOnce( k(agentPosition(Agent,    Step, Position))     ),
@@ -295,6 +305,13 @@ updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHea
 
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
+	retractall( k(agentPosition(Agent,    _Step, _Position))     ),
+    retractall( k(agentEnergy(Agent,      _Step, _Energy))       ),
+    retractall( k(agentMaxEnergy(Agent,   _Step, _MaxEnergy))    ),
+    retractall( k(agentHealth(Agent,      _Step, _Health))       ),
+    retractall( k(agentMaxHealth(Agent,   _Step, _MaxHealth))    ),
+    retractall( k(agentStrength(Agent,    _Step, _Strength))     ),
+    retractall( k(agentVisualRange(Agent, _Step, _VisualRange))  ),
     assertOnce( k(agentTeam(Agent,        Team))               ),
     assertOnce( k(agentRole(Agent,        Role))               ),
     assertOnce( k(agentPosition(Agent,    Step, Position))     ),
@@ -304,6 +321,7 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     assertOnce( k(agentMaxHealth(Agent,   Step, MaxHealth))    ),
     assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
     assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ).
+
 
 
 %------------------------------------------------------------------------------%
@@ -317,16 +335,25 @@ updateTeammateEntity(Agent, Team, _Position, _Health, _MaxHealth, _VisualRange) 
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
+    retractall( k(agentPosition(    Agent, _Step, _Position    ) )),
+    retractall( k(agentHealth(      Agent, _Step, _Health      ) )),
+    retractall( k(agentMaxHealth(   Agent, _Step, _MaxHealth   ) )),
+    retractall( k(agentVisualRange( Agent, _Step, _VisualRange ) )),
     assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
-    assertOnce( k(agentHealth(      Agent, Step, Health) )),
-    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health      ) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth   ) )),
     assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
-    assertOnce( k(agentTeam(        Agent, Team) )),
+    retractall( k(agentTeam(        Agent, _Team               ) )),
+    retractall( k(agentPosition(    Agent, _Step, _Position    ) )),
+    retractall( k(agentHealth(      Agent, _Step, _Health      ) )),
+    retractall( k(agentMaxHealth(   Agent, _Step, _MaxHealth   ) )),
+    retractall( k(agentVisualRange( Agent, _Step, _VisualRange ) )),
+    assertOnce( k(agentTeam(        Agent, Team              ) )),
     assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
-    assertOnce( k(agentHealth(      Agent, Step, Health) )),
-    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth) )),
+    assertOnce( k(agentHealth(      Agent, Step, Health      ) )),
+    assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth   ) )),
     assertOnce( k(agentVisualRange( Agent, Step, VisualRange ) )).
     
 updateEntityTeamPosition(Agent, Team, _Position, _Status) :-
@@ -339,13 +366,18 @@ updateEntityTeamPosition(Agent, Team, _Position, _Status) :-
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
     currentStep(Step),
-    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
-    assertOnce( k(agentStatus(      Agent, Step, Status) )).
+    retractall( k(agentPosition(    Agent, _Step, _Position ) )),
+    retractall( k(agentStatus(      Agent, _Step, _Status   ) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status   ) )).
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
-    assertOnce( k(agentTeam(        Agent, Team) )),
-    assertOnce( k(agentPosition(    Agent, Step, Position    ) )),
-    assertOnce( k(agentStatus(      Agent, Step, Status) )).
+    retractall( k(agentTeam(        Agent, _Team            ) )),
+    retractall( k(agentPosition(    Agent, _Step, _Position ) )),
+    retractall( k(agentStatus(      Agent, _Step, _Status   ) )),
+    assertOnce( k(agentTeam(        Agent, Team           ) )),
+    assertOnce( k(agentPosition(    Agent, Step, Position ) )),
+    assertOnce( k(agentStatus(      Agent, Step, Status   ) )).
 
 
 
