@@ -724,8 +724,8 @@ assertReagruparseGoal :-
 
 % Hay alguna zona, el goal es un nodo de mi color.
 assertReagruparseGoal :- 
-	currentStep(Step),
-	myTeam(MyTeam),
+	% currentStep(Step),
+	% myTeam(MyTeam),
 	retractall(isGoal(_)),
     assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
 		% currentStep(Step),
