@@ -111,6 +111,10 @@ class Agent():
         self.prolog.query("retractall(notExplored(_))").next()
         self.prolog.query("retractall(inRange(_))").next()
         #self.prolog = None
+        if self.verbose:
+            self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
+        self.prolog.query("close_output").next()
+        self.prolog = None
         print "done"
 
 
@@ -385,6 +389,7 @@ class Agent():
 
         print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
+
         if (msg_type == 'sim-start'):
             print "\n\n===== NEW SIMULATION =====\n\n"
             print "@Agent: Received simulation start notification."

@@ -597,25 +597,6 @@ rechargeEnergy(Step, Agent, Recharge) :-
 rechargeEnergy(Step, Agent, Recharge) :-
 	maxEnergy(Step, Agent, MaxEnergy),
     Recharge is round(MaxEnergy * 0.5).
-
-checkLastAction :-
-    lastAction(probe),
-	lastActionResult(successful),
-    myPosition(MyPos),
-    retractall(k(nodeValue(MyPos, _Value))),
-    assert(k(nodeValue(MyPos, 5))),
-    fail.
-    
-    
-checkLastAction :-
-    lastAction(survey),
-	lastActionResult(successful),
-    myPosition(MyPos),
-    foreach(
-        k(edge(MyPos, Node2, _)),
-        updateEdge(MyPos, Node2, 5)
-    ),
-    fail.
     
 checkLastAction :-
 	lastActionResult(failed), !.
@@ -1009,6 +990,13 @@ cutCondition(probe(Node)) :-
 	nodeValue(Node, Value),
 	Value \= unknown,
     writeln('el nodo ya fue probeado').
+    
+cutCondition(aumento(_Node)) :- 
+    currentStep(Step),
+    myName(Agent),
+    myTeam(MyTeam),
+	agenteEnZona(Step, Agent, MyTeam),
+    writeln('aumente la zona :)').
     
 cutCondition(defensaPropia(_)):-
 	countTurns(1), !,

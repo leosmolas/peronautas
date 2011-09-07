@@ -36,6 +36,7 @@ setBeliefs :-
 	assert(b(myPosition(MyPosition)) <- true), !,
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
+    calcTime(setDifPuntosSinMi),
 	calcTime(setEsSeguro), !,
 		
     % printFindAll('b', b(_)),
@@ -275,8 +276,9 @@ esFrontera(Node) :-
 esFrontera2(Node) :-
     currentStep(Step),
     myTeam(T),
-    k(edge(Node, Neigh, _V)),
-    k(nodeTeam(Step, Neigh, T2)),
+    equipoVecino(Step, Node, T),
+    equipoVecino(Step, Node, T2),
+    
     T2 \= T, !.
 
 setEstoyEnLaFrontera :-
@@ -400,33 +402,34 @@ setDifPuntosExpansion :-
 
 setAumento :-
     myStatus(normal),
-    myTeam(Team),
-	currentStep(Step),
-    retractall(isGoal(_, _)),
-	retractall(isFail(_, _)),
-    assert((
-        isGoal(Node, Cost) :- 
-            !, 
-            Cost =< 2, 
-            Cost > 0, 
-            currentStep(Step),
-            k(nodeTeam(Step, Node, none)),
-            b(nodeAtDistance(Node, Distance)),
-            Distance < 4
-    )),
-	assert((
-        isFail(_, Cost2) :- 
-            Cost2 > 2
-    )),
-    assert((
-        isFail(Node, _) :- 
-            currentStep(Step),
-            myTeam(MyTeam),
-            k(nodeTeam(Step, Node, MyTeam))
-    )),
+    % myTeam(Team),
+	% currentStep(Step),
+    % retractall(isGoal(_, _)),
+	% retractall(isFail(_, _)),
+    % assert((
+        % isGoal(Node, Cost) :- 
+            % !, 
+            % Cost =< 2, 
+            % Cost > 0, 
+            % currentStep(Step),
+            % k(nodeTeam(Step, Node, none)),
+            % b(nodeAtDistance(Node, Distance)),
+            % Distance < 4
+    % )),
+	% assert((
+        % isFail(_, Cost2) :- 
+            % Cost2 > 2
+    % )),
+    % assert((
+        % isFail(Node, _) :- 
+            % currentStep(Step),
+            % myTeam(MyTeam),
+            % k(nodeTeam(Step, Node, MyTeam))
+    % )),
+    myPosition(MyPos),
     setof(
         FinalNode,
-        setPosibleAumentoAux(FinalNode, Step, Team),
+        k(edge(MyPos, FinalNode, _)),
         Aumento
     ),
     setPosibleAumento(0, Aumento),
@@ -456,6 +459,22 @@ posibleAumento(X, Aumento, Nodo) :-
     b(nodeAtDistance(Nodo, Dist)),
     Dist >= X,
     Dist < NewCost.
+    % aisladoConAmigo(Nodo).
+    
+% aisladoConAmigo(Nodo) :-
+    % myPosition(MyPos),
+    % currentStep(Step),
+    % position(Step, Agent, MyPos),
+    % team(Agent, MyTeam),
+    % myTeam(MyTeam),
+    % foreach(
+        % equipoVecino(Step, MyPos, TeamNeigh),
+        % TeamNeigh \= MyTeam
+    % ),
+    % b(nodeAtDistance(Nodo, 1)), !,
+    % fail.
+    
+% aisladoConAmigo.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
     currentStep(Step),	
@@ -602,8 +621,14 @@ setDistanciaExplorar :-
             searchPath(Position, Node, Energy, [[survey]], 1)
         )
     ), !.
-    
+
 setDistanciaExplorar.
+    
+average(List, Result) :- length(List, Len), sum(List, Sum), Result is Sum / Len.
+
+sum([], 0).
+sum([H|T], Sum) :- sum(T, Temp), Sum is Temp + H.
+    
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxilio
@@ -663,12 +688,11 @@ equipoVecino(Step, MyPos, Team) :-
 	k(nodeTeam(Step, Neigh, Team)).
 
 setReagruparse :-
-	currentStep(0),
-	writeln('setReagruparse: caso firstPerceivedStep'), !.
+	currentStep(0), !.
 	
 setReagruparse :-
     myStatus(normal),
-	not(b(posibleAumento(_))),
+	% not(b(posibleAumento(_))),
 	myPosition(MyPos),
 	currentStep(Step),
 	myTeam(MyTeam),
@@ -676,29 +700,18 @@ setReagruparse :-
 		equipoVecino(Step, MyPos, Team),
 		Team \= MyTeam
 	),
+    
 	% k(nodeTeam(Step, MyPos, Team)),
 	% MyTeam \= Team, 
-	assertReagruparseGoal,
-	setPathReagruparse,
-	setAgentesEnZona.
+	calcTime(assertReagruparseGoal),
+	calcTime(setPathReagruparse),
+	calcTime(setAgentesEnZona).
 	
 setReagruparse.
 
-% Hay alguna zona, el goal es un nodo de mi color.
-assertReagruparseGoal :- 
-	currentStep(Step),
-	myTeam(MyTeam),
-	k(nodeTeam(Step, _Node, MyTeam)), !,
-	retractall(isGoal(_)),
-    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
-		currentStep(Step),
-		myTeam(MyTeam),
-		k(nodeTeam(Step, FinalNode, MyTeam)),
-		equipoVecino(Step, FinalNode, MyTeam)
-	)).
-
 % No hay ninguna zona, el goal es un agente de mi equipo.
 assertReagruparseGoal :- 
+    zoneScore(0), !,
 	retractall(isGoal(_)),
     assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
 		currentStep(Step),
@@ -708,15 +721,29 @@ assertReagruparseGoal :-
 		Agent \= MyName,
 		team(Agent, MyTeam)		
 	)).
+
+% Hay alguna zona, el goal es un nodo de mi color.
+assertReagruparseGoal :- 
+	% currentStep(Step),
+	% myTeam(MyTeam),
+	retractall(isGoal(_)),
+    assert((isGoal(ucsNode(FinalNode, _, _, _, _)) :- 
+		% currentStep(Step),
+		% myTeam(MyTeam),
+		% k(nodeTeam(Step, FinalNode, MyTeam)),
+		% equipoVecino(Step, FinalNode, MyTeam)
+        b(frontera(FinalNode))
+	)).
+
 	
 setPathReagruparse :-
 	myPosition(InitialNode),
 	myEnergy(Energy),
     singleton_heap(InitialFrontier, 0, ucsNode(InitialNode, Energy, [], [], 0)),
-    write('pathSearchReagruparse'),
+    retractall(isFail(_)),
     ucsAux(InitialFrontier, [], _Path, Actions, PathCost, _RemainingEnergy),     
 	assert(b(distanciaAZona(PathCost)) <- true),
-	write('distaciaAZona:'), writeln(PathCost),
+	writeln('distaciaAZona:'), writeln(PathCost),
     assert(b(pathReagruparse(Actions))).    
 
 setAgentesEnZona :-

@@ -89,6 +89,7 @@ repairCost(2) :-
 repairCost(3) :-
     myStatus(disabled).
 
+
 %------------------------------  Repair  --------------------------------%
 
 action([repair, Ally]):-
@@ -99,6 +100,7 @@ action([repair, Ally]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Ally, Position),
+    status(Step, Ally, disabled),
     write(1.3),nl,
     myName(Name),
     Ally \= Name,
@@ -107,10 +109,11 @@ action([repair, Ally]):-
     team(Step, Ally, Team),
     write(1.5),nl,
     !.
-    
+
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -123,6 +126,21 @@ action([survey, Position]) :-
 %-------------------------------  Goto  ---------------------------------%
 
 %-- First Node Goto --%
+    
+action([goto, X]) :-
+    myStatus(normal),
+    myPosition(Position),
+    k(edge(Position, X, Cost)),
+    currentStep(Step),
+    position(Step, AllyAgent, X),
+    myTeam(Team),
+    team(AllyAgent, Team),
+    Cost \= unknown,
+    write(3.2),nl,
+    myEnergy(Energy),
+    Energy >= Cost, 
+    write(3.3),nl,
+    !.
 
 action([goto, X]) :-
     write(3.1),nl,
@@ -134,7 +152,6 @@ action([goto, X]) :-
     Energy >= Cost, 
     write(3.3),nl,
     !.
-
 %-------------------------------  Recharge  ------------------------------%
     
 action([recharge]) :-

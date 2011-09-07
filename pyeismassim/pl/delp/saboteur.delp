@@ -8,7 +8,7 @@
     atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value).
     
 atacarValue(Turns, EnergyLeft, DifPuntos, RolePoints, Points, Value) :-
-    Value is (10 - Turns) ** 2 * 4 - DifPuntos ** 2 + EnergyLeft + RolePoints + Points.
+    Value is (10 - Turns) ** 2 * 10 - DifPuntos ** 2 + EnergyLeft + RolePoints + Points + 100.
     
 is_a_built_in(atacarValue(_Turns, _EnergyLeft, _, _RolePoints, _, _Value)).
 

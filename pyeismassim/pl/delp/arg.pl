@@ -86,15 +86,22 @@ is_a_built_in(myEnergy(_)).
 is_a_built_in(myPosition(_)).
 is_a_built_in(myStatus(_)).
 is_a_built_in(myTeam(_)).
+is_a_built_in(myName(_)).
 is_a_built_in(b(_)).
 is_a_built_in(mePegaron).
 is_a_built_in(money(_)).
 is_a_built_in(currentStep(_)).
 is_a_built_in(buyCount(_, _)).
+is_a_built_in(agenteEnZona(_Agent)).
 
 position(Agent, Position) :-
     currentStep(Step),
     position(Step, Agent, Position).
+    
+agenteEnZona(Agent):-
+    currentStep(Step),
+    myTeam(MyTeam),
+    agenteEnZona(Step, Agent, MyTeam).
 
 % Para poner banderas
 is_a_built_in(w(_)).

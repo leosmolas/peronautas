@@ -1,5 +1,5 @@
 ﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                               Saboteur                                %
+%                               Inspector                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Actions (priority order):
@@ -38,9 +38,12 @@ reachableNode(Node, [[Node, Cost] | _T]) :-
 reachableNode(Node, [_ | T]) :-
     reachableNode(Node, T).
 
-%------------------------------  Attack  --------------------------------%
+%------------------------------  Inspect  --------------------------------%
 
 action([inspect]):-
+    myStatus(normal),
+    lastAction(LastAction),
+    LastAction \= inspect,
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -48,6 +51,7 @@ action([inspect]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    status(Step, Enemy, normal),
     write(1.3),nl,
     myName(Name),
     Enemy \= Name,
@@ -61,6 +65,7 @@ action([inspect]):-
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -70,11 +75,19 @@ action([survey, Position]) :-
     write(2.3),nl,
     !.
 
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
+
 %-------------------------------  Goto  ---------------------------------%
 
 %-- Barbarian Goto --%
 
 action([goto, NeighborNode]) :-
+    myStatus(normal),
     write(3.1),nl,
     myPosition(Position),
     k(edge(Position, NeighborNode, Cost)), 

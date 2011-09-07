@@ -87,7 +87,7 @@ searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
     retractall(isGoal(_)),	
     assert(isGoal(ucsNode(FinalNode, _, _, _, _))),
     singleton_heap(InitialFrontier, 0, ucsNode(Position, Energy, [], [], 0)),
-    ucs(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
+    ucsAux(InitialFrontier, [], Path, Actions, PathCost, NewEnergy), 
     NewTurns is PathCost + 1,
     calcRecharge(NewEnergy, 2, [[attack, Agent]], NewActions, NewTurns, NewTurns2, RemainingEnergy1),
     append(Actions, NewActions, Plan),
@@ -100,7 +100,24 @@ searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
     
 %------------------------------  Attack  --------------------------------%
 
+% action([buy, shield]):-
+%     myStatus(normal),
+%     myEnergy(Energy),
+%     currentStep(Step),
+%     Energy >= 2,
+%     %0 is Step mod 10, % cada 10 turnos evaluamos si compramos shield
+%     money(X),
+%     X > 4, !.
+    
+% action([buy, sabotageDevice]):-
+%     myStatus(normal),
+%     currentStep(Step),
+%     5 is Step mod 10, % cada 10 turnos evaluamos si compramos shield
+%     money(X),
+%     X > 4, !.
+
 action([attack, Enemy]):-
+    myStatus(normal),
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -108,6 +125,7 @@ action([attack, Enemy]):-
     currentStep(Step),
     myPosition(Position),
     position(Step, Enemy, Position),
+    status(Step, Enemy, normal),
     myName(Name),
     Enemy \= Name,
     write(1.3),nl,
@@ -117,9 +135,12 @@ action([attack, Enemy]):-
     write(1.4),nl,
     !.
     
+
+
 %------------------------------  Survey  --------------------------------%
 
 action([survey, Position]) :-
+    myStatus(normal),
     write(2.1),nl,
     myEnergy(Energy),
     Energy > 0,
@@ -128,12 +149,21 @@ action([survey, Position]) :-
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(2.3),nl,
     !.
+    
+
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
 
 %-------------------------------  Goto  ---------------------------------%
 
 %-- Barbarian Goto --%
 
 action([goto, NeighborNode]) :-
+    myStatus(normal),
     write(3.1),nl,
     myPosition(Position),
     k(edge(Position, NeighborNode, Cost)), 
@@ -144,6 +174,7 @@ action([goto, NeighborNode]) :-
     write(3.3),nl,
     currentStep(Step),
     position(Step, EnemyAgent, NeighborNode),
+    status(Step, EnemyAgent, normal),
     write(3.4),nl,
     myTeam(Team),
     team(Step, EnemyAgent, EnemyTeam),
