@@ -1,5 +1,5 @@
 ﻿%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                               Saboteur                                %
+%                               Inspector                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Actions (priority order):
@@ -38,10 +38,12 @@ reachableNode(Node, [[Node, Cost] | _T]) :-
 reachableNode(Node, [_ | T]) :-
     reachableNode(Node, T).
 
-%------------------------------  Attack  --------------------------------%
+%------------------------------  Inspect  --------------------------------%
 
 action([inspect]):-
     myStatus(normal),
+    lastAction(LastAction),
+    LastAction \= inspect,
     write(1.1),nl,
     myEnergy(Energy),
     Energy > 1,
@@ -72,6 +74,13 @@ action([survey, Position]) :-
     hasAtLeastOneUnsurveyedEdge(Position), 
     write(2.3),nl,
     !.
+
+%-----------------------------  Keep zone  ------------------------------%
+action([recharge]) :-
+    myStatus(normal),
+    zoneScore(X),
+    writeln('Keep calm and keep the zone! :D'),
+    X > 40, !.
 
 %-------------------------------  Goto  ---------------------------------%
 
