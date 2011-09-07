@@ -6,7 +6,9 @@ import cProfile
 import cPickle
 import base64
 
-
+# ver que va a quedando en la kb turno a turno y que se puede sacar
+#
+    1
 # [ ] timeout del receive del servidor
 #       si se cae, que el PS no incluya la percepcion del agente caido en los demas
 #       mensaje por defecto para asumir para los demas?
@@ -122,7 +124,7 @@ class PerceptConnection():
             print "and received data."
         except:
             print "@PerceptServerConnection: receive from percept server timed out!"
-            percept = {}
+            percept = dictionary
         self.sckt.close()
         return percept
 
