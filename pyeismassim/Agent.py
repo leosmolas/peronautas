@@ -103,6 +103,10 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
+        
+        if (self.username == 'a1'):
+            self.prolog.query("tell('debug.txt'), listing, told.").next()
+
         self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("retractall(k(_))").next()
         self.prolog.query("retractall(myName(_))").next()
