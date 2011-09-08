@@ -604,7 +604,7 @@ checkLastAction :-
 	plan([]), !.
 	
 checkLastAction :-
-	retract(plan([_Action | Actions])),
+	retractall(plan([_Action | Actions])),
 	assert(plan(Actions)), !.
     
 buyCount(sensor, 0).
@@ -615,7 +615,7 @@ setBuyCount :-
 	lastAction(buy),
 	lastActionResult(successful),
 	ultimaCompra(Item),
-	retract(buyCount(Item, CurrentCount)),
+	retractall(buyCount(Item, CurrentCount)),
 	NewCount is CurrentCount + 1,
 	assert(buyCount(Item, NewCount)), !.
 	
@@ -781,13 +781,13 @@ planning(reagruparse) :-
 	
 planning(reagruparse) :-
 	b(pathReagruparse(Actions)),
-	retract(plan(_)),
+	retractall(plan(_)),
     assert(plan(Actions)).
 	
 planning(comprar(Item)) :-
 	retractall(ultimaCompra(_)),
 	assert(ultimaCompra(Item)),
-	retract(plan(_)),
+	retractall(plan(_)),
     assert(plan([[buy, Item]])).
     
 planning(atacar(Agent)) :-
@@ -849,7 +849,7 @@ assertPlan(Node, FinalActions) :-
     myPosition(InitialPosition),
     
     b(path(InitialPosition, Node, FinalActions, _, _, Actions, _, _)),
-    retract(plan(_)),
+    retractall(plan(_)),
     assert(plan(Actions)).
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
