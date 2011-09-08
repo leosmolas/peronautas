@@ -154,16 +154,23 @@ setMuertos :-
 		MuertosEnemigos
 	),
 	length(Muertos, MuertosEsteTurno),
-	retract(muertos(miEquipo, MuertosActuales)),
+    cantMuertos(MuertosActuales, MuertosActualesEnemigos),
+	retractall(muertos(_, _)),
 	TotalMuertos is MuertosActuales + MuertosEsteTurno,
 	assert(muertos(miEquipo, TotalMuertos)),
 	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
-	retract(muertos(enemigo, MuertosActualesEnemigos)),
+	
 	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
 	assert(muertos(enemigo, TotalMuertosEnemigos)).
 
 setMuertos.
+
+cantMuertos(MuertosActuales, MuertosActualesEnemigos) :-
+    muertos(miEquipo, MuertosActuales),
+    muertos(enemigo, MuertosActualesEnemigos), !.
     
+cantMuertos(0, 0).
+
 % searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
     % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
     
