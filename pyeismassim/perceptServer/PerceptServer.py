@@ -424,7 +424,6 @@ if (__name__ == "__main__"):
                     # The agent has reconnected.
                     difference.union(historyPercept)
                 data = fset2dict(difference)
-                print "TYPE:",type(data)
                 agents[i].bR = send_data(agents[i].sckt, data)
                 #agents[i].sckt.shutdown(socket.SHUT_RDWR)
                 agents[i].sckt.close()

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from BeautifulSoup import BeautifulStoneSoup
-from string import replace, lower
 import pprint
 
 # Author: Iñaki Garay
@@ -129,7 +128,7 @@ def parse_request_action(xml):
                 # NavigableString.
                 # In the latter case, it is most probably a space or junk and
                 # will not be indexable with strings.
-                achievements_list.append(achievements_tag.contents[i]['name'])
+                achievements_list.append("'%s'" % achievements_tag.contents[i]['name'])
         result_private['achievements'] = achievements_list
     else:
         result_private['achievements'] = []
@@ -139,8 +138,8 @@ def parse_request_action(xml):
         vis_verts_list = []
         for i in range(len(vis_verts_tag.contents)):
             if (vis_verts_tag.contents[i].__class__.__name__ == "Tag"):
-                vis_verts_list.append( { 'name' : vis_verts_tag.contents[i]['name'].lower()
-                                       , 'team' : vis_verts_tag.contents[i]['team'].lower()
+                vis_verts_list.append( { 'name' : "'%s'" % vis_verts_tag.contents[i]['name']
+                                       , 'team' : "'%s'" % vis_verts_tag.contents[i]['team']
                                        } )
         result_public['vis_verts'] = vis_verts_list
     else:
@@ -151,8 +150,8 @@ def parse_request_action(xml):
         vis_edges_list = []
         for i in range(len(vis_edges_tag.contents)):
             if (vis_edges_tag.contents[i].__class__.__name__ == "Tag"):
-                vis_edges_list.append( { 'node1' : vis_edges_tag.contents[i]['node1']
-                                       , 'node2' : vis_edges_tag.contents[i]['node2']
+                vis_edges_list.append( { 'node1' : "'%s'" % vis_edges_tag.contents[i]['node1']
+                                       , 'node2' : "'%s'" % vis_edges_tag.contents[i]['node2']
                                        } )
         result_public['vis_edges'] = vis_edges_list
     else:
@@ -163,10 +162,10 @@ def parse_request_action(xml):
         vis_ents_list = []
         for i in range(len(vis_ents_tag.contents)):
             if (vis_ents_tag.contents[i].__class__.__name__ == "Tag"):
-                vis_ents_list.append( { 'name'   : vis_ents_tag.contents[i]['name'].lower()
-                                      , 'node'   : vis_ents_tag.contents[i]['node'].lower()
-                                      , 'team'   : vis_ents_tag.contents[i]['team'].lower()
-                                      , 'status' : vis_ents_tag.contents[i]['status'].lower() # normal | disabled
+                vis_ents_list.append( { 'name'   : "'%s'" % vis_ents_tag.contents[i]['name']
+                                      , 'node'   : "'%s'" % vis_ents_tag.contents[i]['node']
+                                      , 'team'   : "'%s'" % vis_ents_tag.contents[i]['team']
+                                      , 'status' : "'%s'" % vis_ents_tag.contents[i]['status'] # normal | disabled
                                       } )
         result_public['vis_ents'] = vis_ents_list
     else:
@@ -177,8 +176,8 @@ def parse_request_action(xml):
         probed_verts_list = []
         for i in range(len(probed_verts_tag.contents)):
             if (probed_verts_tag.contents[i].__class__.__name__ == "Tag"):
-                probed_verts_list.append( { 'name'  : probed_verts_tag.contents[i]['name']
-                                          , 'value' : probed_verts_tag.contents[i]['value']
+                probed_verts_list.append( { 'name'  : "'%s'" % probed_verts_tag.contents[i]['name']
+                                          , 'value' : "'%s'" % probed_verts_tag.contents[i]['value']
                                           } )
         result_public['probed_verts'] = probed_verts_list
     else:
@@ -189,9 +188,9 @@ def parse_request_action(xml):
         surveyed_edges_list = []
         for i in range(len(surveyed_edges_tag.contents)):
             if (surveyed_edges_tag.contents[i].__class__.__name__ == "Tag"):
-                surveyed_edges_list.append( { 'node1'  : surveyed_edges_tag.contents[i]['node1']
-                                            , 'node2'  : surveyed_edges_tag.contents[i]['node2']
-                                            , 'weight' : surveyed_edges_tag.contents[i]['weight']
+                surveyed_edges_list.append( { 'node1'  : "'%s'" % surveyed_edges_tag.contents[i]['node1']
+                                            , 'node2'  : "'%s'" % surveyed_edges_tag.contents[i]['node2']
+                                            , 'weight' : "'%s'" % surveyed_edges_tag.contents[i]['weight']
                                             } )
         result_public['surveyed_edges'] = surveyed_edges_list
     else:
@@ -202,16 +201,16 @@ def parse_request_action(xml):
         inspected_ents_list = []
         for i in range(len(inspected_ents_tag.contents)):
             if (inspected_ents_tag.contents[i].__class__.__name__ == "Tag"):
-                inspected_ents_list.append( { 'energy'     : inspected_ents_tag.contents[i]['energy']
-                                            , 'health'     : inspected_ents_tag.contents[i]['health']
-                                            , 'max_energy' : inspected_ents_tag.contents[i]['maxenergy']
-                                            , 'max_health' : inspected_ents_tag.contents[i]['maxhealth']
-                                            , 'name'       : inspected_ents_tag.contents[i]['name'].lower()
-                                            , 'node'       : inspected_ents_tag.contents[i]['node']
-                                            , 'role'       : inspected_ents_tag.contents[i]['role'].lower()
-                                            , 'strength'   : inspected_ents_tag.contents[i]['strength']
-                                            , 'team'       : inspected_ents_tag.contents[i]['team'].lower()
-                                            , 'vis_range'  : inspected_ents_tag.contents[i]['visrange']
+                inspected_ents_list.append( { 'energy'     : "'%s'" % inspected_ents_tag.contents[i]['energy']
+                                            , 'health'     : "'%s'" % inspected_ents_tag.contents[i]['health']
+                                            , 'max_energy' : "'%s'" % inspected_ents_tag.contents[i]['maxenergy']
+                                            , 'max_health' : "'%s'" % inspected_ents_tag.contents[i]['maxhealth']
+                                            , 'name'       : "'%s'" % inspected_ents_tag.contents[i]['name']
+                                            , 'node'       : "'%s'" % inspected_ents_tag.contents[i]['node']
+                                            , 'role'       : "'%s'" % inspected_ents_tag.contents[i]['role']
+                                            , 'strength'   : "'%s'" % inspected_ents_tag.contents[i]['strength']
+                                            , 'team'       : "'%s'" % inspected_ents_tag.contents[i]['team']
+                                            , 'vis_range'  : "'%s'" % inspected_ents_tag.contents[i]['visrange']
                                             } )
         result_public['inspected_ents'] = inspected_ents_list
     else:

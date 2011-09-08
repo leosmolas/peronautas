@@ -122,6 +122,24 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def processSimulationStart(self, msg_dict):
+
+        def roleHardCode(username):
+            roledict = { '1'  : 'explorer'
+                       , '2'  : 'explorer'
+                       , '3'  : 'repairer'
+                       , '4'  : 'repairer'
+                       , '5'  : 'saboteur'
+                       , '6'  : 'saboteur'
+                       , '7'  : 'sentinel'
+                       , '8'  : 'sentinel'
+                       , '9'  : 'inspector'
+                       , '10' : 'inspector'
+                       }
+            number = username[-1:]
+            if (number == '0'):
+                number = '10'
+            return roledict[number]
+            
         defaultVisionRange = { 'explorer' : 2
                              , 'repairer' : 1
                              , 'saboteur' : 1
@@ -129,21 +147,17 @@ class Agent():
                              , 'inspector': 1
                              }
 
-        self.role = msg_dict['role'].lower()
-        if   (self.role == 'explorer'):
-            self.prolog_role_file = 'pl/explorer.pl'
-        elif (self.role == 'repairer'):
-            self.prolog_role_file = 'pl/repairer.pl'
-        elif (self.role == 'sentinel'):
-            self.prolog_role_file = 'pl/sentinel.pl'
-        elif (self.role == 'saboteur'):
-            self.prolog_role_file = 'pl/saboteur.pl'
-        elif (self.role == 'inspector'):
-            self.prolog_role_file = 'pl/inspector.pl'
-        else:
-            print "@Agent: Error: unknown role"
-            quit()
+        #self.role = msg_dict['role'].lower()
+        self.role             = roleHardCode(self.username)
+        self.prolog_role_file = "pl/%s.pl" % (self.role)
         self.prolog.consult(self.prolog_role_file)
+
+        if self.username[-1] == '0':
+            team = self.username[:-2]
+        else:
+            team = self.username[:-1]
+        for x in range(1,11):
+            self.prolog.query("assertOnce(k(agentRole(%s%d, %s)))" % (team, x, roleHardCode(str(x)))).next()
 
         self.prolog.query("updateMyName(%s)" % self.username).next()
         if (self.communication):
@@ -151,6 +165,7 @@ class Agent():
             self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
         print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
         self.prolog.query("assert(myVisionRange(%s))" % defaultVisionRange[self.role]).next()
+        self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
 
 
 
@@ -288,7 +303,7 @@ class Agent():
         # Synchronize perceptions with others.
         if (self.firstTurn):
             msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public, True)
-            print "\nRECONNECTION!\n"
+            print "@Agent: first turn running, requesting history from percept server."
             print_message(msg_dict_difference)
         else:
             msg_dict_difference = self.perceptConnection.send_and_recv(msg_dict_public)
@@ -298,10 +313,8 @@ class Agent():
         self.processPerception(msg_dict_private, msg_dict_public)
         
         # Decide action.
-
         now = time.time()
         if self.dummy or (now > self.deadline):
-
             query_result = self.prolog.query("execDummy(X)").next()
         else:
             self.remainingTime = self.deadline - now
@@ -326,104 +339,32 @@ class Agent():
 
 
     #----------------------------------------------------------------------------------------------#
-    def processBye(self, msg_dict):
-        print_message(msg_dict)
-
-
-
-    #----------------------------------------------------------------------------------------------#
     def perceiveActLoop(self):
         # Receive simulation start notification.
-        print "@Agent: Waiting for simulation start notification."
+        print "@Agent: Waiting for message from MASSim server."
 
         xml = self.massimConnection.receive()
         msg_type, _, msg_dict, _ = parse(xml)
 
-        def roleHardCode(username):
-            roledict = { '1'  : 'explorer'
-                       , '2'  : 'explorer'
-                       , '3'  : 'repairer'
-                       , '4'  : 'repairer'
-                       , '5'  : 'saboteur'
-                       , '6'  : 'saboteur'
-                       , '7'  : 'sentinel'
-                       , '8'  : 'sentinel'
-                       , '9'  : 'inspector'
-                       , '10' : 'inspector'
-                       }
-            number = username[-1:]
-            if (number == '0'):
-                number = '10'
-            return roledict[number]
-            
-        defaultVisionRange = { 'explorer' : 2
-                             , 'repairer' : 1
-                             , 'saboteur' : 1
-                             , 'sentinel' : 3
-                             , 'inspector': 1
-                             }
-        self.role             = roleHardCode(self.username)
-        self.prolog_role_file = "pl/%s.pl" % (self.role)
-        self.prolog.consult(self.prolog_role_file)
-
-
-        if self.username[-1] == '0':
-            team = self.username[:-2]
-        else:
-            team = self.username[:-1]
-        for x in range(1,11):
-            self.prolog.query("assertOnce(k(agentRole(%s%d, %s)))" % (team, x, roleHardCode(str(x)))).next()
-
-        self.prolog.query("updateMyName(%s)" % self.username).next()
-        if (self.communication):
-            self.prolog.query("conectar(%s)" % self.username).next()
-            self.prolog.query("registrar([d3lp0r, %s], mapc)" % self.role).next()
-
-        print "@Agent: Saving the visual range of %s: %s" % (self.role, defaultVisionRange[self.role])
-        self.prolog.query("assert(k(agentVisionRange(0,%s,%s)))" % (self.username, defaultVisionRange[self.role])).next()
-
-        if (msg_type == 'sim-start'):
-            print "\n\n===== NEW SIMULATION =====\n\n"
-            print "@Agent: Received simulation start notification."
-            print_message(msg_dict)
-            print "@Agent: Processing simulation start"
-            self.processSimulationStart(msg_dict)
-            print "@Agent: Finished simulation start"
-            quitPerceiveActLoop = False
-        elif (msg_type == 'bye'):
-            print "@Agent: Received bye"
-            self.processBye(msg_dict)
-            self.quit = True
-            quitPerceiveActLoop = True
-        elif (msg_type == 'request-action'):
-            quitPerceiveActLoop = False
-            print "@Agent: %s receiving perception from server..." % self.username
-            xml = self.massimConnection.receive()
-            msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
-            if (msg_type == 'request-action'):
-                self.turnStartTime = time.time()
-                print "------------------------------------------------------------"
-                print "@Agent: Step: %s" % msg_dict_private['step']
-
-                # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
-                action_xml, action_str = self.processActionRequest(action_id, msg_dict_private, msg_dict_public)
-
-                # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
-                if (self.communication):
-                    print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
-                    self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
-                self.massimConnection.send(action_xml)
-                self.firstTurn = False
-        else:
-            self.quit = True
-            quitPerceiveActLoop = True
-
+        quitPerceiveActLoop = False
         while (not quitPerceiveActLoop):
-            print "@Agent: %s receiving perception from server..." % self.username
+            
             xml = self.massimConnection.receive()
             msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
-            # time.sleep(0.5)
-            if (msg_type == 'request-action'):
+
+            # Apparently, the sim-start message is not received at the very beginning. 
+            self.processSimulationStart(msg_dict)
+
+            if (msg_type == 'sim-start'):
+                print "\n\n===== NEW SIMULATION =====\n\n"
+                print "@Agent: Received simulation start notification."
+                print_message(msg_dict)
+                print "@Agent: Processing simulation start...",
+                self.processSimulationStart(msg_dict)
+                print "done"
+                quitPerceiveActLoop = False
+            elif (msg_type == 'request-action'):
+                print "@Agent: %s receiving perception from server..." % self.username
                 self.turnStartTime = time.time()
                 self.deadline = self.massimConnection.messageReceived + msg_dict_private['total_time'] / 1000 - 0.2 # VALOR A CAMBIAR
                 print "------------------------------------------------------------"
@@ -434,19 +375,25 @@ class Agent():
 
                 # Segunda fase: los agentes se comunican entre si, y se reconsideran las acciones.
                 if (self.communication):
-                    print "@Agent: Calling: communicateAndResolveConflicts(%s, NewAction)" % action_str
                     self.prolog.query("communicateAndResolveConflicts(%s, NewAction)" % action_str).next()
+
+                # Send the action to the MASSim server.
                 self.massimConnection.send(action_xml)
                 self.firstTurn = False
             elif (msg_type == 'sim-end'):
                 print "@Agent: Received sim-end"
                 print_message(msg_dict_private)
                 quitPerceiveActLoop = True
+            elif (msg_type == 'bye'):
+                print "@Agent: Received bye"
+                print_message(msg_dict_private)
+                self.quit = True
+                quitPerceiveActLoop = True
             else:
                 print "@Agent: In area 51."
                 print_message(msg_dict_private)
+                quitPerceiveActLoop = True
                 self.quit = True
-                quit()
 
 
 
