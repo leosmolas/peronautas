@@ -332,6 +332,12 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def perceiveActLoop(self):
+        # Receive simulation start notification.
+        print "@Agent: Waiting for simulation start notification."
+
+        xml = self.massimConnection.receive()
+        msg_type, _, msg_dict, _ = parse(xml)
+
         def roleHardCode(username):
             roledict = { '1'  : 'explorer'
                        , '2'  : 'explorer'
@@ -349,32 +355,17 @@ class Agent():
                 number = '10'
             return roledict[number]
             
-        # Receive simulation start notification.
-        print "@Agent: Waiting for simulation start notification."
-
-        xml = self.massimConnection.receive()
-        msg_type, _, msg_dict, _ = parse(xml)
-
-        
-        self.role = roleHardCode(self.username)
-        if   (self.role == 'explorer'):
-            self.prolog_role_file = 'pl/explorer.pl'
-        elif (self.role == 'repairer'):
-            self.prolog_role_file = 'pl/repairer.pl'
-        elif (self.role == 'sentinel'):
-            self.prolog_role_file = 'pl/sentinel.pl'
-        elif (self.role == 'saboteur'):
-            self.prolog_role_file = 'pl/saboteur.pl'
-        elif (self.role == 'inspector'):
-            self.prolog_role_file = 'pl/inspector.pl'
-        self.prolog.consult(self.prolog_role_file)
-
         defaultVisionRange = { 'explorer' : 2
                              , 'repairer' : 1
                              , 'saboteur' : 1
                              , 'sentinel' : 3
                              , 'inspector': 1
                              }
+        self.role             = roleHardCode(self.username)
+        self.prolog_role_file = "pl/%s.pl" % (self.role)
+        self.prolog.consult(self.prolog_role_file)
+
+
         if self.username[-1] == '0':
             team = self.username[:-2]
         else:
