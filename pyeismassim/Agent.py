@@ -105,12 +105,15 @@ class Agent():
         print "@Agent: Prolog finalization",
         self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("retractall(k(_))").next()
+        self.prolog.query("retractall(b(_))").next()
+        self.prolog.query("retractall(h(_))").next()
         self.prolog.query("retractall(myName(_))").next()
         self.prolog.query("retractall(visibleNode(_))").next()
         self.prolog.query("retractall(notVisible(_))").next()
         self.prolog.query("retractall(explored(_))").next()
         self.prolog.query("retractall(notExplored(_))").next()
         self.prolog.query("retractall(inRange(_))").next()
+        self.prolog.query("retractall(buyCount(_,_))").next()
         #self.prolog = None
         if self.verbose:
             self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
