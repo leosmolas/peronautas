@@ -4,6 +4,7 @@
     [delp/arg].
     
 :- dynamic b/1.
+:- dynamic muertos/2.
 
 setBeliefs :-
     calcTime(setHaySaboteador),
@@ -154,11 +155,11 @@ setMuertos :-
 		MuertosEnemigos
 	),
 	length(Muertos, MuertosEsteTurno),
-	retract(muertos(miEquipo, MuertosActuales)),
+	retractall(muertos(miEquipo, MuertosActuales)),
 	TotalMuertos is MuertosActuales + MuertosEsteTurno,
 	assert(muertos(miEquipo, TotalMuertos)),
 	length(MuertosEnemigos, MuertosEnemigosEsteTurno),
-	retract(muertos(enemigo, MuertosActualesEnemigos)),
+	retractall(muertos(enemigo, MuertosActualesEnemigos)),
 	TotalMuertosEnemigos is MuertosActualesEnemigos + MuertosEnemigosEsteTurno,
 	assert(muertos(enemigo, TotalMuertosEnemigos)).
 

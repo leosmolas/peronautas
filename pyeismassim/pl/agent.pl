@@ -217,9 +217,8 @@ assertOnce(X) :- asserta(X).
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
     currentStep(Step),
-    retractall( k(nodeTeam(_Step, Name, CurrentTeam)) ),
-    asserta(    k(nodeTeam( Step, Name, CurrentTeam)) ).
-    % assertOnce( h(nodeTeam(Name, none)) ). % no tiene sentido despues limpiar todo
+    retractall( k(nodeTeam(_Step, Name, _CurrentTeam)) ),
+    asserta(    k(nodeTeam( Step, Name,  CurrentTeam)) ).
 
 
 
