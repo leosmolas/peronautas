@@ -79,9 +79,10 @@ class Agent():
     def disconnect(self):
         self.massimConnection.disconnect()
         self.perceptConnection.disconnect()
-        self.log.close()
-        self.log = sys.__stdout__
-        sys.stdout = sys.__stdout__
+        if (self.logToFile):
+           self.log.close()
+           self.log = sys.__stdout__
+           sys.stdout = sys.__stdout__
 
 
 
@@ -410,7 +411,7 @@ class Agent():
             msg_type, action_id, msg_dict_private, msg_dict_public = parse(xml)
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
-                print ""
+                print "------------------------------------------------------------"
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
                 # Primera fase deliberativa: el agente considera por si mismo que accion realizar.
@@ -434,7 +435,7 @@ class Agent():
             if (msg_type == 'request-action'):
                 self.turnStartTime = time.time()
                 self.deadline = self.massimConnection.messageReceived + msg_dict_private['total_time'] / 1000 - 0.2 # VALOR A CAMBIAR
-                print 
+                print "------------------------------------------------------------"
                 print "@Agent: Step: %s" % msg_dict_private['step']
 
                 # Primera fase deliberativa: el agente considera por si mismo que accion realizar.

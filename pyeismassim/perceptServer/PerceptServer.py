@@ -339,6 +339,10 @@ if (__name__ == "__main__"):
             print "Loading percept history."
             loadfile = open('percept_history', 'rb')
             historyPercept = cPickle.load(loadfile)
+        else:
+            dumpfile = open('percept_history', 'wb')
+            dumpfile.close()
+            
     else:
         print ""
         print "         Usage: python PerceptServer.py NUMBER_CONNECTIONS HOST_IP PORT_NUMBER [-l]"
@@ -422,7 +426,7 @@ if (__name__ == "__main__"):
                 data = fset2dict(difference)
                 print "TYPE:",type(data)
                 agents[i].bR = send_data(agents[i].sckt, data)
-                agents[i].sckt.shutdown(socket.SHUT_RDWR)
+                #agents[i].sckt.shutdown(socket.SHUT_RDWR)
                 agents[i].sckt.close()
                 logFile.write( "        Agent %s: sending %s bytes." % (agents[i].name, agents[i].bR) )
 
