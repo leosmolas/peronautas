@@ -31,8 +31,7 @@ probeoSinPerderMucho(Value, X) -<
     
 ~probeoSinPerderMucho(_Value, X)  <-
     b(distancia(X, [[probe]], Dist, _EnergyLeft)),
-    lessEq(Dist, 3).    
-    
+    lessEq(Dist, 3).        
         
 probearValue(Dist, EnergyLeft, InZone, Promedio, Positivo, Negativo, Coef, Value) :-
     Value is ((10 - Dist) ** 2 * 2 + Positivo - Negativo ** 2 + InZone + EnergyLeft + (Promedio - 3) ** 3) * Coef.

@@ -4,24 +4,6 @@
 
 :- ['delp/saboteur.delp'].
 
-% Actions (priority order):
-%                   -attack
-%                   -survey
-%                   -goto
-%                   -parry  (no implemented)
-%                   -buy    (no implemented)
-%                   -rechage
-%                   -skip   (no implemented)
-
-%-----------------------------------------------------------------------%
-
-execDummy(Action) :- 
-    action(Action).
-    
-% rolMetas.
-
-% rolSetBeliefs.
-
 rolMetas :-
     foreach(
         b(enemyPosition(Agent, _Node)),
@@ -97,7 +79,20 @@ searchPathSaboteur(Position, FinalNode, Agent, Energy) :-
     
 searchPathSaboteur(_Position, _FinalNode, _Agent, _Energy).
 
-    
+%------------------------------------------------------------------------%
+% Actions (priority order):
+%                   -attack
+%                   -survey
+%                   -goto
+%                   -parry  (no implemented)
+%                   -buy    (no implemented)
+%                   -rechage
+%                   -skip   (no implemented)
+
+%------------------------------------------------------------------------%
+execDummy(Action) :- 
+    action(Action).
+	
 %------------------------------  Attack  --------------------------------%
 
 % action([buy, shield]):-

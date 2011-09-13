@@ -4,8 +4,6 @@
 %                                Operations                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 % setOwner(+Nodes, +Owner)
 % sets the owner of the node Nodes to Owner.
 setOwner([], _).

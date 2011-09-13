@@ -40,15 +40,12 @@
 
 :- [graph/map, 
     utils, 
-    beliefs].
-    
+    beliefs].    
 
 :- use_module(library(time)).
-
 :- use_module(library(heaps)).
 
 % :- set_prolog_flag(debug_on_error, false).
-
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                             Knowledge and Beliefs                            %
@@ -113,80 +110,59 @@
 %                             Percept Processing                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 %------------------------------------------------------------------------------%
 updateMyName(X) :- 
     var(X), !,
-    fail.
-    
+    fail.    
 
 updateMyName(X) :- 
    retractall( myName(_) ),
    asserta(    myName(X) ).
 
-
-
 %------------------------------------------------------------------------------%
 updateStep(X) :-
 	firstPerceivedStep(_), !,
     retract( currentStep(_) ),
-    asserta( currentStep(X) ),
-	write('Update step 1: '), writeln(X).
+    asserta( currentStep(X) ).
 
 updateStep(X) :-
 	assert(firstPerceivedStep(X)),
-    asserta( currentStep(X) ),
-	write('Update step 2: '), writeln(X).
+    asserta( currentStep(X) ).
 	
 %------------------------------------------------------------------------------%
 updateMaxEnergyDisabled(X) :- 
     retractall( maxEnergyDisabled(_) ),
     asserta(    maxEnergyDisabled(X) ).
 
-
-
 %------------------------------------------------------------------------------%
 updateLastAction(X) :- 
     retractall( lastAction(_) ),
     asserta(    lastAction(X) ).
-
-
 
 %------------------------------------------------------------------------------%
 updateLastActionResult(X) :- 
     retractall( lastActionResult(_) ),
     asserta(    lastActionResult(X) ).
 
-
-
 %------------------------------------------------------------------------------%
 updateMoney(X) :- 
     retractall( money(_) ), 
     asserta(    money(X) ).
-
-
 
 %------------------------------------------------------------------------------%
 updateScore(X) :- 
     retractall( score(_) ), 
     asserta(    score(X) ).
 
-
-
 %------------------------------------------------------------------------------%
 updateZoneScore(X) :- 
     retractall( zoneScore(_) ), 
     asserta(    zoneScore(X) ).
 
-
-
 %------------------------------------------------------------------------------%
 updateLastStepScore(X) :- 
     retractall( lastStepScore(_) ), 
     asserta(    lastStepScore(X) ).
-
-
 
 %------------------------------------------------------------------------------%
 updateNodeValue(Name, unknown) :-
@@ -207,12 +183,8 @@ updateNodeValue(Name, Value) :-
     asserta( notVisible(Name) ),
     asserta( k(nodeValue(Name, Value)) ).
 
-
-
 assertOnce(X) :- call(X), !.
 assertOnce(X) :- asserta(X).
-
-
 
 %------------------------------------------------------------------------------%
 updateNodeTeam(Name, CurrentTeam) :-
@@ -220,21 +192,15 @@ updateNodeTeam(Name, CurrentTeam) :-
     retractall( k(nodeTeam(_Step, Name, _CurrentTeam)) ),
     asserta(    k(nodeTeam( Step, Name,  CurrentTeam)) ).
 
-
-
 %------------------------------------------------------------------------------%
 insertEdge(Node1, Node2, Cost) :-
     asserta( k(edge(Node1, Node2, Cost)) ),
     asserta( k(edge(Node2, Node1, Cost)) ).
 
-
-
 %------------------------------------------------------------------------------%
 deleteEdge(Node1, Node2, Cost) :-
     retract( k(edge(Node1, Node2, Cost)) ),
     retract( k(edge(Node2, Node1, Cost)) ).
-
-
 
 %------------------------------------------------------------------------------%
 % Succeeds if the edge must be updated.
@@ -259,7 +225,6 @@ updateEdge(Node1, Node2, Cost) :-
     insertEdge(Node1, Node2, Cost).
 
 
-
 %------------------------------------------------------------------------------%
 
 updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange, _Status) :-
@@ -267,8 +232,7 @@ updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHea
         var(Agent) ;
         var(Team)  ;
         var(Role)  
-    ), !,
-    writeln('ERROR!!!!!!!!!!!!!! updateEntity1: se intento asertar una variable').
+    ), !.
 
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange, Status) :-
     currentStep(Step),
@@ -291,16 +255,13 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ),
     assertOnce( k(agentStatus(Agent,      Step, Status))       ).
 
-
-
 %------------------------------------------------------------------------------%
 updateEntity(Agent, Team, _Position, Role, _Energy, _MaxEnergy, _Health, _MaxHealth, _Strength, _VisualRange) :-
     ( 
         var(Agent);
         var(Team);
         var(Role)
-    ), !,
-    writeln('ERROR!!!!!!!!!!!!!! updateEntity2: se intento asertar una variable').
+    ), !.
 
 updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, Strength, VisualRange) :-
     currentStep(Step),
@@ -321,15 +282,12 @@ updateEntity(Agent, Team, Position, Role, Energy, MaxEnergy, Health, MaxHealth, 
     assertOnce( k(agentStrength(Agent,    Step, Strength))     ),
     assertOnce( k(agentVisualRange(Agent, Step, VisualRange))  ).
 
-
-
 %------------------------------------------------------------------------------%
 updateTeammateEntity(Agent, Team, _Position, _Health, _MaxHealth, _VisualRange) :-
     ( 
         var(Agent);
         var(Team)
-    ), !,
-    writeln('ERROR!!!!!!!!!!!!!! updateTeammateEntity1: se intento asertar una variable').
+    ), !.
 
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     k(agentTeam(Agent, Team)), !,
@@ -342,6 +300,7 @@ updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     assertOnce( k(agentHealth(      Agent, Step, Health        ) )),
     assertOnce( k(agentMaxHealth(   Agent, Step, MaxHealth     ) )),
     assertOnce( k(agentVisualRange( Agent, Step, VisualRange   ) )).
+	
 updateTeammateEntity(Agent, Team, Position, Health, MaxHealth, VisualRange) :-
     currentStep(Step),
     retractall( k(agentTeam(        Agent, _Team               ) )),
@@ -359,8 +318,7 @@ updateEntityTeamPosition(Agent, Team, _Position, _Status) :-
     ( 
         var(Agent);
         var(Team)
-    ), !,
-    writeln('ERROR!!!!!!!!!!!!!! updateEntityTeamPosition: se intento asertar una variable').
+    ), !.
 
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     k(agentTeam(Agent, Team)), !,
@@ -369,6 +327,7 @@ updateEntityTeamPosition(Agent, Team, Position, Status) :-
     retractall( k(agentStatus(      Agent, _, _Status       ) )),
     assertOnce( k(agentPosition(    Agent, Step, Position   ) )),
     assertOnce( k(agentStatus(      Agent, Step, Status     ) )).
+	
 updateEntityTeamPosition(Agent, Team, Position, Status) :-
     currentStep(Step),
     retractall( k(agentTeam(        Agent, _Team            ) )),
@@ -379,15 +338,12 @@ updateEntityTeamPosition(Agent, Team, Position, Status) :-
     assertOnce( k(agentStatus(      Agent, Step, Status     ) )).
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Phases                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initial phase for all agents.
 phase(exploration).
-
-
 
 % Every turn, we check whether the phase has changed.
 updatePhase :-
@@ -407,9 +363,10 @@ updatePhase :-
     %),
     %UnexploresNodes = [],
 
-    write('The phase has changed!'),nl,
+    write('The phase has changed!'), nl,
     retractall(phase(_)),
     asserta(phase(remaining)).
+	
 % Don't you ever fail me!
 updatePhase.
 
@@ -465,8 +422,6 @@ myStatus(Status) :-
     currentStep(Step),
     k(agentStatus(Agent, Step, Status)).
 
-
-
 % X(?Step, +Agent, -Value)
 team(Step, Agent, Team) :-
     lastKnownInfo(agentTeam, Step, Agent, Team).
@@ -504,9 +459,7 @@ roleNumber(6, saboteur).
 roleNumber(7, sentinel).
 roleNumber(8, sentinel).
 roleNumber(9, inspector).
-roleNumber(0, inspector).
-
-    
+roleNumber(0, inspector).    
 
 %------------------------------------------------------------------------------%
 % lastKnownInfo(+Field, -Step, +Agent, -Value) :-
@@ -522,8 +475,7 @@ lastKnownInfo(agentRole, _Step, Agent, Value) :-
     append(_X, [Y], String),
     roleNumber(Y, Value), !.
 	
-lastKnownInfo(agentRole, _Step, _Agent, unknown).
-    
+lastKnownInfo(agentRole, _Step, _Agent, unknown).    
     
 % El step viene instanciado, por lo que no tiene sentido ponerse a buscar para atras
 lastKnownInfo(Field, Step, Agent, Value) :-
@@ -532,15 +484,12 @@ lastKnownInfo(Field, Step, Agent, Value) :-
     Field \= role,
     A =.. [Field, Agent, Step, Value],
     Q =.. [k, A],
-    call(Q).
-    
+    call(Q).    
 
 % lastKnownInfo(Field, Step, Agent, Value) :-
     % var(Step),
     % currentStep(InitialStep),
     % lastKnownInfo1(Field, InitialStep, Step, Agent, Value).
-
-
 
 %------------------------------------------------------------------------------%
 % Condicion de corte, exito.
@@ -577,7 +526,6 @@ getInfo(agentStrength, Step, Agent, Strength) :-
     k(agentStrength(Step, Agent, Strength)).
 getInfo(agentVisualRange, Step, Agent, VisualRange) :-
     k(agentVisualRange(Agent, Step, VisualRange)).
-
 
 myRechargeEnergy(Recharge) :-
     myStatus(disabled), !,
@@ -634,7 +582,7 @@ run(TimeLimit, Action) :-
         % run2(Action),
         E, 
         ( % except :
-            write('ERROR!!!!!!!!!!!!: '),
+            write('Error catched in run: '),
             writeln(E),
             writeln('Executing dummy now:'),
             retractall(b(_)),
@@ -649,7 +597,7 @@ run(_TimeLimit, Action) :-
     retractall(b(_) <- true),
     retractall(intention(_)),
     assert(intention(quedarse(_))),
-	writeln('Run: caso de stop iteration'),
+	writeln('Run: stop iteration'),
 	planning(quedarse(_)),
     exec(Action).
     
@@ -658,21 +606,17 @@ runInitialization:-
     nl, nl, nl, write('Current Step: '), writeln(Step),
     checkLife,
 	calcTime(setMuertos),
-   	printFindAll('muertos:', muertos(_, _)),
     checkLastAction,
-	calcTime(setBuyCount),
-  	printFindAll('buyCount:', buyCount(_, _)), !.
+	calcTime(setBuyCount), !.
     
 run2(SetBeliefsTimeLimit, Action) :-
     runInitialization,
-    plan([]), !,
-    
+    plan([]), !,    
     retractall(countTurns(_)),
 	assert(countTurns(0)),
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(7)), !,
     calcTime(argumentation(SetBeliefsTimeLimit, Meta)),
-
     write('Meta: '), writeln(Meta),
     calcTime(planning(Meta)),
     exec(Action),
@@ -690,7 +634,7 @@ run2(SetBeliefsTimeLimit, Action) :-
     calcTime(setExploredAndVisible),
 	calcTime(setNodesAtDistance(7)), !,
 	calcTime(argumentation(SetBeliefsTimeLimit, MetaNueva)), !,
-    write('Meta Nueva: '), writeln(MetaNueva),
+    write('Meta nueva: '), writeln(MetaNueva),
     calcTime(planning(MetaNueva)),
     exec(Action),
     writeln(Action),
@@ -708,7 +652,6 @@ run2(_SetBeliefsTimeLimit, Action) :-
     retractall(b(_)),
     retractall(b(_) <- true),
     toogleOffVisibleNodes.	
-
 	
 run2(SetBeliefsTimeLimit, Action) :-	
 	retractall(countTurns(_)),
@@ -724,9 +667,7 @@ run2(SetBeliefsTimeLimit, Action) :-
     
 plan([]).
 
-saveKB(Append) :-
-
-    
+saveKB(Append) :-    
     myName(Name),
     concat('logs/', Name, S2),
     concat(S2, Append, S3),
@@ -744,7 +685,7 @@ argumentation(SetBeliefsTimeLimit, Meta) :-
     catch(
         call_with_time_limit(SetBeliefsTimeLimit, calcTime(setBeliefs)),
         time_limit_exceeded,
-        writeln('\tWARNING!!!!!: set beliefs limit time exceeded, delping now')
+        writeln('\tWarning: set beliefs limit time exceeded, delping now')
     ),
     calcTime(meta(Meta)),
     retractall(intention(_)),
@@ -757,7 +698,7 @@ calcTime(Exec) :-
     call(Exec),
     get_time(After),
     Time is (After - Before) * 1000,
-    write('\t<time value="'),write(Time), writeln('"/>'),
+    write('\t<time value="'), write(Time), writeln('"/>'),
     writeln('</predicate>').
     
 calcTime(Exec) :- call(Exec).
@@ -765,7 +706,6 @@ calcTime(Exec) :- call(Exec).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                   Planning                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 planning(explorar(Node)) :-
     assertPlan(Node, [[survey]]).
@@ -933,17 +873,14 @@ replanning(_) :-
     retractall(intention(_)),
     assert(intention(quedarse(InitialPosition))),
     planning(quedarse(InitialPosition)).
-
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            Condicion de corte                                %
+%                            Cut Conditions                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 	
 cutCondition(_) :-
-	countTurns(V), % este predicado se lleva para controlar que las metas que persiguen agentes no se pasen de mambo    
+	countTurns(V), % este predicado controla que las metas de persecucion tengan un limite de turnos.    
 	V2 is V + 1, 
 	retractall(countTurns(_)),
 	assert(countTurns(V2)),
@@ -961,25 +898,20 @@ cutCondition(Meta) :-
     myTeam(MyTeam),
     team(Agent, Team),
     Team \= MyTeam,
-    role(Agent, saboteur),
-    writeln('hay un enemigo saboteador en mi nodo').
+    role(Agent, saboteur).
     
 cutCondition(Meta) :-
-    Meta \= atacar(_),
-    
-    mePegaron,
-    writeln('hay un enemigo saboteador en mi nodo y me bajo la vida').
+    Meta \= atacar(_),    
+    mePegaron.
     
 cutCondition(Meta) :-
     Meta \= reparar(_),
     Meta \= auxilio(_),
-    myStatus(disabled),
-    writeln('me mataron :(').
+    myStatus(disabled).
 
 cutCondition(explorar(Node)) :-
 	explored(Node),
-	not(hasAtLeastOneUnsurveyedEdge(Node)), 
-	writeln('el nodo ya fue explorado').
+	not(hasAtLeastOneUnsurveyedEdge(Node)).
 	
 cutCondition(comprar(_)).
 
@@ -987,49 +919,40 @@ cutCondition(quedarse(_)).
 	
 cutCondition(probe(Node)) :- 
 	nodeValue(Node, Value),
-	Value \= unknown,
-    writeln('el nodo ya fue probeado').
+	Value \= unknown.
     
 cutCondition(aumento(_Node)) :- 
     currentStep(Step),
     myName(Agent),
     myTeam(MyTeam),
-	agenteEnZona(Step, Agent, MyTeam),
-    writeln('aumente la zona :)').
+	agenteEnZona(Step, Agent, MyTeam).
     
 cutCondition(defensaPropia(_)):-
-	countTurns(1), !,
-    writeln('estoy defendiendome (y paso un turno)').
+	countTurns(1), !.
 	
 cutCondition(reagruparse):-
-	countTurns(3),
-    writeln('pasaron 3 turnos y no llegue a la zona').
+	countTurns(3).
 	
 cutCondition(reagruparse):-
 	% myPosition(MyPos),
 	currentStep(Step),
 	myTeam(Team),
 	myName(Agent),
-	agenteEnZona(Step, Agent, Team),	
-    writeln('llegue a la zona :D').
+	agenteEnZona(Step, Agent, Team).
 
 cutCondition(atacar(_Agent)) :-
-	countTurns(5),
-    writeln('pasaron 5 turnos y no le pegue').
+	countTurns(5).
 	
 cutCondition(atacar(Agent)) :-
 	currentStep(Step),
-	status(Step, Agent, disabled),
-    writeln('moli a palos al agente enemigo').
+	status(Step, Agent, disabled).
     
 cutCondition(auxilio(_Agent)) :-
-	countTurns(5),
-    writeln('pasaron 5 turnos y no consegui ayuda').
+	countTurns(5).
     
 cutCondition(auxilio(_Agent)) :-
 	myMaxHealth(Health),
-    myHealth(Health),
-    writeln('me curaron :D').
+    myHealth(Health).
 	
 cutCondition(atacar(Agent)) :-
 	myTeam(MyTeam),
@@ -1046,18 +969,15 @@ cutCondition(atacar(Agent)) :-
 	( 
 		role(Agent2, unknown);
 		role(Agent2, saboteur)
-	),
-    writeln('estoy por ser atacado por dos saboteadores').
+	).
 
 cutCondition(reparar(_Agent)) :-
-	countTurns(5),
-    writeln('pase 5 turnos sin reparar a mi amigo').
+	countTurns(5).
     
 cutCondition(reparar(Agent)) :-
 	currentStep(Step),
 	health(Step, Agent, Value),
-	maxHealth(Step, Agent, Value),
-    writeln('ya repare a mi amigo').
+	maxHealth(Step, Agent, Value).
 	
 cutCondition(reparar(Agent)) :-
 	myTeam(MyTeam),
@@ -1065,8 +985,7 @@ cutCondition(reparar(Agent)) :-
 	status(Step, Agent, normal),
 	status(Step, Agent2, disabled),
 	Agent \= Agent2,
-	team(Agent2, MyTeam),
-    writeln('hay otro agente que necesita mas ayuda').
+	team(Agent2, MyTeam).
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                    Exec                                      %
@@ -1076,16 +995,13 @@ exec(Action) :-
     plan([Action | _Actions]).
     
 exec([skip]) :-
-    writeln('aca no deberia haber llegado'),
     plan([]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                  Auxiliary                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-%-----------------------------------------------------------------------%
+%------------------------------------------------------------------------------%
 reachableNode(Node, [[_, unknown] | T]) :-
     reachableNode(Node, T),
     !.
@@ -1096,8 +1012,6 @@ reachableNode(Node, [[Node, Cost] | _T]) :-
     !.
 reachableNode(Node, [_ | T]) :-
     reachableNode(Node, T).
-
-
 
 %------------------------------------------------------------------------------%
 % Succeeds when Node has not been surveyed. 
@@ -1110,14 +1024,11 @@ hasAtLeastOneUnsurveyedEdge(Node1) :-
 hasAtLeastOneUnsurveyedEdgeAux(Node) :-
 	k(edge(Node, _Node2, unknown)), !.
 
-
 %------------------------------------------------------------------------------%
 redirect_output(Filename) :-
     write('Prolog redirecting output to: '),write(Filename),nl,
     open(Filename, write, S),
     set_output(S).
-
-
 
 %------------------------------------------------------------------------------%
 % saveMap(+Filename)
@@ -1148,8 +1059,6 @@ printList([]).
 printList([H | T]) :-
     write('    '), write(H), write('.'), nl,
     printList(T).
-
-
 
 %------------------------------------------------------------------------------%
 
@@ -1186,8 +1095,6 @@ dumpKB :-
     printFindAll('AGENT STRENGTH:',     k(agentStrength(    _X31, _X32, _X33 ))),
     printFindAll('AGENT STATUS:',       k(agentStatus(      _,    _,    _ ))),
     printFindAll('AGENT VISUAL RANGE:', k(agentVisualRange( _X34, _X35, _X36 ))).
-
-
 
 %------------------------------------------------------------------------------%
 printHNodeTeams(Title) :-

@@ -3,14 +3,15 @@
 :- [interpreter/delp]. % interprete
 
 :- consult('arg.delp'). % reglas de argumentación
-   % consult('mundo2.delp'). % hechos asertados en una situación del mundo particular
 
 % criterios de comparación
 
-% greaterArgValue está definido más abajo, y lo que hace es buscar los argValue de los argumentos, si es que existen, para compararlos
+% greaterArgValue busca los argValue de los argumentos, si es que existen, para compararlos
 :- % comparison_on(greaterArgValue),
-% defeater2assumption es un criterio que establece derrota cuando uno de los argumentos es una asunción, es derrotado por cualquier otra cosa que tenga algo.
+
+% defeater2assumption establece: cuando uno de los argumentos es una asunción, es derrotado por cualquier otro que tenga razones a favor.
    comparison_on(defeater2assumption),
+   
 % more_specific es la espeficidad de siempre.
    comparison_on(more_specific).
 
@@ -50,7 +51,6 @@ meta(X) :-
     mejorMeta(X, _).
     
 calcMeta(X) :-
-
     X =.. [Meta | Args],
     Query =.. [Meta, Value | Args],
     answer(Query, Answer),
@@ -64,7 +64,8 @@ calcMeta(X) :-
     assert(mejorMeta(X, Value)).
     
 
-% todos los predicados que siguen son operaciones aritméticas y de comparación, para que los use delp.
+% predicados de operaciones aritméticas, comparación, y otros, declarados como
+% built-in para ser utilizados directamente por delp.
 is_a_built_in(mult(_X,_Y,_Z)).
 is_a_built_in(add(_X,_Y,_Z)).
 is_a_built_in(sust(_X,_Y,_Z)).
@@ -76,7 +77,7 @@ is_a_built_in(lessEq(_X,_Y)).
 is_a_built_in(equal(_X,_Y)).
 is_a_built_in(notEqual(_X,_Y)).
 
-is_a_built_in(phase(_)). % delp revisara las fases
+is_a_built_in(phase(_)). 
 is_a_built_in(role(_, _)).
 is_a_built_in(position(_, _)).
 is_a_built_in(myMaxHealth(_)).
@@ -103,7 +104,7 @@ agenteEnZona(Agent):-
     myTeam(MyTeam),
     agenteEnZona(Step, Agent, MyTeam).
 
-% Para poner banderas
+% Para imprimir en delp.
 is_a_built_in(w(_)).
 
 w(X) :- writeln(X).
@@ -122,8 +123,6 @@ greaterEq(X,Y) :- X >=  Y.
 lessEq(X,Y)    :- X =<  Y.
 equal(X,Y)     :- X =:= Y. % este es el igual, pero no instancia, sólo chequea igualdad. (O sea, no es el mismo que el =, que si instancia.)
 notEqual(X,Y)  :- X \=  Y.
-
-
 
 % Por cuestiones históricas y emocionales, todo lo que sigue va a quedar. (El criterio de comparación).
 
@@ -182,14 +181,12 @@ notEqual(X,Y)  :- X \=  Y.
 % equalArgValues(HeadA, HeadB) :- % Son la misma meta. Comparo por los argumentos
     % HeadA =.. [Meta | ArgAs],
     % HeadB =.. [Meta | ArgBs],
-    % ArgAs @< ArgBs. % esta es la comparación de términos.
- 
+    % ArgAs @< ArgBs. % esta es la comparación de términos. 
 
 % equalArgValues(HeadA, HeadB) :- % Son metas distintas. Veo cuál está primero en el orden de prioridad
     % % write('hola'), % Quinto año de la carrera y write 'hola' (diría el vasco :P)
     % % HeadA =.. [MetaA | ArgAs],
     % % HeadB =.. [MetaB | ArgBs],
     % posibleMeta(HeadA, ValueA),
-    % posibleMeta(HeadB, ValueB),
-    
+    % posibleMeta(HeadB, ValueB),    
     % ValueA > ValueB.
