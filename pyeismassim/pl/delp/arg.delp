@@ -1,4 +1,3 @@
-
 % DESIRE expansión(Nodo)
 expansion(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
@@ -6,24 +5,21 @@ expansion(Value, X) -<
     b(difPuntosZona(X, DifPuntos)),
     phaseCoef(expansion, Coef),
     expansionValue(Dist, DifPuntos, EnergyLeft, Coef, Value).
-                
+
 expansionValue(Dist, DifPuntos, EnergyLeft, Coef, Value) :-
     Value is (round(log(DifPuntos) * 60) - Dist * 2 + EnergyLeft) * Coef.
-                 
+   
 is_a_built_in(expansionValue(_Dist2, _DifPuntos2, _E, _Coef, _Value2)).
-                 
+   
+   
 % DESIRE explorar(Nodo)
-
-
 explorar(Value, X) -< 
     b(distancia(X, [[survey]], Dist, EnergyLeft)),
     less(Dist, 3),
-
     b(difPuntosZona(X, DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),
     phaseCoef(explorar, Coef),
     explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value).
-
 
 explorar(Value, X) -<
     b(distancia(X, [[survey]], Dist, EnergyLeft)),
@@ -41,7 +37,7 @@ is_a_built_in(explorarValue(_Dist, _Positivo, _Negativo, _E, _Coef, _Value)).
 positivoONegativo(DifPuntos, DifPuntos, 0) <- greaterEq(DifPuntos, 0).
 positivoONegativo(DifPuntos, 0, DifPuntos) <- less(DifPuntos, 0).
 
-
+% DESIRE aumento
 % X instanciado con todos los nodos a distancia máxima 2 de la zona
 aumento(Value, X) -< 
     b(distancia(X, [], Dist, EnergyLeft)),
@@ -56,7 +52,8 @@ aumentoValue(Dist,  DifPuntos, EnergyLeft, Coef, Value) :-
     
 is_a_built_in(aumentoValue(_Dist3,  _DifPuntos3, _E, _Coef, _Value3)).
 
-       
+
+% DESIRE reagruparse
 reagruparse(Value) -< 
     b(distanciaAZona(DistaciaZona)),
 	b(agentesEnZona(AgentesEnZona)),
@@ -70,9 +67,8 @@ is_a_built_in(reagruparseValue(_DistaciaZona, _AgentesEnZona, _Coef, _Value)).
 
 ~reagruparse(_) <-
     b(distanciaAZona(0)).
-
-
     
+% DESIRE auxilio (busqueda de reparador)
 auxilio(Value, Repairer) -<
 	position(Repairer, Nodo),
 	myMaxHealth(Max),
@@ -87,11 +83,10 @@ auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value) :-
 	
 is_a_built_in(auxilioValue(_Dist, _EnergyLeft, _Max, _Health, _Negativo, _Value)).
 
-	   
-% DESIRE defensaPropia(Nodo)
+
+% DESIRE defensaPropia
 defensaPropia(1000, Node) -<
-    myStatus(normal),
-    
+    myStatus(normal),    
     puedoHacerParry,
     myPosition(Node),
     haySaboteador(Node).
@@ -125,7 +120,7 @@ puedoHacerParry -<
     myEnergy(Energy),
     less(Energy,2).
     
-	   
+
 % DESIRE quedarse(Nodo)
 quedarse(20, _) -< true.
 
@@ -147,32 +142,27 @@ quedarseValue(SinMi, Value) :-
     
 is_a_built_in(quedarseValue(_SinMi, _Value)).
 
-% DESIRE comprar
 
+% DESIRE comprar
 comprar(500, sabotageDevice) -<
 	myRole(saboteur),
 	puedoComprarHardcode(sabotageDevice).
-
     
 comprar(500, shield) -<
 	myRole(repairer),
 	puedoComprarHardcode(shield).
-
     
 % comprar(Value, sabotageDevice) -<
 	% myRole(saboteur),
 	% puedoComprar(sabotageDevice),
 	% difMuertos(DifMuertos),
-	% comprarValue(DifMuertos, Value).
-    
-    
+	% comprarValue(DifMuertos, Value).    
 	
 % comprarValue(DifMuertos, Value) :-
 	% Value is 20 + (DifMuertos - 1.5).
 	
-% is_a_built_in(comprarValue(_DifMuertos, _)).
-	
-        
+% is_a_built_in(comprarValue(_DifMuertos, _)).	
+ 
 % puedoComprar(shield) <-
 	% myEnergy(Energy),
 	% greaterEq(Energy, 2),
@@ -210,9 +200,6 @@ puedoComprarHardcode(shield) <-
 	greaterEq(Money, 8),
 	buyCount(shield, Count),
 	less(Count, 1).
-
-    
-
 	
 difMuertos(DifMuertos) <-
 	muertos(miEquipo, Muertos),
@@ -233,7 +220,6 @@ is_a_built_in(coefMuertos(_Muertos, _MuertosEnemigos, _DifMuertos)).
 	
 is_a_built_in(muertos(_Team, _Count)).
 
-
 ~estoyEnLaFrontera -< true.
 
 esSeguro(_) -< true.
@@ -248,7 +234,6 @@ haySaboteador(Position) <-
 phaseCoef(_, 1.0) -< true.
 ~phaseCoef(X, 1.0) <- phaseCoef(X, V), notEqual(V, 1.0).
 
-
 % b(difPuntosSinMi(0)) -< true.
 % ~b(difPuntosSinMi(0)) <- 
 	% b(difPuntosSinMi(P)),
@@ -259,5 +244,3 @@ agentRolePoints(_, _R, 0) -< true.
 ~agentRolePoints(I, R, 0) <- 
 	agentRolePoints(I, R, V),
 	notEqual(V, 0).
-
-%%%%%%%%%%%%%%%%%%%%%%%%

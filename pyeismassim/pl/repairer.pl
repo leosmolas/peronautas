@@ -2,30 +2,7 @@
 %                               Repairer                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Actions (priority order):
-%                   -repair
-%                   -survey
-%                   -goto
-%                   -parry  (no implemented)
-%                   -buy    (no implemented)
-%                   -rechage
-%                   -skip   (no implemented)
-
-%-----------------------------------------------------------------------%
-
 :- ['delp/repairer.delp'].
-
-execDummy(Action) :- 
-    action(Action).
-    
-
-        
-% rolMetas.
-
-
-
-% rolSetBeliefs.
-
 
 rolMetas :-
     foreach(
@@ -33,12 +10,9 @@ rolMetas :-
         doNotFail(calcMeta(reparar(Agent)))
     ).
 
-
-
 rolSetBeliefs :-
     setTeammatePosition, !,
-    setTeammateDistance.
-    
+    setTeammateDistance.    
 
 injuredAgent(Agent) :-
     myTeam(MyTeam),
@@ -89,8 +63,22 @@ repairCost(2) :-
 repairCost(3) :-
     myStatus(disabled).
 
+%-----------------------------------------------------------------------%
+	
+%Actions (priority order):
+%                   -repair
+%                   -survey
+%                   -goto
+%                   -parry  (no implemented)
+%                   -buy    (no implemented)
+%                   -rechage
+%                   -skip   (no implemented)
 
-%------------------------------  Repair  --------------------------------%
+%-----------------------------------------------------------------------%
+execDummy(Action) :- 
+    action(Action).
+	
+%------------------------------  Repair  -------------------------------%
 
 action([repair, Ally]):-
     write(1.1),nl,

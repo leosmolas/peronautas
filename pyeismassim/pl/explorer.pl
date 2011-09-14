@@ -4,11 +4,6 @@
 
 :- ['delp/explorer.delp'].
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parte de argumentacion
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 rolMetas:-
     foreach(
         b(posibleProbear(N)), 
@@ -19,7 +14,6 @@ rolMetas:-
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Probear
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 rolSetBeliefs :-
     myStatus(normal), !,
@@ -97,7 +91,6 @@ rolSetDistancia :-
 
     ).
 
-
 setPromedioValorVecinos :-
     foreach(
         (
@@ -134,7 +127,7 @@ calcPromedioValor(_Node).
 %                   -rechage
 %                   -skip   (no implemented)
 
-%----------------------------------------------------------------------%
+%-----------------------------------------------------------------------%
 
 execDummy(Action) :- 
     action(Action).
@@ -169,7 +162,6 @@ action([survey, Position]) :-
 action([recharge]) :-
     myStatus(normal),
     zoneScore(X),
-    writeln('Keep calm and keep the zone! :D'),
     X > 40, !.
 
 %-------------------------------  Goto  ---------------------------------%
@@ -182,9 +174,7 @@ action([goto, X]) :-
     k(edge(Position, X, Cost)),
     Cost \= unknown,
     Energy >= Cost,
-    k(nodeValue(X, unknown)),
-    write('Yendo al nodo '), write(X), writeln(' que esta sin probear.'),
-    !.
+    k(nodeValue(X, unknown)), !.
      
 %-- Goto First Node --%
 
@@ -197,8 +187,7 @@ action([goto, X]) :-
     Cost \= unknown,
     write(4.3),nl,
     Energy >= Cost, 
-    write(4.4),nl,
-    !.
+    write(4.4),nl, !.
 
 %-------------------------------  Recharge  ------------------------------%
 

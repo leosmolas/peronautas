@@ -1,5 +1,4 @@
-:-  [utils], 
-    % [kmap], 
+:-  [utils],  
     [graph/map], 
     [delp/arg].
     
@@ -9,8 +8,7 @@
 setBeliefs :-
     calcTime(setHaySaboteador),
     not(myRole(saboteur)),
-    estoyEnPeligro, 
-    writeln('estoy en Peligro!!!! :O'), !,
+    estoyEnPeligro, !,
     myTeam(T),
     teamPoints(T, ActualPoints),
     assert(b(actualPoints(ActualPoints))),
@@ -24,12 +22,11 @@ setBeliefs :-
             calcTime(setDifPuntosNode(Neigh, A, T)),
             searchPath(Pos, Neigh, Energy, [], 0)
         )
-    ),
-    printFindAll('b', b(_)),
-    printFindAll('b <- true', b(_) <- true).
+    ).
+    % printFindAll('b', b(_)),
+    % printFindAll('b <- true', b(_) <- true).
     
-setBeliefs :-
-    
+setBeliefs :-    
     myTeam(T),
     teamPoints(T, ActualPoints),
     assert(b(actualPoints(ActualPoints))), !,
@@ -38,12 +35,9 @@ setBeliefs :-
     myStatus(Status),
     assert(b(myStatus(Status)) <- true), !,
     calcTime(setDifPuntosSinMi),
-	calcTime(setEsSeguro), !,
-		
-    % printFindAll('b', b(_)),
+	calcTime(setEsSeguro), !,	
     calcTime(rolSetBeliefs), !,
-    calcTime(setEstoyEnLaFrontera), !,
-    % calcTime(setPosibleExpansion), !,
+    calcTime(setEstoyEnLaFrontera), !,  
     calcTime(setAumento), !,
     calcTime(setPosibleExplorar), !,
     calcTime(setPosibleAuxilio), !,
@@ -120,17 +114,6 @@ setHaySaboteador:-
 muertos(miEquipo, 0).
 muertos(enemigo, 0).
 
-% setMuertos :-
-	% currentStep(Step),
-	% TotalMuertosEnemigos is Step // 5,
-	% TotalMuertos is TotalMuertosEnemigos * 2,
-	% myTeam(MyTeam),
-	% retract(muertos(MyTeam, _MuertosActuales)),
-	% retract(muertos(enemigo, _MuertosActualesEnemigos)),
-	% assert(muertos(MyTeam, TotalMuertos)),
-	% assert(muertos(enemigo, TotalMuertosEnemigos)), !.
-	
-	
 setMuertos :-
 	currentStep(Step),
 	PreviousStep is Step - 1,
@@ -172,15 +155,12 @@ cantMuertos(MuertosActuales, MuertosActualesEnemigos) :-
     
 cantMuertos(0, 0).
 
-% searchPath(_Position, Node, _Energy, ActionToBeDone, _CostOfAction) :-
-    % (b(distancia(Node, ActionToBeDone, _PathCost, _RemainingEnergy)) <- true), !.
-    
+% Wrapper para la busqueda de caminos con UCS
 searchPath(Position, Node, Energy, ActionToBeDone, CostOfAction) :-
     pathSearch(Position, Node, Energy, ActionToBeDone, CostOfAction, _Path, _Actions, PathCost, RemainingEnergy), !,
     assert(b(distancia(Node, ActionToBeDone, PathCost, RemainingEnergy)) <- true).
     
 searchPath(_Position, _Node, _Energy, _ActionToBeDone, _CostOfAction).
-    
 
 visibleNode(N) :-
     explored(N),
@@ -190,8 +170,7 @@ visibleNode(N) :-
         inRange(N1)
     ), !,
     retract(notVisible(N)),
-    asserta(visibleNode(N)).
-    
+    asserta(visibleNode(N)).    
 
 writeLenght(Name, Node, Pattern) :-
     verbose, !,
@@ -207,8 +186,8 @@ writeLenght(Name, Node, Pattern) :-
 writeLenght(_Name, _Node, _Pattern).
     
 % toogleOnVisibleNode(+Node)
-% si el nodo ya estÃ¡ marcado como visible, no hace nada
-% sino, hace el toogle
+% si el nodo ya esta marcado como visible, no hace nada
+% sino, hace el toggle
 toogleOnVisibleNode(Node) :-
     visibleNode(Node), !.
     
@@ -229,7 +208,7 @@ agentsRangeVision(Step, MyTeam, Range, Position) :-
     team(Agent, MyTeam),
     visualRange(Step, Agent, Range),
     position(Step, Agent, Position),
-    Range \= unknown.            % esto es un parche para cuando se corre sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberña tener
+    Range \= unknown. % esto es para el caso que se corra sin servidor de percepciones, porque sino el rango del compañero es un dato que se deberia tener
     
 % setExploredAndVisible
 % predicado que setea como "exploredNode" a los nodos para los cuales conozco todos sus vecinos,
@@ -255,10 +234,8 @@ setExploredAndVisibleAux1(Range, Position) :-
 		breadthFirst(Position, Node, _Path, _Cost),
 		setExploredAndVisibleAux2(Node)		
 	).
-	% write('termine agente '),write(Agent),nl	
 	
 setExploredAndVisibleAux2(Node) :- 
-	% write(' Marking node as explored: '),write(Node),nl,
 	retractall(notExplored(Node)),
 	assertOnce(explored(Node)),
 	toogleOnVisibleNode(Node).
@@ -268,8 +245,7 @@ setExploredAndVisibleAux2(Node) :-
 % Expansion
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-setFrontera :-
-    
+setFrontera :-    
     foreach(
         esFrontera(Node),
         assertOnce(b(frontera(Node)))
@@ -285,8 +261,7 @@ esFrontera2(Node) :-
     currentStep(Step),
     myTeam(T),
     equipoVecino(Step, Node, T),
-    equipoVecino(Step, Node, T2),
-    
+    equipoVecino(Step, Node, T2),    
     T2 \= T, !.
 
 setEstoyEnLaFrontera :-
@@ -296,12 +271,6 @@ setEstoyEnLaFrontera :-
     assert(b(estoyEnLaFrontera)).
     
 setEstoyEnLaFrontera.
-
-% chequearFrontera(Neigh, T) :-
-	% currentStep(Step),
-    % member(Y, Neigh),
-    % k(nodeTeam(Step, Y, Other)), 
-	% Other \= T, !.
 
 setPosibleExpansion :-
     b(estoyEnLaFrontera),
@@ -345,10 +314,8 @@ setDistanciaExpansion :-
     
 setDistanciaExpansion.
 
-setDifPuntosNode(Node, A, T) :-
-    
-    b(actualPoints(ActualPoints)),
-    
+setDifPuntosNode(Node, A, T) :-    
+    b(actualPoints(ActualPoints)),    
     setHypotheticalMap,
     moveAgent(A, Node),
     coloringAlgorithm,
@@ -358,7 +325,6 @@ setDifPuntosNode(Node, A, T) :-
     
 setDifPuntosNode(_Node, _A, _T).
 
-
 setDifPuntosSinMi :-
 	(b(difPuntosSinMi(_DifPuntos)) <- true), !.
 
@@ -366,8 +332,7 @@ setDifPuntosSinMi :-
     myStatus(disabled), !,
     assert(b(difPuntosSinMi(0)) <- true).
 
-setDifPuntosSinMi :-
-    
+setDifPuntosSinMi :-    
     b(actualPoints(ActualPoints)),
     setHypotheticalMap,
 	currentStep(Step),
@@ -377,11 +342,9 @@ setDifPuntosSinMi :-
 	myTeam(T),
     teamHPoints(T, Points),
     DifPuntos is Points - ActualPoints,                    
-    % write('Points: '), writeln(Points),
     assert(b(difPuntosSinMi(DifPuntos)) <- true).
 	
 setDifPuntosSinMi.
-
     
 setDifPuntosExpansion :-
     myName(A),
@@ -402,38 +365,13 @@ setDifPuntosExpansion :-
         setDifPuntosNode(Node, A, T)
     ).
 
-
 	
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Aumento
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 setAumento :-
-    myStatus(normal),
-    % myTeam(Team),
-	% currentStep(Step),
-    % retractall(isGoal(_, _)),
-	% retractall(isFail(_, _)),
-    % assert((
-        % isGoal(Node, Cost) :- 
-            % !, 
-            % Cost =< 2, 
-            % Cost > 0, 
-            % currentStep(Step),
-            % k(nodeTeam(Step, Node, none)),
-            % b(nodeAtDistance(Node, Distance)),
-            % Distance < 4
-    % )),
-	% assert((
-        % isFail(_, Cost2) :- 
-            % Cost2 > 2
-    % )),
-    % assert((
-        % isFail(Node, _) :- 
-            % currentStep(Step),
-            % myTeam(MyTeam),
-            % k(nodeTeam(Step, Node, MyTeam))
-    % )),
+    myStatus(normal),    
     myPosition(MyPos),
     setof(
         FinalNode,
@@ -467,22 +405,6 @@ posibleAumento(X, Aumento, Nodo) :-
     b(nodeAtDistance(Nodo, Dist)),
     Dist >= X,
     Dist < NewCost.
-    % aisladoConAmigo(Nodo).
-    
-% aisladoConAmigo(Nodo) :-
-    % myPosition(MyPos),
-    % currentStep(Step),
-    % position(Step, Agent, MyPos),
-    % team(Agent, MyTeam),
-    % myTeam(MyTeam),
-    % foreach(
-        % equipoVecino(Step, MyPos, TeamNeigh),
-        % TeamNeigh \= MyTeam
-    % ),
-    % b(nodeAtDistance(Nodo, 1)), !,
-    % fail.
-    
-% aisladoConAmigo.
 
 setPosibleAumentoAux(FinalNode, Step, MyTeam) :-
     currentStep(Step),	
@@ -549,8 +471,7 @@ setPosibleExplorar :-
     chequearPosibleExplorar(0),
     b(posibleExplorar(_Node)), !,
     calcTime(setDistanciaExplorar),
-    calcTime(setDifPuntosExplorar).
-    
+    calcTime(setDifPuntosExplorar).    
     
 setPosibleExplorar. 
     
@@ -558,8 +479,6 @@ chequearPosibleExplorar(4) :- !.
     
 chequearPosibleExplorar(_) :-
     b(posibleExplorar(_Node)), !.
-    
-
     
 chequearPosibleExplorar(X) :-
     NewCost is X + 2,
@@ -606,8 +525,7 @@ setDifPuntosExplorar :-
     Cost2 >= 3,
     setDifPuntosSinMi.
 
-setDifPuntosExplorar.
-    
+setDifPuntosExplorar.    
 
 setDistanciaExplorar :-
     myPosition(Position),
@@ -700,17 +618,13 @@ setReagruparse :-
 	
 setReagruparse :-
     myStatus(normal),
-	% not(b(posibleAumento(_))),
 	myPosition(MyPos),
 	currentStep(Step),
 	myTeam(MyTeam),
 	foreach(
 		equipoVecino(Step, MyPos, Team),
 		Team \= MyTeam
-	),
-    
-	% k(nodeTeam(Step, MyPos, Team)),
-	% MyTeam \= Team, 
+	),    
 	calcTime(assertReagruparseGoal),
 	calcTime(setPathReagruparse),
 	calcTime(setAgentesEnZona).
@@ -813,7 +727,6 @@ assertSaboteurs :-
             Role = unknown
         ),
         [Saboteur]
-    ),
-    
+    ),    
     assertOnce(k(agentRole(Saboteur, saboteur))).
     
