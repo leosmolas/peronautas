@@ -2,7 +2,7 @@
 %                               Explorer                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- ['aux/explorer.delp'].
+:- ['utils/explorer.delp'].
 
 rolMetas:-
     foreach(

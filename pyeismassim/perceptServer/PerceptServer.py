@@ -6,26 +6,11 @@ import cProfile
 import cPickle
 import base64
 
-# ver que va a quedando en la kb turno a turno y que se puede sacar
-# [ ] timeout del receive del servidor
-#       si se cae, que el PS no incluya la percepcion del agente caido en los demas
-#       mensaje por defecto para asumir para los demas?
-#       se bardean los demas si no saben algo de otro agente?
-#       que se le envia al agente que llego tarde?
-#       que se hace con el mensaje que llegara del agente ? descartarlo?
-# [ ] threads
-
-# - probar reconectarnos y llegar tarde
-# - que el percept server sincronize el comienzo?
-# LIMPIAR AGENT.PY
-#     make the agent send a connect messsage to the percept server
-# TESTEAR LA RECONEXION
-# TESTEAR LA HISTORY PERCEPT
-# TESTEAR TIMEOUT
-# TESTEAR TIMEOUT PERPCET SERVER RECEIVE DEL LADO DEL AGENTE
 BUFSIZE = 4096
 
 ####################################################################################################
+# These two functions recv_data and send_data are used both by the agent connection class and the 
+# percept server. 
 def recv_data(sckt):
     stop = False
     buf = ''
@@ -41,30 +26,17 @@ def recv_data(sckt):
 
 ####################################################################################################
 def send_data(sckt, data):
-    # Serialize
     msg        = cPickle.dumps(data, cPickle.HIGHEST_PROTOCOL)
     bytes_sent = sckt.send(msg)
     return bytes_sent
 
 ####################################################################################################
-class VortexPerceptConnection():
-
-    def __init__(self):
-        pass
-
-    def connect(self):
-        pass
-
-    def disconnect(self):
-        pass
-
-    def send_and_recv(self, data, reconnect = False):
-        return dict([])
-
-####################################################################################################
 class PerceptConnection():
     """
     This is the client's connection to the shared percept server.
+    It handles converting the percept dictionary into a list of tuples which can be converted into
+    a frozenset for easy merge and diffing, and the de/serialization of these datastructures over 
+    the socket connection.
     """
 
     def __init__(self, host, port, name):
@@ -128,6 +100,21 @@ class PerceptConnection():
         return percept
 
 ####################################################################################################
+class VortexPerceptConnection():
+
+    def __init__(self):
+        pass
+
+    def connect(self):
+        pass
+
+    def disconnect(self):
+        pass
+
+    def send_and_recv(self, data, reconnect = False):
+        return dict([])
+
+####################################################################################################
 class LogFile():
 
     def __init__(self, path, mode):
@@ -149,7 +136,9 @@ class LogFile():
         for key in sorted(agentdict.keys()):
             agentdata = agentdict[key]
             agentstring += "%s,%s,%s,%s,%s," % agentdata
-        # format is: turn, reception time, send time, total time, agent1 reception time, agent1 send time, agent1 total time, agent1 bytes sent, agent1 bytes received, agent2 ...
+        # format is: turn, reception time, send time, total time, agent1
+        # reception time, agent1 send time, agent1 total time, agent1 bytes
+        # sent, agent1 bytes received, agent2 ...
         self.fileobj.write("%s,%s,%s,%s,%s\n" % (turn, reception, send, total, agentstring))
 
 ####################################################################################################
@@ -168,7 +157,7 @@ class AgentConnection():
         self.bS        = 0 # bytes sent
         self.bR        = 0 # bytes received
     
-####################################################################################################
+################################################################################
 def dict2fset(dictionary):
     result = [ (0, dictionary['name'] ) ]
     position_list = dictionary.get('position')
@@ -248,6 +237,7 @@ def dict2fset(dictionary):
         result.append(t)
     return frozenset(result)
 
+#------------------------------------------------------------------------------#
 def fset2dict(fset):
     result = { 'position'       : []
              , 'vis_verts'      : []
@@ -315,6 +305,7 @@ def fset2dict(fset):
             print "@PerceptServerConnection: decode error: ", p
     return result
 
+#------------------------------------------------------------------------------#
 def signal_handler(signal, frame):
     serverSocket.close()
 
@@ -325,6 +316,7 @@ def signal_handler(signal, frame):
     print "Percept server shutdown."
     sys.exit(0)
 
+#------------------------------------------------------------------------------#
 if (__name__ == "__main__"):
 
     historyPercept = set([])

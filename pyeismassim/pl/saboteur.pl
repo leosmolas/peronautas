@@ -2,7 +2,7 @@
 %                               Saboteur                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- ['aux/saboteur.delp'].
+:- ['utils/saboteur.delp'].
 
 rolMetas :-
     foreach(

@@ -2,7 +2,7 @@
 %                               Repairer                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- ['aux/repairer.delp'].
+:- ['utils/repairer.delp'].
 
 rolMetas :-
     foreach(

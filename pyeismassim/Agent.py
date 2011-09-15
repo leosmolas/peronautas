@@ -15,6 +15,17 @@ from pyswip.easy                 import *
 ####################################################################################################
 class Agent():
     
+# The Agent class' point of entry is the mainLoop method.
+# This method cycles through simulations and exits when it receives a 'bye'
+# message or encounters an anomalous situation. The mainLoop method calls the
+# perceiveActLoop, which encapsulates message reception and handling.
+# If an action-request message is received, the processActionRequest method is
+# called.
+# This in turn calls the processPerception method, which uses the various other
+# process* methods to update the agent's KB with information from the
+# perception.
+# Decision making takes place in the processActionRequest method.
+
     #----------------------------------------------------------------------------------------------#
     def __init__(self, USER, PASS, logToFile, massimHost, perceptServerHost, perceptServerPort, dummy, communication, verbose):
         self.firstTurn = True
@@ -61,22 +72,19 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def connect(self):
-        # Connect and authenticate.
+        # Connect and authenticate to the MASSim server.
         try:
             self.massimConnection.connect()
         except:
             print "@Agent: Error during connection attempt to the MASSim server."
             quit()
-        #try:
-        #    self.perceptConnection.connect(self.username)
-        #except:
-        #    print "@Agent: Error during connection attempt to the percept server."
-        #    quit()
 
 
 
     #----------------------------------------------------------------------------------------------#
     def disconnect(self):
+        # Let both the MASSim server and the percept server know that we will no
+        # longer be connecting.
         self.massimConnection.disconnect()
         self.perceptConnection.disconnect()
         if (self.logToFile):
@@ -89,7 +97,6 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologInitialization(self):
         print "@Agent: Prolog initialization",
-        #from pyswip.prolog               import Prolog
         self.prolog = Prolog()
         self.prolog.consult("pl/agent.pl")
         if (self.logToFile):
@@ -103,11 +110,6 @@ class Agent():
     #----------------------------------------------------------------------------------------------#
     def prologFinalization(self):
         print "@Agent: Prolog finalization",
-        
-        if (self.username == 'a1'):
-            self.prolog.query("tell('debug.txt'), listing, told.").next()
-
-        self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("retractall(k(_))").next()
         self.prolog.query("retractall(b(_))").next()
         self.prolog.query("retractall(h(_))").next()
@@ -118,7 +120,6 @@ class Agent():
         self.prolog.query("retractall(notExplored(_))").next()
         self.prolog.query("retractall(inRange(_))").next()
         self.prolog.query("retractall(buyCount(_,_))").next()
-        #self.prolog = None
         if self.verbose:
             self.prolog.query("saveKB('-%d')" % self.currentLoop).next()
         self.prolog.query("close_output").next()
@@ -154,8 +155,7 @@ class Agent():
                              , 'inspector': 1
                              }
 
-        #self.role = msg_dict['role'].lower()
-        self.role             = roleHardCode(self.username)
+        self.role = roleHardCode(self.username)
         self.prolog_role_file = "pl/%s.pl" % (self.role)
         self.prolog.consult(self.prolog_role_file)
 
@@ -190,26 +190,23 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def processNodes(self, msg_dict):
-        # Obtenemos todos los vertices sondeados.
-        # Despues, para cada vertice visible, nos fijamos si
-        # el vertice esta entre los vertices sondeados
-        # Si lo esta, se actualiza la informacion del verice con su valor, 
-        # sino, se actualiza con el valor unknown.
+        # First, we obtain all the probed vertices.
+        # Then, for each visible vertex, we check whether the vertx is among the probed vertices.
+        # If it is, it's information is updated with it's value.
+        # Otherwise, it's information is updated with the value unknown.
         probed_verts = msg_dict.get('probed_verts', [])
         self.prolog.query("retractall(inRange(_))").next()
         for x in msg_dict.get('vis_verts', []):
-            # Esta el vertice entre los vertices sondeados?
             self.prolog.query("asserta(inRange(%s))" % x['name']).next()
+            # in_pv == "in probed vertices"
             in_pv = False
             for pv in probed_verts:
                 if (pv['name'] == x['name']):
                     in_pv = True
                     break
             if (in_pv):
-                #print "El nodo %s esta entre los nodos sondeados" % x['name']
                 self.prolog.query('updateNodeValue(%s,%s)' % (x['name'], pv['value'])).next()
             else:
-                #print "El nodo %s no esta entre los nodos sondeados" % x['name']
                 self.prolog.query('updateNodeValue(%s,unknown)' % x['name']).next()
             self.prolog.query('updateNodeTeam(%s,%s)' % (x['name'], x['team'])).next()
 
@@ -217,7 +214,7 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def processEdges(self, msg_dict):
-        # Actualizamos el estado del mapa con los arcos.
+        # We update the map state with edges.
         for e in msg_dict.get('vis_edges', []):
             self.prolog.query("updateEdge(%s,%s,unknown)" % (e['node1'], e['node2'])).next()
         for e in msg_dict.get('surveyed_edges', []):
@@ -227,10 +224,7 @@ class Agent():
 
     #----------------------------------------------------------------------------------------------#
     def processEntities(self, msg_dict_private, msg_dict_public):
-        visible_entity_names   = frozenset([e['name'] for e in msg_dict_public['vis_ents']])
-        inspected_entity_names = frozenset([e['name'] for e in msg_dict_public['inspected_ents']])
-
-        # Proceso el resto de las entidades visibles.
+        # Process the rest of the visible entities.
         for vis_ent in msg_dict_public['vis_ents']:
             self.prolog.query("updateEntityTeamPosition(%s,%s,%s,%s)" % (vis_ent['name'], vis_ent['team'], vis_ent['node'], vis_ent['status'])).next()
 
@@ -415,7 +409,6 @@ class Agent():
             try:
                 self.perceiveActLoop()
             except socket.error:
-                print "holas"
                 self.prolog.query("catch(saveKB('-fin-%d'),E,writeln(E))" % self.currentLoop).next()
                 sys.exit(0)
             self.prologFinalization()

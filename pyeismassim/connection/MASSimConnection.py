@@ -55,7 +55,7 @@ class MASSimConnection:
 
     def receive(self):
         """
-        Recibe del socket de a bloques de 2048 bytes. Mientras no se detecte el 
+        Recibe del socket de a bloques de 4096 bytes. Mientras no se detecte el 
         final del mensaje, que deberia ser un byte 0, intenta recibir mas 
         informacion. Devuelve el string recibido por el socket.
         """

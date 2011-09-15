@@ -1,6 +1,6 @@
 :-  [utils],  
     [graph/map], 
-    [aux/arg].
+    [utils/arg].
     
 :- dynamic b/1.
 :- dynamic muertos/2.
