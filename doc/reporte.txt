@@ -1,0 +1,124 @@
+= Technical Report
+
+== Abstract
+
+== Introduction
+
+1. What was the motivation to participate in the contest?
+2. What is the history of the team?
+3. What is the name of your team?
+4. How many developers and designers did you have?  At what level of education are your team members?
+5. From which field of research do you come form?  Which work is related?
+
+== System Analysis and Design
+
+1. If some multi-agent system methodology such as Prometheus, O-MaSE, or Tropos was used, how did you use it? 
+   If you did not what were the reasons?
+
+   No multi-agent system methodology was used.
+
+2. Is the solution based on the centralisation of coordination/information on a specific agent?
+   Conversely if you plan a decentralised solution, which strategy do you plan to use?
+
+   The solution follows a decentralised architecture in which agents run completely decoupled, sharing nothing.
+   Percepts are communicated via a broadcast mechanism.
+   Decision-making takes place individually
+
+3. What is the communication strategy and how complex is it?
+
+   Agents communicate their percepts to other agents via a broadcast mechanism implemented in a dedicate 'percept server'.
+   Complexity is minimal, with push/pull mechanism/api/interface/?.
+
+4. How are the following agent features considered/implemented: autonomy, proactiveness, reactiveness?
+
+   autonomy: agents are completely autonomous, as the decision making process is executed individually by each agent, with no influence from team members other than what is communicated via percepts. 
+   decision taken by an agent are influences solely by the current simulation state and the results previous decisions.
+   -> apunta a que no requiere de intervencion humana para correr
+   reactiveness: 
+   proactiveness: 
+
+5. Is the team a truly multi-agent system or rather a centralised system in disguise?
+
+    cuac
+
+6. How much time (man hours) have you invested (approximately) for implementing your team?
+
+    many many many many
+
+7. Did you discuss the design and strategies of your agent team with other developers? 
+   To which extent did your test your agents playing with other teams?
+
+== Software Architecture
+
+1. Which programming language did you use to implement the multi-agent system?
+
+    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5
+    Language integration was achieved using the pyswip to call Prolog from Python.
+
+2. Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
+
+    No multi-agent programming languages/patforms/frameworks were used due to previous experience indicating a general lack of flexibilty, and a lack of familiarity on behalf of the development team.
+
+3. How have you mapped the designed architecture (both multi-agent and individual agent architectures) to programming codes, 
+   i.e., how did you implement specific agent-oriented concepts and designed artifacts using the programming language?
+
+    Aca hay que poner como cada parte del dibujito original de leo a codigo.
+
+4. Which development platforms and tools are used? How much time did you invest in learning those?
+
+    Both Linux and the Windows operating system were used as development platforms, since the language runtimes chosen for implementation were portable. Some caveats were encountered however.
+
+5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, ....) are used? How much time did you invest in learning those?
+
+    Python and Prolog were well-known at the start of the project, and were chosen for precisely those reasons.
+
+6. What features were missing in your language choice that would have facilitated your development task?
+
+    Nada
+
+7. What features of your programming language has simplified your development task?
+                                                                                                                                         
+    Python's amenity to rapid application development and 'batteries-included philosophy' facilitated implementing the communication layer to the MASSimg server, parsing of peceptions, rapid addition of planned features and bug correction.
+
+8. Which algorithms are used/implemented?
+
+    A uniform cost search was implemented in prolog.
+    The zone-coloring algorithm was also implemented in prolog.
+    The implementation of Defeasible Logic Programming (DeLP) by the LIDIA was used for the deliberative process.
+
+9. How did you distribute the agents on several machines? And if you did not please justify why.
+
+    Initial plans were to distribute agents on several machines. Each agents runs as a separate process, and communicates with others via TCP sockets. After some experience agents were run on one machine. Having the choice was a benefit of the proposed design.
+
+10. To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
+11. What part of the development was most difficult/complex? What kind of problems have you found and how are they solved?
+12. How many lines of code did you write for your software?
+
+== Stategies, Details, and Statistics
+
+1. What is the main strategy of your team?
+2. How does the overall team work together? (coordination, information sharing, ...)
+3. How do your agents analyze the topology of the map? And how do they exploit their findings?
+4. How do your agents communicate with the server?
+5. How do you implement the roles of the agents? Which strategies do the different roles implement?
+6. How do you find good zones? How do you estimate the value of zones?
+7. How do you conquer zones? How do you defend zones if attacked? Do you attack zones?
+8. Can your agents change their behavior during runtime? If so, what triggers the changes?
+9. What algorithm(s) do you use for agent path planning?
+10. How do you make use of the buying-mechanism?
+11. How important are achievements for your overall strategy?
+12. Do your agents have an explicit mental state?
+13. How do your agents communicate? And what do they communicate?
+14. How do you organize your agents? Do you use e.g. hierarchies? Is your organization implicit or explicit?
+15. Is most of your agents’ behavior emergent on and individual and team level?
+16. If your agents perform some planning, how many steps do they plan ahead?
+
+== Conclusion
+1. What have you learned from the participation in the contest?
+2. Which are the strong and weak points of the team?
+3. How suitable was the chosen programming language, methodology, tools, and algorithms?
+4. What can be improved in the context for next year?
+5. Why did your team perform as it did? Why did the other teams perform better/worse than you did?
+6. Which other research fields might be interested in the Multi-Agent Program- ming Contest?
+7. How can the current scenario be optimized? How would those optimization pay off?
+
