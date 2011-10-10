@@ -14,11 +14,10 @@ import base64
 #       que se le envia al agente que llego tarde?
 #       que se hace con el mensaje que llegara del agente ? descartarlo?
 # [ ] threads
+# [ ] move agent connection to within the percept server
 
 # - probar reconectarnos y llegar tarde
 # - que el percept server sincronize el comienzo?
-# LIMPIAR AGENT.PY
-#     make the agent send a connect messsage to the percept server
 # TESTEAR LA RECONEXION
 # TESTEAR LA HISTORY PERCEPT
 # TESTEAR TIMEOUT

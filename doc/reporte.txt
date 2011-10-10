@@ -1,80 +1,129 @@
 = Technical Report
 
+figuras
+- la arquitectura del agente
+- la arquitectura del programa
+- ejemplo del fog of war y coloreo
+
+meter una buena explicacion de la arquitectura bdi en la parte de diseño
+
 == Abstract
+
+This report presents the design and results of the d3lp0r multi-agent system developed by the LIDIA team for the 2011 Multi-Agent Programming Contest.
+The d3lp0r agents use a BDI architecture extended with planning and argumentation (via Defeasible Logic Programming) to model a cooperating team operating in a dynamic and competitive environment.
+In particular, the main goal of this report is to describe the chosen architecture, the communication scheme and the way argumentation was put to use in the agent's reasoning process and the technical details thereof.
+
+{
+    This paper presents the Argonauts multi-agent framework which was
+    developed as part of a one year student project at Technische Universität Dortmund.
+    The Argonauts framework builds on a BDI approach to model rational agents
+    that act cooperatively in a dynamic and indeterministically changing environment.
+    However, our agent model extends the traditional BDI approach in several aspects,
+    most notably by incorporating motivation into the agent’s goal selection mechanism.
+    The framework has been applied by the Argonauts team in the 2010 version of
+    the annual multi-agent programming contest organized by Technische Universität
+    Clausthal. In this paper, we present a high-level specification and analysis of the
+    actual system used for solving the given scenario. We do this by applying the GAIA
+    methodology, a high-level and iterative approach to model communication and roles
+    in multi-agent scenarios. We further describe the technical details and insights gained
+    during our participation in the multi-agent programming contest.
+    
+    In this article we report on the JIAC V team for the agent programming
+    competition 2009, going through the different phases of development and describing
+    the JIAC V agent framework. Based on an iterative approach, we identified and
+    implemented different agent roles. While there is no explicit team concept, the agents
+    cooperate by informing each other of their perceptions and intentions, which leads
+    to emergent team behavior which very dynamically and flexibly reacts to the state of
+    the game.
+}
 
 == Introduction
 
+The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia Artificial, Artificial Intelligence Research and Development Laboratory) research group was established in 1992 in the Universidad Nacional del Sur. The d3lp0r team was formed incorporating 6 graduate students, 2 Ph.D. students and 3 professors. The undergraduate students fully developed the system, while the Ph.D. students and professors provided guidance. The group's main motivation was to apply argumentation via defeasible logic programming (DeLP) in a multi-agent gaming situation and to test the integration of the different technologies used.
+
+PREGUNTAS {
 1. What was the motivation to participate in the contest?
-
-    objectivo mas alla de participar y la experiencia era testear la integracion de las tecnologias que usamos
-    python, prolog y delp
-    mucho exito
-
 2. What is the history of the team?
 3. What is the name of your team?
 4. How many developers and designers did you have?  At what level of education are your team members?
 5. From which field of research do you come form?  Which work is related?
+}
+
+== Preliminaries
+
+Si nos quedamos cortos, explicamos DeLP.
 
 == System Analysis and Design
 
+PREGUNTAS {
 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or Tropos was used, how did you use it? 
    If you did not what were the reasons?
-
-   No multi-agent system methodology was used.
-
 2. Is the solution based on the centralisation of coordination/information on a specific agent?
    Conversely if you plan a decentralised solution, which strategy do you plan to use?
-
-   The solution follows a decentralised architecture in which agents run completely decoupled, sharing nothing.
-   Percepts are communicated via a broadcast mechanism.
-   Decision-making takes place individually
-
 3. What is the communication strategy and how complex is it?
-
-   Agents communicate their percepts to other agents via a broadcast mechanism implemented in a dedicate 'percept server'.
-   Complexity is minimal, with push/pull mechanism/api/interface/?.
-
 4. How are the following agent features considered/implemented: autonomy, proactiveness, reactiveness?
-
-   autonomy: agents are completely autonomous, as the decision making process is executed individually by each agent, with no influence from team members other than what is communicated via percepts. 
-   decision taken by an agent are influences solely by the current simulation state and the results previous decisions.
-   -> apunta a que no requiere de intervencion humana para correr
-   proactiveness: Our intention-based agents generate many possible desires in most of the turns, and selects the best they can find, given their knowledge of the world. They try to accomplish that intention, for several turns, until they finish, or they find another reason to stop, and recalculate their intention.
-   reactiveness: In every turn, the obtained perception is used to decide which intention is going to be selected (when the agent hasn't got any), or it's used to decide whether it is necessary to carry on the actual intention, or recalculate it. This happens when the intention has been achieved (by the agent or other teammate), when it's no longer necessary, when something else may be more important to do, or when the agent is in danger.
-    
-
 5. Is the team a truly multi-agent system or rather a centralised system in disguise?
-
-    cuac
-    
-    I swear! it's distributed! more than was actually needed! please stop asking :(
-
 6. How much time (man hours) have you invested (approximately) for implementing your team?
-
-    many many many many
-    
-    Over 9000!
-
 7. Did you discuss the design and strategies of your agent team with other developers? 
    To which extent did your test your agents playing with other teams?
-   
-   We did speak with members of a team of the previous competition (The Argonauts), but just in an introductory way, since that was before we started.
-   
-   We didn't test out agents with any other team.
+}
+
+- Scenario analysis
+
+    sacarlo del enunciado, resumirlo
+
+- Arquitectura del agente
+- Cooperation model
+
+An agent architecture was developed based on the BDI model.
+
+algo parecido a esto:
+    Since the desires have an important impact on the possible intentions that an
+    agent will pursue, our approach focuses on refining the way desires are generated.
+
+poner algo que justifique esto, y refrasear esto:
+    sale de las prioridades de las metas
+    This results in a less reactive and more autonomous way in which an agent acts.
+
+Since the intentions specified for the agents are simple, the need for predefined plans or a planning component to generate a sequence of actions from an intention.
+    las intenciones son muy simples, reduciendo la necesidad de un planificador
+
+   The solution follows a decentralised architecture in which agents run completely decoupled in different processes while sharing nothing.
+   Percepts are communicated among agent members of the team via a broadcast mechanism developed as part of the multi-agent system.
+   This design was chosen for its minimal complexity.
+
+   Agents are completely autonomous meaning that decision-making takes place individually at the agent level, with no intervention from human operators or a central intelligence agency within the system, and that decisions made by an agent are influenced solely by the current simulation state and the results of previous steps.
+
+   Our intention-based agents generate many possible desires in most of the turns, and selects the best they can find, given their knowledge of the world. They try to accomplish that intention, for several turns, until they finish, or they find another reason to stop, and recalculate their intention.
+
+   Every turn, the obtained percept is used to decide which intention is going to be selected (when the agent hasn't got any), or it's used to decide whether it is necessary to carry on the actual intention, or recalculate it. This happens when the intention has been achieved (by the agent or other teammate), when it's no longer necessary, when something else may be more important to do, or when the agent is in danger.
+
+   Experience from a previous instance of the MAPC was shared with our teams by members of the ARGONAUTS team from Universität Dortmund. Although the initial plan was to run tests against other agent teams prior to the competition, time constraints made this impossible.
+
+    No design methodology specific to multi-agent systems was used. However, development was conducted using a simplified XP (extreme programming) methodology. 
 
 == Software Architecture
 
+PREGUNTAS {
 1. Which programming language did you use to implement the multi-agent system?
+2. Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
+3. How have you mapped the designed architecture (both multi-agent and individual agent architectures) to programming codes
+   i.e., how did you implement specific agent-oriented concepts and designed artifacts using the programming language?
+4. Which development platforms and tools are used? How much time did you invest in learning those?
+5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, ....) are used? How much time did you invest in learning those?
+6. What features were missing in your language choice that would have facilitated your development task?
+7. What features of your programming language has simplified your development task?
+8. Which algorithms are used/implemented?
+9. How did you distribute the agents on several machines? And if you did not please justify why.
+10. To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
+11. What part of the development was most difficult/complex? What kind of problems have you found and how are they solved?
+12. How many lines of code did you write for your software?
+}
 
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, a defeasible logic language, was used as a service within Prolog.
     Language integration was achieved using the pyswip library, to call Prolog from Python.
 
-2. Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
-
     No multi-agent programming languages/patforms/frameworks were used due to previous experience indicating a general lack of flexibilty, and a lack of familiarity on behalf of the development team.
-
-3. How have you mapped the designed architecture (both multi-agent and individual agent architectures) to programming codes, 
-   i.e., how did you implement specific agent-oriented concepts and designed artifacts using the programming language?
 
     Aca hay que poner como cada parte del dibujito original de leo a codigo.
     
@@ -84,43 +133,24 @@
     
     The Prolog part handles all the decision taking, argumentation, and planning. It returns the action binded to a variable to Python, that then generates with it an XML to be sent to the server.
 
-4. Which development platforms and tools are used? How much time did you invest in learning those?
-
     Both Linux and the Windows operating system were used as development platforms, since the language runtimes chosen for implementation were portable. Some caveats were encountered however.
     
     We used git as our revision control system. In general, we did not spend much time in learning it, since some of us had already worked with it.
 
-5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, ....) are used? How much time did you invest in learning those?
-
     Python and Prolog were well-known at the start of the project, and were chosen for precisely those reasons.
-
-6. What features were missing in your language choice that would have facilitated your development task?
-
-    Nada
-    
     We also selected our languages for their flexibilty, in order to not have this problem.
-
-7. What features of your programming language has simplified your development task?
 
     Python's amenity to rapid application development and 'batteries-included philosophy' facilitated implementing the communication layer to the MASSimg server, parsing of peceptions, rapid addition of planned features and bug correction.
     
     *** Faltaria algo de prolog ahora que no se me ocurre ***
 
-8. Which algorithms are used/implemented?
-
     Search algorithms, as Uniform Cost Search, and Depth First Search were implemented in Prolog.
     The zone-coloring algorithm was also implemented in Prolog.
     The implementation of Defeasible Logic Programming (DeLP) by the LIDIA was used for the deliberative process.
 
-9. How did you distribute the agents on several machines? And if you did not please justify why.
-
     Initial plans were to distribute agents on several machines. Each agents runs as a separate process, and communicates with others via TCP sockets. After some experience agents were run on one machine. Having the choice was a benefit of the proposed design.
 
-10. To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
-
     Reasoning takes place within the perceive-act cycle.
-
-11. What part of the development was most difficult/complex? What kind of problems have you found and how are they solved?
 
     MANULON
     Seteo de beliefs.
@@ -137,9 +167,6 @@
     Finally, for this last algorithm also, we added a big optimization, that allowed us to call several times to it, with the virtual cost of only one call. It was done using memoization, and a more thoughtful invocation, 
     
     For the coloring algorithm, we added several improvements, for both optimization and correctness. In essence, since we only had a incomplete version of the full map in every turn, we added a concept of "fog of war" to the agents, assuming always in a pessimistic way. 
-    
-
-12. How many lines of code did you write for your software?
 
     Total LOC is 5842. 
     
@@ -175,23 +202,15 @@
     If an agent is not being part of any zone, it tries to regroup with a partner. When a zone is formed, and the agent is part of it, for each potentally beneficial neighbor node, the agent calculates how much points would they win if it moves, and that information is used by the decision taking module.
 
 7. How do you conquer zones? How do you defend zones if attacked? Do you attack zones?
-
-    
-
 8. Can your agents change their behavior during runtime? If so, what triggers the changes?
-
 9. What algorithm(s) do you use for agent path planning?
 
     MANULON
 
 10. How do you make use of the buying-mechanism?
-
 11. How important are achievements for your overall strategy?
-
 12. Do your agents have an explicit mental state?
-
 13. How do your agents communicate? And what do they communicate?
-
 14. How do you organize your agents? Do you use e.g. hierarchies? Is your organization implicit or explicit?
 
     NO
@@ -207,8 +226,6 @@
 == Conclusion
 
 1. What have you learned from the participation in the contest?
-
-    many many many many things
 
 2. Which are the strong and weak points of the team?
 
