@@ -39,26 +39,35 @@
    autonomy: agents are completely autonomous, as the decision making process is executed individually by each agent, with no influence from team members other than what is communicated via percepts. 
    decision taken by an agent are influences solely by the current simulation state and the results previous decisions.
    -> apunta a que no requiere de intervencion humana para correr
-   reactiveness: 
-   proactiveness: 
+   proactiveness: Our intention-based agents generate many possible desires in most of the turns, and selects the best they can find, given their knowledge of the world. They try to accomplish that intention, for several turns, until they finish, or they find another reason to stop, and recalculate their intention.
+   reactiveness: In every turn, the obtained perception is used to decide which intention is going to be selected (when the agent hasn't got any), or it's used to decide whether it is necessary to carry on the actual intention, or recalculate it. This happens when the intention has been achieved (by the agent or other teammate), when it's no longer necessary, when something else may be more important to do, or when the agent is in danger.
+    
 
 5. Is the team a truly multi-agent system or rather a centralised system in disguise?
 
     cuac
+    
+    I swear! it's distributed! more than was actually needed! please stop asking :(
 
 6. How much time (man hours) have you invested (approximately) for implementing your team?
 
     many many many many
+    
+    Over 9000!
 
 7. Did you discuss the design and strategies of your agent team with other developers? 
    To which extent did your test your agents playing with other teams?
+   
+   We did speak with members of a team of the previous competition (The Argonauts), but just in an introductory way, since that was before we started.
+   
+   We didn't test out agents with any other team.
 
 == Software Architecture
 
 1. Which programming language did you use to implement the multi-agent system?
 
-    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5
-    Language integration was achieved using the pyswip to call Prolog from Python.
+    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, a defeasible logic language, was used as a service within Prolog.
+    Language integration was achieved using the pyswip library, to call Prolog from Python.
 
 2. Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
 
@@ -68,10 +77,18 @@
    i.e., how did you implement specific agent-oriented concepts and designed artifacts using the programming language?
 
     Aca hay que poner como cada parte del dibujito original de leo a codigo.
+    
+    The perception is processed by the Python program, parsing the XML. Then, it sends it to the Percept Server, that also receives all the information sent by its teammates. This is a centralised server that every turn merges all perceptions, and delivers them back to the agents.
+    
+    Now, with a more complete version of the world, the Python code asserts all the perception into Prolog, then querying it for the next action to be executed. 
+    
+    The Prolog part handles all the decision taking, argumentation, and planning. It returns the action binded to a variable to Python, that then generates with it an XML to be sent to the server.
 
 4. Which development platforms and tools are used? How much time did you invest in learning those?
 
     Both Linux and the Windows operating system were used as development platforms, since the language runtimes chosen for implementation were portable. Some caveats were encountered however.
+    
+    We used git as our revision control system. In general, we did not spend much time in learning it, since some of us had already worked with it.
 
 5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, ....) are used? How much time did you invest in learning those?
 
@@ -80,15 +97,19 @@
 6. What features were missing in your language choice that would have facilitated your development task?
 
     Nada
+    
+    We also selected our languages for their flexibilty, in order to not have this problem.
 
 7. What features of your programming language has simplified your development task?
 
     Python's amenity to rapid application development and 'batteries-included philosophy' facilitated implementing the communication layer to the MASSimg server, parsing of peceptions, rapid addition of planned features and bug correction.
+    
+    *** Faltaria algo de prolog ahora que no se me ocurre ***
 
 8. Which algorithms are used/implemented?
 
-    A uniform cost search was implemented in prolog.
-    The zone-coloring algorithm was also implemented in prolog.
+    Search algorithms, as Uniform Cost Search, and Depth First Search were implemented in Prolog.
+    The zone-coloring algorithm was also implemented in Prolog.
     The implementation of Defeasible Logic Programming (DeLP) by the LIDIA was used for the deliberative process.
 
 9. How did you distribute the agents on several machines? And if you did not please justify why.
@@ -106,10 +127,22 @@
     Tamaño de la KB de los agentes.
     Sincronizacion.
     Optimizacion.
+    
+    The most difficult problems were related to optimization. Much of our time has been spent in reducing the complexity of our algorithms, and the times they were called.
+    
+    For both search algorithms, the Depth First Search and the Uniform Cost Search, we added conditions that could cut several branches, when they were expanding to unwanted nodes. This conditions were set by the caller, since they depend on the context of the problem.
+    
+    For the UCS, we first used simply a stack, implemented with a list, to keep track of the frontier, because of Prolog's inability of working with arrays, that would allowed us to develop a heap data structure, to be used in a priority queue. Lately, we found a Prolog library that implemented this data structure, and the migration was pleasently straightforward.
+    
+    Finally, for this last algorithm also, we added a big optimization, that allowed us to call several times to it, with the virtual cost of only one call. It was done using memoization, and a more thoughtful invocation, 
+    
+    For the coloring algorithm, we added several improvements, for both optimization and correctness. In essence, since we only had a incomplete version of the full map in every turn, we added a concept of "fog of war" to the agents, assuming always in a pessimistic way. 
+    
 
 12. How many lines of code did you write for your software?
 
-    Total LOC is 5842.
+    Total LOC is 5842. 
+    
     "Infrastructure" : 
     "Reasoning" :
 
@@ -139,9 +172,11 @@
 
 6. How do you find good zones? How do you estimate the value of zones?
 
-    ACA VA LO DEL ALGORITMO DE COLOREO
+    If an agent is not being part of any zone, it tries to regroup with a partner. When a zone is formed, and the agent is part of it, for each potentally beneficial neighbor node, the agent calculates how much points would they win if it moves, and that information is used by the decision taking module.
 
 7. How do you conquer zones? How do you defend zones if attacked? Do you attack zones?
+
+    
 
 8. Can your agents change their behavior during runtime? If so, what triggers the changes?
 
