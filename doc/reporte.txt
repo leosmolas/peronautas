@@ -51,6 +51,12 @@ PREGUNTAS {
 
 == Preliminaries
 
+The whole d3lp0r system was developed in the context of MAPC 2011 (footnote?). The game's scenario was represented by an undirected graph, in which every node was a valid location (with a predefined associated value), and edges labeled with costs that indicated how much energy was drained if an agent walked through the edge.
+Every match consisted of two rival teams, in which every team had a set of agents with different preestablished roles (Explorer, Saboteur, Repairer, Sentinel and Inspector). Every agent role had particular characteristics (Energy, Health, Vision range), and determined the kind of actions that the agent could perform.
+Match simulations took place in steps; in every step, each team was awarded with points determined by the state of the simulation; the team's agents received percepts with partial information about the current simulation state, and had a discrete amount of time to make a decision about their actions; at the end of the match, the team with the most points was the winner.
+In order to earn points, each team's agents should position themselves in the map so that they formed "zones" (zones were determined by an algorithm specified by the organizers). Other special situacions, such as earning different achievements, could also increase the team's points.
+
+
 Si nos quedamos cortos, explicamos DeLP.
 
 == System Analysis and Design
