@@ -133,7 +133,7 @@ PREGUNTAS {
 
     Aca hay que poner como cada parte del dibujito original de leo a codigo.
     
-    The perception is processed by the Python program, parsing the XML. Then, it sends it to the Percept Server, that also receives all the information sent by its teammates. This is a centralised server that every turn merges all perceptions, and delivers them back to the agents.
+    The perception is processed by the Python program, that parses the XML. Then, it sends it to the Percept Server, that also receives all the information sent by its teammates. This is a centralised server that every step merges all perceptions, and delivers them back to the agents.
     
     Now, with a more complete version of the world, the Python code asserts all the perception into Prolog, then querying it for the next action to be executed. 
     
@@ -148,7 +148,7 @@ PREGUNTAS {
 
     Python's amenity to rapid application development and 'batteries-included philosophy' facilitated implementing the communication layer to the MASSimg server, parsing of peceptions, rapid addition of planned features and bug correction.
     
-    *** Faltaria algo de prolog ahora que no se me ocurre ***
+    We made use of Prolog's declarate nature to model states of the world, and it also made more straightforward to implement search algorithms.
 
     Search algorithms, as Uniform Cost Search, and Depth First Search were implemented in Prolog.
     The zone-coloring algorithm was also implemented in Prolog.
@@ -164,15 +164,16 @@ PREGUNTAS {
     Sincronizacion.
     Optimizacion.
     
-    The most difficult problems were related to optimization. Much of our time has been spent in reducing the complexity of our algorithms, and the times they were called.
+    The most difficult problems were related to optimization. Much of our time has been spent in reducing the complexity of our algorithms, and the times they are called.
     
+    For the coloring algorithm, we added several improvements, for both optimization and correctness. In essence, since we only had a incomplete version of the full map in every step, we added the concept of "fog of war" to the agents, assuming always in a pessimistic way. 
+
     For both search algorithms, the Depth First Search and the Uniform Cost Search, we added conditions that could cut several branches, when they were expanding to unwanted nodes. This conditions were set by the caller, since they depend on the context of the problem.
     
-    For the UCS, we first used simply a stack, implemented with a list, to keep track of the frontier, because of Prolog's inability of working with arrays, that would allowed us to develop a heap data structure, to be used in a priority queue. Lately, we found a Prolog library that implemented this data structure, and the migration was pleasently straightforward.
+    For the UCS, we first used a simple stack, implemented with a list, to keep track of the frontier, because of Prolog's inability to work with arrays, that would have allowed us to develop a heap data structure, to be used in a priority queue. Lately, we found a Prolog library that implemented this data structure, and the migration was pleasently straightforward.
     
-    Finally, for this last algorithm also, we added a big optimization, that allowed us to call several times to it, with the virtual cost of only one call. It was done using memoization, and a more thoughtful invocation, 
-    
-    For the coloring algorithm, we added several improvements, for both optimization and correctness. In essence, since we only had a incomplete version of the full map in every turn, we added a concept of "fog of war" to the agents, assuming always in a pessimistic way. 
+    Finally, for this last algorithm also, we added an important optimization, that allowed us to call several times to it, with the virtual cost of only one call. It was done using memoization, and a more thoughtful invocation, 
+
 
     Total LOC is 5842. 
     
@@ -210,15 +211,35 @@ PREGUNTAS {
     
 
 7. How do you conquer zones? How do you defend zones if attacked? Do you attack zones?
+
+    If the expansion intention explained in the previous answer is selected and carried on, then a new zone is implicitly conquered.
+
+    Both attacking and defense are implicitly implemented. Sabouteurs attack enemies that are near, so they might attack them if they enter our team's zone, as well as when they are in their zone.
+
 8. Can your agents change their behavior during runtime? If so, what triggers the changes?
+
+    Our agents do not change their behavior during runtime.
+
 9. What algorithm(s) do you use for agent path planning?
 
-    MANULON
+    Path planning is implemented with an Uniform Cost Search. What we tried to minimize was the amount of steps required to achieve the goal, rather than the spent energy. The returned result is the list of actions to be done, rather than the list of nodes.
 
 10. How do you make use of the buying-mechanism?
+
+    Agents followed a list of predefined buying actions, when the necessary amount of money was reached.
+
 11. How important are achievements for your overall strategy?
+
+    Our agents did not have achievements in consideration. However, they managed to achieve a significant number of them, since this behavior was implicitly implemented.
+
 12. Do your agents have an explicit mental state?
+
+    .
+
 13. How do your agents communicate? And what do they communicate?
+
+    They
+
 14. How do you organize your agents? Do you use e.g. hierarchies? Is your organization implicit or explicit?
 
     NO
@@ -229,7 +250,9 @@ PREGUNTAS {
 
 16. If your agents perform some planning, how many steps do they plan ahead?
 
-    AS NECESSARY, MANULON
+    The agents make plans as long as the selected intention requieres. This may sound excesive, but the possible goals were previously selected for their potential, taking in consideration their distance (in nodes, not in actions).
+
+    However, plans are recalculated in every step. This decision was made taking in consideration the fact that in the steps that we do not need to 
     
 == Conclusion
 
