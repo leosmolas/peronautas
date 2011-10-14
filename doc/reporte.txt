@@ -148,6 +148,7 @@ developers?
     Since the intentions specified for the agents are simple, the need for 
     predefined plans or a planning component to generate a sequence of actions 
     from an intention.
+    
     las intenciones son muy simples, reduciendo la necesidad de un planificador
 
     The solution follows a decentralised architecture in which agents run 
@@ -316,7 +317,7 @@ problems have you found and how are they solved?
 
     Finally, for this last algorithm also, we added an important optimization, 
     that allowed us to call several times to it, with the virtual cost of only one 
-    call. It was done using memoization, and a more thoughtful invocation, 
+    call. It was done using memoization, and a more thoughtful invocation.
 
 
     Total LOC is 5842. 
@@ -374,7 +375,8 @@ different roles implement?
 7. How do you conquer zones? How do you defend zones if attacked? Do you 
 attack zones?
 
-    If the expansion intention explained is selected and carried on, then a new better zone is implicitly conquered.
+    If the expansion intention explained is selected and carried on, then a new 
+    better zone is implicitly conquered.
 
     Both attacking and defense are implicitly implemented. Sabouteurs attack 
     enemies that are near, so they might attack them if they enter our team's 
@@ -396,17 +398,25 @@ the changes?
     spent energy. The returned result is the list of actions to be done, rather 
     than the list of nodes.
     
-    Since this algorithm can be called several times in one step, it was crucial to
-    perform many optimizations
+    Since this algorithm can be called several times in one step, given that the 
+    actual amount of steps spent by an intention is taken under consideration by 
+    the decision-taking module, it was crucial to perform several optimizations in 
+    it. In the end, this allowed us to run all the agents in a single machine, 
+    during the competition.
 
 10. How do you make use of the buying-mechanism?
 
-    Agents followed a list of predefined buying actions, when the necessary amount 
-    of money was reached.
+    Agents follow a list of predefined buying actions, when the necessary amount 
+    of money is reached.
+    
+    Many different approaches were considered, i.e. a more thoughtful one, having 
+    in consideration the amount of deaths, of our team, and of our enemy. However,
+    this simple approach was the most easy to implement, and it was proven that it
+    was the most succesful one.
 
 11. How important are achievements for your overall strategy?
 
-    Our agents did not have achievements in consideration. However, they managed 
+    Our agents do not have achievements in consideration. However, they manage
     to achieve a significant number of them, since this behavior was implicitly 
     implemented.
 
@@ -476,22 +486,24 @@ organization implicit or explicit?
 
     Our team is formed by a group of friends, so a strong point in the developing 
     proccess would have been the cohesion and comradeship. We had also worked 
-    together, in university's projects as well as outside it, in small freelance 
-    projects, so we well knew what to expect from each other, and every member's 
+    together, in university's projects as well as outside them, in small freelance 
+    projects, so we well knew what to expect from each other, and each member's 
     capabilities. 
 
     Several events in the developing proccess had depend from this bond, i.e. the 
     deployment. We could not connect to the server in the test matches from our 
     university, because of several network problems. Just a couple of days before 
     the competition, we decided to connect all from one of our partner's house, 
-    who had the better infrastructure. This may seem stranger given the fact that 
-    we had to spent all night working and testing there, so for a week the 
-    headquarters for our team also became our home.
+    who had the better infrastructure (connection to Internet, and space in his 
+    department). This may seem stranger given the fact that we had to spent all 
+    night working and testing there, so for a week the headquarters for our team 
+    also became our home.
 
     However, we had many problems. Many of them were related with our lack of 
     professionality, and lack of experience working in a big project. For example, 
     we had problems simple but annoying problems, such as the encoding of our 
-    source files, or having different versions installed in our computers.
+    source files, or having different versions of the programs we used to program
+    installed in our computers.
 
 3. How suitable was the chosen programming language, methodology, tools, and 
 algorithms?
