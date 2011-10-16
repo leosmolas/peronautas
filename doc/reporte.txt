@@ -98,29 +98,20 @@ are your team members?
 PREGUNTAS {
 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or 
 Tropos was used, how did you use it? 
-
    If you did not what were the reasons?
-   
 2. Is the solution based on the centralisation of coordination/information on 
 a specific agent?
-
    Conversely if you plan a decentralised solution, which strategy do you plan 
 to use?
-
 3. What is the communication strategy and how complex is it?
-
 4. How are the following agent features considered/implemented: autonomy, 
 proactiveness, reactiveness?
-
 5. Is the team a truly multi-agent system or rather a centralised system in 
 disguise?
-
 6. How much time (man hours) have you invested (approximately) for 
 implementing your team?
-
 7. Did you discuss the design and strategies of your agent team with other 
 developers? 
-
    To which extent did your test your agents playing with other teams?
 }
 
@@ -188,40 +179,28 @@ developers?
 
 PREGUNTAS {
 1. Which programming language did you use to implement the multi-agent system?
-
 2. Did you use multi-agent programming languages? Why or why not to use a 
 multi-agent programming language?
-
 3. How have you mapped the designed architecture (both multi-agent and 
 individual agent architectures) to programming codes i.e., how did you 
 implement specific agent-oriented concepts and designed artifacts using the 
 programming language?
-
 4. Which development platforms and tools are used? How much time did you 
 invest in learning those?
-
 5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, 
 ....) are used? How much time did you invest in learning those?
-
 6. What features were missing in your language choice that would have 
 facilitated your development task?
-
 7. What features of your programming language has simplified your development 
 task?
-
 8. Which algorithms are used/implemented?
-
 9. How did you distribute the agents on several machines? And if you did not 
 please justify why.
-
 10. To which extend is the reasoning of your agents synchronized with the 
 receive-percepts/send-action cycle?
-
 11. What part of the development was most difficult/complex? What kind of 
 problems have you found and how are they solved?
-
 12. How many lines of code did you write for your software?
-
 }
 
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
@@ -319,7 +298,6 @@ problems have you found and how are they solved?
     that allowed us to call several times to it, with the virtual cost of only one 
     call. It was done using memoization, and a more thoughtful invocation.
 
-
     Total LOC is 5842. 
 
     "Infrastructure" : 
@@ -328,14 +306,9 @@ problems have you found and how are they solved?
 
 == Stategies, Details, and Statistics
 
-1. What is the main strategy of your team?
-
     The main strategy of the team consists of detecting profitable zones from the 
     explored vertices, and positioning the agents correctly to maintain, defend 
     and expand the zones.
-
-2. How does the overall team work together? (coordination, information 
-sharing, ...)
 
     On each perceive/act cycle, agents receive the percept from the MASSim server, 
     separate the information which will remain private and which will be shared. 
@@ -347,33 +320,18 @@ sharing, ...)
     Once the agent's action has been determined by argumentation and planning, it 
     is sent to the MASSim server.
 
-3. How do your agents analyze the topology of the map? And how do they exploit 
-their findings?
-
     Agents make no assumption about the map topology. They will prefer higher 
     valued nodes over lower ones.
-
-4. How do your agents communicate with the server?
 
     Some functionality provided by the eismassim library was reimplemented in a 
     connection library in python.
 
-5. How do you implement the roles of the agents? Which strategies do the 
-different roles implement?
-
     Agent recover their assigned role from the simulation start message, and 
-
-6. How do you find good zones? How do you estimate the value of zones?
 
     If an agent is not being part of any zone, it tries to regroup with a partner. 
     When a zone is formed, and the agent is part of it, for each potentally 
     beneficial neighbor node, the agent calculates how much points would they win 
     if it moves, and that information is used by the decision taking module.
-
-
-
-7. How do you conquer zones? How do you defend zones if attacked? Do you 
-attack zones?
 
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
@@ -385,13 +343,8 @@ attack zones?
     to expand the zone, occupying the contested node, and implicitly defending it.
     
 
-8. Can your agents change their behavior during runtime? If so, what triggers 
-the changes?
-
     Our agents do not change their behavior during runtime. It is actually very 
     easy to add this feature, but we had not enough time to implement this.
-
-9. What algorithm(s) do you use for agent path planning?
 
     Path planning is implemented with an Uniform Cost Search. What we tried to 
     minimize was the amount of steps required to achieve the goal, rather than the 
@@ -404,8 +357,6 @@ the changes?
     it. In the end, this allowed us to run all the agents in a single machine, 
     during the competition.
 
-10. How do you make use of the buying-mechanism?
-
     Agents follow a list of predefined buying actions, when the necessary amount 
     of money is reached.
     
@@ -414,22 +365,45 @@ the changes?
     this simple approach was the most easy to implement, and it was proven that it
     was the most succesful one.
 
-11. How important are achievements for your overall strategy?
+    Agents followed a list of predefined buying actions, when the necessary amount 
+    of money was reached.
 
-    Our agents do not have achievements in consideration. However, they manage
+    Our agents did not have achievements in consideration. However, they managed 
     to achieve a significant number of them, since this behavior was implicitly 
     implemented.
 
+    The agents make plans as long as the selected intention requieres. This may 
+    sound excesive, but the possible goals were previously selected for their 
+    potential, taking in consideration their distance (in nodes, not in actions).
+
+    However, plans are recalculated in every step. This decision was made taking 
+    in consideration the fact that in the steps that we do not need to 
+
+PREGUNTAS {
+1. What is the main strategy of your team?
+2. How does the overall team work together? (coordination, information 
+sharing, ...)
+3. How do your agents analyze the topology of the map? And how do they exploit 
+their findings?
+4. How do your agents communicate with the server?
+5. How do you implement the roles of the agents? Which strategies do the 
+different roles implement?
+6. How do you find good zones? How do you estimate the value of zones?
+7. How do you conquer zones? How do you defend zones if attacked? Do you 
+attack zones?
+8. Can your agents change their behavior during runtime? If so, what triggers 
+the changes?
+9. What algorithm(s) do you use for agent path planning?
+10. How do you make use of the buying-mechanism?
+11. How important are achievements for your overall strategy?
 12. Do your agents have an explicit mental state?
-
-.
-
 13. How do your agents communicate? And what do they communicate?
-
-    They
-
 14. How do you organize your agents? Do you use e.g. hierarchies? Is your 
 organization implicit or explicit?
+15. Is most of your agents’ behavior emergent on and individual and team level?
+16. If your agents perform some planning, how many steps do they plan ahead?
+
+}
 
     The only organization that the agents have is the proper given by the 
     environment, which is the roles. 
@@ -463,25 +437,9 @@ organization implicit or explicit?
     the non-monotonic nature of DeLP, the argumentation language used in the 
     decision-taking module.
 
-15. Is most of your agents’ behavior emergent on and individual and team level?
-
-    YES
-
-16. If your agents perform some planning, how many steps do they plan ahead?
-
-    The agents make plans as long as the selected intention requieres. This may 
-    sound excesive, but the possible goals were previously selected for their 
-    potential, taking in consideration their distance (in nodes, not in actions).
-
-    However, plans are recalculated in every step. This decision was made taking 
-    in consideration the fact that in the steps that we do not need to 
-
 == Conclusion
 
 1. What have you learned from the participation in the contest?
-
-
-
 2. Which are the strong and weak points of the team?
 
     Our team is formed by a group of friends, so a strong point in the developing 
@@ -563,13 +521,4 @@ off?
     client. Many of us reimplemented the eismassim module, so we are vulnerable to 
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
