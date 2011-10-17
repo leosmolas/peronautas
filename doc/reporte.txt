@@ -33,7 +33,7 @@ meter una buena explicacion de la arquitectura bdi en la parte de diseño
     scenario. We do this by applying the GAIA methodology, a high-level and 
     iterative approach to model communication and roles in multi-agent scenarios. 
     We further describe the technical details and insights gained during our 
-    participation in the multi-agent programming contest.     
+    participation in the multi-agent programming contest.
 
     In this article we report on the JIAC V team for the agent programming 
     competition 2009, going through the different phases of development and 
@@ -41,7 +41,7 @@ meter una buena explicacion de la arquitectura bdi en la parte de diseño
     identified and implemented different agent roles. While there is no explicit 
     team concept, the agents cooperate by informing each other of their 
     perceptions and intentions, which leads to emergent team behavior which very 
-    dynamically and flexibly reacts to the state of the game. 
+    dynamically and flexibly reacts to the state of the game.
 }
 
 == Introduction
@@ -210,7 +210,7 @@ problems have you found and how are they solved?
     from Python.
 
     No multi-agent programming languages/patforms/frameworks were used due to 
-    previous experience indicating a general lack of flexibilty, and a lack of 
+    previous experience indicating a general lack of flexibility, and a lack of 
     familiarity on behalf of the development team.
 
     Aca hay que poner como cada parte del dibujito original de leo a codigo.
@@ -238,7 +238,7 @@ problems have you found and how are they solved?
     Python and Prolog were well-known at the start of the project, and were chosen 
     for precisely those reasons.
 
-    We also selected our languages for their flexibilty, in order to not have this 
+    We also selected our languages for their flexibility, in order to not have this 
     problem.
 
     Python's amenity to rapid application development and 'batteries-included 
@@ -246,8 +246,8 @@ problems have you found and how are they solved?
     server, parsing of peceptions, rapid addition of planned features and bug 
     correction.
 
-    We made use of Prolog's declarate nature to model states of the world, and it 
-    also made more straightforward to implement search algorithms.
+    We made use of Prolog's declarative nature to model states of the world, and it 
+    also made it more straightforward to implement search algorithms.
 
     Search algorithms, as Uniform Cost Search, and Depth First Search were 
     implemented in Prolog.
@@ -259,7 +259,7 @@ problems have you found and how are they solved?
 
     Initial plans were to distribute agents on several machines. Each agents runs 
     as a separate process, and communicates with others via TCP sockets. After 
-    some experience agents were run on one machine. Having the choice was a 
+    some experience and bencmarking, agents were run on one machine due to performance issues. Having the choice was a 
     benefit of the proposed design.
 
     Reasoning takes place within the perceive-act cycle.
@@ -314,7 +314,7 @@ problems have you found and how are they solved?
     separate the information which will remain private and which will be shared. 
     The public part of the percept is sent to the percept server, which performs a 
     union of all percept and send the difference back to each agent. After 
-    receiving the joint percept, the agents enter a belief setting page, and later 
+    receiving the joint percept, the agents enter a belief setting phase, and later 
     an argumentation phase.
 
     Once the agent's action has been determined by argumentation and planning, it 
@@ -326,7 +326,7 @@ problems have you found and how are they solved?
     Some functionality provided by the eismassim library was reimplemented in a 
     connection library in python.
 
-    Agent recover their assigned role from the simulation start message, and 
+    Agents recover their assigned role from the simulation start message, and 
 
     If an agent is not being part of any zone, it tries to regroup with a partner. 
     When a zone is formed, and the agent is part of it, for each potentally 
@@ -522,3 +522,217 @@ off?
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
     
+---------------------------------------------------------------------------------------------------------
+TL;DR section: (short answers for all questions)
+
+== Introduction
+1. What was the motivation to participate in the contest?
+The group's main motivation was to apply argumentation via defeasible logic programming (DeLP) in a multi-agent gaming situation and to test the integration of the different technologies used.
+
+2. What is the history of the team?
+The LIDIA research group was established in 1992 in the Universidad Nacional del Sur, and it is the first time our time participates in the contest.
+
+3. What is the name of your team?
+The team's name is d3lp0r.
+
+4. How many developers and designers did you have?  At what level of education 
+are your team members?
+The d3lp0r team was formed incorporating 6 graduate students, 2 Ph.D. students and 3 professors.
+
+5. From which field of research do you come form?  Which work is related?
+The LIDIA research group has been working in Artificial Intelligence and Argumentation via Defeasible Logic Programming for almost 20 years now, and the DeLP server technology developed has been used in the contest.
+
+== System Analysis and Design
+1. If some multi-agent system methodology such as Prometheus, O-MaSE, or 
+Tropos was used, how did you use it? If you did not what were the reasons?
+No design methodology specific to multi-agent systems was used. However, 
+development was conducted using a simplified XP (extreme programming) 
+methodology. 
+
+2. Is the solution based on the centralisation of coordination/information on 
+a specific agent? Conversely if you plan a decentralised solution, which strategy do you plan 
+to use?
+The solution follows a decentralised architecture in which agents run completely decoupled in different processes while sharing nothing.
+
+3. What is the communication strategy and how complex is it?
+Percepts are communicated among agent members of the team via a broadcast mechanism 
+developed as part of the multi-agent system. This design was chosen for its minimal complexity.
+
+4. How are the following agent features considered/implemented: autonomy, 
+proactiveness, reactiveness?
+Agents are completely autonomous; decision-making takes place individually at the agent level, with no intervention from human operators or a central intelligence agency within the system.
+Agents assign priorities to different possible goals depending on their desires, and plan in order to achieve the most valuable goal. This results in a less reactive and more autonomous way in which an agent acts.
+
+
+5. Is the team a truly multi-agent system or rather a centralised system in 
+disguise?
+The team is a truly multi-agent system, and has absolutely no centralised characteristics.
+
+
+6. How much time (man hours) have you invested (approximately) for 
+implementing your team?
+I don't know, but IT'S OVER 9.000!
+
+
+7. Did you discuss the design and strategies of your agent team with other 
+developers? To which extent did your test your agents playing with other teams?
+Experience from a previous instance of the MAPC was shared with our teams by 
+members of the ARGONAUTS team from Universität Dortmund. Although the initial 
+plan was to run tests against other agent teams prior to the competition, time 
+constraints made this impossible.
+
+
+== Software Architecture
+1. Which programming language did you use to implement the multi-agent system?
+The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
+a defeasible logic language, was used as a service within Prolog.
+
+2. Did you use multi-agent programming languages? Why or why not to use a 
+multi-agent programming language?
+No multi-agent programming languages/patforms/frameworks were used due to 
+previous experience indicating a general lack of flexibility, and a lack of 
+familiarity on behalf of the development team.
+
+3. How have you mapped the designed architecture (both multi-agent and 
+individual agent architectures) to programming codes i.e., how did you 
+implement specific agent-oriented concepts and designed artifacts using the 
+programming language?
+The perception is processed by the Python program, that parses the XML. Then, 
+it sends it to the Percept Server that every step merges all perceptions, and delivers them back to the agents.
+The Python code asserts all the perception into Prolog, then querying it for the next action to be executed.
+Prolog handles all the decision making, argumentation and planning, and returns the action binded to a variable to Python, that then generates with 
+it an XML to be sent to the server.
+
+4. Which development platforms and tools are used? How much time did you 
+invest in learning those?
+Both Linux and the Windows operating system were used as development 
+platforms, since the language runtimes chosen for implementation were 
+portable.
+We used git as our revision control system. In general, we did not spend much 
+time in learning it, since some of us had already worked with it.
+
+5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, 
+....) are used? How much time did you invest in learning those?
+Python and Prolog were the chosen languages for the development of the system. Most of us had already worked with both of them, so we did not spend much time learning those.
+
+6. What features were missing in your language choice that would have 
+facilitated your development task?
+
+
+7. What features of your programming language has simplified your development 
+task?
+Python's amenity to rapid application development and 'batteries-included 
+philosophy' facilitated implementing the communication layer to the MASSimg 
+server, parsing of peceptions, rapid addition of planned features and bug 
+correction.
+We made use of Prolog's declarative nature to model states of the world, and it 
+also made it more straightforward to implement search algorithms.
+
+
+8. Which algorithms are used/implemented?
+Search algorithms, as Uniform Cost Search and Depth First Search, as well as the zone-coloring algorithm were 
+implemented in Prolog.
+The implementation of Defeasible Logic Programming (DeLP) by the LIDIA was 
+used for the deliberative process.
+
+9. How did you distribute the agents on several machines? And if you did not 
+please justify why.
+Initial plans were to distribute agents on several machines. Each agents runs 
+as a separate process, and communicates with others via TCP sockets. After 
+some experience and bencmarking, agents were run on one machine due to performance issues. Having the choice was a 
+benefit of the proposed design.
+
+10. To which extend is the reasoning of your agents synchronized with the 
+receive-percepts/send-action cycle?
+
+
+11. What part of the development was most difficult/complex? What kind of 
+problems have you found and how are they solved?
+The most difficult problems were related to optimization. Much of our time has 
+been spent in reducing the complexity of our algorithms, and the times they 
+are called.
+
+12. How many lines of code did you write for your software?
+Total LOC is 5842.
+
+== Stategies, Details, and Statistics
+1. What is the main strategy of your team?
+The main strategy of the team consists of detecting profitable zones from the 
+explored vertices, and positioning the agents correctly to maintain, defend 
+and expand the zones.
+
+2. How does the overall team work together? (coordination, information 
+sharing, ...)
+On each perceive/act cycle, agents receive the percept from the MASSim server, 
+separate the information which will remain private and which will be shared. 
+The public part of the percept is sent to the percept server, which performs a 
+union of all percept and send the difference back to each agent. After 
+receiving the joint percept, the agents enter a belief setting phase, and later 
+an argumentation phase.
+
+
+3. How do your agents analyze the topology of the map? And how do they exploit 
+their findings?
+Agents make no assumption about the map topology. They will prefer higher 
+valued nodes over lower ones.
+
+4. How do your agents communicate with the server?
+Some functionality provided by the eismassim library was reimplemented in a 
+connection library in Python.
+
+5. How do you implement the roles of the agents? Which strategies do the 
+different roles implement?
+Agents recover their assigned role from the simulation start message.
+(????????????????????????)
+
+6. How do you find good zones? How do you estimate the value of zones?
+If an agent is not being part of any zone, it tries to regroup with a partner. 
+When a zone is formed, and the agent is part of it, for each potentally 
+beneficial neighbor node, the agent calculates how much points would they win 
+if it moves, and that information is used by the decision taking module.
+
+7. How do you conquer zones? How do you defend zones if attacked? Do you 
+attack zones?
+Both attacking and defense are implicitly implemented. Sabouteurs attack 
+enemies that are near, so they might attack them if they enter our team's 
+zone, as well as when they are in their zone. Any other agent of another role
+can go to a node that has, for example, two agents, one for each team, in order
+to expand the zone, occupying the contested node, and implicitly defending it.
+
+
+8. Can your agents change their behavior during runtime? If so, what triggers 
+the changes?
+Our agents do not change their behavior during runtime. It is actually very 
+easy to add this feature, but we had not enough time to implement this.
+
+
+9. What algorithm(s) do you use for agent path planning?
+Path planning is implemented with an Uniform Cost Search. What we tried to 
+minimize was the amount of steps required to achieve the goal, rather than the 
+spent energy. The returned result is the list of actions to be done.
+
+10. How do you make use of the buying-mechanism?
+Agents followed a list of predefined buying actions, when the necessary amount 
+of money was reached.
+
+11. How important are achievements for your overall strategy?
+Our agents did not have achievements in consideration. However, they managed 
+to achieve a significant number of them, since this behavior was implicitly 
+implemented.
+
+
+12. Do your agents have an explicit mental state?
+
+13. How do your agents communicate? And what do they communicate?
+Agents only communicate their perceptions via a perception server implemented in Python.
+
+14. How do you organize your agents? Do you use e.g. hierarchies? Is your 
+organization implicit or explicit?
+
+15. Is most of your agents’ behavior emergent on and individual and team level?
+
+16. If your agents perform some planning, how many steps do they plan ahead?
+The agents make plans as long as the selected intention requieres. This may 
+sound excesive, but the possible goals were previously selected for their 
+potential, taking in consideration their distance (in nodes, not in actions).
+However, plans are recalculated in every step.
