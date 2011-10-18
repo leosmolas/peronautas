@@ -438,7 +438,7 @@ the strong and weak points of the team?
     from our university, because of several network problems. Just a couple of
     days before the competition, we decided to connect all from one of our
     partner's house, who had the better infrastructure (connection to
-    Internet, and space in his department). This may seem stranger given the
+    Internet, and space in his apartment). This may seem stranger given the
     fact that we had to spent all night working and testing there, so for a
     week the headquarters for our team also became our home.
 
@@ -460,7 +460,7 @@ algorithms?
 
 4. What can be improved in the context for next year?
 
-    Many things should and will be improved for next year competence. We had
+    Many things should and will be improved for next year competence. We have
     gained an important amount of knowledge, capability and experience, that
     shall help us in all aspects of the developing proccess, not to mention
     the important amount of code already written, and all the good decisions
@@ -647,7 +647,8 @@ complexity of our algorithms, and the times they are called.
 12. How many lines of code did you write for your software?  Total LOC is
 5842.
 
-== Stategies, Details, and Statistics 1. What is the main strategy of your
+== Stategies, Details, and Statistics
+1. What is the main strategy of your
 team?  The main strategy of the team consists of detecting profitable zones
 from the explored vertices, and positioning the agents correctly to maintain,
 defend and expand the zones.
@@ -723,3 +724,47 @@ The agents make plans as long as the selected intention requieres. This may
 sound excesive, but the possible goals were previously selected for their
 potential, taking in consideration their distance (in nodes, not in actions).
 However, plans are recalculated in every step.
+
+== Conclusion
+
+1. What have you learned from the participation in the contest?
+    Being our first experience building a system this size, we learned several lessons about working in big projects, such as setting standards and synchronizing versions of the technologies used.
+
+
+2. Which are the strong and weak points of the team?
+    Our team is formed by a group of friends, so a strong point in the
+    developing proccess was the cohesion and comradeship. We had
+    already worked together, both in university's projects and in
+    small freelance projects, so we well knew what to expect from each other,
+    and each member's capabilities.
+
+  
+3. How suitable was the chosen programming language, methodology, tools, and
+algorithms?
+    We are really happy with our decisions involving programming languages,
+    tools and algorithms. Of course, we had many problems, and much time was
+    spent deciding what to choose, but having all the proccess in
+    consideration, we may had took the right calls.
+
+4. What can be improved in the context for next year?
+    There were several hotfixes that were written and deployed at the same time we were facing our competitors due to the lack of testing in the actual context of the competition. This situation should obviously not happen, and adding much more real testing is one of our main priorities for next year's competition.
+
+5. Why did your team perform as it did? Why did the other teams perform
+better/worse than you did?
+
+6. Which other research fields might be interested in the Multi-Agent
+Programming Contest?
+
+
+7. How can the current scenario be optimized? How would those optimization pay
+off?
+
+    More information for the nodes, including something useful for a directed search (i.e., absolute coordinates), would help in
+    the implementation of a A* search (which would decrease execution time). Defining the most valuable zones randomly would benefit teams that thoughtfully look for and conquer good zones, rather than teams that assume that the center of the map is the most valuable zone and don't explore the rest.
+
+    A more informing/informational/apprising? feedback from the server would
+    be appreciated, specially involving errors.
+
+    Finally, we think it will be really helpful for all that we had test
+    matches in a more early stage, in order to have more time to correct
+    errors in the client.
