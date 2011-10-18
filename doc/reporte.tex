@@ -2,6 +2,8 @@
 
 % \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
 
 \title{An Argumentative Approach for a BDI Agent} % tentativo
         
@@ -10,7 +12,11 @@
         Leonardo Molas \and
         Emiliano Montenegro \and
         Fernando Sisul \and
-        Manuel Torres
+        Manuel Torres \and
+        Sebastián Gottifredi \and
+        Alejandro García \and
+        Diego Martínez \and
+        Guillermo Simari
         }
         
 \institute{Universidad Nacional del Sur}
@@ -109,6 +115,15 @@ are your team members?
 
 \section{System Analysis and Design}
 
+
+    Many man hours were spent designing the software at the early stages of the 
+    development. However, many changes and additions were done afterwards, due 
+    to our lack of experience in the multi-agent area.
+    
+    Despite this, our approach was more than satisfying; it happened to be
+    modular, correct and really close of what it is written in the literature. 
+
+
 \begin{comment}
 PREGUNTAS {
 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or 
@@ -131,13 +146,32 @@ developers?
 }
 \end{comment}
 
-\subsection{Scenario analysis}
+%\subsection{Scenario analysis}
 
-\subsection{Agent Architecture}
+\subsection{Agent Design's Approach}
 
-\subsection{Cooperation model}
+    An agent architecture was developed based on the BDI model, that will be
+    better explained later.
 
-    An agent architecture was developed based on the BDI model.
+    The solution follows a decentralised architecture in which agents run 
+    completely decoupled in different processes while sharing nothing. Percepts 
+    are communicated among agent members of the team via a broadcast mechanism 
+    developed as part of the multi-agent system. This design was chosen for its 
+    minimal complexity.
+
+    Agents are completely autonomous meaning that decision-making takes place 
+    individually at the agent level, with no intervention from human operators or 
+    a central intelligence agency within the system, and that decisions made by an 
+    agent are influenced solely by the current simulation state and the results of 
+    previous steps.
+
+    No design methodology specific to multi-agent systems was used. However, 
+    development was conducted using a simplified XP (extreme programming) 
+    methodology.
+    
+%\subsection{Cooperation model}
+
+\begin{comment}
 
     algo parecido a esto:
 
@@ -152,21 +186,11 @@ developers?
     This results in a less reactive and more autonomous way in which an agent acts.
 
     las intenciones son muy simples, reduciendo la necesidad de un planificador
+    
     Since the intentions specified for the agents are simple, the need for 
     predefined plans or a planning component to generate a sequence of actions 
     from an intention.
 
-    The solution follows a decentralised architecture in which agents run 
-    completely decoupled in different processes while sharing nothing. Percepts 
-    are communicated among agent members of the team via a broadcast mechanism 
-    developed as part of the multi-agent system. This design was chosen for its 
-    minimal complexity.
-
-    Agents are completely autonomous meaning that decision-making takes place 
-    individually at the agent level, with no intervention from human operators or 
-    a central intelligence agency within the system, and that decisions made by an 
-    agent are influenced solely by the current simulation state and the results of 
-    previous steps.
 
     Our intention-based agents generate many possible desires in most of the 
     turns, and selects the best they can find, given their knowledge of the world. 
@@ -180,9 +204,7 @@ developers?
     it's no longer necessary, when something else may be more important to do, or 
     when the agent is in danger.
 
-    No design methodology specific to multi-agent systems was used. However, 
-    development was conducted using a simplified XP (extreme programming) 
-    methodology.
+\end{comment}
 
 \section{Software Architecture}
 
@@ -214,16 +236,14 @@ problems have you found and how are they solved?
 }
 \end{comment}
 
-    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
-    a defeasible logic programming language, was used as a service within Prolog.
 
-    Language integration was achieved using the pyswip library, calling Prolog 
-    predicates from Python.
 
-    No multi-agent programming languages/patforms/frameworks were used due to 
-    previous experience indicating a general lack of flexibilty, and a lack of 
-    familiarity on behalf of the development team.
 
+\subsection{Architecture implementation}
+
+
+\begin{comment}
+    
     Aca hay que poner como cada parte del dibujito original de leo a codigo.
 
     The perception is processed by the Python program, that parses the XML. Then, 
@@ -239,6 +259,85 @@ problems have you found and how are they solved?
     It returns the action binded to a variable to Python, that then generates with 
     it an XML to be sent to the server.
 
+\end{comment}
+
+\begin{figure}
+ \centering
+   \includegraphics[width=\textwidth]{agent_architecture2.png}
+     \caption{Our agent's architecture in a flow-like chart. Dashed arrows stands for 
+     process flow, and solid lines, for data flow.}
+ \label{fig:architecture}
+\end{figure}
+
+%Aca va toda la bola de explicacion del dibujito
+
+    The first part of the architecture is the Python part, that handles all the 
+    communication with the servers. It first opens a TCP/IP connection with the 
+    MASSIM server, and authenticates. Then it does the same with our Percept 
+    Server, that has to be running. It waits for all the agents, and then 
+    everything is set to start the simulation.
+
+\subsubsection{Percept-act loop.}
+
+    When the first action-request message is received, this loop starts. It 
+    first processes the perception, and then sends it to the Percept Server. 
+    This waits for all the other agents' perception, merges them, and then sends 
+    back a new version, that cointains everything that has been seen by its
+    teammates, but not by itself.
+    
+    This global perception is asserted into Prolog. Then, Python queries it, asking for an action to be performed.
+    
+\subsubsection{Action requested.}
+
+    As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
+    all the processing in Prolog. The perception is already in the knowledge 
+    base, that is formed by the ``static'' and ``dynamic'' data. 
+
+    If the agent has already an intention stored, the \textit{cut condition} 
+    checks whether it still is significant to keep doing it. It is a series of 
+    simple conditions, that reviews the state of the world.
+
+    Then, if there was not any intention, or the cut condition decides it is not 
+    interesting to keep it, the \textit{beliefs setting} is started. It 
+    generates the possible desires for this step, according to what is stored in 
+    the knowledge base, and, for each one of them, the beliefs needed.
+
+    The decision-taking module is implemented in DeLP, a defeasible logic 
+    programming language used in argumentation. Given the set of possible 
+    desires and beliefs set by the previous module, it selects the best desire, 
+    returning it as the intention to be done.
+
+    All the plans for all the desires were previously calculated and stored as 
+    beliefs, since the amount of steps that they need is used by the 
+    argumentation module. The \textit{planning} module selects the one 
+    corresponding to the selected intention, and stores it.
+
+    The execution module only gets the plan, and returns to Python the first 
+    action in it.
+
+    However, if the process flow comes from the other branch of \ref{
+    fig:architecture}, the execution is not that simple. Since skipping the 
+    decision-taking makes this branch insignificant in terms of time, we decided 
+    to recalculate the plan. This might help us when a better path is 
+    discovered, even though this is unlikely.
+
+    Back again in Python, with the returned action, an XML is formed, to be sent 
+    to the server.
+
+\subsection{Programming languages, platforms and tools}
+
+    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
+    a defeasible logic programming language, was used as a service within Prolog.
+    Language integration was achieved using the pyswip library, calling Prolog 
+    predicates from Python. The implementation of Defeasible Logic Programming 
+    (DeLP) by the LIDIA was used for the deliberative process. They were 
+    well-known at the start of the project, and were chosen for precisely those
+    reasons.
+
+    No multi-agent programming languages/patforms/frameworks were used due to 
+    previous experience indicating a general lack of flexibilty, and a lack of 
+    familiarity on behalf of the development team.
+    
     Both Linux and the Windows operating system were used as development 
     platforms, since the language runtimes chosen for implementation were 
     portable. Some caveats were encountered however.
@@ -246,51 +345,33 @@ problems have you found and how are they solved?
     We used git as our revision control system. In general, we did not spend much 
     time in learning it, since some of us had already worked with it.
 
-    Python and Prolog were well-known at the start of the project, and were chosen 
-    for precisely those reasons.
-
-    We also selected our languages for their flexibilty, in order to not have this 
-    problem.
-
+\subsubsection{Benefits.}
+    
     Python's amenity to rapid application development and 'batteries-included 
     philosophy' facilitated implementing the communication layer to the MASSimg 
     server, parsing of peceptions, rapid addition of planned features and bug 
     correction.
 
-    We made use of Prolog's declarate nature to model states of the world, and it 
-    also made more straightforward to implement search algorithms.
-
-    Search algorithms, as Uniform Cost Search, and Depth First Search were 
+    We made use of Prolog's declarative nature to model states of the world, and it 
+    also made more straightforward to implement search algorithms like Uniform Cost 
+    Search, and Depth First Search. The zone-coloring algorithm was also 
     implemented in Prolog.
-
-    The zone-coloring algorithm was also implemented in Prolog.
-
-    The implementation of Defeasible Logic Programming (DeLP) by the LIDIA was 
-    used for the deliberative process.
 
     Initial plans were to distribute agents on several machines. Each agents runs 
     as a separate process, and communicates with others via TCP sockets. After 
     some experience agents were run on one machine. Having the choice was a 
     benefit of the proposed design.
 
-    Reasoning takes place within the perceive-act cycle.
-
-    Seteo de beliefs.
-
-    Tamaño de la KB de los agentes.
-
-    Sincronizacion.
-
-    Optimizacion.
+\subsubsection{Problems encountered.}
 
     The most difficult problems were related to optimization. Much of our time has 
     been spent in reducing the complexity of our algorithms, and the times they 
     are called.
 
     For the coloring algorithm, we added several improvements, for both 
-    optimization and correctness. In essence, since we only had a incomplete 
-    version of the full map in every step, we added the concept of "fog of war" to 
-    the agents, assuming always in a pessimistic way. 
+    optimization and correctness. In essence, since we only had an incomplete 
+    version of the full map in every step, we added the concept of ``fog of war`'' 
+    to the agents, assuming always in a pessimistic way. 
 
     For both search algorithms, the Depth First Search and the Uniform Cost 
     Search, we added conditions that could cut several branches, when they were 
@@ -298,16 +379,14 @@ problems have you found and how are they solved?
     they depend on the context of the problem.
 
     For the UCS, we first used a simple stack, implemented with a list, to keep 
-    track of the frontier, because of Prolog's inability to work with arrays, that 
+    track of the frontier, because of Prolog's inability to work with arrays. This 
     would have allowed us to develop a heap data structure, to be used in a 
     priority queue. Lately, we found a Prolog library that implemented this data 
     structure, and the migration was pleasently straightforward.
 
-    Finally, for this last algorithm also, we added an important optimization, 
-    that allowed us to call several times to it, with the virtual cost of only one 
+    Finally, for this last algorithm too, we added an important optimization, 
+    that allowed us to call it several times, with the virtual cost of only one 
     call. It was done using memoization, and a more thoughtful invocation.
-
-    Total LOC is 5842. 
 
 \section{Stategies, Details, and Statistics}
 
@@ -463,12 +542,12 @@ off?
 \end{comment}
     
     Our team is formed by a group of friends, so a strong point in the developing 
-    proccess would have been the cohesion and comradeship. We had also worked 
+    process would have been the cohesion and comradeship. We had also worked 
     together, in university's projects as well as outside them, in small freelance 
     projects, so we well knew what to expect from each other, and each member's 
     capabilities. 
 
-    Several events in the developing proccess had depend from this bond, i.e. the 
+    Several events in the developing process had depend from this bond, i.e. the 
     deployment. We could not connect to the server in the test matches from our 
     university, because of several network problems. Just a couple of days before 
     the competition, we decided to connect all from one of our partner's house, 
@@ -485,14 +564,14 @@ off?
 
     We are really grateful with our decisions involving programming languages, 
     tools and algorithms. Of course, we had many problems, and much time was spent 
-    deciding what to choose, but having all the proccess in consideration, we may 
+    deciding what to choose, but having all the process in consideration, we may 
     had took the right calls. We should thank the great education given by our 
     university (Universidad Nacional del Sur), and a great mentoring from our 
     professors.
 
     Many things should and will be improved for next year competence. We had 
     gained an important amount of knowledge, capability and experience, that shall 
-    help us in all aspects of the developing proccess, not to mention the 
+    help us in all aspects of the developing process, not to mention the 
     important amount of code already written, and all the good decisions already 
     made.
 
