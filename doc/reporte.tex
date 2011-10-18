@@ -3,18 +3,9 @@
 % \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{verbatim}
 
-
 \title{An Argumentative Approach for a BDI Agent} % tentativo
-
-% \author{Iñaki Garay\inst{1} \and 
-        % Diego Marcovecchio\inst{2} \and
-        % Leonardo Molas\inst{3} \and
-        % Emiliano Montenegro\inst{4} \and
-        % Fernando Sisul\inst{5} \and
-        % Manuel Torres\inst{6}
-        % }
         
-\author{Iñaki Garay \and 
+\author{I\~{n}aki Garay \and 
         Diego Marcovecchio \and
         Leonardo Molas \and
         Emiliano Montenegro \and
@@ -26,25 +17,24 @@
 
 \begin{document}
 
-
-\frontmatter          % for the preliminaries
+\frontmatter % for the preliminaries
 
 \maketitle
 
 \begin{comment}
 \pagestyle{headings}  % switches on printing of running heads
 \addtocmark{Hamiltonian Mechanics} % additional mark in the TOC
-
-= Technical Report
-
 figuras
 - la arquitectura del agente
 - la arquitectura del programa
 - ejemplo del fog of war y coloreo
-
 meter una buena explicacion de la arquitectura bdi en la parte de diseño
-\end{comment}
 
+- arquitectura
+- argumentacion
+- estrategias
+- percept server
+\end{comment}
 
 \begin{abstract}
     This report presents the design and results of the d3lp0r multi-agent system 
@@ -58,39 +48,11 @@ meter una buena explicacion de la arquitectura bdi en la parte de diseño
     use in the agent's reasoning process and the technical details thereof.
 \end{abstract}
 
-\begin{comment}
-{
-    This paper presents the Argonauts multi-agent framework which was developed as 
-    part of a one year student project at Technische Universität Dortmund. The 
-    Argonauts framework builds on a BDI approach to model rational agents that act 
-    cooperatively in a dynamic and indeterministically changing environment. 
-    However, our agent model extends the traditional BDI approach in several 
-    aspects, most notably by incorporating motivation into the agent’s goal 
-    selection mechanism. The framework has been applied by the Argonauts team in 
-    the 2010 version of the annual multi-agent programming contest organized by 
-    Technische Universität Clausthal. In this paper, we present a high-level 
-    specification and analysis of the actual system used for solving the given 
-    scenario. We do this by applying the GAIA methodology, a high-level and 
-    iterative approach to model communication and roles in multi-agent scenarios. 
-    We further describe the technical details and insights gained during our 
-    participation in the multi-agent programming contest.     
-
-    In this article we report on the JIAC V team for the agent programming 
-    competition 2009, going through the different phases of development and 
-    describing the JIAC V agent framework. Based on an iterative approach, we 
-    identified and implemented different agent roles. While there is no explicit 
-    team concept, the agents cooperate by informing each other of their 
-    perceptions and intentions, which leads to emergent team behavior which very 
-    dynamically and flexibly reacts to the state of the game. 
-}
-\end{comment}
-
-% == Introduction
 \section{Introduction}
 
     The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia 
     Artificial, Artificial Intelligence Research and Development Laboratory) 
-    research group was established in 1992 in the Universidad Nacional del Sur. 
+    research group was established in 1992 at the Universidad Nacional del Sur. 
     The d3lp0r team was formed incorporating 6 graduate students, 2 Ph.D. students 
     and 3 professors. The undergraduate students fully developed the system, while 
     the Ph.D. students and professors provided guidance. The group's main 
@@ -99,7 +61,6 @@ meter una buena explicacion de la arquitectura bdi en la parte de diseño
     test the integration of the different technologies used.
 
 \begin{comment}
-    
 PREGUNTAS {
 1. What was the motivation to participate in the contest?
 2. What is the history of the team?
@@ -108,9 +69,6 @@ PREGUNTAS {
 are your team members?
 5. From which field of research do you come form?  Which work is related?
 }
-
-== Preliminaries
-
 \end{comment}
 
 \section{Preliminaries}
@@ -138,14 +96,13 @@ are your team members?
     specified by the organizers). Other special situacions, such as earning 
     different achievements, could also increase the team's points.
 
-
+\begin{comment}
     Si nos quedamos cortos, explicamos DeLP.
+\end{comment}
 
-% == System Analysis and Design
 \section{System Analysis and Design}
 
 \begin{comment}
-
 PREGUNTAS {
 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or 
 Tropos was used, how did you use it? 
@@ -165,15 +122,13 @@ implementing your team?
 developers? 
    To which extent did your test your agents playing with other teams?
 }
-
 \end{comment}
 
-- Scenario analysis
+\subsection{Scenario analysis}
 
-    sacarlo del enunciado, resumirlo
+\subsection{Agent Architecture}
 
-- Arquitectura del agente
-- Cooperation model
+\subsection{Cooperation model}
 
     An agent architecture was developed based on the BDI model.
 
@@ -226,14 +181,11 @@ developers?
 
     No design methodology specific to multi-agent systems was used. However, 
     development was conducted using a simplified XP (extreme programming) 
-    methodology. 
-
-% == Software Architecture
+    methodology.
 
 \section{Software Architecture}
 
 \begin{comment}
-
 PREGUNTAS {
 1. Which programming language did you use to implement the multi-agent system?
 2. Did you use multi-agent programming languages? Why or why not to use a 
@@ -259,7 +211,6 @@ receive-percepts/send-action cycle?
 problems have you found and how are they solved?
 12. How many lines of code did you write for your software?
 }
-
 \end{comment}
 
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
@@ -323,8 +274,6 @@ problems have you found and how are they solved?
 
     Reasoning takes place within the perceive-act cycle.
 
-    MANULON
-
     Seteo de beliefs.
 
     Tamaño de la KB de los agentes.
@@ -362,8 +311,6 @@ problems have you found and how are they solved?
     ``Infrastructure'' : 
 
     ``Reasoning'' :
-
-% == Stategies, Details, and Statistics
 
 \section{Stategies, Details, and Statistics}
 
@@ -441,7 +388,6 @@ problems have you found and how are they solved?
     in consideration the fact that in the steps that we do not need to 
 
 \begin{comment}
-    
 PREGUNTAS {
 1. What is the main strategy of your team?
 2. How does the overall team work together? (coordination, information 
@@ -467,7 +413,6 @@ organization implicit or explicit?
 16. If your agents perform some planning, how many steps do they plan ahead?
 
 }
-
 \end{comment}
 
     The only organization that the agents have is the proper given by the 
@@ -479,15 +424,14 @@ organization implicit or explicit?
         \item all the Python part, that servers as a receive-percepts/send-action client 
         of the server,
         
-        \item the Percet Server,
+        \item the Percept Server,
         
         \item an important part of the Prolog code, including all the utilities used, the
         implementation of the BDI architecture, the structure of the 
         decision-taking module, and a considerable part of the arguments used, that
         are common to all the roles.
-        
     \end{itemize}
-        
+    
     Apart from all this, each role has a couple of separate files, that have 
     specific code, including the arguments used in the decision-taking module, and
     the setting of the beliefs needed for those arguments. Here is where the 
@@ -499,18 +443,29 @@ organization implicit or explicit?
     differently, faced to the same situation, according to our judgment.
     
     These separation is negligible, having in consideration the amount of code 
-    written for the agents, and may be near a 5% of it. However, this has proven to
+    written for the agents, and may be near a 5\% of it. However, this has proven to
     be more than enough to modify considerably the behavior of the agents, thanks to
     the non-monotonic nature of DeLP, the argumentation language used in the 
     decision-taking module.
 
-% == Conclusion
-
 \section{Conclusion}
 
+\begin{comment}
+PREGUNTAS {
 1. What have you learned from the participation in the contest?
 2. Which are the strong and weak points of the team?
-
+3. How suitable was the chosen programming language, methodology, tools, and 
+algorithms?
+4. What can be improved in the context for next year?
+5. Why did your team perform as it did? Why did the other teams perform 
+better/worse than you did?
+6. Which other research fields might be interested in the Multi-Agent 
+Programming Contest?
+7. How can the current scenario be optimized? How would those optimization pay 
+off?
+}
+\end{comment}
+    
     Our team is formed by a group of friends, so a strong point in the developing 
     proccess would have been the cohesion and comradeship. We had also worked 
     together, in university's projects as well as outside them, in small freelance 
@@ -532,17 +487,12 @@ organization implicit or explicit?
     source files, or having different versions of the programs we used to program
     installed in our computers.
 
-3. How suitable was the chosen programming language, methodology, tools, and 
-algorithms?
-
     We are really grateful with our decisions involving programming languages, 
     tools and algorithms. Of course, we had many problems, and much time was spent 
     deciding what to choose, but having all the proccess in consideration, we may 
     had took the right calls. We should thank the great education given by our 
     university (Universidad Nacional del Sur), and a great mentoring from our 
     professors.
-
-4. What can be improved in the context for next year?
 
     Many things should and will be improved for next year competence. We had 
     gained an important amount of knowledge, capability and experience, that shall 
@@ -556,16 +506,6 @@ algorithms?
     were written and deployed at the same time we were facing our competitors, in 
     all but the last day of competition, in which we already had everything in 
     consideration and control.
-
-5. Why did your team perform as it did? Why did the other teams perform 
-better/worse than you did?
-
-6. Which other research fields might be interested in the Multi-Agent 
-Programming Contest?
-
-
-7. How can the current scenario be optimized? How would those optimization pay 
-off?
 
     Many optimizations ocurred to us for the scenario, and the contest in general. 
     For example, more information for the nodes, including something useful for a 
@@ -590,5 +530,5 @@ off?
     client. Many of us reimplemented the eismassim module, so we are vulnerable to 
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
-    
+
 \end{document} 
