@@ -139,17 +139,13 @@ developers?
 }
 \end{comment}
 
-    Many man hours were spent designing the software at the early stages of the 
-    development. However, many changes and additions were done afterwards, due 
-    to our lack of experience in the multi-agent area.
-    
-    Despite this, our approach was more than satisfying; it happened to be
-    modular, correct and really close of what it is written in the literature. 
+    Despite many man-hours dedicated to design in the early stages of
+    the competition, the development team's lack of experience in multi-agent
+    systems necessitated several changes and additions. 
+    Despite this, our approach was more than satisfying; resulting to be
+    modular, correct and in close correspondence with the literature.
 
-\subsection{Agent Design's Approach}
-
-    An agent architecture was developed based on the BDI model, that will be
-    better explained later.
+\subsection{Agent Design}
 
     The solution follows a decentralised architecture in which agents run 
     completely decoupled in different processes while sharing nothing. Percepts 
@@ -162,15 +158,16 @@ developers?
     a central intelligence agency within the system, and that decisions made by an 
     agent are influenced solely by the current simulation state and the results of 
     previous steps.
+    The agent architecture developed is based on the BDI model, and is explained in
+    detail in further sections.
 
     No design methodology specific to multi-agent systems was used. However, 
-    development was conducted using a simplified XP (extreme programming) 
+    the implementation was conducted using a simplified XP (extreme programming) 
     methodology.
-    
+
 %\subsection{Cooperation model}
 
 \begin{comment}
-
     algo parecido a esto:
 
     Since the desires have an important impact on the possible intentions that an 
@@ -189,7 +186,6 @@ developers?
     predefined plans or a planning component to generate a sequence of actions 
     from an intention.
 
-
     Our intention-based agents generate many possible desires in most of the 
     turns, and selects the best they can find, given their knowledge of the world. 
     They try to accomplish that intention, for several turns, until they finish, 
@@ -201,7 +197,6 @@ developers?
     when the intention has been achieved (by the agent or other teammate), when 
     it's no longer necessary, when something else may be more important to do, or 
     when the agent is in danger.
-
 \end{comment}
 
 \section{Software Architecture}
@@ -258,8 +253,8 @@ problems have you found and how are they solved?
 %\begin{figure}
 % \centering
 %   \includegraphics[width=\textwidth]{agent_architecture2.png}
-%     \caption{Our agent's architecture in a flow-like chart. Dashed arrows stands for 
-%     process flow, and solid lines, for data flow.}
+%     \caption{Agent architecture in a flow chart-like diagram. 
+%     Dashed arrows represent process flow, solid lines represent data flow.}
 % \label{fig:architecture}
 %\end{figure}
 
@@ -271,7 +266,7 @@ problems have you found and how are they solved?
     Server, that has to be running. It waits for all the agents, and then 
     everything is set to start the simulation.
 
-\subsubsection{Percept-act loop.}
+\subsubsection{Percept-act loop}
 
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
@@ -282,7 +277,7 @@ problems have you found and how are they solved?
     This global perception is asserted into Prolog. Then, Python queries it,
     asking for an action to be performed.
     
-\subsubsection{Action requested.}
+\subsubsection{Action requested}
 
     As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
     all the processing in Prolog. The perception is already in the knowledge 
