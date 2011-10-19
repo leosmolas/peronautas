@@ -469,42 +469,14 @@ problems have you found and how are they solved?
     proven to be the most succesful one.
 
     
-    
-
-
-
-\begin{comment}
-PREGUNTAS {
-1. What is the main strategy of your team?
-2. How does the overall team work together? (coordination, information 
-sharing, ...)
-3. How do your agents analyze the topology of the map? And how do they exploit 
-their findings?
-4. How do your agents communicate with the server?
-5. How do you implement the roles of the agents? Which strategies do the 
-different roles implement?
-6. How do you find good zones? How do you estimate the value of zones?
-7. How do you conquer zones? How do you defend zones if attacked? Do you 
-attack zones?
-8. Can your agents change their behavior during runtime? If so, what triggers 
-the changes?
-9. What algorithm(s) do you use for agent path planning?
-10. How do you make use of the buying-mechanism?
-11. How important are achievements for your overall strategy?
-12. Do your agents have an explicit mental state?
-13. How do your agents communicate? And what do they communicate?
-14. How do you organize your agents? Do you use e.g. hierarchies? Is your 
-organization implicit or explicit?
-15. Is most of your agents’ behavior emergent on and individual and team level?
-16. If your agents perform some planning, how many steps do they plan ahead?
-}
-\end{comment}
+\subsection{Agents' organization}
 
     The only organization that the agents have is the proper given by the 
     environment, which is the roles. 
     
     Refering to our actual programming, all the agents have a strong core of common
     code, which is:
+    
     \begin{itemize}
         \item all the Python part, that servers as a receive-percepts/send-action client 
         of the server,
@@ -528,7 +500,7 @@ organization implicit or explicit?
     differently, faced to the same situation, according to our judgment.
     
     These separation is negligible, having in consideration the amount of code 
-    written for the agents, and may be near a 5\% of it. However, this has proven to
+    written for the agents, and may be near a 5\% of it. However, this has been proven to
     be more than enough to modify considerably the behavior of the agents, thanks to
     the non-monotonic nature of DeLP, the argumentation language used in the 
     decision-taking module.
