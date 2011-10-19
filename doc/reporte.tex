@@ -100,29 +100,22 @@ are your team members?
     a strength comparison. Certain actions may cause further information to be
     included in subsequent percepts. 
 
-    \textbf{AKI: working on this. En general, hay que poner todo en presente.}
+    A match consists of several simulations, each simulation proceeds as
+    a series of steps. Each step, each agent is provided with a percept with
+    partial information about the current simulation state and is
+    queried for its action. 
 
-    Match simulations took place in steps; in every step, each team was awarded 
-    with points determined by the state of the simulation; the team's agents 
-    received percepts with partial information about the current simulation state, 
-    and had a discrete amount of time to make a decision about their actions; at 
-    the end of the match, the team with the most points was the winner.
+    The goal is to maximize the score function each step. A team is awarded
+    points according to the value of the nodes controlled by the team, and
+    in addition certain achievements. Agents may control more nodes than the
+    those they are positioned in by forming zones, groups of nodes under the
+    influence of a team determined by a graph coloring algorithm specified in
+    the scenario description. 
 
-    In order to earn points, each team's agents should position themselves in the 
-    map so that they formed "zones" (zones were determined by an algorithm 
-    specified by the organizers). Other special situacions, such as earning 
-    different achievements, could also increase the team's points.
+    The final score for a team is the sum of points over all steps; at the end
+    of the match, the team with the most points is the winner.
 
 \section{System Analysis and Design}
-
-
-    Many man hours were spent designing the software at the early stages of the 
-    development. However, many changes and additions were done afterwards, due 
-    to our lack of experience in the multi-agent area.
-    
-    Despite this, our approach was more than satisfying; it happened to be
-    modular, correct and really close of what it is written in the literature. 
-
 
 \begin{comment}
 PREGUNTAS {
@@ -146,7 +139,12 @@ developers?
 }
 \end{comment}
 
-%\subsection{Scenario analysis}
+    Many man hours were spent designing the software at the early stages of the 
+    development. However, many changes and additions were done afterwards, due 
+    to our lack of experience in the multi-agent area.
+    
+    Despite this, our approach was more than satisfying; it happened to be
+    modular, correct and really close of what it is written in the literature. 
 
 \subsection{Agent Design's Approach}
 
@@ -236,11 +234,7 @@ problems have you found and how are they solved?
 }
 \end{comment}
 
-
-
-
 \subsection{Architecture implementation}
-
 
 \begin{comment}
     
@@ -261,13 +255,13 @@ problems have you found and how are they solved?
 
 \end{comment}
 
-\begin{figure}
- \centering
-   \includegraphics[width=\textwidth]{agent_architecture2.png}
-     \caption{Our agent's architecture in a flow-like chart. Dashed arrows stands for 
-     process flow, and solid lines, for data flow.}
- \label{fig:architecture}
-\end{figure}
+%\begin{figure}
+% \centering
+%   \includegraphics[width=\textwidth]{agent_architecture2.png}
+%     \caption{Our agent's architecture in a flow-like chart. Dashed arrows stands for 
+%     process flow, and solid lines, for data flow.}
+% \label{fig:architecture}
+%\end{figure}
 
 %Aca va toda la bola de explicacion del dibujito
 
@@ -285,7 +279,8 @@ problems have you found and how are they solved?
     back a new version, that cointains everything that has been seen by its
     teammates, but not by itself.
     
-    This global perception is asserted into Prolog. Then, Python queries it, asking for an action to be performed.
+    This global perception is asserted into Prolog. Then, Python queries it,
+    asking for an action to be performed.
     
 \subsubsection{Action requested.}
 
@@ -445,7 +440,6 @@ problems have you found and how are they solved?
     potential, taking into consideration their distance (in nodes, not in 
     actions). However, plans are recalculated in every step, as explained earlier.
 
-    
 \subsubsection{Communication.}
 
     Some functionality provided by the \textit{eismassim} library was
@@ -458,7 +452,7 @@ problems have you found and how are they solved?
     receiving the joint percept, the agents enter a belief setting phase, and 
     later an argumentation phase.
     
-\subsubsection{Buying.}
+\subsubsection{Buying}
 
     Agents follow a list of predefined buying actions, when the necessary amount 
     of money is reached.
@@ -468,7 +462,6 @@ problems have you found and how are they solved?
     However, this simple approach was the easiest to implement, and it was
     proven to be the most succesful one.
 
-    
 \subsection{Agents' organization}
 
     The only organization that the agents have is the proper given by the 
