@@ -7,23 +7,23 @@
 
 \title{An Argumentative Approach for a BDI Agent} % tentativo
         
-\author{I\~{n}aki Garay \and 
-        Diego Marcovecchio \and
-        Leonardo Molas \and
-        Emiliano Montenegro \and
-        Fernando Sisul \and
-        Manuel Torres \and
-        Sebastián Gottifredi \and
-        Alejandro García \and
-        Diego Martínez \and
-        Guillermo Simari
+\author{I\~{n}aki Garay \and      % igarai@gmail.com
+        Diego Marcovecchio \and   % diegomarcov@gmail.com
+        Leonardo Molas \and       % leos.molas@gmail.com
+        Emiliano Montenegro \and  % emm.montenegro@gmail.com
+        Fernando Sisul \and       % fsisul@gmail.com
+        Manuel Torres \and        % jmtorresluc@gmail.com
+        Sebastián Gottifredi \and % sebastian.gottifredi@gmail.com
+        Alejandro García \and     % ajg@cs.uns.edu.ar
+        Diego Martínez \and       % dcm@cs.uns.edu.ar
+        Guillermo Simari          % grs@cs.uns.edu.ar
         }
-        
+
 \institute{Universidad Nacional del Sur}
 
 \begin{document}
 
-\frontmatter % for the preliminaries
+\frontmatter
 
 \maketitle
 
@@ -168,18 +168,12 @@ developers?
 \begin{comment}
     algo parecido a esto:
 
-    Since the desires have an important impact on the possible intentions that an 
-    agent will pursue, our approach focuses on refining the way desires are 
-    generated.
-
-    poner algo que justifique esto, y refrasear esto:
-
-    sale de las prioridades de las metas
+        Since the desires have an important impact on the possible intentions that an 
+        agent will pursue, our approach focuses on refining the way desires are 
+        generated.
 
     This results in a less reactive and more autonomous way in which an agent acts.
 
-    las intenciones son muy simples, reduciendo la necesidad de un planificador
-    
     Since the intentions specified for the agents are simple, the need for 
     predefined plans or a planning component to generate a sequence of actions 
     from an intention.
@@ -229,25 +223,6 @@ problems have you found and how are they solved?
 
 \subsection{Architecture implementation}
 
-\begin{comment}
-    
-    Aca hay que poner como cada parte del dibujito original de leo a codigo.
-
-    The perception is processed by the Python program, that parses the XML. Then, 
-    it sends it to the Percept Server, that also receives all the information sent 
-    by its teammates. This is a centralised server that every step merges all 
-    perceptions, and delivers them back to the agents.
-
-    Now, with a more complete version of the world, the Python code asserts all 
-    the perception into Prolog, then querying it for the next action to be 
-    executed. 
-
-    The Prolog part handles all the decision taking, argumentation, and planning. 
-    It returns the action binded to a variable to Python, that then generates with 
-    it an XML to be sent to the server.
-
-\end{comment}
-
 %\begin{figure}
 % \centering
 %   \includegraphics[width=\textwidth]{agent_architecture2.png}
@@ -264,7 +239,20 @@ problems have you found and how are they solved?
     Server, that has to be running. It waits for all the agents, and then 
     everything is set to start the simulation.
 
-\subsubsection{Percept-act loop}
+    The perception is processed by the Python program, that parses the XML. Then, 
+    it sends it to the Percept Server, that also receives all the information sent 
+    by its teammates. This is a centralised server that every step merges all 
+    perceptions, and delivers them back to the agents.
+
+    Now, with a more complete version of the world, the Python code asserts all 
+    the perception into Prolog, then querying it for the next action to be 
+    executed. 
+
+    The Prolog part handles all the decision taking, argumentation, and planning. 
+    It returns the action binded to a variable to Python, that then generates with 
+    it an XML to be sent to the server.
+
+\subsubsection{Perceive-act loop}
 
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
