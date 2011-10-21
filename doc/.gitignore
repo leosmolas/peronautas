@@ -1,0 +1,6 @@
+*.svg
+*.aux
+*.pdf
+!tech-report-template.pdf
+*.log
+*.gz
