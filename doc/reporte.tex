@@ -4,6 +4,8 @@
 \usepackage{verbatim}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{bibentry}
+\usepackage[numbers]{natbib}
 
 \title{An Argumentative Approach for a BDI Agent} % tentativo
         
@@ -157,8 +159,8 @@ developers?
     a central intelligence agency within the system, and that decisions made by an 
     agent are influenced solely by the current simulation state and the results of 
     previous steps.
-    The agent architecture developed is based on the BDI model, and is explained in
-    detail in further sections.
+    The agent architecture developed is based on the BDI model \cite{Rao:1991}, 
+    and is explained in detail in further sections.
 
     No design methodology specific to multi-agent systems was used. However, 
     the implementation was conducted using a simplified XP (extreme programming) 
@@ -288,8 +290,9 @@ problems have you found and how are they solved?
 
 \subsection{Programming languages, platforms and tools}
 
-    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP, 
-    a defeasible logic programming language, was used as a service within Prolog.
+    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP 
+    \cite{Garcia:2004a}, a defeasible logic programming language, was used as a 
+    service within Prolog. 
     Language integration was achieved using the pyswip library, calling Prolog 
     predicates from Python. The implementation of Defeasible Logic Programming 
     (DeLP) by the LIDIA was used for the deliberative process. They were 
@@ -391,10 +394,12 @@ problems have you found and how are they solved?
 
 \subsubsection{Path planning.}
 
-    Path planning is implemented with an Uniform Cost Search. What we tried to 
-    minimize was the amount of steps required to achieve the goal, rather than the 
-    spent energy. The returned result is the list of actions to be done, rather 
-    than the list of nodes.
+    Path planning is implemented with an Uniform Cost Search 
+    \cite{Russell:2003:AIM:773294}. 
+    What we tried to minimize was the amount of steps required to achieve the 
+    goal, rather than the spent energy. 
+    The returned result is the list of actions to be done, rather than the list of 
+    nodes.
     
     Since this algorithm can be called several times in one step, given that the 
     actual amount of steps spent by an intention is taken under consideration by 
@@ -547,5 +552,12 @@ off?
     client. Many of us reimplemented the eismassim module, so we are vulnerable to 
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
+    
+    
+
+%BIBTEX
+    
+\bibliographystyle{plainnat} 
+\bibliography{bib} 
 
 \end{document} 
