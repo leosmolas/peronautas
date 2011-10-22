@@ -166,31 +166,6 @@ developers?
     the implementation was conducted using a simplified XP (extreme programming) 
     methodology.
 
-\begin{comment}
-    algo parecido a esto:
-
-        Since the desires have an important impact on the possible intentions that an 
-        agent will pursue, our approach focuses on refining the way desires are 
-        generated.
-
-    This results in a less reactive and more autonomous way in which an agent acts.
-
-    Since the intentions specified for the agents are simple, the need for 
-    predefined plans or a planning component to generate a sequence of actions 
-    from an intention.
-
-    Our intention-based agents generate many possible desires in most of the 
-    turns, and selects the best they can find, given their knowledge of the world. 
-    They try to accomplish that intention, for several turns, until they finish, 
-    or they find another reason to stop, and recalculate their intention.
-
-    Each turn, the obtained percept is used to decide which intention is going to 
-    be selected (when the agent hasn't got any), or it's used to decide whether it 
-    is necessary to carry on the actual intention, or recalculate it. This happens 
-    when the intention has been achieved (by the agent or other teammate), when 
-    it's no longer necessary, when something else may be more important to do, or 
-    when the agent is in danger.
-\end{comment}
 
 \section{Software Architecture}
 
@@ -269,11 +244,11 @@ problems have you found and how are they solved?
     checks whether it still is significant to keep doing it. It is a series of 
     simple conditions, that reviews the state of the world.
 
-    Then, if there was not any commited intention, or the cut condition decides it is not 
-    interesting to keep it, the \textit{beliefs setting process} is started. It 
-    generates the possible desires for this step, according to what is stored in 
-    the knowledge base, and, for each one of them, the beliefs needed.
-
+    Then, if there was not any commited intention, or the cut condition decides 
+    it is not interesting to keep it, the \textit{beliefs setting process} is 
+    started. It generates the possible desires for this step, according to what 
+    is stored in the knowledge base, and, for each one of them, the beliefs 
+    needed. 
     The decision-taking module is implemented in DeLP, a defeasible logic 
     programming language that uses argumentation to reason with conflicting
     information. 
@@ -284,13 +259,16 @@ problems have you found and how are they solved?
     All the plans for all the desires were previously calculated and stored as 
     beliefs, since the amount of steps that they need is used by the 
     argumentation module. The \textit{planning} module selects the one 
-    corresponding to the selected intention, and stores it. Then, the execution module only gets the plan, and returns to Python the first 
+    corresponding to the selected intention, and stores it. Then, the 
+    execution module only gets the plan, and returns to Python the first 
     action in it.
 
-    However, if the process flow comes from the other branch of Fig. \ref{fig:architecture} (that is, after the cut condition, the agent has an intention), the execution is not that simple. Since skipping the 
-    decision-taking makes this branch insignificant in terms of time, we decided 
-    to recalculate the plan. This might help us when a better path is 
-    discovered, even though this is unlikely.
+    However, if the process flow comes from the other branch of Fig. \ref{
+    fig:architecture} (that is, after the cut condition, the agent has an 
+    intention), the execution is not that simple. Since skipping the decision-
+    taking makes this branch insignificant in terms of time, we decided to 
+    recalculate the plan. This might help us when a better path is discovered, 
+    even though this is unlikely.
 
     Back again in Python, with the returned action, an XML is formed, to be sent 
     to the server.
@@ -329,8 +307,10 @@ problems have you found and how are they solved?
     Search, and Depth First Search. The zone-coloring algorithm was also 
     implemented in Prolog.
     
+    %%%%%%%%%%%%%%%%%%%%%%%%
     %poner algo de DeLP acá
-
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    
     Initial plans were to distribute agents on several machines. Each agents runs 
     as a separate process, and communicates with others via TCP sockets. After 
     some experience and benchmarking, agents were run on one machine, due to 
