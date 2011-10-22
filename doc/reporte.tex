@@ -222,8 +222,6 @@ problems have you found and how are they solved?
 }
 \end{comment}
 
-\subsection{Architecture implementation}
-
 \begin{figure}
 \centering
   \includegraphics[width=\textwidth]{agent_architecture2.png}
@@ -231,6 +229,15 @@ problems have you found and how are they solved?
     Dashed arrows represent process flow, solid lines represent data flow.}
 \label{fig:architecture}
 \end{figure}
+
+    In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
+    i.e. its interactions with the servers (MASSIM, and our Percept Server), 
+    and its internal components.
+ 
+
+\subsection{Architecture implementation}
+
+
 
 %Aca va toda la bola de explicacion del dibujito
 
@@ -246,10 +253,11 @@ problems have you found and how are they solved?
     first processes the perception, and then sends it to the Percept Server. 
     This waits for all the other agents' perception, merges them, and then sends 
     back a new version, that cointains everything that has been seen by its
-    teammates, but not by itself.
-    
-    This global perception is asserted into Prolog. Then, Python queries it,
-    asking for an action to be performed.
+    teammates, but not by itself. Finally, this global perception is asserted 
+    into Prolog. 
+    As it will be explained below, this part of the program constitutes the 
+    decision making module. Therefore, the Python part will query it, for the
+    next action to be performed by the agent.
     
 \subsubsection{Action requested.}
 
@@ -261,26 +269,25 @@ problems have you found and how are they solved?
     checks whether it still is significant to keep doing it. It is a series of 
     simple conditions, that reviews the state of the world.
 
-    Then, if there was not any intention, or the cut condition decides it is not 
-    interesting to keep it, the \textit{beliefs setting} is started. It 
+    Then, if there was not any commited intention, or the cut condition decides it is not 
+    interesting to keep it, the \textit{beliefs setting process} is started. It 
     generates the possible desires for this step, according to what is stored in 
     the knowledge base, and, for each one of them, the beliefs needed.
 
     The decision-taking module is implemented in DeLP, a defeasible logic 
-    programming language used in argumentation. Given the set of possible 
+    programming language that uses argumentation to reason with conflicting
+    information. 
+    Given the set of possible 
     desires and beliefs set by the previous module, it selects the best desire, 
     returning it as the intention to be done.
 
     All the plans for all the desires were previously calculated and stored as 
     beliefs, since the amount of steps that they need is used by the 
     argumentation module. The \textit{planning} module selects the one 
-    corresponding to the selected intention, and stores it.
-
-    The execution module only gets the plan, and returns to Python the first 
+    corresponding to the selected intention, and stores it. Then, the execution module only gets the plan, and returns to Python the first 
     action in it.
 
-    However, if the process flow comes from the other branch of \ref{
-    fig:architecture}, the execution is not that simple. Since skipping the 
+    However, if the process flow comes from the other branch of Fig. \ref{fig:architecture} (that is, after the cut condition, the agent has an intention), the execution is not that simple. Since skipping the 
     decision-taking makes this branch insignificant in terms of time, we decided 
     to recalculate the plan. This might help us when a better path is 
     discovered, even though this is unlikely.
@@ -321,6 +328,8 @@ problems have you found and how are they solved?
     also made more straightforward to implement search algorithms like Uniform Cost 
     Search, and Depth First Search. The zone-coloring algorithm was also 
     implemented in Prolog.
+    
+    %poner algo de DeLP acá
 
     Initial plans were to distribute agents on several machines. Each agents runs 
     as a separate process, and communicates with others via TCP sockets. After 
@@ -488,6 +497,8 @@ Programming Contest?
 off?
 }
 \end{comment}
+
+\subsection{Our team, and its development}
     
     Our team is formed by a group of friends, so a strong point in the developing 
     process would have been the cohesion and comradeship. We had also worked 
@@ -505,17 +516,17 @@ off?
     also became our home.
 
     However, we had many problems. Many of them were related with our lack of 
-    professionality, and lack of experience working in a big project. For example, 
-    we had problems simple but annoying problems, such as the encoding of our 
-    source files, or having different versions of the programs we used to program
-    installed in our computers.
+    professionality, and lack of experience working in a large project. 
+    For example, we had problems simple but annoying problems, such as the 
+    encoding of our source files, or having different versions of the programs 
+    we used to program installed in our computers.
 
     We are really grateful with our decisions involving programming languages, 
     tools and algorithms. Of course, we had many problems, and much time was spent 
-    deciding what to choose, but having all the process in consideration, we may 
-    had took the right calls. We should thank the great education given by our 
-    university (Universidad Nacional del Sur), and a great mentoring from our 
-    professors.
+    deciding what to choose. Nevertheless, having all the process in 
+    consideration, we may had took the right calls. We should thank the great 
+    education given by our university (Universidad Nacional del Sur), and a 
+    great mentoring from our professors.
 
     Many things should and will be improved for next year competence. We have
     gained an important amount of knowledge, capability and experience, that shall 
@@ -530,6 +541,8 @@ off?
     all but the last day of competition, in which we already had everything in 
     consideration and control.
 
+\subsection{Our thoughts about possible optimizations to the contest}
+    
     Many optimizations ocurred to us for the scenario, and the contest in general. 
     For example, more information for the nodes, including something useful for a 
     directed search (i.e., absolute coordinates), would help in the implementation 
