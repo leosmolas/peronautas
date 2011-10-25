@@ -17,6 +17,7 @@ integration of the different technologies used.
 \begin{question}
 What is the history of the team?  
 \end{question}
+
 The LIDIA research group was established in 1992 in the Universidad 
 Nacional del Sur, and it is the first time our time participates in the 
 contest.
@@ -38,6 +39,7 @@ students, two Ph.D. students and three professors.
 \begin{question}
 From which field of research do you come form?  Which work is related?  
 \end{question}
+
 The
 LIDIA research group has been working in Artificial Intelligence and
 Argumentation via Defeasible Logic Programming for almost 20 years now, and
@@ -51,6 +53,7 @@ If some multi-agent system methodology such
 as Prometheus, O-MaSE, or Tropos was used, how did you use it? If you did not
 what were the reasons?  
 \end{question}
+
 No design methodology specific to multi-agent systems
 was used. However, development was conducted using a simplified XP (extreme
 programming) methodology. 
@@ -59,7 +62,7 @@ programming) methodology.
 Is the solution based on the centralisation of coordination/information on
 a specific agent? Conversely if you plan a decentralised solution, which
 strategy do you plan to use?  
-\begin{question}
+\end{question}
 
 The solution follows a decentralised
 architecture in which agents run completely decoupled in different processes
@@ -78,6 +81,7 @@ minimal complexity.
 How are the following agent features considered/implemented: autonomy,
 proactiveness, reactiveness?  
 \end{question}
+
 Agents are completely autonomous;
 decision-making takes place individually at the agent level, with no
 intervention from human operators or a central intelligence agency within the
@@ -89,6 +93,7 @@ results in a less reactive and more autonomous way in which an agent acts.
 Is the team a truly multi-agent system or rather a centralised system in
 disguise?  
 \end{question}
+
 The team is a truly multi-agent system, and has absolutely no
 centralised characteristics.
 
@@ -96,6 +101,7 @@ centralised characteristics.
 How much time (man hours) have you invested (approximately) for
 implementing your team?  
 \end{question}
+
 % 28 weeks, 8 hs per week, 6 developers ~= 1500
 
 About 1500 hs.
@@ -118,6 +124,7 @@ competition, time constraints made this impossible.
 Which programming language did you use to
 implement the multi-agent system?  
 \end{question}
+
 The agent system was implemented using
 Python 2.7 and SWI Prolog 5.10.5. DeLP, a defeasible logic language, was used
 as a service within Prolog.
@@ -177,6 +184,7 @@ facilitated your development task?
 What features of your programming language has simplified your development
 task?  
 \end{question}
+
 Python's amenity to rapid application development and
 'batteries-included philosophy' facilitated implementing the communication
 layer to the MASSimg server, parsing of peceptions, rapid addition of planned
@@ -187,141 +195,238 @@ implement search algorithms.
 \begin{question}
 Which algorithms are used/implemented?  
 \end{question}
+
 Search algorithms, as Uniform Cost
 Search and Depth First Search, as well as the zone-coloring algorithm were
 implemented in Prolog.  The implementation of Defeasible Logic Programming
 (DeLP) by the LIDIA was used for the deliberative process.
 
-9. How did you distribute the agents on several machines? And if you did not
-please justify why.  Initial plans were to distribute agents on several
+\begin{question}
+How did you distribute the agents on several machines? And if you did not
+please justify why.  
+\end{question}
+
+Initial plans were to distribute agents on several
 machines. Each agents runs as a separate process, and communicates with others
 via TCP sockets. After some experience and bencmarking, agents were run on one
 machine due to performance issues. Having the choice was a benefit of the
 proposed design.
 
-10. To which extend is the reasoning of your agents synchronized with the
+\begin{question}
+To which extend is the reasoning of your agents synchronized with the
 receive-percepts/send-action cycle?
+\end{question}
+
+All the reasoning is done after receiving the percepts, and before sending the
+action.
 
 
-11. What part of the development was most difficult/complex? What kind of
-problems have you found and how are they solved?  The most difficult problems
+\begin{question}
+What part of the development was most difficult/complex? What kind of
+problems have you found and how are they solved?  
+\end{question}
+
+The most difficult problems
 were related to optimization. Much of our time has been spent in reducing the
 complexity of our algorithms, and the times they are called.
 
-12. How many lines of code did you write for your software?  Total LOC is
-5842.
+\begin{question}
+How many lines of code did you write for your software?  
+\end{question}
 
-== Stategies, Details, and Statistics
-1. What is the main strategy of your
-team?  The main strategy of the team consists of detecting profitable zones
+Total LOC is 5842.
+
+% == Stategies, Details, and Statistics
+\subsection{Stategies, Details, and Statistics}
+
+\begin{question}
+What is the main strategy of your
+team?  
+\end{question}
+
+The main strategy of the team consists of detecting profitable zones
 from the explored vertices, and positioning the agents correctly to maintain,
 defend and expand the zones.
 
-2. How does the overall team work together? (coordination, information
-sharing, ...) On each perceive/act cycle, agents receive the percept from the
+\begin{question}
+How does the overall team work together? (coordination, information
+sharing, ...) 
+\end{question}
+
+On each perceive/act cycle, agents receive the percept from the
 MASSim server, separate the information which will remain private and which
 will be shared.  The public part of the percept is sent to the percept server,
 which performs a union of all percept and send the difference back to each
 agent. After receiving the joint percept, the agents enter a belief setting
 phase, and later an argumentation phase.
 
+\begin{question}
+How do your agents analyze the topology of the map? And how do they exploit
+their findings? 
+\end{question}
 
-3. How do your agents analyze the topology of the map? And how do they exploit
-their findings?  Agents make no assumption about the map topology. They will
+Agents make no assumption about the map topology. They will
 prefer higher valued nodes over lower ones.
 
-4. How do your agents communicate with the server?  Some functionality
+
+\begin{question}
+How do your agents communicate with the server?  
+\end{question}
+
+Some functionality
 provided by the eismassim library was reimplemented in a connection library in
 Python.
 
-5. How do you implement the roles of the agents? Which strategies do the
-different roles implement?  Agents recover their assigned role from the
-simulation start message.  (????????????????????????)
+\begin{question}
+How do you implement the roles of the agents? Which strategies do the
+different roles implement?  
+\end{question}
 
-6. How do you find good zones? How do you estimate the value of zones?  If an
+Agents recover their assigned role from the
+simulation start message.  
+
+\begin{question}
+How do you find good zones? How do you estimate the value of zones?  
+\end{question}
+
+If an
 agent is not being part of any zone, it tries to regroup with a partner.  When
 a zone is formed, and the agent is part of it, for each potentally beneficial
 neighbor node, the agent calculates how much points would they win if it
 moves, and that information is used by the decision taking module.
 
-7. How do you conquer zones? How do you defend zones if attacked? Do you
-attack zones?  Both attacking and defense are implicitly implemented.
+\begin{question}
+How do you conquer zones? How do you defend zones if attacked? Do you
+attack zones?  
+\end{question}
+
+Both attacking and defense are implicitly implemented.
 Sabouteurs attack enemies that are near, so they might attack them if they
 enter our team's zone, as well as when they are in their zone. Any other agent
 of another role can go to a node that has, for example, two agents, one for
 each team, in order to expand the zone, occupying the contested node, and
 implicitly defending it.
 
-
+\begin{question}
 8. Can your agents change their behavior during runtime? If so, what triggers
-the changes?  Our agents do not change their behavior during runtime. It is
+the changes?  
+\end{question}
+
+Our agents do not change their behavior during runtime. It is
 actually very easy to add this feature, but we had not enough time to
 implement this.
 
+\begin{question}
+What algorithm(s) do you use for agent path planning?  
+\end{question}
 
-9. What algorithm(s) do you use for agent path planning?  Path planning is
+Path planning is
 implemented with an Uniform Cost Search. What we tried to minimize was the
 amount of steps required to achieve the goal, rather than the spent energy.
 The returned result is the list of actions to be done.
 
-10. How do you make use of the buying-mechanism?  Agents followed a list of
+\begin{question}
+How do you make use of the buying-mechanism?  
+\end{question}
+
+Agents followed a list of
 predefined buying actions, when the necessary amount of money was reached.
 
-11. How important are achievements for your overall strategy?  Our agents did
+\begin{question}
+How important are achievements for your overall strategy?  
+\end{question}
+
+Our agents did
 not have achievements in consideration. However, they managed to achieve a
 significant number of them, since this behavior was implicitly implemented.
 
+\begin{question}
+Do your agents have an explicit mental state?
+\end{question}
 
-12. Do your agents have an explicit mental state?
 
-13. How do your agents communicate? And what do they communicate?  Agents only
+\begin{question}
+How do your agents communicate? And what do they communicate?  
+\end{question}
+
+Agents only
 communicate their perceptions via a perception server implemented in Python.
 
-14. How do you organize your agents? Do you use e.g. hierarchies? Is your
+\begin{question}
+How do you organize your agents? Do you use e.g. hierarchies? Is your
 organization implicit or explicit?
+\end{question}
 
-15. Is most of your agents’ behavior emergent on and individual and team
+
+\begin{question}
+Is most of your agents’ behavior emergent on and individual and team
 level?
+\end{question}
 
-16. If your agents perform some planning, how many steps do they plan ahead?
+\begin{question}
+If your agents perform some planning, how many steps do they plan ahead?
+\end{question}
+
 The agents make plans as long as the selected intention requieres. This may
 sound excesive, but the possible goals were previously selected for their
 potential, taking in consideration their distance (in nodes, not in actions).
 However, plans are recalculated in every step.
 
-== Conclusion
+% == Conclusion
+\subsection{Conclusion}
 
-1. What have you learned from the participation in the contest?
-    Being our first experience building a system this size, we learned several lessons about working in big projects, such as setting standards and synchronizing versions of the technologies used.
+\begin{question}
+What have you learned from the participation in the contest?
+\end{question}
 
+Being our first experience building a system this size, we learned several 
+lessons about working in big projects, such as setting standards and 
+synchronizing versions of the technologies used.
 
-2. Which are the strong and weak points of the team?
+\begin{question}
+Which are the strong and weak points of the team?
+\end{question}
+
     Our team is formed by a group of friends, so a strong point in the
     developing proccess was the cohesion and comradeship. We had
     already worked together, both in university's projects and in
     small freelance projects, so we well knew what to expect from each other,
     and each member's capabilities.
 
-  
-3. How suitable was the chosen programming language, methodology, tools, and
+\begin{question}  
+How suitable was the chosen programming language, methodology, tools, and
 algorithms?
+\end{question}
+
     We are really happy with our decisions involving programming languages,
     tools and algorithms. Of course, we had many problems, and much time was
     spent deciding what to choose, but having all the proccess in
     consideration, we may had took the right calls.
 
-4. What can be improved in the context for next year?
-    There were several hotfixes that were written and deployed at the same time we were facing our competitors due to the lack of testing in the actual context of the competition. This situation should obviously not happen, and adding much more real testing is one of our main priorities for next year's competition.
+\begin{question}
+What can be improved in the context for next year?
+\end{question}
 
-5. Why did your team perform as it did? Why did the other teams perform
+There were several hotfixes that were written and deployed at the same 
+time we were facing our competitors due to the lack of testing in the 
+actual context of the competition. This situation should obviously not 
+happen, and adding much more real testing is one of our main priorities 
+for next year's competition.
+
+\begin{question}
+Why did your team perform as it did? Why did the other teams perform
 better/worse than you did?
+\end{question}
 
+\begin{question}
 6. Which other research fields might be interested in the Multi-Agent
 Programming Contest?
+\end{question}
 
-
-7. How can the current scenario be optimized? How would those optimization pay
+\begin{question}
+How can the current scenario be optimized? How would those optimization pay
 off?
+\end{question}
 
     More information for the nodes, including something useful for a directed search (i.e., absolute coordinates), would help in
     the implementation of a A* search (which would decrease execution time). Defining the most valuable zones randomly would benefit teams that thoughtfully look for and conquer good zones, rather than teams that assume that the center of the map is the most valuable zone and don't explore the rest.
