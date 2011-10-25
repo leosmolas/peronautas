@@ -1,83 +1,145 @@
-TL;DR section: (short answers for all questions)
+%TL;DR section: (short answers for all questions)
 
-== Introduction 1. What was the motivation to participate in the contest?  The
-group's main motivation was to apply argumentation via defeasible logic
-programming (DeLP) in a multi-agent gaming situation and to test the
+\section*{Short Answers}
+
+% == Introduction 1. 
+
+\subsection{Introduction}
+
+\begin{question}
+What was the motivation to participate in the contest?  
+\end{question}
+
+The group's main motivation was to apply argumentation via defeasible 
+logic programming (DeLP) in a multi-agent gaming situation and to test the
 integration of the different technologies used.
 
-2. What is the history of the team?  The LIDIA research group was established
-in 1992 in the Universidad Nacional del Sur, and it is the first time our time
-participates in the contest.
+\begin{question}
+What is the history of the team?  
+\end{question}
+The LIDIA research group was established in 1992 in the Universidad 
+Nacional del Sur, and it is the first time our time participates in the 
+contest.
 
-3. What is the name of your team?  The team's name is d3lp0r.
+\begin{question}
+What is the name of your team?  
+\end{question}
 
-4. How many developers and designers did you have?  At what level of education
-are your team members?  The d3lp0r team was formed incorporating 6 graduate
-students, 2 Ph.D. students and 3 professors.
+The team's name is d3lp0r.
 
-5. From which field of research do you come form?  Which work is related?  The
+\begin{question}
+How many developers and designers did you have?  At what level of education
+are your team members?  
+\end{question}
+
+The d3lp0r team was formed incorporating six graduate
+students, two Ph.D. students and three professors.
+
+\begin{question}
+From which field of research do you come form?  Which work is related?  
+\end{question}
+The
 LIDIA research group has been working in Artificial Intelligence and
 Argumentation via Defeasible Logic Programming for almost 20 years now, and
 the DeLP server technology developed has been used in the contest.
 
-== System Analysis and Design 1. If some multi-agent system methodology such
+\subsection{System Analysis and Design}
+
+% == System Analysis and Design
+\begin{question}
+If some multi-agent system methodology such
 as Prometheus, O-MaSE, or Tropos was used, how did you use it? If you did not
-what were the reasons?  No design methodology specific to multi-agent systems
+what were the reasons?  
+\end{question}
+No design methodology specific to multi-agent systems
 was used. However, development was conducted using a simplified XP (extreme
 programming) methodology. 
 
-2. Is the solution based on the centralisation of coordination/information on
+\begin{question}
+Is the solution based on the centralisation of coordination/information on
 a specific agent? Conversely if you plan a decentralised solution, which
-strategy do you plan to use?  The solution follows a decentralised
+strategy do you plan to use?  
+\begin{question}
+
+The solution follows a decentralised
 architecture in which agents run completely decoupled in different processes
 while sharing nothing.
 
-3. What is the communication strategy and how complex is it?  Percepts are
+\begin{question}
+What is the communication strategy and how complex is it?  
+\end{question}
+
+Percepts are
 communicated among agent members of the team via a broadcast mechanism
 developed as part of the multi-agent system. This design was chosen for its
 minimal complexity.
 
-4. How are the following agent features considered/implemented: autonomy,
-proactiveness, reactiveness?  Agents are completely autonomous;
+\begin{question}
+How are the following agent features considered/implemented: autonomy,
+proactiveness, reactiveness?  
+\end{question}
+Agents are completely autonomous;
 decision-making takes place individually at the agent level, with no
 intervention from human operators or a central intelligence agency within the
 system.  Agents assign priorities to different possible goals depending on
 their desires, and plan in order to achieve the most valuable goal. This
 results in a less reactive and more autonomous way in which an agent acts.
 
-
-5. Is the team a truly multi-agent system or rather a centralised system in
-disguise?  The team is a truly multi-agent system, and has absolutely no
+\begin{question}
+Is the team a truly multi-agent system or rather a centralised system in
+disguise?  
+\end{question}
+The team is a truly multi-agent system, and has absolutely no
 centralised characteristics.
 
+\begin{question}
+How much time (man hours) have you invested (approximately) for
+implementing your team?  
+\end{question}
+% 28 weeks, 8 hs per week, 6 developers ~= 1500
 
-6. How much time (man hours) have you invested (approximately) for
-implementing your team?  I don't know, but IT'S OVER 9.000!
+About 1500 hs.
 
-
-7. Did you discuss the design and strategies of your agent team with other
+\begin{question}
+Did you discuss the design and strategies of your agent team with other
 developers? To which extent did your test your agents playing with other
-teams?  Experience from a previous instance of the MAPC was shared with our
+teams?  
+\end{question}
+
+Experience from a previous instance of the MAPC was shared with our
 teams by members of the ARGONAUTS team from Universität Dortmund. Although the
 initial plan was to run tests against other agent teams prior to the
 competition, time constraints made this impossible.
 
+\subsection{Software Architecture}
+% == Software Architecture 
 
-== Software Architecture 1. Which programming language did you use to
-implement the multi-agent system?  The agent system was implemented using
+\begin{question}
+Which programming language did you use to
+implement the multi-agent system?  
+\end{question}
+The agent system was implemented using
 Python 2.7 and SWI Prolog 5.10.5. DeLP, a defeasible logic language, was used
 as a service within Prolog.
 
-2. Did you use multi-agent programming languages? Why or why not to use a
-multi-agent programming language?  No multi-agent programming
+\begin{question}
+Did you use multi-agent programming languages? Why or why not to use a
+multi-agent programming language?  
+\end{question}
+
+No multi-agent programming
 languages/patforms/frameworks were used due to previous experience indicating
 a general lack of flexibility, and a lack of familiarity on behalf of the
 development team.
 
-3. How have you mapped the designed architecture (both multi-agent and
+\begin{question}
+How have you mapped the designed architecture (both multi-agent and
 individual agent architectures) to programming codes i.e., how did you
 implement specific agent-oriented concepts and designed artifacts using the
-programming language?  The perception is processed by the Python program, that
+programming language?  
+\end{question}
+
+The perception is processed by the Python program, that
 parses the XML. Then, it sends it to the Percept Server that every step merges
 all perceptions, and delivers them back to the agents.  The Python code
 asserts all the perception into Prolog, then querying it for the next action
@@ -85,33 +147,47 @@ to be executed.  Prolog handles all the decision making, argumentation and
 planning, and returns the action binded to a variable to Python, that then
 generates with it an XML to be sent to the server.
 
-4. Which development platforms and tools are used? How much time did you
-invest in learning those?  Both Linux and the Windows operating system were
+\begin{question}
+Which development platforms and tools are used? How much time did you
+invest in learning those?  
+\end{question}
+
+Both Linux and the Windows operating system were
 used as development platforms, since the language runtimes chosen for
 implementation were portable.  We used git as our revision control system. In
 general, we did not spend much time in learning it, since some of us had
 already worked with it.
 
-5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java,
-....) are used? How much time did you invest in learning those?  Python and
+\begin{question}
+Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java,
+....) are used? 
+\end{question}
+
+How much time did you invest in learning those?  Python and
 Prolog were the chosen languages for the development of the system. Most of us
 had already worked with both of them, so we did not spend much time learning
 those.
 
-6. What features were missing in your language choice that would have
+\begin{question}
+What features were missing in your language choice that would have
 facilitated your development task?
+\end{question}
 
-
-7. What features of your programming language has simplified your development
-task?  Python's amenity to rapid application development and
+\begin{question}
+What features of your programming language has simplified your development
+task?  
+\end{question}
+Python's amenity to rapid application development and
 'batteries-included philosophy' facilitated implementing the communication
 layer to the MASSimg server, parsing of peceptions, rapid addition of planned
 features and bug correction.  We made use of Prolog's declarative nature to
 model states of the world, and it also made it more straightforward to
 implement search algorithms.
 
-
-8. Which algorithms are used/implemented?  Search algorithms, as Uniform Cost
+\begin{question}
+Which algorithms are used/implemented?  
+\end{question}
+Search algorithms, as Uniform Cost
 Search and Depth First Search, as well as the zone-coloring algorithm were
 implemented in Prolog.  The implementation of Defeasible Logic Programming
 (DeLP) by the LIDIA was used for the deliberative process.
