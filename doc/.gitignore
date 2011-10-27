@@ -4,3 +4,5 @@
 !tech-report-template.pdf
 *.log
 *.gz
+*.bbl
+*.blg
