@@ -278,17 +278,31 @@ problems have you found and how are they solved?
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP 
     \cite{Garcia:2004a}, a defeasible logic programming language, was used as a 
     service within Prolog. 
-    Language integration was achieved using the pyswip library, calling Prolog 
-    predicates from Python. The implementation of Defeasible Logic Programming 
-    (DeLP) by the LIDIA was used for the deliberative process. They were 
-    well-known at the start of the project, and were chosen for precisely those
-    reasons.
+    Language integration was achieved using the \textit{pyswip}\ library, 
+    calling Prolog predicates from Python. The implementation of Defeasible 
+    Logic Programming (DeLP) by the LIDIA was used for the deliberative 
+    process. They were well-known at the start of the project, and were chosen 
+    for precisely those reasons.
+    
+    No multi-agent programming languages/patforms/frameworks were used due to 
+    previous experience indicating a general lack of flexibility, and a lack of 
+    familiarity on behalf of the development team.
+    
+    Both Linux and the Windows operating system were used as development 
+    platforms, since the language runtimes chosen for implementation were 
+    portable. Some caveats were encountered however.
+
+    We used \textit{git}\ as our revision control system. In general, we did 
+    not spend much time in learning it, since some of us had already worked 
+    with it.
+    
+\subsubsection{DeLP.}
     
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
     \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
 
-    In \DLP~\cite{citaDeLP}, knowledge is represented using facts, strict rules
+    In DeLP\cite{Garcia:2004a}, knowledge is represented using facts, strict rules
     and defeasible rules. Facts and strict rules are ground literals representing
     firm information that can not be challenged. \textit{Defeasible Rules}
     (d-rules) are denoted $\drule{L_0}{L_1, \ldots, L_n}$ (where $L_i$ are literals)
@@ -308,18 +322,9 @@ problems have you found and how are they solved?
     that it supports.
 
     In DeLP, a query $L$ is \emph{warranted} from a program if a \emph{non-defeated}
-    argument \Arg\ supporting $L$ exists. 
+    argument that supports $L$ exists. %\Arg\ 
 
-    No multi-agent programming languages/patforms/frameworks were used due to 
-    previous experience indicating a general lack of flexibility, and a lack of 
-    familiarity on behalf of the development team.
-    
-    Both Linux and the Windows operating system were used as development 
-    platforms, since the language runtimes chosen for implementation were 
-    portable. Some caveats were encountered however.
 
-    We used git as our revision control system. In general, we did not spend much 
-    time in learning it, since some of us had already worked with it.
 
 \subsubsection{Benefits.}
     
