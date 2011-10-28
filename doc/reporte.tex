@@ -1,13 +1,12 @@
 \documentclass{llncs2e/llncs}
 
-% \usepackage{makeidx}  % allows for indexgeneration
 \usepackage{verbatim}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{bibentry}
 \usepackage[numbers]{natbib}
 
-\title{An Argumentative Approach for a BDI Agent} % tentativo
+\title{An Argumentative Approach for a BDI Agent} 
         
 \author{I\~{n}aki Garay \and      % igarai@gmail.com
         Diego Marcovecchio \and   % diegomarcov@gmail.com
@@ -21,26 +20,13 @@
         Guillermo Simari          % grs@cs.uns.edu.ar
         }
 
-\institute{Universidad Nacional del Sur \email{\{igarai,diegomarcov,leos.molas,emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}@cs.uns.edu.ar}}
+\institute{Universidad Nacional del Sur \\\email{\{igarai,diegomarcov,leos.molas,%
+emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
+@cs.uns.edu.ar}}
 
 \begin{document}
 
 \maketitle
-
-\begin{comment}
-\pagestyle{headings}  % switches on printing of running heads
-\addtocmark{Hamiltonian Mechanics} % additional mark in the TOC
-figuras
-- la arquitectura del agente
-- la arquitectura del programa
-- ejemplo del fog of war y coloreo
-meter una buena explicacion de la arquitectura bdi en la parte de diseño
-
-- arquitectura
-- argumentacion
-- estrategias
-- percept server
-\end{comment}
 
 \begin{abstract}
     This report presents the design and results of the d3lp0r multi-agent system 
@@ -70,17 +56,6 @@ meter una buena explicacion de la arquitectura bdi en la parte de diseño
     members of the ARGONAUTS team from Universität Dortmund. Although the initial 
     plan was to run tests against other agent teams prior to the competition, time 
     constraints acted against this.
-
-\begin{comment}
-PREGUNTAS {
-1. What was the motivation to participate in the contest?
-2. What is the history of the team?
-3. What is the name of your team?
-4. How many developers and designers did you have?  At what level of education 
-are your team members?
-5. From which field of research do you come form?  Which work is related?
-}
-\end{comment}
 
 \section{Preliminaries}
 
@@ -118,28 +93,6 @@ are your team members?
 
 \section{System Analysis and Design}
 
-\begin{comment}
-PREGUNTAS {
-1. If some multi-agent system methodology such as Prometheus, O-MaSE, or 
-Tropos was used, how did you use it? 
-   If you did not what were the reasons?
-2. Is the solution based on the centralisation of coordination/information on 
-a specific agent?
-   Conversely if you plan a decentralised solution, which strategy do you plan 
-to use?
-3. What is the communication strategy and how complex is it?
-4. How are the following agent features considered/implemented: autonomy, 
-proactiveness, reactiveness?
-5. Is the team a truly multi-agent system or rather a centralised system in 
-disguise?
-6. How much time (man hours) have you invested (approximately) for 
-implementing your team?
-7. Did you discuss the design and strategies of your agent team with other 
-developers? 
-   To which extent did your test your agents playing with other teams?
-}
-\end{comment}
-
     Despite many man-hours dedicated to design in the early stages of
     the competition, the development team's lack of experience in multi-agent
     systems made necessary several changes and additions. 
@@ -169,41 +122,13 @@ developers?
 
 \section{Software Architecture}
 
-\begin{comment}
-PREGUNTAS {
-1. Which programming language did you use to implement the multi-agent system?
-2. Did you use multi-agent programming languages? Why or why not to use a 
-multi-agent programming language?
-
-3. How have you mapped the designed architecture (both multi-agent and 
-individual agent architectures) to programming codes i.e., how did you 
-implement specific agent-oriented concepts and designed artifacts using the 
-programming language?
-4. Which development platforms and tools are used? How much time did you 
-invest in learning those?
-5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, 
-....) are used? How much time did you invest in learning those?
-6. What features were missing in your language choice that would have 
-facilitated your development task?
-7. What features of your programming language has simplified your development 
-task?
-8. Which algorithms are used/implemented?
-9. How did you distribute the agents on several machines? And if you did not 
-please justify why.
-10. To which extend is the reasoning of your agents synchronized with the 
-receive-percepts/send-action cycle?
-11. What part of the development was most difficult/complex? What kind of 
-problems have you found and how are they solved?
-12. How many lines of code did you write for your software?
-}
-\end{comment}
 
 \begin{figure}
-%\centering
-%  \includegraphics[width=\textwidth]{agent_architecture2.png}
-%    \caption{Agent architecture in a flow chart-like diagram. 
-%    Dashed arrows represent process flow, solid lines represent data flow.}
-%\label{fig:architecture}
+\centering
+ \includegraphics[width=\textwidth]{agent_architecture2.png}
+   \caption{Agent architecture in a flow chart-like diagram. 
+   Dashed arrows represent process flow, solid lines represent data flow.}
+\label{fig:architecture}
 \end{figure}
 
     In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
@@ -213,9 +138,6 @@ problems have you found and how are they solved?
 
 \subsection{Architecture implementation}
 
-
-
-%Aca va toda la bola de explicacion del dibujito
 
     The first part of the architecture is the Python part, that handles all the 
     communication with the servers. It first opens a TCP/IP connection with the 
@@ -264,8 +186,8 @@ problems have you found and how are they solved?
     execution module only gets the plan, and returns to Python the first 
     action in it.
 
-    However, if the process flow comes from the other branch of Fig. \ref{
-    fig:architecture} (that is, after the cut condition, the agent has an 
+    However, if the process flow comes from the other branch of Fig. 
+    \ref{fig:architecture} (that is, after the cut condition, the agent has an 
     intention), the execution is not that simple. Since skipping the decision-
     taking makes this branch insignificant in terms of time, we decided to 
     recalculate the plan. This might help us when a better path is discovered, 
@@ -492,22 +414,6 @@ problems have you found and how are they solved?
     decision-taking module.
 
 \section{Conclusion}
-
-\begin{comment}
-PREGUNTAS {
-1. What have you learned from the participation in the contest?
-2. Which are the strong and weak points of the team?
-3. How suitable was the chosen programming language, methodology, tools, and 
-algorithms?
-4. What can be improved in the context for next year?
-5. Why did your team perform as it did? Why did the other teams perform 
-better/worse than you did?
-6. Which other research fields might be interested in the Multi-Agent 
-Programming Contest?
-7. How can the current scenario be optimized? How would those optimization pay 
-off?
-}
-\end{comment}
 
 \subsection{Our team, and its development}
     
