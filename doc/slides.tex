@@ -4,14 +4,15 @@
 \usepackage{graphicx}
 \usepackage{helvet}
 \usepackage{hyperref}
+%\usepackage{listings}
 
 
 \usetheme{Hannover}
 \usecolortheme[named=FireBrick]{structure} 
-%\setbeamercovered{transparent}
+\setbeamercovered{transparent}
 
 
-\title{An Argumentative Approach for a BDI Agent} 
+\title[d3lp0r]{\texttt{d3lp0r:}\\\large{A team for the Multi-Agent Programming Contest, based on argumentative BDI agents}}
 \author{LIDIA}
 \institute{Universidad Nacional del Sur} %\\\email{\{igarai,diegomarcov,leos.molas,%
 % emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
@@ -126,5 +127,41 @@ minimal complexity.
 
 \end{frame}
 
+%%%%%%%% FRAME %%%%%%%%%%%%
+
+\begin{frame}
+\center
+ \includegraphics[width=\textwidth]{mamarracho.png}
+
+\end{frame}
+
+%%%%%%%% FRAME %%%%%%%%%%%%
+
+\begin{frame}[fragile]
+% aumento(Value, X) -<
+    % b(distancia(X, [], Dist, EnergyLeft)),
+    % esSeguro(X),
+    % b(difPuntosZona(X, DifPuntos)),
+    % greater(DifPuntos, 0),
+    % phaseCoef(aumento, Coef),
+    % aumentoValue(Dist,  DifPuntos, EnergyLeft, 
+        % Coef, Value).
+
+\begin{verbatim}
+expansion(Value, Node) -<
+    distance(Node, Distance),
+    zoneDifference(Node, Difference),
+    isSafe(Node),
+    expansionValue(Distance, Difference, Value).
+    
+~isSafe(Node) <-
+    twoSaboteurs(Node).
+    
+~expansion(_Value, Node) <-
+    zoneDifference(Node, Difference),
+    lessOrEqual(Difference, 0).
+        
+\end{verbatim}
+\end{frame}
 
 \end{document}
