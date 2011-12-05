@@ -30,7 +30,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \begin{abstract}
     This report presents the design and results of the d3lp0r multi-agent system 
-    developed by the LIDIA team for the 2011 Multi-Agent Programming Contest.
+    developed by the LIDIA team for the Multi-Agent Programming Contest 2011 (MAPC).
     The d3lp0r agents use a BDI architecture extended with planning and 
     argumentation (via Defeasible Logic Programming) to model a cooperating team 
     operating in a dynamic and competitive environment.
@@ -41,6 +41,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \end{abstract}
 
 \section{Introduction}
+
+    The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
+    Programming Contest 2011 (MAPC) hosted by the Clausthal University of
+    Technology (www.tu-clausthal.de). 
 
     The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia 
     Artificial, Artificial Intelligence Research and Development Laboratory) 
@@ -53,43 +57,43 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     and to test the integration of the different technologies used.
 
     Experience from a previous instance of the MAPC was shared with our teams by 
-    members of the ARGONAUTS team from Universität Dortmund. Although the initial 
+    members of the ARGONAUTS team from TU Dortmund. Although the initial 
     plan was to run tests against other agent teams prior to the competition, time 
     constraints acted against this.
 
-\section{Preliminaries}
+%\section{Preliminaries}
+%
+%    The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
+%    Programming Contest 2011 (MAPC) hosted by the Clausthal University of
+%    Technology (www.tu-clausthal.de). 
 
-    The \texttt{d3lp0r} system was developed in the context of the 2011 edition 
-    of the Multi-Agent Programming Contest hosted by the University of 
-    Clausthal. 
-
-    The simulation scenario is represented as an undirected graph, in which 
-    nodes are valid agent locations weighted by value, and edges are valid
-    transitions weighted by cost. 
-    Agent state includes energy, health, and strength parameters. Agent percepts
-    include visible nodes, edges, and other agents. 
-    Each agent is assigned a role in the simulation (Explorer, Saboteur,
-    Repairer, Sentinel and Inspector) which determines its valid actions and
-    initial maximum values for the agent state parameters. 
-    Actions in general have an energy cost, movement action costs depend on edge
-    weights, successful attack actions decrease enemy agent's health subject to
-    a comparison of their strength attributes. Certain actions may cause further
-    information to be included in subsequent percepts. 
-
-    A match consists of several simulations, and each simulation proceeds as
-    a series of steps. In each step, each agent is provided with a percept with
-    partial information about the current simulation state and is
-    queried for its action. 
-
-    The goal is to maximize the score function each step. A team is awarded
-    points according to the value of the nodes controlled by the team, and
-    in addition certain achievements. Agents may control more nodes than 
-    those they are positioned in by forming zones, groups of nodes under the
-    influence of a team determined by a graph coloring algorithm specified in
-    the scenario description. 
-
-    The final score for a team is the sum of points over all steps; at the end
-    of the match, the team with the most points is the winner.
+%    The simulation scenario is represented as an undirected graph, in which 
+%    nodes are valid agent locations weighted by value, and edges are valid
+%    transitions weighted by cost. 
+%    Agent state includes energy, health, and strength parameters. Agent percepts
+%    include visible nodes, edges, and other agents. 
+%    Each agent is assigned a role in the simulation (Explorer, Saboteur,
+%    Repairer, Sentinel and Inspector) which determines its valid actions and
+%    initial maximum values for the agent state parameters. 
+%    Actions in general have an energy cost, movement action costs depend on edge
+%    weights, successful attack actions decrease enemy agent's health subject to
+%    a comparison of their strength attributes. Certain actions may cause further
+%    information to be included in subsequent percepts. 
+%
+%    A match consists of several simulations, and each simulation proceeds as
+%    a series of steps. In each step, each agent is provided with a percept with
+%    partial information about the current simulation state and is
+%    queried for its action. 
+%
+%    The goal is to maximize the score function each step. A team is awarded
+%    points according to the value of the nodes controlled by the team, and
+%    in addition certain achievements. Agents may control more nodes than 
+%    those they are positioned in by forming zones, groups of nodes under the
+%    influence of a team determined by a graph coloring algorithm specified in
+%    the scenario description. 
+%
+%    The final score for a team is the sum of points over all steps; at the end
+%    of the match, the team with the most points is the winner.
 
 \section{System Analysis and Design}
 
@@ -98,8 +102,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     systems made necessary several changes and additions. 
     Nevertheless, our approach was more than satisfying, resulting to be
     modular, correct and in close correspondence with the literature.
-
-\subsection{Agent Design}
 
     The solution follows a decentralised architecture in which agents run 
     completely decoupled in different processes while sharing nothing. Percepts 
@@ -119,20 +121,21 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     the implementation was conducted using a simplified XP (extreme programming) 
     methodology.
 
+    Approximately 1500 man-hours were invested in the team development.
 
 \section{Software Architecture}
 
 
-\begin{figure}
-\centering
- \includegraphics[width=\textwidth]{agent_architecture.pdf}
-   \caption{Agent architecture in a flow chart-like diagram. 
-   Dashed arrows represent process flow, solid lines represent data flow.}
-\label{fig:architecture}
-\end{figure}
+%\begin{figure}
+%\centering
+% \includegraphics[width=\textwidth]{agent_architecture.pdf}
+%   \caption{Agent architecture in a flow chart-like diagram. 
+%   Dashed arrows represent process flow, solid lines represent data flow.}
+%\label{fig:architecture}
+%\end{figure}
 
     In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
-    i.e. its interactions with the servers (MASSIM, and our Percept Server), 
+    i.e. its interactions with the servers (MASSim, and our Percept Server), 
     and its internal components.
  
 
@@ -141,7 +144,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     The first part of the architecture is the Python part, that handles all the 
     communication with the servers. It first opens a TCP/IP connection with the 
-    MASSIM server, and authenticates. Then it does the same with our Percept 
+    MASSim server, and authenticates. Then it does the same with our Percept 
     Server, that has to be running. It waits for all the agents, and then 
     everything is set to start the simulation.
 
@@ -150,7 +153,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
     This waits for all the other agents' perceptions, merges them, and then sends 
-    back a new version that cointains everything that has been seen by the agent 
+    back a new version that contains everything that has been seen by the agent 
     teammates, but not by itself. Finally, this global perception is asserted 
     into Prolog. 
     As it will be explained below, this part of the program constitutes the 
@@ -296,7 +299,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     that allowed us to call it several times, with the virtual cost of only one 
     call. It was done using memoization, and a more thoughtful invocation.
 
-\section{Stategies, Details, and Statistics}
+% TODO LO DE LAS LINEAS DE CODIGO
+
+\section{Strategies, Details, and Statistics}
 
 \subsection{Strategy}
     The main strategy of the team consists of detecting profitable zones from the 
@@ -305,10 +310,15 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     
     Our agents do not change their behavior during runtime. It is actually very 
     easy to add this feature, but we had not enough time to implement it.
+
+    % TODO explicar lo de las fases
     
     Achievements are not taken under consideration. However, agents can
     achieve a significant number of them, since this behavior is implicitly 
     implemented.
+
+    % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
+    % porque surgen del proceso de razonamiento
     
 \subsubsection{Zone conquering.}
     
@@ -321,6 +331,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
+
+    % TODO explicar como una agente sabe si esta en una zona o no
 
 \subsubsection{Attacking and defending.}
     
@@ -483,12 +495,98 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     that, and detecting infrastructure issues, such as network problems.
     
     
+    % TODO pregunta 6 que otros campos
+    % Game AI, Robotics
 
 %BIBTEX
     
 \bibliographystyle{plainnat} 
 \bibliography{bib} 
 
-\include{questions}
+%\include{questions}
 
 \end{document} 
+
+
+%referencia del concurso
+%referencias estandar para argumentacion y delp
+%referencia de XP
+%
+
+
+%PRELIMINARIES
+%
+%   no va la explicacion
+%
+%SYSTEM ANALYSIS AND DESIGN
+%
+%    proactiveness
+%
+%    What is the communication strategy and how complex is it?
+%
+%    Explicar mejor la arqui del Percept server, su mecanismo
+%    que cada agente tiene su propia KB
+%    que no hay variables compartidos
+%
+%    Horas   
+%
+%    abril
+%        144 = 6 x 4 x 6
+%    mayo
+%        144 = 6 x 4 x 6
+%    junio
+%        144 = 6 x 4 x 6
+%        120 = 6 x 20
+%    julio
+%        144 = 6 x 4 x 6
+%        120 = 6 x 20
+%    agosto
+%        144 = 6 x 4 x 6
+%    septiembre
+%        360 = 5 x 12 x 6
+%
+%    1500 total
+%
+%    % 28 weeks, 8 hs per week, 6 developers ~= 1500
+%
+%SW ARCHITECTURE
+%
+%    separar el grafico en dos partes
+%    alto nivel, separacion python prolog delp
+%    bajo nivel, con todos los modulos e interacciones
+%    
+%    IÑAKI:
+%        como se representa el conocimiento?
+%        how does de static dynamic and initial data look like?
+%        como se representa entre el agente y el PS?
+%        ejemplos de codigo 
+%        como se traduce a prolog para meterlo en la KB?
+%        UNA BUENA EXPLICACION DEL PIPELINE DE DATOS
+%
+%    MOLAS: how does delp look like?  ejemplos de delp
+%    MOLAS: how does an intention look like?
+%
+%    3.2: Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
+%
+%    3.4: 4. Which development platforms and tools are used? How much time did you invest in learning those?
+%            editor for the design process? 
+%            what IDE did you use?
+%            what abpout debugger for delp?
+%            hours spent learning those?
+%
+%        poner que no usamos IDEs 
+%        poner lo del visualizador del arboles dialecticos de delp?
+%
+%    3.10 To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
+%
+%    3.12 How many lines of code did you write for your software?
+%
+%
+%    cada turno la informacion en la kb se actualiza, se usa el parametro de step para ver la edad y validez de la info
+%    ejemplo el algoritmo de coloreo permite generacion de creencias, por lo cual en la kb no esta solamente la percepcion
+%
+%4 STRATEGIES DETAILS STATISTICS
+%
+%deberia haber una pequeña introduccion a la seccion en general, entre el titulo de la seccion y el subtitulo Strategy
+%
+%% TODO explicar lo de las fases

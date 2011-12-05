@@ -113,7 +113,7 @@ teams?
 \end{question}
 
 Experience from a previous instance of the MAPC was shared with our
-teams by members of the ARGONAUTS team from Universität Dortmund. Although the
+teams by members of the ARGONAUTS team from TU Dortmund. Although the
 initial plan was to run tests against other agent teams prior to the
 competition, time constraints made this impossible.
 
@@ -187,7 +187,7 @@ task?
 
 Python's amenity to rapid application development and
 'batteries-included philosophy' facilitated implementing the communication
-layer to the MASSimg server, parsing of peceptions, rapid addition of planned
+layer to the MASSim server, parsing of peceptions, rapid addition of planned
 features and bug correction.  We made use of Prolog's declarative nature to
 model states of the world, and it also made it more straightforward to
 implement search algorithms.
@@ -208,7 +208,7 @@ please justify why.
 
 Initial plans were to distribute agents on several
 machines. Each agents runs as a separate process, and communicates with others
-via TCP sockets. After some experience and bencmarking, agents were run on one
+via TCP sockets. After some experience and benchmarking, agents were run on one
 machine due to performance issues. Having the choice was a benefit of the
 proposed design.
 
@@ -236,12 +236,11 @@ How many lines of code did you write for your software?
 
 Total LOC is 5842.
 
-% == Stategies, Details, and Statistics
-\subsection{Stategies, Details, and Statistics}
+% == Strategies, Details, and Statistics
+\subsection{Strategies, Details, and Statistics}
 \setcounter{question}{0}
 \begin{question}
-What is the main strategy of your
-team?  
+What is the main strategy of your team?
 \end{question}
 
 The main strategy of the team consists of detecting profitable zones
@@ -428,8 +427,13 @@ How can the current scenario be optimized? How would those optimization pay
 off?
 \end{question}
 
-    More information for the nodes, including something useful for a directed search (i.e., absolute coordinates), would help in
-    the implementation of a A* search (which would decrease execution time). Defining the most valuable zones randomly would benefit teams that thoughtfully look for and conquer good zones, rather than teams that assume that the center of the map is the most valuable zone and don't explore the rest.
+    More information for the nodes, including something useful for a directed
+    search (i.e., absolute coordinates), would help in
+    the implementation of a A* search (which would decrease execution time).
+    Defining the most valuable zones randomly would benefit teams that
+    thoughtfully look for and conquer good zones, rather than teams that assume
+    that the center of the map is the most valuable zone and don't explore the
+    rest.
 
     A more informing/informational/apprising? feedback from the server would
     be appreciated, specially involving errors.
