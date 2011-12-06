@@ -43,8 +43,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \section{Introduction}
 
     The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
-    Programming Contest 2011 (MAPC) hosted by the Clausthal University of
-    Technology (www.tu-clausthal.de). 
+    Programming Contest 2011 (MAPC) \cite{BehrensAMAI2010b} hosted by the 
+    Clausthal University of
+    Technology \footnote{More information in \texttt{www.tu-clausthal.de}}.
 
     The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia 
     Artificial, Artificial Intelligence Research and Development Laboratory) 
@@ -52,8 +53,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     The d3lp0r team was formed incorporating six graduate students, two Ph.D. 
     students and three professors. The undergraduate students fully developed the 
     system, while the Ph.D. students and professors provided guidance. The group's 
-    main motivation was to apply argumentation via defeasible logic programming 
-    (DeLP) in a BDI based agent, in the context of a multi-agent gaming situation, 
+    main motivation was to apply argumentation \cite{Prakken:1997}
+    \cite{Rahwan:2009} \cite{Bench-Capon:2007}\ via defeasible logic programming 
+    (DeLP \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the context of a 
+    multi-agent gaming situation, 
     and to test the integration of the different technologies used.
 
     Experience from a previous instance of the MAPC was shared with our teams by 
@@ -175,8 +178,11 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     started. It generates the possible desires for this step, according to what 
     is stored in the knowledge base, and, for each one of them, the beliefs 
     needed. 
-    The decision-making module is implemented in DeLP, a defeasible logic 
-    programming language that uses argumentation to reason with conflicting
+    The decision-making module is implemented in DeLP\cite{Rotstein:2007}
+    \cite{Ferretti:2008},
+    a defeasible logic 
+    programming language that uses argumentation 
+    \cite{DBLP:conf/comma/2008}\ to reason with conflicting
     information. 
     Given the set of possible 
     desires and beliefs set by the previous module, it selects the best desire, 
@@ -303,36 +309,45 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \section{Strategies, Details, and Statistics}
 
+    In this section, we will explain the main characteristics of the agents' 
+    strategies, as well as several implementation details, such as algorithms
+    used, and agents' organization.
+
 \subsection{Strategy}
+
     The main strategy of the team consists of detecting profitable zones from the 
     explored vertices, and positioning the agents correctly to maintain, defend 
     and expand the zones. 
     
-    Our agents do not change their behavior during runtime. It is actually very 
-    easy to add this feature, but we had not enough time to implement it.
-
-    % TODO explicar lo de las fases
-    
-    Achievements are not taken under consideration. However, agents can
-    achieve a significant number of them, since this behavior is implicitly 
-    implemented.
-
-    % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
-    % porque surgen del proceso de razonamiento
+    The agents coordinate in an implicit way. This is, the  information shared 
+    consists only of the perception received, without having neither 
+    preprocessed beliefs, nor control variables. The agents do not communicate
+    their intention, or plans, so any coordination that they may have has been
+    achieved implicitly.
+    % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
+    % lineas antes.
     
 \subsubsection{Zone conquering.}
     
-    If an agent is not being part of any zone, it tries to regroup with a partner. 
+    The agents calculate whether they are in a zone, or not. This is achieved
+    by checking the color of their node (received in the perception), and if
+    a neighbor of it is also colored by its team (if that doesn't happen, the
+    node do not increase the zone points).
+    
+    If an agent is not being part of any zone, it tries to regroup with a 
+    partner. 
     When a zone is formed, and the agent is part of it, for each potentially 
-    beneficial neighbor node, the agent calculates how much points would they win 
-    if it moves, and that information is used by the decision taking module.
+    beneficial neighbor node, the agent calculates how much points would they 
+    win if it moves.
+    This is done with our reimplementation of the coloring algorithm used by
+    the MASSim server.
+    This information is used by the decision taking module.
+    
     Agents make no assumption about the map topology. They will prefer higher 
     valued nodes over lower ones.
 
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
-
-    % TODO explicar como una agente sabe si esta en una zona o no
 
 \subsubsection{Attacking and defending.}
     
@@ -367,6 +382,32 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     potential, taking into consideration their distances (in nodes, not in 
     actions). However, plans are recalculated in every step, as explained earlier.
 
+
+\subsubsection{Buying.}
+
+    Agents follow a list of predefined buying actions, when the necessary amount 
+    of money is reached.
+    
+    Many different approaches were considered, e.g. a more thoughtful one, taking
+    into consideration the amount of deaths of our team and of our enemy.
+    However, this simple approach was the easiest to implement, and it was
+    proven to be the most succesful one.
+
+\subsubsection{Achievements.}
+    Achievements are not taken under consideration. However, agents can
+    achieve a significant number of them, since this behavior is implicitly 
+    implemented.
+
+    % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
+    % porque surgen del proceso de razonamiento
+    
+\subsubsection{Phases.}
+
+    Our agents do not change their behavior during runtime. It is actually very 
+    easy to add this feature, but we had not enough time to implement it.
+    % TODO explicar lo de las fases
+    
+
 \subsubsection{Communication.}
 
     Some functionality provided by the \textit{eismassim} library was
@@ -379,16 +420,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     receiving the joint percept, the agents enter a belief setting phase, and 
     later an argumentative phase.
     
-\subsubsection{Buying}
-
-    Agents follow a list of predefined buying actions, when the necessary amount 
-    of money is reached.
-    
-    Many different approaches were considered, e.g. a more thoughtful one, taking
-    into consideration the amount of deaths of our team and of our enemy.
-    However, this simple approach was the easiest to implement, and it was
-    proven to be the most succesful one.
-
 \subsection{Agents' organization}
 
     The only organization that the agents have is the proper given by the 
@@ -508,9 +539,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \end{document} 
 
 
-%referencia del concurso
-%referencias estandar para argumentacion y delp
-%referencia de XP
+%referencia del concurso: YATÁ
+%referencias estandar para argumentacion y delp: YATÁ
+%referencia de XP: NOTÁ
 %
 
 
@@ -563,8 +594,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 %        como se traduce a prolog para meterlo en la KB?
 %        UNA BUENA EXPLICACION DEL PIPELINE DE DATOS
 %
-%    MOLAS: how does delp look like?  ejemplos de delp
-%    MOLAS: how does an intention look like?
+%    MANU: how does delp look like?  ejemplos de delp
+%    MANU: how does an intention look like?
 %
 %    3.2: Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
 %
@@ -587,6 +618,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 %
 %4 STRATEGIES DETAILS STATISTICS
 %
-%deberia haber una pequeña introduccion a la seccion en general, entre el titulo de la seccion y el subtitulo Strategy
+%deberia haber una pequeña introduccion a la seccion en general, entre el titulo de la seccion y el subtitulo Strategy: YATÁ
 %
-%% TODO explicar lo de las fases
+%% TODO explicar lo de las fases: YATÁ
