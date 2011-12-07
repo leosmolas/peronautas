@@ -252,12 +252,11 @@ How does the overall team work together? (coordination, information
 sharing, ...) 
 \end{question}
 
-On each perceive/act cycle, agents receive the percept from the
-MASSim server, separate the information which will remain private and which
-will be shared.  The public part of the percept is sent to the percept server,
-which performs a union of all percept and send the difference back to each
-agent. After receiving the joint percept, the agents enter a belief setting
-phase, and later an argumentation phase.
+The agents coordinate in an implicit way. This is, the  information shared 
+consists only of the perception received, without having neither 
+preprocessed beliefs, nor control variables. The agents do not communicate
+their intention, or plans, so any coordination that they may have has been
+achieved implicitly.
 
 \begin{question}
 How do your agents analyze the topology of the map? And how do they exploit
@@ -307,7 +306,7 @@ each team, in order to expand the zone, occupying the contested node, and
 implicitly defending it.
 
 \begin{question}
-8. Can your agents change their behavior during runtime? If so, what triggers
+Can your agents change their behavior during runtime? If so, what triggers
 the changes?  
 \end{question}
 
@@ -350,6 +349,14 @@ How do your agents communicate? And what do they communicate?
 
 Agents only
 communicate their perceptions via a perception server implemented in Python.
+
+On each perceive/act cycle, agents receive the percept from the
+MASSim server, separate the information which will remain private and which
+will be shared.  The public part of the percept is sent to the percept server,
+which performs a union of all percept and send the difference back to each
+agent. After receiving the joint percept, the agents enter a belief setting
+phase, and later an argumentation phase.
+
 
 \begin{question}
 How do you organize your agents? Do you use e.g. hierarchies? Is your
