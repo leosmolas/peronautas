@@ -64,12 +64,11 @@ a specific agent? Conversely if you plan a decentralised solution, which
 strategy do you plan to use?  
 \end{question}
 
-The solution follows a decentralised
-architecture in which agents run completely decoupled in different processes
-while sharing nothing.
+The solution follows a decentralised architecture in which agents run completely decoupled in different processes.
+Agents share no memory and decision-making takes places individually, even though every agent communicates part of his perception to the others.
 
 \begin{question}
-What is the communication strategy and how complex is it?  
+What is the communication strategy and how complex is it?
 \end{question}
 
 Percepts are
@@ -109,11 +108,11 @@ About 1500 hs.
 \begin{question}
 Did you discuss the design and strategies of your agent team with other
 developers? To which extent did your test your agents playing with other
-teams?  
+teams?
 \end{question}
 
 Experience from a previous instance of the MAPC was shared with our
-teams by members of the ARGONAUTS team from TU Dortmund. Although the
+teams by members of the ARGONAUTS team from TU Dortmund\cite{Holzgen:2011}. Although the
 initial plan was to run tests against other agent teams prior to the
 competition, time constraints made this impossible.
 
@@ -135,9 +134,9 @@ multi-agent programming language?
 \end{question}
 
 No multi-agent programming
-languages/patforms/frameworks were used due to previous experience indicating
-a general lack of flexibility, and a lack of familiarity on behalf of the
-development team.
+languages/platforms/frameworks were used. Being the first time we participated
+in the contest, we decided not to use technologies that we had absolutely no experience on. Besides,
+one of our goals was to develop our own platform in order to keep developing in the future.
 
 \begin{question}
 How have you mapped the designed architecture (both multi-agent and
@@ -159,11 +158,8 @@ Which development platforms and tools are used? How much time did you
 invest in learning those?  
 \end{question}
 
-Both Linux and the Windows operating system were
-used as development platforms, since the language runtimes chosen for
-implementation were portable.  We used git as our revision control system. In
-general, we did not spend much time in learning it, since some of us had
-already worked with it.
+All our code was written using either vim (on Linux) or Notepad++ (on Windows). We used no IDEs, but
+occasionally we did use the SWI-Prolog integrated debugger.
 
 \begin{question}
 Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java,
@@ -179,6 +175,8 @@ those.
 What features were missing in your language choice that would have
 facilitated your development task?
 \end{question}
+
+
 
 \begin{question}
 What features of your programming language has simplified your development
@@ -362,12 +360,16 @@ phase, and later an argumentation phase.
 How do you organize your agents? Do you use e.g. hierarchies? Is your
 organization implicit or explicit?
 \end{question}
+There is no agent hierarchy, and since the decision-making process takes
+place individually for each agent, there is no organization between them.
 
 
 \begin{question}
-Is most of your agents’ behavior emergent on and individual and team
+Is most of your agents behavior emergent on an individual and team
 level?
 \end{question}
+Since each agent makes decisions considering the other agents' status,
+team behavior is emergent from individual behavior.
 
 \begin{question}
 If your agents perform some planning, how many steps do they plan ahead?
@@ -423,11 +425,17 @@ for next year's competition.
 Why did your team perform as it did? Why did the other teams perform
 better/worse than you did?
 \end{question}
+We had several problems that didn't let us perform as good as we expected.
+Our lack of experience in this kind of contests, unexpected network and latency
+problems, as well as some bugs that caused critical performance issues, caused
+our team to lose several matches that could've been won otherwise.
 
 \begin{question}
-6. Which other research fields might be interested in the Multi-Agent
+Which other research fields might be interested in the Multi-Agent
 Programming Contest?
 \end{question}
+Both Robotics and Gaming AI are interesting fields that could benefit from
+participating in the contest.
 
 \begin{question}
 How can the current scenario be optimized? How would those optimization pay
