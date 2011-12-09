@@ -173,7 +173,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Server, that has to be running. It waits for all the agents, and then 
     everything is set to start the simulation.
 
+
 \subsubsection{Percept-act loop.}
+
 
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
@@ -185,7 +187,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     decision making module. Therefore, the Python part will query it, for the
     next action to be performed by the agent.
     
+
 \subsubsection{Action requested.}
+
 
     As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
     all the processing in Prolog. The perception is already in the knowledge 
@@ -227,7 +231,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Back again in Python, with the returned action, an XML is formed to be sent 
     to the server.
 
+
 \subsection{Programming languages, platforms and tools}
+
 
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP 
     \cite{Garcia:2004a}, a defeasible logic programming language, was used as a 
@@ -250,8 +256,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     not spend much time in learning it, since some of us had already worked 
     with it.
     
+
 \subsubsection{DeLP.}
     
+
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
     \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
@@ -279,9 +287,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     argument that supports $L$ exists. %\Arg\ 
 
 
-
 \subsubsection{Benefits.}
     
+
     Python's amenity to rapid application development and 'batteries-included 
     philosophy' facilitated implementing the communication layer to the MASSim 
     server, parsing of peceptions, rapid addition of planned features and bug 
@@ -301,7 +309,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     performance issues. 
     Having the choice was a benefit of the proposed design.
 
+
 \subsubsection{Problems encountered.}
+
 
     The most difficult problems were related to optimization. Much of our time was 
     spent in reducing the complexity of our algorithms, and the times they 
@@ -329,7 +339,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 % TODO LO DE LAS LINEAS DE CODIGO
 
+
 \section{Strategies, Details, and Statistics}
+
 
 % 4 Strategies, Details and Statistics
 % [ ]  1. What is the main strategy of your team?
@@ -353,7 +365,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     strategies, as well as several implementation details, such as algorithms
     used, and agents' organization.
 
+
 \subsection{Strategy}
+
 
     The main strategy of the team consists of detecting profitable zones from the 
     explored vertices, and positioning the agents correctly to maintain, defend 
@@ -367,8 +381,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
     % lineas antes.
     
+
 \subsubsection{Zone conquering.}
     
+
     The agents calculate whether they are in a zone, or not. This is achieved
     by checking the color of their node (received in the perception), and if
     a neighbor of it is also colored by its team (if that doesn't happen, the
@@ -389,7 +405,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
 
+
 \subsubsection{Attacking and defending.}
+
     
     Both attacking and defense are implicitly implemented. Sabouteurs attack 
     enemies that are near, so they might attack them if they enter our team's 
@@ -397,12 +415,16 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     can go to a node that has, for example, two agents, one for each team, in order
     to expand the zone, occupying the contested node, and implicitly defending it.
     
+
 \subsection{Implementation}
+
 
     Here are the details of the implementation of the different parts of the
     agents.
 
+
 \subsubsection{Path planning.}
+
 
     Path planning is implemented with an Uniform Cost Search 
     \cite{Russell:2003:AIM:773294}. 
@@ -425,6 +447,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsubsection{Buying.}
 
+
     Agents follow a list of predefined buying actions, when the necessary amount 
     of money is reached.
     
@@ -434,6 +457,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     proven to be the most succesful one.
 
 \subsubsection{Achievements.}
+
+
     Achievements are not taken under consideration. However, agents can
     achieve a significant number of them, since this behavior is implicitly 
     implemented.
@@ -441,7 +466,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
     % porque surgen del proceso de razonamiento
     
+
 \subsubsection{Phases.}
+
 
     Our agents do not change their behavior during runtime. It is actually very 
     easy to add this feature, but we had not enough time to implement it.
@@ -449,6 +476,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     
 
 \subsubsection{Communication.}
+
 
     Some functionality provided by the \textit{eismassim} library was
     reimplemented in a connection library in Python.
@@ -460,7 +488,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     receiving the joint percept, the agents enter a belief setting phase, and 
     later an argumentative phase.
     
+
 \subsection{Agents' organization}
+
 
     The only organization that the agents have is the proper given by the 
     environment, which is the roles. 
@@ -469,15 +499,15 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     code, which is:
     
     \begin{itemize}
-        \item all the Python part, that servers as a receive-percepts/send-action client 
-        of the server,
-        
-        \item the Percept Server,
-        
-        \item an important part of the Prolog code, including all the utilities used, the
-        implementation of the BDI architecture, the structure of the 
-        decision-taking module, and a considerable part of the arguments used, that
-        are common to all the roles.
+    \item all the Python part, that servers as a receive-percepts/send-action client 
+    of the server,
+    
+    \item the Percept Server,
+    
+    \item an important part of the Prolog code, including all the utilities used, the
+    implementation of the BDI architecture, the structure of the 
+    decision-taking module, and a considerable part of the arguments used, that
+    are common to all the roles.
     \end{itemize}
     
     Apart from all this, each role has a couple of separate files, that have 
@@ -496,7 +526,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     the non-monotonic nature of DeLP, the argumentation language used in the 
     decision-taking module.
 
+
 \section{Conclusion}
+
 
 % 5 Conclusion
 % [ ] 1. What have you learned from the participation in the contest?
@@ -507,8 +539,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 % [ ] 6. Which other research fields might be interested in the Multi-Agent Programming Contest?
 % [ ] 7. How can the current scenario be optimized? How would those optimization pay off?
 
+
 \subsection{Our team, and its development}
     
+
     Our team is formed by a group of friends, so a strong point in the developing 
     process has been the cohesion and comradeship. We had also worked together,
     in university's projects as well as outside them, in small freelance 
@@ -549,8 +583,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     all but the last day of competition, in which we already had everything in 
     consideration and control.
 
+
 \subsection{Our thoughts about possible optimizations to the contest}
     
+
     Many optimizations ocurred to us for the scenario, and the contest in general. 
     For example, more information for the nodes, including something useful for a 
     directed search (i.e., absolute coordinates), would help in the implementation 
@@ -584,6 +620,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \bibliography{bib} 
 
 %\include{questions}
+
 
 \end{document} 
 
