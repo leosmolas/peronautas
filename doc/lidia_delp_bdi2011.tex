@@ -309,104 +309,139 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \section{Strategies, Details, and Statistics}
 
-    In this section, we will explain the main characteristics of the agents' 
-    strategies, as well as several implementation details, such as algorithms
-    used, and agents' organization.
+    In this section, we will explain the main characteristics of the team's 
+	overall strategy, as well as several implementation details, such as 
+	algorithms used and agents' organization.
 
+% TODO: discutir orden de las cosas 
+    
 \subsection{Strategy}
 
     The main strategy of the team consists of detecting profitable zones from the 
-    explored vertices, and positioning the agents correctly to maintain, defend 
-    and expand the zones. 
+    explored nodes, and positioning the agents correctly to maintain, defend 
+    and expand the zones formed. 
     
-    The agents coordinate in an implicit way. This is, the  information shared 
-    consists only of the perception received, without having neither 
+    To accomplish this, all agents follow the same concept (beyond its roles). 
+    Every agent is responsible for calculating and comparing the benefits of the 
+    different potential actions. This process includes all possible actions 
+    (depending on the role), and is based in many factors, such as the gain in terms 
+    of score, the need of the team for the execution of a role-specific action, and, 
+    generally, the benefit that the agent is currently contributing to the team. 
+    The action considered to be the most beneficial for the team is selected as the
+    next intention, and a plan is elaborated to achieve it.
+    
+    For example, a repairer agent that is part of a zone will attempt to keep or
+    expand the zone by moving to a better node (in terms of zone coloring), 
+    unless a teammate needs to be repaired.
+    
+    Agents coordination is achived in an implicit way. This is, the information
+    shared consists only of the perception received, not including neither 
     preprocessed beliefs, nor control variables. The agents do not communicate
-    their intention, or plans, so any coordination that they may have has been
-    achieved implicitly.
+    their intentions or plans, so any coordination that they may exhibit is 
+    accomplished implicitly.
     % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
     % lineas antes.
-    
+       
 \subsubsection{Zone conquering.}
     
-    The agents calculate whether they are in a zone, or not. This is achieved
-    by checking the color of their node (received in the perception), and if
-    a neighbor of it is also colored by its team (if that doesn't happen, the
-    node do not increase the zone points).
-    
-    If an agent is not being part of any zone, it tries to regroup with a 
-    partner. 
-    When a zone is formed, and the agent is part of it, for each potentially 
-    beneficial neighbor node, the agent calculates how much points would they 
-    win if it moves.
-    This is done with our reimplementation of the coloring algorithm used by
-    the MASSim server.
-    This information is used by the decision taking module.
-    
-    Agents make no assumption about the map topology. They will prefer higher 
-    valued nodes over lower ones.
+    The exploration of the map is made gradually, as a result of the reasoning 
+    proccess. The actions related to the exploration (probe, survey) are weight 
+    along with all other actions and are selected when it is considered important. 
+    This is seen to a greater extent during the inicial steps of the simulations, 
+    when the team lacks of knowledge about the map and other kind of actions are 
+    unnecesary. Agents make no assumptions about the map topology.
 
+    Agents are not primarily focused on finding new zones, but they attempt to 
+    expand and maximize the points of the existing ones.    
+    They calculate whether they are part of a zone or not. This is achieved
+    by checking the color of the current node (received in the perception), and if
+    a neighbor of it is also colored by the agent team (if this is not the case, the 
+    node does not increase the zone points).
+    If an agent is not being part of any zone, it tries to regroup with its 
+    teammates. 
+    When a zone is formed, and the agent is part of it, for each potentially 
+    beneficial neighbor node, the agent calculates how much points would the team 
+    gain if it moves, and tries to expand the zone if possible.
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
+    
+    This estimations are done with our reimplementation of the coloring algorithm used 
+    by the MASSim server. This information is used by the decision taking module.  
 
 \subsubsection{Attacking and defending.}
     
-    Both attacking and defense are implicitly implemented. Sabouteurs attack 
-    enemies that are near, so they might attack them if they enter our team's 
-    zone, as well as when they are in their zone. Any other agent of another role
-    can go to a node that has, for example, two agents, one for each team, in order
-    to expand the zone, occupying the contested node, and implicitly defending it.
+    Both attacking and defense of zones are implicitly implemented. 
+    Sabouteurs prefer to attack enemies that are near, so if an agent of another 
+    team enters our team's zone, it will be attacked by the saboteurs in the zone.
+    This is the most likely scenario, unless the saboteur's position is so 
+    important that it decides to stay in the formation in order to keep the zone.
+
+    The same happens with enemies in their own zones. Zones are not intentionally 
+    destroyed, but any agent that is part of a zone may be attacked, affecting 
+    posibbly the structure of that zone.
+    
+    Agents of other roles can also implicitly defend a zone. For example, an agent 
+    can go to a node that has one agent of each team, with the purpose of coloring the 
+    contested node and defending the zone.
+    
+\subsubsection{Phases.}
+
+    Our agents do not change their behavior during runtime. This feature was 
+    analysed, but the team did not have enough time to finish its implementation.
+    
+    The approach proposed consists in adding a phase indicator that holds different 
+    phase values like 'exploration', or 'expansion'. The phase is updated at runtime
+    considering elements like the number of steps or the team's overall performance 
+    in the simulation in progress.
+    
+    The phase component is weight as an extra factor that modifies the potential 
+    benefit of each action, so that its inclusion directly affects the action-selection 
+    proccess.
+    
+\subsubsection{Buying.}
+
+    Agents follow a list of predefined buying actions, when the necessary amount 
+    of money is reached. This behaviour follows the idea of getting some specific skill 
+    upgrades that the team considered important to achieve early in the simulations.
+    
+    Many other approaches regarding the use of the earned money were considered as well.
+    % No se si el regarding esta bien usado.
+    For example a more thoughtful one, taking into consideration the amount of deaths 
+    of our team and our enemy. However, this simple approach was the easiest to implement, 
+    and it was proven to be the most succesful one.
+
+\subsubsection{Achievements.}
+
+    Achievements are not explicitly taken under consideration. That is, the agents'
+    reasoning proccess is not affected by the possibility of completing achievements.    
+    However, the team can manage to achieve a significant number of them, which 
+    results naturally from the agents' behaviour. 
+    This fact let the development team avoid the need of adding special features 
+    dedicated to the seek of achievements.
     
 \subsection{Implementation}
 
-    Here are the details of the implementation of the different parts of the
-    agents.
-
+    Here are some implementation details of the different parts of the agents.
+    
 \subsubsection{Path planning.}
 
     Path planning is implemented with an Uniform Cost Search 
     \cite{Russell:2003:AIM:773294}. 
     What we tried to minimize was the amount of steps required to achieve the 
-    goal, rather than the spent energy. 
-    The returned result is the list of actions to be done, rather than the list of 
+    goal, rather than the energy spent. 
+    The returned result is a list of actions to be done, rather than a list of 
     nodes.
     
-    Since this algorithm can be called several times in one step, given that the 
+    Since this algorithm can be called several times in one step, and given that the 
     actual amount of steps spent by an intention is taken under consideration by 
     the decision-taking module, it was crucial to perform several optimizations in 
-    it. In the end, this allowed us to run all the agents in a single machine, 
+    it. In the end, this allowed us to run all the agents in a single machine  
     during the competition.
     
     The plans are as long as the selected intention requieres. This may 
     sound excesive, but the possible goals were previously selected for their 
     potential, taking into consideration their distances (in nodes, not in 
-    actions). However, plans are recalculated in every step, as explained earlier.
-
-
-\subsubsection{Buying.}
-
-    Agents follow a list of predefined buying actions, when the necessary amount 
-    of money is reached.
-    
-    Many different approaches were considered, e.g. a more thoughtful one, taking
-    into consideration the amount of deaths of our team and of our enemy.
-    However, this simple approach was the easiest to implement, and it was
-    proven to be the most succesful one.
-
-\subsubsection{Achievements.}
-    Achievements are not taken under consideration. However, agents can
-    achieve a significant number of them, since this behavior is implicitly 
-    implemented.
-
-    % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
-    % porque surgen del proceso de razonamiento
-    
-\subsubsection{Phases.}
-
-    Our agents do not change their behavior during runtime. It is actually very 
-    easy to add this feature, but we had not enough time to implement it.
-    % TODO explicar lo de las fases
-    
+    actions). However, plans are recalculated in every step, as explained earlier.    
 
 \subsubsection{Communication.}
 
@@ -422,8 +457,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     
 \subsection{Agents' organization}
 
-    The only organization that the agents have is the proper given by the 
-    environment, which is the roles. 
+    As mentioned, all agents operate in the same way.
+    The only organization that they have is the proper given by the environment, 
+    which is the roles.
     
     Refering to our actual programming, all the agents have a strong core of common
     code, which is:
@@ -444,11 +480,11 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     specific code, including the arguments used in the decision-taking module, and
     the setting of the beliefs needed for those arguments. Here is where the 
     individual behavior is set, since the specific actions that can be done by each
-    role are being had in consideration here.
+    role are had in consideration here.
     
     Specific values for the decision-taking module for each role are also included
-    in these files, and this is what can make that agents of different role act 
-    differently, faced to the same situation, according to our judgment.
+    in these files, and this is what can make that agents of different roles act 
+    differently faced to the same situation, according to our judgement.
     
     This separation is negligible, having in consideration the amount of code 
     written for the agents, and may be near a 5\% of it. However, this has been proven to
