@@ -43,26 +43,21 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \section{Introduction}
 
     The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
-    Programming Contest 2011 (MAPC) \cite{BehrensAMAI2010b} hosted by the 
-    Clausthal University of
-    Technology \footnote{More information in \texttt{www.tu-clausthal.de}}.
+    Programming Contest 2011 (MAPC) \cite{BehrensAMAI2010b} hosted by the
+    Clausthal University of Technology \footnote{More information in
+    \texttt{www.tu-clausthal.de}}.
 
-    The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia 
-    Artificial, Artificial Intelligence Research and Development Laboratory) 
-    research group was established in 1992 at the Universidad Nacional del Sur. 
-    The d3lp0r team was formed incorporating six graduate students, two Ph.D. 
-    students and three professors. The undergraduate students fully developed the 
-    system, while the Ph.D. students and professors provided guidance. The group's 
-    main motivation was to apply argumentation \cite{Prakken:1997}
-    \cite{Rahwan:2009} \cite{Bench-Capon:2007}\ via defeasible logic programming 
-    (DeLP \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the context of a 
-    multi-agent gaming situation, 
-    and to test the integration of the different technologies used.
-
-    Experience from a previous instance of the MAPC was shared with our teams by 
-    members of the ARGONAUTS team from TU Dortmund. Although the initial 
-    plan was to run tests against other agent teams prior to the competition, time 
-    constraints acted against this.
+    The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia
+    Artificial, Artificial Intelligence Research and Development Laboratory)
+    research group was established in 1992 at the Universidad Nacional del Sur.
+    The d3lp0r team was formed incorporating six graduate students, two Ph.D.
+    students and three professors. The undergraduate students fully developed
+    the system, while the Ph.D. students and professors provided guidance. The
+    group's main motivation was to apply argumentation \cite{Prakken:1997}
+    \cite{Rahwan:2009} \cite{Bench-Capon:2007}\ via defeasible logic programming
+    (DeLP \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the
+    context of a multi-agent gaming situation, and to test the integration of
+    the different technologies used.
 
 %\section{Preliminaries}
 %
@@ -101,55 +96,73 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \section{System Analysis and Design}
 
 % 2 System Analysis and Design
-% [ ] 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or Tropos was used, how did you use it? If you did not what were the reasons?
-% [ ] 2. Is the solution based on the centralisation of coordination/information on a specific agent? Conversely if you plan a decentralised solution, which strategy do you plan to use?
-% [ ] 3. What is the communication strategy and how complex is it?
-% [ ] 4. How are the following agent features considered/implemented: autonomy, proactiveness, reactiveness?
-% [ ] 5. Is the team a truly multi-agent system or rather a centralised system in disguise?
-% [ ] 6. How much time (man hours) have you invested (approximately) for implementing your team?
-% [ ] 7. Did you discuss the design and strategies of your agent team with other developers? To which extent did your test your agents playing with other teams?
+% [x] 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or
+%        Tropos was used, how did you use it? If you did not what were the
+%        reasons?
+% [x] 2. Is the solution based on the centralisation of coordination/information 
+%        on a specific agent? Conversely if you plan a decentralised solution, 
+%        which strategy do you plan to use?
+% [x] 3. What is the communication strategy and how complex is it?
+% [ ] 4. How are the following agent features considered/implemented: autonomy, 
+%        proactiveness, reactiveness?
+% [x] 5. Is the team a truly multi-agent system or rather a centralised system 
+%        in disguise?
+% [x] 6. How much time (man hours) have you invested (approximately) for 
+%        implementing your team?
+% [x] 7. Did you discuss the design and strategies of your agent team with other 
+%        developers? To which extent did your test your agents playing with 
+%        other teams?
 
-    Despite many man-hours dedicated to design in the early stages of
-    the competition, the development team's lack of experience in multi-agent
-    systems made necessary several changes and additions. 
-    Nevertheless, our approach was more than satisfying, resulting to be
-    modular, correct and in close correspondence with the literature.
+    Despite many man-hours dedicated to design in the early stages of the
+    competition, the development team's lack of experience in multi-agent
+    systems made several changes and additions necessary and precluded the use
+    of design methodologies specific to multi-agent systems.  The implementation
+    was conducted using a simplified XP (extreme programming) methodology.
+    [REFERENCIA] Nevertheless, our approach was more than satisfying, resulting
+    to be modular, correct and in close correspondence with the literature.
 
-    The solution follows a decentralised architecture in which agents run 
-    completely decoupled in different processes while sharing nothing. Percepts 
-    are communicated among agent members of the team via a broadcast mechanism 
-    developed as part of the multi-agent system. This design was chosen for its 
-    minimal complexity.
+    The solution follows a decentralised architecture in which agents run
+    completely decoupled in different processes with no shared state. 
+    
+    % COMMUNICATION STRATEGY
+    In addition to the agent processes, the system design includes an
+    independent ``percept server'', through which percepts are communicated
+    among agent team members via a broadcast mechanism running on standard
+    network sockets.  Each agent handles his own connection to the MASSim
+    server, and upon receiving its percept, retransmits it to the percept
+    server.  The percept server joins all percepts into a ``global percept'',
+    and sends each agent the set difference between its own and the global
+    percept.  The agent then enters its reasoning phase and decides which
+    action it will send back to the MASSim server.  Other than the percept
+    server mechanism, there is no communication among team agents. This design
+    was chosen for its minimal complexity.
 
-    Agents are completely autonomous meaning that decision-making takes place 
-    individually at the agent level, with no intervention from human operators or 
-    a central intelligence agency within the system, and that decisions made by an 
-    agent are influenced solely by the current simulation state and the results of 
-    previous steps.
-    The agent architecture developed is based on the BDI model \cite{Rao:1991}, 
-    and is explained in detail in further sections.
+    Agents can also be configured to run in a standalone mode, in which they will
+    not use the percept server and thus have no communication with the rest of
+    the team.  Team performance drops noticeably in this case, as the actions
+    are less informed. 
 
-    No design methodology specific to multi-agent systems was used. However, 
-    the implementation was conducted using a simplified XP (extreme programming) 
-    methodology.
+    % DECENTRALISED, AUTONOMY
+    Agents are completely autonomous meaning that decision-making takes place
+    individually at the agent level, with no intervention from human operators
+    or a central intelligence agency within the system, and that decisions made
+    by an agent are influenced solely by the current simulation state and the
+    results of previous steps.  
+    Despite the sharing of all percepts among the team agents in the initial
+    phase of the turn, no control variables or instructions are included. 
+    The agent architecture developed is based on the
+    BDI model \cite{Rao:1991}, and is explained in detail in further sections.
+
+    % TODO: PROACTIVENESS, REACTIVENESS, REASONING DESIGN
 
     Approximately 1500 man-hours were invested in the team development.
 
-\section{Software Architecture}
+    Experience from a previous instance of the MAPC was shared with our teams by
+    members of the ARGONAUTS team from TU Dortmund\cite{Holzgen:2011}. Although
+    the initial plan was to run tests against other agent teams prior to the
+    competition, time constraints made this impossible.
 
-% 3 Software Architecture
-% [ ]  1. Which programming language did you use to implement the multi-agent system?
-% [ ]  2. Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
-% [ ]  3. How have you mapped the designed architecture (both multi-agent and individual agent architectures) to programming codes, i.e., how did you implement specific agent-oriented concepts and designed artifacts using the programming language?
-% [ ]  4. Which development platforms and tools are used? How much time did you invest in learning those?
-% [ ]  5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, ....) are used? How much time did you invest in learning those?
-% [ ]  6. What features were missing in your language choice that would have facilitated your development task?
-% [ ]  7. What features of your programming language has simplified your development task?
-% [ ]  8. Which algorithms are used/implemented?
-% [ ]  9. How did you distribute the agents on several machines? And if you did not please justify why.
-% [ ] 10. To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
-% [ ] 11. What part of the development was most difficult/complex? What kind of problems have you found and how are they solved?
-% [ ] 12. How many lines of code did you write for your software?
+\section{Software Architecture}
 
 %\begin{figure}
 %\centering
@@ -163,9 +176,34 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     i.e. its interactions with the servers (MASSim, and our Percept Server), 
     and its internal components.
  
+% 3 Software Architecture
+% [x]  1. Which programming language did you use to implement the multi-agent 
+%         system?
+% [ ]  2. Did you use multi-agent programming languages? Why or why not to use a 
+%         multi-agent programming language?
+% [ ]  3. How have you mapped the designed architecture (both multi-agent and 
+%         individual agent architectures) to programming codes, i.e., how did 
+%         you implement specific agent-oriented concepts and designed artifacts 
+%         using the programming language?
+% [ ]  4. Which development platforms and tools are used? How much time did you 
+%         invest in learning those?
+% [ ]  5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, 
+%         ....) are used? How much time did you invest in learning those?
+% [ ]  6. What features were missing in your language choice that would have 
+%         facilitated your development task?
+% [ ]  7. What features of your programming language has simplified your 
+%         development task?
+% [ ]  8. Which algorithms are used/implemented?
+% [ ]  9. How did you distribute the agents on several machines? And if you did 
+%         not please justify why.
+% [ ] 10. To which extend is the reasoning of your agents synchronized with the 
+%         receive-percepts/send-action cycle?
+% [ ] 11. What part of the development was most difficult/complex? What kind of 
+%         problems have you found and how are they solved?
+% [ ] 12. How many lines of code did you write for your software?
+
 
 \subsection{Architecture implementation}
-
 
     The first part of the architecture is the Python part, that handles all the 
     communication with the servers. It first opens a TCP/IP connection with the 
@@ -173,9 +211,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Server, that has to be running. It waits for all the agents, and then 
     everything is set to start the simulation.
 
-
 \subsubsection{Percept-act loop.}
-
 
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
@@ -186,10 +222,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     As it will be explained below, this part of the program constitutes the 
     decision making module. Therefore, the Python part will query it, for the
     next action to be performed by the agent.
-    
 
 \subsubsection{Action requested.}
-
 
     As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
     all the processing in Prolog. The perception is already in the knowledge 
@@ -231,9 +265,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Back again in Python, with the returned action, an XML is formed to be sent 
     to the server.
 
-
 \subsection{Programming languages, platforms and tools}
-
 
     The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP 
     \cite{Garcia:2004a}, a defeasible logic programming language, was used as a 
@@ -255,11 +287,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     We used \textit{git}\ as our revision control system. In general, we did 
     not spend much time in learning it, since some of us had already worked 
     with it.
-    
 
 \subsubsection{DeLP.}
     
-
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
     \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
@@ -286,10 +316,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     In DeLP, a query $L$ is \emph{warranted} from a program if a \emph{non-defeated}
     argument that supports $L$ exists. %\Arg\ 
 
-
 \subsubsection{Benefits.}
     
-
     Python's amenity to rapid application development and 'batteries-included 
     philosophy' facilitated implementing the communication layer to the MASSim 
     server, parsing of peceptions, rapid addition of planned features and bug 
@@ -309,9 +337,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     performance issues. 
     Having the choice was a benefit of the proposed design.
 
-
 \subsubsection{Problems encountered.}
-
 
     The most difficult problems were related to optimization. Much of our time was 
     spent in reducing the complexity of our algorithms, and the times they 
@@ -339,9 +365,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 % TODO LO DE LAS LINEAS DE CODIGO
 
-
 \section{Strategies, Details, and Statistics}
-
 
 % 4 Strategies, Details and Statistics
 % [ ]  1. What is the main strategy of your team?
@@ -361,119 +385,143 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 % [ ] 15. Is most of your agents’ behavior emergent on and individual and team level?
 % [ ] 16. If your agents perform some planning, how many steps do they plan ahead?
     
-    In this section, we will explain the main characteristics of the agents' 
-    strategies, as well as several implementation details, such as algorithms
-    used, and agents' organization.
+    In this section, we will explain the main characteristics of the team's 
+	overall strategy, as well as several implementation details, such as 
+	algorithms used and agents' organization.
 
-
+% TODO: discutir orden de las cosas 
+    
 \subsection{Strategy}
 
 
     The main strategy of the team consists of detecting profitable zones from the 
-    explored vertices, and positioning the agents correctly to maintain, defend 
-    and expand the zones. 
+    explored nodes, and positioning the agents correctly to maintain, defend 
+    and expand the zones formed. 
     
-    The agents coordinate in an implicit way. This is, the  information shared 
-    consists only of the perception received, without having neither 
+    To accomplish this, all agents follow the same concept (beyond its roles). 
+    Every agent is responsible for calculating and comparing the benefits of the 
+    different potential actions. This process includes all possible actions 
+    (depending on the role), and is based in many factors, such as the gain in terms 
+    of score, the need of the team for the execution of a role-specific action, and, 
+    generally, the benefit that the agent is currently contributing to the team. 
+    The action considered to be the most beneficial for the team is selected as the
+    next intention, and a plan is elaborated to achieve it.
+    
+    For example, a repairer agent that is part of a zone will attempt to keep or
+    expand the zone by moving to a better node (in terms of zone coloring), 
+    unless a teammate needs to be repaired.
+    
+    Agents coordination is achived in an implicit way. This is, the information
+    shared consists only of the perception received, not including neither 
     preprocessed beliefs, nor control variables. The agents do not communicate
-    their intention, or plans, so any coordination that they may have has been
-    achieved implicitly.
+    their intentions or plans, so any coordination that they may exhibit is 
+    accomplished implicitly.
     % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
     % lineas antes.
-    
-
+       
 \subsubsection{Zone conquering.}
     
+    The exploration of the map is made gradually, as a result of the reasoning 
+    proccess. The actions related to the exploration (probe, survey) are weight 
+    along with all other actions and are selected when it is considered important. 
+    This is seen to a greater extent during the inicial steps of the simulations, 
+    when the team lacks of knowledge about the map and other kind of actions are 
+    unnecesary. Agents make no assumptions about the map topology.
 
-    The agents calculate whether they are in a zone, or not. This is achieved
-    by checking the color of their node (received in the perception), and if
-    a neighbor of it is also colored by its team (if that doesn't happen, the
-    node do not increase the zone points).
-    
-    If an agent is not being part of any zone, it tries to regroup with a 
-    partner. 
+    Agents are not primarily focused on finding new zones, but they attempt to 
+    expand and maximize the points of the existing ones.    
+    They calculate whether they are part of a zone or not. This is achieved
+    by checking the color of the current node (received in the perception), and if
+    a neighbor of it is also colored by the agent team (if this is not the case, the 
+    node does not increase the zone points).
+    If an agent is not being part of any zone, it tries to regroup with its 
+    teammates. 
+
     When a zone is formed, and the agent is part of it, for each potentially 
-    beneficial neighbor node, the agent calculates how much points would they 
-    win if it moves.
-    This is done with our reimplementation of the coloring algorithm used by
-    the MASSim server.
-    This information is used by the decision taking module.
-    
-    Agents make no assumption about the map topology. They will prefer higher 
-    valued nodes over lower ones.
-
+    beneficial neighbor node, the agent calculates how much points would the team 
+    gain if it moves, and tries to expand the zone if possible.
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
+    
+    This estimations are done with our reimplementation of the coloring algorithm used 
+    by the MASSim server. This information is used by the decision taking module.  
 
 
 \subsubsection{Attacking and defending.}
 
     
-    Both attacking and defense are implicitly implemented. Sabouteurs attack 
-    enemies that are near, so they might attack them if they enter our team's 
-    zone, as well as when they are in their zone. Any other agent of another role
-    can go to a node that has, for example, two agents, one for each team, in order
-    to expand the zone, occupying the contested node, and implicitly defending it.
-    
+    Both attacking and defense of zones are implicitly implemented. 
+    Sabouteurs prefer to attack enemies that are near, so if an agent of another 
+    team enters our team's zone, it will be attacked by the saboteurs in the zone.
+    This is the most likely scenario, unless the saboteur's position is so 
+    important that it decides to stay in the formation in order to keep the zone.
 
+    The same happens with enemies in their own zones. Zones are not intentionally 
+    destroyed, but any agent that is part of a zone may be attacked, affecting 
+    posibbly the structure of the enemy zone.
+    
+    Agents of other roles can also implicitly defend a zone. For example, an agent 
+    can go to a node that has one agent of each team, with the purpose of coloring the 
+    contested node and defending the zone.
+    
+\subsubsection{Phases.}
+
+    Our agents do not change their behavior during runtime. This feature was 
+    analysed, but the team did not have enough time to finish its implementation.
+    
+    The approach proposed consists in adding a phase indicator that holds different 
+    phase values like 'exploration', or 'expansion'. The phase is updated at runtime
+    considering elements like the number of steps or the team's overall performance 
+    in the simulation in progress.
+    
+    The phase component is weight as an extra factor that modifies the potential 
+    benefit of each action, so that its inclusion directly affects the action-selection 
+    proccess.
+    
+\subsubsection{Buying.}
+
+    Agents follow a list of predefined buying actions, when the necessary amount 
+    of money is reached. This behaviour follows the idea of getting some specific skill 
+    upgrades that the team considered important to achieve early in the simulations.
+    
+    Many other approaches regarding the use of the earned money were considered as well.
+    % No se si el regarding esta bien usado.
+    For example a more thoughtful one, taking into consideration the amount of deaths 
+    of our team and our enemy. However, this simple approach was the easiest to implement, 
+    and it was proven to be the most succesful one.
+
+\subsubsection{Achievements.}
+
+    Achievements are not explicitly taken under consideration. That is, the agents'
+    reasoning proccess is not affected by the possibility of completing achievements.    
+    However, the team can manage to achieve a significant number of them, which 
+    results naturally from the agents' behaviour. 
+    This fact let the development team avoid the need of adding special features 
+    dedicated to the seek of achievements.
+    
 \subsection{Implementation}
 
-
-    Here are the details of the implementation of the different parts of the
-    agents.
-
-
+    Here are some implementation details of the different parts of the agents.
+    
 \subsubsection{Path planning.}
-
 
     Path planning is implemented with an Uniform Cost Search 
     \cite{Russell:2003:AIM:773294}. 
     What we tried to minimize was the amount of steps required to achieve the 
-    goal, rather than the spent energy. 
-    The returned result is the list of actions to be done, rather than the list of 
+    goal, rather than the energy spent. 
+    The returned result is a list of actions to be done, rather than a list of 
     nodes.
     
-    Since this algorithm can be called several times in one step, given that the 
+    Since this algorithm can be called several times in one step, and given that the 
     actual amount of steps spent by an intention is taken under consideration by 
     the decision-taking module, it was crucial to perform several optimizations in 
-    it. In the end, this allowed us to run all the agents in a single machine, 
+    it. In the end, this allowed us to run all the agents in a single machine  
     during the competition.
     
     The plans are as long as the selected intention requieres. This may 
     sound excesive, but the possible goals were previously selected for their 
     potential, taking into consideration their distances (in nodes, not in 
-    actions). However, plans are recalculated in every step, as explained earlier.
-
-
-\subsubsection{Buying.}
-
-
-    Agents follow a list of predefined buying actions, when the necessary amount 
-    of money is reached.
-    
-    Many different approaches were considered, e.g. a more thoughtful one, taking
-    into consideration the amount of deaths of our team and of our enemy.
-    However, this simple approach was the easiest to implement, and it was
-    proven to be the most succesful one.
-
-\subsubsection{Achievements.}
-
-
-    Achievements are not taken under consideration. However, agents can
-    achieve a significant number of them, since this behavior is implicitly 
-    implemented.
-
-    % TODO explicar que no se apunta EXPLICITAMENTE a buscar achievements 
-    % porque surgen del proceso de razonamiento
-    
-
-\subsubsection{Phases.}
-
-
-    Our agents do not change their behavior during runtime. It is actually very 
-    easy to add this feature, but we had not enough time to implement it.
-    % TODO explicar lo de las fases
-    
+    actions). However, plans are recalculated in every step, as explained earlier.    
 
 \subsubsection{Communication.}
 
@@ -491,9 +539,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsection{Agents' organization}
 
-
-    The only organization that the agents have is the proper given by the 
-    environment, which is the roles. 
+    As mentioned, all agents operate in the same way.
+    The only organization that they have is the proper given by the environment, 
+    which is the roles.
     
     Refering to our actual programming, all the agents have a strong core of common
     code, which is:
@@ -514,11 +562,11 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     specific code, including the arguments used in the decision-taking module, and
     the setting of the beliefs needed for those arguments. Here is where the 
     individual behavior is set, since the specific actions that can be done by each
-    role are being had in consideration here.
+    role are had in consideration here.
     
     Specific values for the decision-taking module for each role are also included
-    in these files, and this is what can make that agents of different role act 
-    differently, faced to the same situation, according to our judgment.
+    in these files, and this is what can make that agents of different roles act 
+    differently faced to the same situation, according to our judgement.
     
     This separation is negligible, having in consideration the amount of code 
     written for the agents, and may be near a 5\% of it. However, this has been proven to
