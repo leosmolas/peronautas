@@ -393,19 +393,27 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     
 \subsection{Strategy}
 
-
     The main strategy of the team consists of detecting profitable zones from the 
     explored nodes, and positioning the agents correctly to maintain, defend 
     and expand the zones formed. 
     
-    To accomplish this, all agents follow the same concept (beyond its roles). 
-    Every agent is responsible for calculating and comparing the benefits of the 
-    different potential actions. This process includes all possible actions 
-    (depending on the role), and is based in many factors, such as the gain in terms 
-    of score, the need of the team for the execution of a role-specific action, and, 
-    generally, the benefit that the agent is currently contributing to the team. 
-    The action considered to be the most beneficial for the team is selected as the
-    next intention, and a plan is elaborated to achieve it.
+    To accomplish this, all agents follow the same concept. Every agent, beyond 
+    its role, is concerned with the formation and expansion of zones.
+    The desicion-taking process is responsible for calculating and selecting the
+    most beneficial intention, which may be focused in the zone conquering (if possible),
+    or not.
+    This selection process is based in many factors, such as the gain in terms 
+    of score, the need of the team for the execution of a role-specific action, or
+    the benefit that the agent is currently contributing to the team. 
+    
+    % To accomplish this, all agents follow the same concept (beyond its roles). 
+    % Every agent is responsible for calculating and comparing the benefits of the 
+    % different potential actions. This process includes all possible actions 
+    % (depending on the role), and is based in many factors, such as the gain in terms 
+    % of score, the need of the team for the execution of a role-specific action, and, 
+    % generally, the benefit that the agent is currently contributing to the team. 
+    % The action considered to be the most beneficial for the team is selected as the
+    % next intention, and a plan is elaborated to achieve it.
     
     For example, a repairer agent that is part of a zone will attempt to keep or
     expand the zone by moving to a better node (in terms of zone coloring), 
@@ -439,16 +447,14 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     When a zone is formed, and the agent is part of it, for each potentially 
     beneficial neighbor node, the agent calculates how much points would the team 
-    gain if it moves, and tries to expand the zone if possible.
+    gain if it moves, and tries to expand the zone.
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
     
     This estimations are done with our reimplementation of the coloring algorithm used 
-    by the MASSim server. This information is used by the decision taking module.  
-
+    by the MASSim server. The information is used by the decision taking module.  
 
 \subsubsection{Attacking and defending.}
-
     
     Both attacking and defense of zones are implicitly implemented. 
     Sabouteurs prefer to attack enemies that are near, so if an agent of another 
@@ -525,7 +531,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsubsection{Communication.}
 
-
     Some functionality provided by the \textit{eismassim} library was
     reimplemented in a connection library in Python.
 
@@ -539,7 +544,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsection{Agents' organization}
 
-    As mentioned, all agents operate in the same way.
+    As mentioned before, all agents operate in the same way.
     The only organization that they have is the proper given by the environment, 
     which is the roles.
     
@@ -562,7 +567,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     specific code, including the arguments used in the decision-taking module, and
     the setting of the beliefs needed for those arguments. Here is where the 
     individual behavior is set, since the specific actions that can be done by each
-    role are had in consideration here.
+    role are taken into consideration here.
     
     Specific values for the decision-taking module for each role are also included
     in these files, and this is what can make that agents of different roles act 
