@@ -244,7 +244,11 @@ What is the main strategy of your team?
 The main strategy of the team consists of detecting profitable zones
 from the explored vertices, and positioning the agents correctly to maintain,
 defend and expand the zones.
-
+Every agent, beyond its role, is concerned with the formation and expansion of zones.
+The desicion-taking process is responsible for calculating and selecting the
+most beneficial intention, which may be focused in the zone conquering (if possible),
+or not.
+    
 \begin{question}
 How does the overall team work together? (coordination, information
 sharing, ...) 
@@ -261,93 +265,100 @@ How do your agents analyze the topology of the map? And how do they exploit
 their findings? 
 \end{question}
 
-Agents make no assumption about the map topology. They will
-prefer higher valued nodes over lower ones.
-
+Agents make no assumption about the map topology. The exploration of the map 
+is done gradually, as a result of the reasoning proccess.
 
 \begin{question}
 How do your agents communicate with the server?  
 \end{question}
 
-Some functionality
-provided by the eismassim library was reimplemented in a connection library in
-Python.
+Some functionality provided by the eismassim library was reimplemented in a 
+connection library in Python.
 
 \begin{question}
 How do you implement the roles of the agents? Which strategies do the
 different roles implement?  
 \end{question}
 
-Agents recover their assigned role from the
-simulation start message.  
+Agents recover their assigned role from the simulation start message.  
+Each role has a couple of separate files, that have specific code, including 
+the arguments used in the decision-taking module, and the setting of the 
+beliefs needed for those arguments.
+All agents follow the same concept. Every agent is concerned with the formation 
+and expansion of zones, beyond its role.
 
 \begin{question}
 How do you find good zones? How do you estimate the value of zones?  
 \end{question}
 
-If an
-agent is not being part of any zone, it tries to regroup with a partner.  When
-a zone is formed, and the agent is part of it, for each potentally beneficial
-neighbor node, the agent calculates how much points would they win if it
-moves, and that information is used by the decision taking module.
+Agents are not primarily focused on finding new zones, but they attempt to 
+expand and maximize the points of the existing ones. They calculate whether 
+they are part of a zone or not. 
+If an agent is not being part of any zone, it tries to regroup with its 
+teammates. When a zone is formed, and the agent is part of it, for each potentially 
+beneficial neighbor node, the agent calculates how much points would the team 
+gain if it moves, and tries to expand the zone.
+This estimations are done with our reimplementation of the coloring algorithm used 
+by the MASSim server.
 
 \begin{question}
 How do you conquer zones? How do you defend zones if attacked? Do you
 attack zones?  
 \end{question}
 
-Both attacking and defense are implicitly implemented.
-Sabouteurs attack enemies that are near, so they might attack them if they
-enter our team's zone, as well as when they are in their zone. Any other agent
-of another role can go to a node that has, for example, two agents, one for
-each team, in order to expand the zone, occupying the contested node, and
-implicitly defending it.
+Both attacking and defense of zones are implicitly implemented. 
+Sabouteurs prefer to attack enemies that are near, so if an agent of another 
+team enters our team's zone, it will be attacked by the saboteurs in the zone.
+The same happens with enemies in their own zones. Zones are not intentionally 
+destroyed, but any agent that is part of a zone may be attacked, affecting 
+posibbly the structure of the enemy zone.
 
 \begin{question}
 Can your agents change their behavior during runtime? If so, what triggers
 the changes?  
 \end{question}
 
-Our agents do not change their behavior during runtime. It is
-actually very easy to add this feature, but we had not enough time to
-implement this.
+Our agents do not change their behavior during runtime. This feature was 
+analysed, but the team did not have enough time to finish its implementation.
 
 \begin{question}
 What algorithm(s) do you use for agent path planning?  
 \end{question}
 
-Path planning is
-implemented with an Uniform Cost Search. What we tried to minimize was the
-amount of steps required to achieve the goal, rather than the spent energy.
-The returned result is the list of actions to be done.
+Path planning is implemented with an Uniform Cost Search. What we tried to 
+minimize was the amount of steps required to achieve the goal, rather than 
+the spent energy. The returned result is a list of actions to be done.
 
 \begin{question}
 How do you make use of the buying-mechanism?  
 \end{question}
 
-Agents followed a list of
-predefined buying actions, when the necessary amount of money was reached.
+Agents follow a list of predefined buying actions, when the necessary amount 
+of money is reached. This behaviour follows the idea of getting some specific skill 
+upgrades that the team considered important to achieve early in the simulations.
 
 \begin{question}
 How important are achievements for your overall strategy?  
 \end{question}
 
-Our agents did
-not have achievements in consideration. However, they managed to achieve a
-significant number of them, since this behavior was implicitly implemented.
+Achievements are not explicitly taken under consideration. That is, the agents'
+reasoning proccess is not affected by the possibility of completing achievements.    
+However, the team can manage to achieve a significant number of them, which 
+results naturally from the agents' behaviour. 
 
 \begin{question}
 Do your agents have an explicit mental state?
 \end{question}
 
+Agents have a complete and explicit mental state. It consists of a set of 
+components, such as beliefs, desires, intentions, and plans. 
 
 \begin{question}
 How do your agents communicate? And what do they communicate?  
 \end{question}
 
-Agents only
-communicate their perceptions via a perception server implemented in Python.
-
+Agents only communicate their perceptions via a perception server implemented 
+in Python.
 On each perceive/act cycle, agents receive the percept from the
 MASSim server, separate the information which will remain private and which
 will be shared.  The public part of the percept is sent to the percept server,
@@ -355,21 +366,22 @@ which performs a union of all percept and send the difference back to each
 agent. After receiving the joint percept, the agents enter a belief setting
 phase, and later an argumentation phase.
 
-
 \begin{question}
 How do you organize your agents? Do you use e.g. hierarchies? Is your
 organization implicit or explicit?
 \end{question}
-There is no agent hierarchy, and since the decision-making process takes
+There is no agent hierarchy, and given the decision-making process takes
 place individually for each agent, there is no organization between them.
-
+The only organization that they have is the proper given by the environment, 
+which is the roles.
 
 \begin{question}
 Is most of your agents behavior emergent on an individual and team
 level?
 \end{question}
-Since each agent makes decisions considering the other agents' status,
-team behavior is emergent from individual behavior.
+The desicion-taking module makes use of other agents' status, but there is 
+neither negotiation nor intentions exchange, so the team performance is 
+emergent on an individual behaviour.
 
 \begin{question}
 If your agents perform some planning, how many steps do they plan ahead?

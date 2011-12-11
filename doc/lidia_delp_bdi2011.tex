@@ -397,23 +397,14 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     explored nodes, and positioning the agents correctly to maintain, defend 
     and expand the zones formed. 
     
-    To accomplish this, all agents follow the same concept. Every agent, beyond 
-    its role, is concerned with the formation and expansion of zones.
+    To accomplish this, all agents follow the same concept. Every agent is concerned 
+    with the formation and expansion of zones, beyond its role.
     The desicion-taking process is responsible for calculating and selecting the
     most beneficial intention, which may be focused in the zone conquering (if possible),
     or not.
-    This selection process is based in many factors, such as the gain in terms 
+    This selection process is based on many factors, such as the gain in terms 
     of score, the need of the team for the execution of a role-specific action, or
     the benefit that the agent is currently contributing to the team. 
-    
-    % To accomplish this, all agents follow the same concept (beyond its roles). 
-    % Every agent is responsible for calculating and comparing the benefits of the 
-    % different potential actions. This process includes all possible actions 
-    % (depending on the role), and is based in many factors, such as the gain in terms 
-    % of score, the need of the team for the execution of a role-specific action, and, 
-    % generally, the benefit that the agent is currently contributing to the team. 
-    % The action considered to be the most beneficial for the team is selected as the
-    % next intention, and a plan is elaborated to achieve it.
     
     For example, a repairer agent that is part of a zone will attempt to keep or
     expand the zone by moving to a better node (in terms of zone coloring), 
@@ -429,7 +420,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
        
 \subsubsection{Zone conquering.}
     
-    The exploration of the map is made gradually, as a result of the reasoning 
+    The exploration of the map is done gradually, as a result of the reasoning 
     proccess. The actions related to the exploration (probe, survey) are weight 
     along with all other actions and are selected when it is considered important. 
     This is seen to a greater extent during the inicial steps of the simulations, 
@@ -509,6 +500,16 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     Here are some implementation details of the different parts of the agents.
     
+\subsubsection{Mental state.}
+
+    Agents have a complete and explicit mental state. It consists of a set of 
+    components, such as beliefs, desires, intentions, and plans. 
+    The belief base includes the information obtained from the perceptions, as
+    well as different kinds of beliefs required by the decision-taking module.
+    The desires are set every step that the agent decides to select a new intention.
+    The intentions and plans kept in the knowledge base are those that the agent
+    is currently carrying out.
+    
 \subsubsection{Path planning.}
 
     Path planning is implemented with an Uniform Cost Search 
@@ -544,7 +545,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsection{Agents' organization}
 
-    As mentioned before, all agents operate in the same way.
+    As explained before, all agents operate in the same way. The desicion-taking
+    module makes use of other agents' status, but there is neither negotiation nor 
+    intentions exchange, so the team performance is emergent on an individual behaviour. 
     The only organization that they have is the proper given by the environment, 
     which is the roles.
     
