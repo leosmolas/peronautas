@@ -59,6 +59,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     context of a multi-agent gaming situation, and to test the integration of
     the different technologies used.
 
+%{{{
 %\section{Preliminaries}
 %
 %    The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
@@ -92,6 +93,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 %
 %    The final score for a team is the sum of points over all steps; at the end
 %    of the match, the team with the most points is the winner.
+%}}}
 
 \section{System Analysis and Design}
 
@@ -162,210 +164,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     the initial plan was to run tests against other agent teams prior to the
     competition, time constraints made this impossible.
 
-\section{Software Architecture}
-
-% TODO hacer la figura mas chica
-
-%\begin{figure}
-%\centering
-% \includegraphics[width=\textwidth]{agent_architecture.pdf}
-%   \caption{Agent architecture in a flow chart-like diagram. 
-%   Dashed arrows represent process flow, solid lines represent data flow.}
-%\label{fig:architecture}
-%\end{figure}
-
-    In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
-    i.e. its interactions with the servers (MASSim, and our Percept Server), 
-    and its internal components.
- 
-% 3 Software Architecture
-% [x]  1. Which programming language did you use to implement the multi-agent 
-%         system?
-% [ ]  2. Did you use multi-agent programming languages? Why or why not to use a 
-%         multi-agent programming language?
-% [ ]  3. How have you mapped the designed architecture (both multi-agent and 
-%         individual agent architectures) to programming codes, i.e., how did 
-%         you implement specific agent-oriented concepts and designed artifacts 
-%         using the programming language?
-% [ ]  4. Which development platforms and tools are used? How much time did you 
-%         invest in learning those?
-% [ ]  5. Which runtime platforms and tools (e.g. Jade, AgentScape, simply Java, 
-%         ....) are used? How much time did you invest in learning those?
-% [ ]  6. What features were missing in your language choice that would have 
-%         facilitated your development task?
-% [ ]  7. What features of your programming language has simplified your 
-%         development task?
-% [ ]  8. Which algorithms are used/implemented?
-% [ ]  9. How did you distribute the agents on several machines? And if you did 
-%         not please justify why.
-% [ ] 10. To which extend is the reasoning of your agents synchronized with the 
-%         receive-percepts/send-action cycle?
-% [ ] 11. What part of the development was most difficult/complex? What kind of 
-%         problems have you found and how are they solved?
-% [ ] 12. How many lines of code did you write for your software?
-
-
-\subsection{Architecture implementation}
-
-    The first part of the architecture is the Python part, that handles all the 
-    communication with the servers. It first opens a TCP/IP connection with the 
-    MASSim server, and authenticates. Then it does the same with our Percept 
-    Server, that has to be running. It waits for all the agents, and then 
-    everything is set to start the simulation.
-
-\subsubsection{Percept-act loop.}
-
-    When the first action-request message is received, this loop starts. It 
-    first processes the perception, and then sends it to the Percept Server. 
-    This waits for all the other agents' perceptions, merges them, and then sends 
-    back a new version that contains everything that has been seen by the agent 
-    teammates, but not by itself. Finally, this global perception is asserted 
-    into Prolog. 
-    As it will be explained below, this part of the program constitutes the 
-    decision making module. Therefore, the Python part will query it, for the
-    next action to be performed by the agent.
-
-\subsubsection{Action requested.}
-
-    As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
-    all the processing in Prolog. The perception is already in the knowledge 
-    base, that is formed by the ``static'' and ``dynamic'' data. 
-
-    If the agent already has an intention stored, the \textit{cut condition}
-    checks whether it makes sense to keep trying to fulfill it. It is a series
-    of simple conditions that review the state of the world.
-
-    Then, if there is not any commited intention, or the cut condition decides 
-    it is not interesting to keep it, the \textit{beliefs setting process} is 
-    started. It generates the possible desires for this step, according to what 
-    is stored in the knowledge base, and, for each one of them, the beliefs 
-    needed. 
-    The decision-making module is implemented in DeLP\cite{Rotstein:2007}
-    \cite{Ferretti:2008},
-    a defeasible logic 
-    programming language that uses argumentation 
-    \cite{DBLP:conf/comma/2008}\ to reason with conflicting
-    information. 
-    Given the set of possible 
-    desires and beliefs set by the previous module, it selects the best desire, 
-    returning it as the intention that the agent commits to achieve.
-
-    All the plans for all the desires were previously calculated and stored as 
-    beliefs, since the amount of steps that they take is used by the 
-    argumentation module. The \textit{planning} module selects the one 
-    corresponding to the selected intention, and stores it. Then, the 
-    execution module only gets the plan, and returns to Python the first 
-    action in it.
-
-    However, if the process flow comes from the other branch of Fig. 
-    \ref{fig:architecture} (that is, after the cut condition, the agent has an 
-    intention), the execution is not that simple. Since skipping the decision-
-    taking makes this branch insignificant in terms of time, we decided to 
-    recalculate the plan. This might help us when a better path is discovered, 
-    even though this is unlikely.
-
-    Back again in Python, with the returned action, an XML is formed to be sent 
-    to the server.
-
-\subsection{Programming languages, platforms and tools}
-
-    The agent system was implemented using Python 2.7 and SWI Prolog 5.10.5. DeLP 
-    \cite{Garcia:2004a}, a defeasible logic programming language, was used as a 
-    service within Prolog. 
-    Language integration was achieved using the \textit{pyswip}\ library, 
-    calling Prolog predicates from Python. The implementation of Defeasible 
-    Logic Programming (DeLP) by the LIDIA was used for the deliberative 
-    process. They were well-known at the start of the project, and were chosen 
-    for precisely those reasons.
-    
-    No multi-agent programming languages/platforms/frameworks were used due to 
-    previous experience indicating a general lack of flexibility, and a lack of 
-    familiarity on behalf of the development team.
-    
-    Both Linux and the Windows operating system were used as development 
-    platforms, since the language runtimes chosen for implementation were 
-    portable. Some caveats were encountered however.
-
-    We used \textit{git}\ as our revision control system. In general, we did 
-    not spend much time in learning it, since some of us had already worked 
-    with it.
-
-\subsubsection{DeLP.}
-    
-    \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
-    \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
-    \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
-
-    In DeLP\cite{Garcia:2004a}, knowledge is represented using facts, strict rules
-    and defeasible rules. Facts and strict rules are ground literals representing
-    firm information that can not be challenged. \textit{Defeasible Rules}
-    (d-rules) are denoted $\drule{L_0}{L_1, \ldots, L_n}$ (where $L_i$ are literals)
-    and represent tentative information. These rules may be used if nothing could
-    be posed against it. A d-rule \textit{``\drule{Head}{Body}''} expresses that
-    \textit{``reasons to believe in Body give reasons to believe in Head''}. A DeLP
-    program is a set of facts, strict rules and defeasible rules. 
-
-    {\it Strong negation} is allowed in the head of program rules, and hence, may
-    be used to represent contradictory knowledge. From such a program contradictory
-    literals could be derived, however,  the set of facts and strict rules must
-    possess certain internal coherence (it has to be non-contradictory). 
-
-    To deal with contradictory information, in DeLP, \emph{arguments} for
-    conflicting pieces of information are built and then compared to decide which
-    one prevails. The prevailing argument is a \emph{warrant} for the information
-    that it supports.
-
-    In DeLP, a query $L$ is \emph{warranted} from a program if a \emph{non-defeated}
-    argument that supports $L$ exists. %\Arg\ 
-
-\subsubsection{Benefits.}
-    
-    Python's amenity to rapid application development and 'batteries-included 
-    philosophy' facilitated implementing the communication layer to the MASSim 
-    server, parsing of peceptions, rapid addition of planned features and bug 
-    correction.
-
-    We made use of Prolog's declarative nature to model states of the world, and it 
-    also made more straightforward to implement search algorithms like Uniform Cost 
-    Search, and Depth First Search. The zone-coloring algorithm was also 
-    implemented in Prolog.
-    
-    DeLP's capability to deal with conflicting pieces of information was also very
-    helpful in order to implement the decision-making module.
-    
-    Initial plans were to distribute agents on several machines. Each agent runs 
-    as a separate process, and communicates with others via TCP sockets. After 
-    some experience and benchmarking, agents were run on one machine, due to 
-    performance issues. 
-    Having the choice was a benefit of the proposed design.
-
-\subsubsection{Problems encountered.}
-
-    The most difficult problems were related to optimization. Much of our time was 
-    spent in reducing the complexity of our algorithms, and the times they 
-    were called.
-
-    For the coloring algorithm, we added several improvements, for both 
-    optimization and correctness. In essence, since we only had an incomplete 
-    version of the full map in every step, we added the concept of ``fog of war`'' 
-    to the agents, assuming always in a pessimistic way. 
-
-    For both search algorithms, the Depth First Search and the Uniform Cost 
-    Search, we added conditions that could cut several branches, when they were 
-    expanding to unwanted nodes. This conditions were set by the caller, since 
-    they depend on the context of the problem.
-
-    For the UCS, we first used a simple stack implemented with a list, to keep 
-    track of the frontier, because of Prolog's inability to work with arrays. This 
-    would have allowed us to develop a heap data structure, to be used in a 
-    priority queue. Lately, we found a Prolog library that implemented this data 
-    structure, and the migration was pleasantly straightforward.
-
-    Finally, for this last algorithm too, we added an important optimization 
-    that allowed us to call it several times, with the virtual cost of only one 
-    call. It was done using memoization, and a more thoughtful invocation.
-
-% TODO LO DE LAS LINEAS DE CODIGO
+\include{swarch}
 
 \section{Strategies, Details, and Statistics}
 
@@ -391,8 +190,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 	overall strategy, as well as several implementation details, such as 
 	algorithms used and agents' organization.
 
-% TODO: discutir orden de las cosas 
-    
 \subsection{Strategy}
 
     The main strategy of the team consists of detecting profitable zones from the 
@@ -424,12 +221,13 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Agents coordination is achived in an implicit way. This is, the information
     shared consists only of the perception received, not including neither 
     preprocessed beliefs, nor control variables. The agents do not communicate
-    their intentions or plans, so any coordination that they may exhibit is 
+    their intentions nor plans, so any coordination that they may exhibit is 
     accomplished implicitly.
     % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
     % lineas antes.
+    % TODO revisar el doble uso de neither nor, juntar las oraciones?
        
-\subsubsection{Zone conquering.}
+\subsubsection{Zone conquering}
     
     The exploration of the map is made gradually, as a result of the reasoning 
     proccess. The actions related to the exploration (probe, survey) are weight 
@@ -456,7 +254,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     This estimations are done with our reimplementation of the coloring algorithm used 
     by the MASSim server. The information is used by the decision taking module.  
 
-\subsubsection{Attacking and defending.}
+\subsubsection{Attacking and defending}
     
     Both attacking and defense of zones are implicitly implemented. 
     Sabouteurs prefer to attack enemies that are near, so if an agent of another 
@@ -472,7 +270,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     can go to a node that has one agent of each team, with the purpose of coloring the 
     contested node and defending the zone.
     
-\subsubsection{Phases.}
+\subsubsection{Phases}
 
     Our agents do not change their behavior during runtime. This feature was 
     analysed, but the team did not have enough time to finish its implementation.
@@ -486,7 +284,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     benefit of each action, so that its inclusion directly affects the action-selection 
     proccess.
     
-\subsubsection{Buying.}
+\subsubsection{Buying}
 
     Agents follow a list of predefined buying actions, when the necessary amount 
     of money is reached. This behaviour follows the idea of getting some specific skill 
@@ -498,7 +296,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     of our team and our enemy. However, this simple approach was the easiest to implement, 
     and it was proven to be the most succesful one.
 
-\subsubsection{Achievements.}
+\subsubsection{Achievements}
 
     Achievements are not explicitly taken under consideration. That is, the agents'
     reasoning proccess is not affected by the possibility of completing achievements.    
@@ -511,7 +309,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     Here are some implementation details of the different parts of the agents.
     
-\subsubsection{Path planning.}
+\subsubsection{Path planning}
 
     Path planning is implemented with an Uniform Cost Search 
     \cite{Russell:2003:AIM:773294}. 
@@ -676,89 +474,5 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 %\include{questions}
 
-
 \end{document} 
 
-
-%referencia del concurso: YATÁ
-%referencias estandar para argumentacion y delp: YATÁ
-%referencia de XP: NOTÁ
-%
-
-
-%PRELIMINARIES
-%
-%   no va la explicacion
-%
-%SYSTEM ANALYSIS AND DESIGN
-%
-%    proactiveness
-%
-%    What is the communication strategy and how complex is it?
-%
-%    Explicar mejor la arqui del Percept server, su mecanismo
-%    que cada agente tiene su propia KB
-%    que no hay variables compartidos
-%
-%    Horas   
-%
-%    abril
-%        144 = 6 x 4 x 6
-%    mayo
-%        144 = 6 x 4 x 6
-%    junio
-%        144 = 6 x 4 x 6
-%        120 = 6 x 20
-%    julio
-%        144 = 6 x 4 x 6
-%        120 = 6 x 20
-%    agosto
-%        144 = 6 x 4 x 6
-%    septiembre
-%        360 = 5 x 12 x 6
-%
-%    1500 total
-%
-%    % 28 weeks, 8 hs per week, 6 developers ~= 1500
-%
-%SW ARCHITECTURE
-%
-%    separar el grafico en dos partes
-%    alto nivel, separacion python prolog delp
-%    bajo nivel, con todos los modulos e interacciones
-%    
-%    IÑAKI:
-%        como se representa el conocimiento?
-%        how does de static dynamic and initial data look like?
-%        como se representa entre el agente y el PS?
-%        ejemplos de codigo 
-%        como se traduce a prolog para meterlo en la KB?
-%        UNA BUENA EXPLICACION DEL PIPELINE DE DATOS
-%
-%    MANU: how does delp look like?  ejemplos de delp
-%    MANU: how does an intention look like?
-%
-%    3.2: Did you use multi-agent programming languages? Why or why not to use a multi-agent programming language?
-%
-%    3.4: 4. Which development platforms and tools are used? How much time did you invest in learning those?
-%            editor for the design process? 
-%            what IDE did you use?
-%            what abpout debugger for delp?
-%            hours spent learning those?
-%
-%        poner que no usamos IDEs 
-%        poner lo del visualizador del arboles dialecticos de delp?
-%
-%    3.10 To which extend is the reasoning of your agents synchronized with the receive-percepts/send-action cycle?
-%
-%    3.12 How many lines of code did you write for your software?
-%
-%
-%    cada turno la informacion en la kb se actualiza, se usa el parametro de step para ver la edad y validez de la info
-%    ejemplo el algoritmo de coloreo permite generacion de creencias, por lo cual en la kb no esta solamente la percepcion
-%
-%4 STRATEGIES DETAILS STATISTICS
-%
-%deberia haber una pequeña introduccion a la seccion en general, entre el titulo de la seccion y el subtitulo Strategy: YATÁ
-%
-%% TODO explicar lo de las fases: YATÁ
