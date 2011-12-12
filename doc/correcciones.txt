@@ -3,7 +3,6 @@ TODO
 - ver si se puede ampliar la parte de diseño
 - reescribir la arquitectura
 - reescribir la conclusion
-- corregir los graficos
 
 ####################################################################################################
 - Is the layout appropriate? Overfull hboxes et cetera.

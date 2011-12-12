@@ -12,7 +12,7 @@
 
 % [x]  4. Which development platforms and tools are used? How much time did you 
 %         invest in learning those?
-% [ ] Question 3.4 not properly answered. Question was more about the question
+% [x] Question 3.4 not properly answered. Question was more about the question
 % what editor did you use for the design process what IDE did you use, what
 % about debugger for DeLP, etc. And the hours spent to learn how to use them.
 %    3.4: 4. Which development platforms and tools are used? How much time did you invest in learning those?
@@ -28,7 +28,7 @@
 %         ....) are used? How much time did you invest in learning those?
 % [ ]  6. What features were missing in your language choice that would have 
 %         facilitated your development task?
-% [ ]  7. What features of your programming language has simplified your 
+% [x]  7. What features of your programming language has simplified your 
 %         development task?
 
 % SECTION IMPLEMENTION
@@ -112,35 +112,38 @@
 \subsection{Implementation}
     %{{{
     The system was implemented as a collection of independent operating system
-    processes, each agent running in its own address space, and in addition the
-    percept server.
-    The agents are started individually and synchronize via the percept server. 
-    % TODO repite percept server
-    Each one handles its own connection to the MASSim and percept servers, as
-    the \textit{eismassim} REFERENCIA package provided by the contest organizers
-    was not used to avoid the difficulty of integrating yet another language and
-    runtime (Java) with the ones being used. 
+    processes, the percept server and each agent running in its own address
+    space.  The agents are started individually and synchronize via the percept
+    server.  Each one handles its own connection to the MASSim and percept
+    servers, as the \textit{eismassim} package provided by the contest
+    organizers was not used to avoid the difficulty of integrating yet another
+    language and runtime (Java) with the ones being used. 
     
-    % TODO hacer la figura mas chica
-    % [ ] The figure should be smaller and the prolog part should be noted in the figure.
-    %    separar el grafico en dos partes
-    %    alto nivel, separacion python prolog delp
-    %    bajo nivel, con todos los modulos e interacciones
-    
-    %\begin{figure}
-    %\centering
-    % \includegraphics[width=\textwidth]{agent_architecture.pdf}
-    %   \caption{Agent architecture in a flow chart-like diagram. 
-    %   Dashed arrows represent process flow, solid lines represent data flow.}
-    %\label{fig:architecture}
-    %\end{figure}
+    \begin{figure}
+    \centering
+    \includegraphics[scale=.3]{agentarchitecture.eps}
+    \caption{Agent architecture in a flow chart-like diagram. Dashed arrows
+    represent process flow, solid lines represent data flow.}
+    \label{fig:architecture}
+    \end{figure}
 
     In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
     i.e. its interactions with the servers (MASSim, and our Percept Server), 
     and its internal components.
-    %}}}
 
-\subsubsection{Individual agent main program}
+    \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{agentprolog.eps}
+    \caption{Architecture of the Prolog decision module}
+    \label{fig:prologmodule}
+    \end{figure}
+
+    Fig. \ref{fig:prologmodule} shows the structure and flow of control and
+    information within the decision making module implemented in Prolog and
+    DeLP.
+    %}}}
+    
+\subsubsection{Agent main program}
     %{{{
     The agent main program is implemented in Python, and handles all
     communication with the servers, XML parsing, processing the information in
@@ -244,6 +247,51 @@
 
 \subsubsection{Knowledge representation}
 
+% XML representation:
+
+% <visibleEdges>
+    % <visibleEdge node1="vertex0" node2="vertex11"/>
+    % ...
+% </visibleEdges>
+% <surveyedEdges>                                                         
+    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
+    % ...
+% </surveyedEdges>
+
+
+% Visible and surveyed edges. Python list representation after the XML parsing:
+
+% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
+% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
+
+
+% Prolog interface to Python:
+
+% updateEdge(Node1, Node2, Weight)        % Predicate called from Python
+
+
+% Prolog Knowledge Base representation:
+
+% k(edge(Node1, Node2, Weight))
+    
+    % k(edge(vertex0, vertex11, unknown))   % If the edge has not been surveyed
+    % k(edge(vertex3, vertex7, 2))      % If the edge has been surveyed
+    
+    
+
+% DESIRES
+
+% Expansion (Aumento)
+% Explore
+% Regroup
+% SeekForRepair (Auxilio)
+% SelfDefense
+% Block (Parry)
+% Stay
+% Buy
+% Probe
+% Repair
+% Attack
 \subsubsection{Deliberation and DeLP}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
@@ -274,7 +322,7 @@
     DESIRE defensaPropia
     
     \begin{small}
-    \begin{verbatim}
+    \begin{Verbatim}
     selfDefense(1000) -<
         myStatus(normal),
         canParry,
@@ -288,7 +336,7 @@
     canParry -< myRole(sentinel).
         
     ~canParry <- myEnergy(Energy), less(Energy, 2). 
-    \end{verbatim}
+    \end{Verbatim}
     \end{small}
  
     Si se cumple todo esto, y el deseo de autodefenderse esta warranted,

@@ -5,6 +5,8 @@
 \usepackage{graphicx}
 \usepackage{bibentry}
 \usepackage[numbers]{natbib}
+\usepackage{fancyvrb}
+\usepackage{epstopdf}
 
 \title{An Argumentative Approach for a BDI Agent} 
         
@@ -191,8 +193,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 % [ ] 16. If your agents perform some planning, how many steps do they plan ahead?
     
     In this section, we will explain the main characteristics of the team's 
-	overall strategy, as well as several implementation details, such as 
-	algorithms used and agents' organization.
+    overall strategy, as well as several implementation details, such as 
+    algorithms used and agents' organization.
 
 \subsection{Strategy}
 
@@ -218,6 +220,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     preprocessed beliefs, nor control variables. The agents do not communicate
     their intentions nor plans, so any coordination that they may exhibit is 
     accomplished implicitly.
+
     % TODO: revisar el inglés de esta oración. No nos convence el "or" de dos
     % lineas antes.
     % TODO revisar el doble uso de neither nor, juntar las oraciones?
@@ -345,7 +348,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     union of all percepts and send the difference back to each agent. After 
     receiving the joint percept, the agents enter a belief setting phase, and 
     later an argumentative phase.
-    
 
 \subsection{Agents' organization}
 
@@ -386,9 +388,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     the non-monotonic nature of DeLP, the argumentation language used in the 
     decision-taking module.
 
-
 \section{Conclusion}
-
 
 % 5 Conclusion
 % [ ] 1. What have you learned from the participation in the contest?
@@ -399,9 +399,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 % [ ] 6. Which other research fields might be interested in the Multi-Agent Programming Contest?
 % [ ] 7. How can the current scenario be optimized? How would those optimization pay off?
 
-
 \subsection{Our team, and its development}
-    
 
     Our team is formed by a group of friends, so a strong point in the developing 
     process has been the cohesion and comradeship. We had also worked together,
@@ -443,10 +441,8 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     all but the last day of competition, in which we already had everything in 
     consideration and control.
 
-
 \subsection{Our thoughts about possible optimizations to the contest}
     
-
     Many optimizations ocurred to us for the scenario, and the contest in general. 
     For example, more information for the nodes, including something useful for a 
     directed search (i.e., absolute coordinates), would help in the implementation 
@@ -470,7 +466,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
     
-    
     % TODO pregunta 6 que otros campos
     % Game AI, Robotics
 
@@ -479,55 +474,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 \bibliographystyle{plainnat} 
 \bibliography{bib} 
 
-%\include{questions}
+\include{questions}
 
 \end{document} 
 
-% ---------------------------------------------------------------------------------------------------------------------
-% BELIEF REPRESENTATION
-
-% XML representation:
-
-% <visibleEdges>
-    % <visibleEdge node1="vertex0" node2="vertex11"/>
-    % ...
-% </visibleEdges>
-% <surveyedEdges>                                                         
-    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
-    % ...
-% </surveyedEdges>
-
-
-% Visible and surveyed edges. Python list representation after the XML parsing:
-
-% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
-% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
-
-
-% Prolog interface to Python:
-
-% updateEdge(Node1, Node2, Weight)        % Predicate called from Python
-
-
-% Prolog Knowledge Base representation:
-
-% k(edge(Node1, Node2, Weight))
-    
-    % k(edge(vertex0, vertex11, unknown))   % If the edge has not been surveyed
-    % k(edge(vertex3, vertex7, 2))      % If the edge has been surveyed
-    
-    
-
-% DESIRES
-
-% Expansion (Aumento)
-% Explore
-% Regroup
-% SeekForRepair (Auxilio)
-% SelfDefense
-% Block (Parry)
-% Stay
-% Buy
-% Probe
-% Repair
-% Attack
