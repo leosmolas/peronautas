@@ -82,18 +82,17 @@
 
 \subsection{Programming languages, platforms and tools}
     %{{{
-    The agent system was implemented using Python 2.7 REFERENCIA and SWI Prolog 5.10.5 REFERENCIA. 
-    Language integration was achieved using the \textit{pyswip}\ library REFERENCIA, 
-    which facilitates the execution of Prolog queries from Python.
-    The implementation of Defeasible Logic Programming (DeLP) by the LIDIA
-    \cite{Garcia:2004a} was used for the deliberative process, in which desires
-    and intentions are set.
-    The standard Python and SWI-Prolog debugging tools were used.
-    DeLP includes a graphical viewer for dialectical trees, allowing
-    visualization of which arguments attack others and facilitating debugging of
-    the defeasible rules employed.
-    DeLP's capability to deal with conflicting pieces of information was also very
-    helpful in order to implement the decision-making module.
+    The agent system was implemented using Python 2.7 REFERENCIA and SWI Prolog
+    5.10.5 REFERENCIA.  Language integration was achieved using the
+    \textit{pyswip}\ library REFERENCIA, which facilitates the execution of
+    Prolog queries from Python.  The implementation of Defeasible Logic
+    Programming (DeLP) by the LIDIA \cite{Garcia:2004a} was used for the
+    deliberative process, in which desires and intentions are set.  The standard
+    Python and SWI-Prolog debugging tools were used.  DeLP includes a graphical
+    viewer for dialectical trees, allowing visualization of which arguments
+    attack others and facilitating debugging of the defeasible rules employed.
+    DeLP's capability to deal with conflicting pieces of information was also
+    very helpful in order to implement the decision-making module.
     
     These languages and platforms were well-known at the start of the project,
     and were chosen for precisely those reasons.
@@ -104,14 +103,24 @@
     defeasible rules was initially considered more difficult than the
     straighforward approach taken.
 
-    Python's amenity to rapid application development and 'batteries-included 
-    philosophy' facilitated implementing the communication layer to the MASSim 
-    server, parsing of peceptions, rapid addition of planned features and bug 
+    Python's amenity to rapid application development and ``batteries-included 
+    philosophy'' facilitated implementing the communication layer to the MASSim 
+    server, parsing of perceptions, rapid addition of planned features and bug 
     correction.
     %}}}
 
 \subsection{Implementation}
     %{{{
+    The system was implemented as a collection of independent operating system
+    processes, each agent running in its own address space, and in addition the
+    percept server.
+    The agents are started individually and synchronize via the percept server. 
+    % TODO repite percept server
+    Each one handles its own connection to the MASSim and percept servers, as
+    the \textit{eismassim} REFERENCIA package provided by the contest organizers
+    was not used to avoid the difficulty of integrating yet another language and
+    runtime (Java) with the ones being used. 
+    
     % TODO hacer la figura mas chica
     % [ ] The figure should be smaller and the prolog part should be noted in the figure.
     %    separar el grafico en dos partes
@@ -129,32 +138,65 @@
     In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
     i.e. its interactions with the servers (MASSim, and our Percept Server), 
     and its internal components.
-
-    The system was implemented as a collection of independent operating system
-    processes, each agent running in its own address space, and in addition the
-    percept server.
-    The agents are started individually and synchronize via de percept server. 
-    Each one handles his own connection to the MASSim and percept servers, as
-    the \textit{eismassim} REFERENCIA package provided by the contest organizers
-    was not used to avoid the difficulty of integrating yet another language and
-    runtime (Java) with the ones being used. 
     %}}}
 
 \subsubsection{Individual agent main program}
     %{{{
-    The first part of the architecture is the Python part, that handles all the 
-    communication with the servers. It first opens a TCP/IP connection with the 
-    MASSim server, and authenticates. Then it does the same with our Percept 
-    Server, that has to be running. It waits for all the agents, and then 
-    everything is set to start the simulation.
-
-    The agent main program is implemented in Python,
+    The agent main program is implemented in Python, and handles all
+    communication with the servers, XML parsing, processing the information in
+    the percept into a form suitable for assertion in the agent's knowledge
+    base, and generation of the XML representing the action taken which is
+    returned to the MASSim server.
+    % TODO ver repeticion de which 
 
     On startup, an agent is passed the information needed to authenticate with
-    the MASSim server and some configuration options, such as network addresses
-    ad ports, whether the percept server and the argumentation framework are to
-    be used or not.
+    the MASSim server and some configuration options such as network addresses
+    and ports, whether the percept server and the argumentation framework are to
+    be used or not, and logging verbosity levels.
 
+    Initialization consists of opening the connections to the MASSim server,
+    authenticating, opening the connection to the percept server, and starting
+    the Prolog engine. The main program loop is then entered, in which messages
+    from the MASSim server are received and parsed. 
+
+    When a message of type \texttt{sim-start} is received, initial information
+    present in the message such as the agent's role and the simulation
+    parameters are asserted into the agent's knowledge base and the perceive-act
+    loop is started.
+
+    Each iteration of the perceive-act loop expects a \texttt{request-action}
+    message from the MASSim server and parses the XML into a Python
+    datastructure:
+
+    \begin{verbatim}
+    EJEMPLO DE PERCEPT EN PYTHON
+    \end{verbatim}
+    
+    If so configured, the agent will then send the percept to the percept server
+    and await the global percept containing the remainig information perceived
+    by the team. The global percept is merged with it's own, and asserted into
+    the agent's knowledge base.
+
+    The decision making module implemented in Prolog is then queried for the
+    next action to be performed by the agent.
+    
+    Once control flow returns to the Python program with the determined action,
+    the corresponding XML message is generated and sent to the MASSim server. 
+
+    % main loop
+    %   initialize
+    %   perceiveActLoop
+    %       massim-recv
+    %       parse
+    %       processActionRequest
+    %           percept-server-send-recv
+    %           processPercept
+    %           run prolog
+    %           send action
+    %}}}
+
+\subsubsection{Percept Server}
+    %{{{
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
     This waits for all the other agents' perceptions, merges them, and then sends 
@@ -162,17 +204,6 @@
     teammates, but not by itself. Finally, this global perception is asserted 
     into Prolog. 
 
-    As will be explained below, this part of the program constitutes the 
-    decision making module. Therefore, the Python part will query it, for the
-    next action to be performed by the agent.
-    
-    Back again in Python, with the returned action, an XML is formed to be sent 
-    to the server.
-
-    %}}}
-
-\subsubsection{Percept Server}
-    %{{{
     %}}}
 
 \subsubsection{Percept processing and belief revision}
@@ -209,8 +240,9 @@
     taking makes this branch insignificant in terms of time, we decided to 
     recalculate the plan. This might help us when a better path is discovered, 
     even though this is unlikely.
-
     %}}}
+
+\subsubsection{Knowledge representation}
 
 \subsubsection{Deliberation and DeLP}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}

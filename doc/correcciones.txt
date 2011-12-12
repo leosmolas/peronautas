@@ -1,0 +1,104 @@
+TODO
+- mandar mail a gotti preguntando por "related work", "proactiveness"
+- ver si se puede ampliar la parte de diseño
+- reescribir la arquitectura
+- reescribir la conclusion
+- corregir los graficos
+
+####################################################################################################
+- Is the layout appropriate? Overfull hboxes et cetera.
+DeLP rule should be in the next line.
+
+- Are the figures fine? Right resolution, friendly and matching colors? Do they use greyscale?
+Two big. Needs one page. Otherwise okay.
+
+- Related Work:Missing.
+
+- General:
+And please stick to the numbering proposed in the template.
+
+####################################################################################################
+- System Analysis and Design
+
+Please give as reference for XP so that people that are not familiar with this can look it up.
+What about proactiveness?
+This section lacks details. Half a page for the system analysis and design is too short.
+
+
+
+
+
+
+
+####################################################################################################
+- Strategies, Details, and Statistics
+"It is actually very easy to add this feature" <- How would you do it?
+Why didn't you consider achievements? It is an important part of the score.
+Please stick more to the order of the questions. The overall strategy and the organisational structure are the most important parts of an agent team and should be therefore explained first.
+How does a agent knows that he is or he is not in a zone?
+What about saboteurs that are in a zone? Do they leave the formation in order to attack an opponent?
+Do you try to attack and destroy other zones?
+How do you explore the map?
+How does the buy-list look like?
+Why did you put item A on 1 and item B on 2 etc.
+Explain for each role what it does. How does the belief base look like? What about the initial plans? etc.
+This section should be the biggest one of your paper. The reader should not only be able to understand the overall structure of your team but also how it actually works. What does the explorer? What does the saboteur? etc.
+Please provide more details.
+
+
+
+
+
+####################################################################################################
+- Conclusion
+Between 6 and 6.1 should be some text.
+What about debugging tools?
+Question 5 and 6 not answered.
+In general, the conclusion should be more research focused.
+
+
+
+
+
+- Short Answers
+7.1 Question 5. Please cite the related work
+7.2
+Question 2. But they are sharing percepts!
+Question 7. Link to the people from Argonauts
+7.3 lack of flexibility <- Why? People from Dortmund used Jason for it.
+Q4: see comment above.
+Q6 not answered.
+7.4 not all questions are answered.
+7.5 not all questions are answered.
+
+
+####################################################################################################
+%referencia de XP: NOTÁ
+
+%SYSTEM ANALYSIS AND DESIGN
+%    proactiveness
+%
+%    Explicar mejor la arqui del Percept server, su mecanismo
+%    que cada agente tiene su propia KB
+%    que no hay variables compartidos
+%
+%    Horas   
+%    abril
+%        144 = 6 x 4 x 6
+%    mayo
+%        144 = 6 x 4 x 6
+%    junio
+%        144 = 6 x 4 x 6
+%        120 = 6 x 20
+%    julio
+%        144 = 6 x 4 x 6
+%        120 = 6 x 20
+%    agosto
+%        144 = 6 x 4 x 6
+%    septiembre
+%        360 = 5 x 12 x 6
+%
+%    1500 total
+%
+%    % 28 weeks, 8 hs per week, 6 developers ~= 1500
+%
