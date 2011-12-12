@@ -103,7 +103,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 %        on a specific agent? Conversely if you plan a decentralised solution, 
 %        which strategy do you plan to use?
 % [x] 3. What is the communication strategy and how complex is it?
-% [ ] 4. How are the following agent features considered/implemented: autonomy, 
+% [x] 4. How are the following agent features considered/implemented: autonomy, 
 %        proactiveness, reactiveness?
 % [x] 5. Is the team a truly multi-agent system or rather a centralised system 
 %        in disguise?
@@ -153,7 +153,11 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     The agent architecture developed is based on the
     BDI model \cite{Rao:1991}, and is explained in detail in further sections.
 
-    % TODO: PROACTIVENESS, REACTIVENESS, REASONING DESIGN
+    The agents' behaviour can be considered proactive, given they pursue their 
+    selected intentions over time, that is, they have persistent goals. Plans 
+    for achieving intentions are recalculated and followed for the number of
+    steps requiered, unless the goal in question becomes impossible or no longer
+    relevant.
 
     Approximately 1500 man-hours were invested in the team development.
 
@@ -763,3 +767,53 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 %deberia haber una pequeña introduccion a la seccion en general, entre el titulo de la seccion y el subtitulo Strategy: YATÁ
 %
 %% TODO explicar lo de las fases: YATÁ
+
+
+% ---------------------------------------------------------------------------------------------------------------------
+% BELIEF REPRESENTATION
+
+% XML representation:
+
+% <visibleEdges>
+    % <visibleEdge node1="vertex0" node2="vertex11"/>
+    % ...
+% </visibleEdges>
+% <surveyedEdges>                                                         
+    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
+    % ...
+% </surveyedEdges>
+
+
+% Visible and surveyed edges. Python list representation after the XML parsing:
+
+% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
+% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
+
+
+% Prolog interface to Python:
+
+% updateEdge(Node1, Node2, Weight)        % Predicate called from Python
+
+
+% Prolog Knowledge Base representation:
+
+% k(edge(Node1, Node2, Weight))
+    
+    % k(edge(vertex0, vertex11, unknown))   % If the edge has not been surveyed
+    % k(edge(vertex3, vertex7, 2))      % If the edge has been surveyed
+    
+    
+
+% DESIRES
+
+% Expansion (Aumento)
+% Explore
+% Regroup
+% SeekForRepair (Auxilio)
+% SelfDefense
+% Block (Parry)
+% Stay
+% Buy
+% Probe
+% Repair
+% Attack
