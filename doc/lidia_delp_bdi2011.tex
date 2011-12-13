@@ -313,11 +313,10 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     
 \subsubsection{Path planning.}
 
-    Path planning is implemented with an Uniform Cost Search 
-    \cite{Russell:2003:AIM:773294}. 
-    What we tried to minimize was the amount of steps required to achieve the 
-    goal, rather than the energy spent. 
-    The returned result is a list of actions to be done, rather than a list of 
+    Path planning is implemented with an Uniform Cost Search
+    \cite{Russell:2003:AIM:773294}.  We tried to minimize the amount of
+    steps required to achieve the goal, rather than the energy spent.  The
+    returned result is a list of actions to be done, rather than a list of
     nodes.
     
     Since this algorithm can be called several times in one step, and given that the 
@@ -327,7 +326,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     during the competition.
     
     The plans are as long as the selected intention requieres. This may 
-    sound excesive, but the possible goals were previously selected for their 
+    sound excessive, but the possible goals were previously selected for their 
     potential, taking into consideration their distances (in nodes, not in 
     actions). However, plans are recalculated in every step, as explained earlier.    
 
@@ -335,10 +334,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
 
     The decision-taking module makes use of other agents' status, but there is
     neither negotiation nor intentions exchange, so the team performance is
-    emergent on an individual behaviour.  The only organization that they have
-    is the proper given by the environment, which is the roles.
+    emergent on individual behaviour.  
     
-    Refering to our actual programming, all the agents have a strong core of
+    Referring to our actual programming, all the agents have a strong core of
     common code, which is all the Python part, that servers as
     a receive-percepts/send-action client of the server; the Percept Server; and
     an important part of the Prolog code. This includes all the utilities used,
@@ -380,23 +378,23 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     lessons about working in large projects, such as setting standards and
     synchronizing versions of the technologies used.
 
-    In LIDIA, our teammates have done an important ammount of research in argumentation
-    and multi-agent systems. This allowed the team to take advantage of previous experiences. 
-    As a weak point can be considered the lack of experience in large projects.
+    In LIDIA, our teammates have done an important amount of research in
+    argumentation and multi-agent systems, providing valuable experience and
+    guidance. 
 
-    In retrospective, we may have taken the right decisions regarding the programming languages. 
-    DeLP resulted to be suitable for the implementation of the decision-making module since
-    it was flexible enough to develop our argumentation approach.
+    We believe the right decisions were taken regarding the
+    programming languages.  DeLP resulted suitable for the implementation
+    of the decision-making module since it was flexible enough to develop our
+    argumentation approach.
 
-    There were several hotfixes that were written and deployed at the same time we
-    were facing our competitors due to the lack of testing in the actual context of
-    the competition. This situation should obviously not happen, and adding much
-    more real testing is one of our main priorities for next year's competition.
+    Several hotfixes that were written and deployed during the competion due to
+    the lack of testing. Avoiding this undesireable situation is one of our main
+    priorities for next year's competition.
 
-    We had several problems that did not let us perform as good as we expected.  Our
-    lack of experience in this kind of contests, unexpected network and latency
-    problems, as well as some bugs that caused critical performance issues, caused
-    our team to lose several matches that could have been won otherwise.
+    Our lack of experience in this kind of contests, unexpected network and
+    latency problems, as well as some bugs that caused critical performance
+    issues, caused our team to lose several matches that could have been won
+    otherwise.
 
 \subsection{Our thoughts about possible optimizations to the contest}
     
