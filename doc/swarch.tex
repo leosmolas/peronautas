@@ -263,11 +263,7 @@
     \end{figure}
     %}}}
 
-<<<<<<< HEAD
 \subsubsection{Belief revision}
-=======
-\subsubsection{Percept processing and belief revision.}
->>>>>>> 781056f66bc502e73d496beef9a82e1e4ce522e2
     %{{{
     Once the remaining information is received from the percept server, the data
     is then asserted into the agent's knowledge base. 
@@ -302,29 +298,6 @@
     even though this is unlikely.
     %}}}
 
-<<<<<<< HEAD
-=======
-\subsubsection{Knowledge representation.}
-
-% XML representation:
-
-% <visibleEdges>
-    % <visibleEdge node1="vertex0" node2="vertex11"/>
-    % ...
-% </visibleEdges>
-% <surveyedEdges>                                                         
-    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
-    % ...
-% </surveyedEdges>
-
-
-% Visible and surveyed edges. Python list representation after the XML parsing:
-
-% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
-% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
-
-
->>>>>>> 781056f66bc502e73d496beef9a82e1e4ce522e2
 % Prolog interface to Python:
 
 % updateEdge(Node1, Node2, Weight)        % Predicate called from Python
@@ -399,32 +372,6 @@
     Si se cumple todo esto, y el deseo de autodefenderse esta warranted,
     entonces el peso de ese deseo es de 1000 (mucho).
 
-    DESIRE stay(Nodo)
-
-    WithoutMe is the difference in points scored without me in the zone 
-    agentInZone true if Agent is in a zone                                          
-    stayWeight computes the Weight of this rule if it is warranted.                
-    stayWieght obtained empirically
-
-    \begin{small}
-    \begin{verbatim}
-    stay(20, _Node) -< true.
-
-    stay(Weight, _Node) -< 
-        b(diffPointsWithoutMe(WithoutMe)),
-        myName(Agent),                    
-        agenteInZone(Agent),              
-        stayWeight(WithoutMe, Weight).    
-
-    ~stay(_, _) -< buy(_, _).
-
-    ~stay(Weight, _) <- stay(Weight2, _), greater(Weight2, Weight).
-
-    stayWeight(WithoutMe, Weight) :- Weight is - WithoutMe * 5.
-        
-    is_a_built_in(stayWeight(_WithoutMe, _Weight)).
-    \end{verbatim}
-    \end{small}
     %}}}
 
 \subsection{Difficulties encountered}
