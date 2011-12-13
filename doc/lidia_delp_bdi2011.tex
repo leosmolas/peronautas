@@ -47,19 +47,18 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
     Programming Contest 2011 (MAPC) \cite{BehrensAMAI2010b} hosted by the
     Clausthal University of Technology \footnote{More information in
-    \texttt{www.tu-clausthal.de}}.
-
-    The LIDIA (Laboratorio de Investigación y Desarrollo en Inteligencia
-    Artificial, Artificial Intelligence Research and Development Laboratory)
-    research group was established in 1992 at the Universidad Nacional del Sur.
-    The d3lp0r team was formed incorporating six graduate students, two Ph.D.
-    students and three professors. The undergraduate students fully developed
-    the system, while the Ph.D. students and professors provided guidance. The
-    group's main motivation was to apply argumentation \cite{Prakken:1997}
-    \cite{Rahwan:2009} \cite{Bench-Capon:2007}\ via defeasible logic programming
-    (DeLP \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the
-    context of a multi-agent gaming situation, and to test the integration of
-    the different technologies used.
+    \texttt{www.tu-clausthal.de}}.  The LIDIA (Laboratorio de Investigación
+    y Desarrollo en Inteligencia Artificial, Artificial Intelligence Research
+    and Development Laboratory) research group was established in 1992 at the
+    Universidad Nacional del Sur.  The d3lp0r team was formed incorporating six
+    graduate students, two Ph.D.  students and three professors. The
+    undergraduate students fully developed the system, while the Ph.D. students
+    and professors provided guidance. The group's main motivation was to apply
+    argumentation \cite{Prakken:1997} \cite{Rahwan:2009}
+    \cite{Bench-Capon:2007}\ via defeasible logic programming (DeLP
+    \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the context
+    of a multi-agent gaming situation, and to test the integration of the
+    different technologies used.
 
 %{{{
 %\section{Preliminaries}
@@ -163,7 +162,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     relevant.
 
     Approximately 1500 man-hours were invested in the team development.
-
     Experience from a previous instance of the MAPC was shared with our teams by
     members of the ARGONAUTS team from TU Dortmund\cite{Holzgen:2011}. Although
     the initial plan was to run tests against other agent teams prior to the
@@ -201,59 +199,49 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     explored nodes, and positioning the agents correctly to maintain, defend 
     and expand the zones formed. 
     
-    To accomplish this, all agents follow the same concept. Every agent is concerned 
-    with the formation and expansion of zones, beyond its role.
-    The desicion-taking process is responsible for calculating and selecting the
-    most beneficial intention, which may be focused in the zone conquering (if possible),
-    or not.
-    This selection process is based on many factors, such as the gain in terms 
-    of score, the need of the team for the execution of a role-specific action, or
-    the benefit that the agent is currently contributing to the team. 
+    Every agent is concerned with the formation and expansion of zones, beyond
+    its role.  The decision-taking process is responsible for calculating and
+    selecting the most beneficial intention. This selection process is based on
+    the gain in terms of score, the need of the team for the execution of
+    a role-specific action, or the benefit that the agent is currently
+    contributing to the team. 
     
-    For example, a repairer agent that is part of a zone will attempt to keep or
-    expand the zone by moving to a better node (in terms of zone coloring), 
-    unless a teammate needs to be repaired.
-    
-    Agents coordination is achived in an implicit way. This is, the information
-    shared consists only of the perception received, not including neither 
-    preprocessed beliefs, nor control variables. The agents do not communicate
-    their intentions nor plans, so any coordination that they may exhibit is 
-    accomplished implicitly.
+    Agents coordination is implicit, only involving the percept information and
+    in particulat excluding processed beliefs and control variables. The agents
+    do not communicate intentions or plans.
 
-    Our agents do not change their behavior during runtime. This feature was 
-    analysed, but the team did not have enough time to finish its implementation.
-    
+    Agents do not change their behavior during runtime, maintaining the same
+    strategy throughout all simulation stages. 
+
 \subsubsection{Zone conquering.}
     
-    The exploration of the map is done gradually, as a result of the reasoning 
-    proccess. The actions related to the exploration (probe, survey) are weight 
-    along with all other actions and are selected when it is considered important. 
-    This is seen to a greater extent during the inicial steps of the simulations, 
-    when the team lacks of knowledge about the map and other kind of actions are 
-    unnecesary. Agents make no assumptions about the map topology.
+    The exploration of the map is done gradually. Actions related to the
+    exploration (probe, survey) are weighed along with all other actions and
+    selected when considered important.  This occurs to a greater extent during
+    the initial steps of the simulations, when the team lacks knowledge of the
+    map and other actions are unnecessary. Agents make no assumptions regarding
+    the map topology.
 
-    Agents are not primarily focused on finding new zones, but they attempt to 
-    expand and maximize the points of the existing ones.    
-    They calculate whether they are part of a zone or not. This is achieved
-    by checking the color of the current node (received in the perception), and if
-    a neighbor of it is also colored by the agent team (if this is not the case, the 
-    node does not increase the zone points).
-    If an agent is not being part of any zone, it tries to regroup with its 
-    teammates. 
+    Behaviour is not primarily focused on finding new zones, but agents do
+    attempt to expand and maximize the points of the existing ones.    They
+    calculate whether they are part of a zone or not. This is achieved by
+    checking the color of the current node and whether a neighbor of it is also
+    colored by the agent team (if this is not the case, the node does not
+    increase the zone points).  If an agent is not part of any zone it tries to
+    regroup with its teammates. 
 
-    When a zone is formed, and the agent is part of it, for each potentially 
-    beneficial neighbor node, the agent calculates how much points would the team 
-    gain if it moves, and tries to expand the zone.
-    If the expansion intention explained is selected and carried on, then a new 
-    better zone is implicitly conquered.
+    When a zone is formed and an agent is part of it, for each potentially
+    beneficial neighbor node, the agent calculates how much points the team
+    would gain if it moves, and tries to expand the zone.  If the expansion
+    intention is selected and acted upon, then a new better zone is implicitly
+    conquered.
     
 \subsubsection{Coloring algorithm.}    
     
-    This estimations are done with our reimplementation of the coloring algorithm used 
-    by the MASSim server. The information is used by the decision taking module.  
-    
-    Our approach makes several assumptions that facilitate the application of the algorithm
-    in a map that has not been completely explored.
+    This estimations are done with our reimplementation of the coloring
+    algorithm used by the MASSim server. The information is used by the decision
+    taking module.  Our approach makes several assumptions that facilitate the
+    application of the algorithm in a map that has not been completely explored.
     
     % The steps of the coloring algorithm are:
     
@@ -343,18 +331,6 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     potential, taking into consideration their distances (in nodes, not in 
     actions). However, plans are recalculated in every step, as explained earlier.    
 
-\subsubsection{Communication.}
-
-    Some functionality provided by the \textit{eismassim} library was
-    reimplemented in a connection library in Python.
-
-    On each perceive/act cycle, agents receive the percept from the MASSim server, 
-    separate the information which will remain private and which will be shared. 
-    The public part of the percept is sent to the percept server, which performs a 
-    union of all percepts and send the difference back to each agent. After 
-    receiving the joint percept, the agents enter a belief setting phase, and 
-    later an argumentative phase.
-
 \subsection{Agents' organization}
 
     As explained before, all agents operate in the same way. The desicion-taking
@@ -424,28 +400,23 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
 \subsection{Our thoughts about possible optimizations to the contest}
     
-    Many optimizations ocurred to us for the scenario, and the contest in general. 
-    For example, more information for the nodes, including something useful for a 
-    directed search (i.e., absolute coordinates), would help in the implementation 
-    of an A* search, that would decrease the execution times.
+    More information associated to nodes, e.g. absolute coordinates, would help
+    in the implementation of directed search decreasing execution time.
 
-    Strategically, the early dominion of the center area played an important part 
+    Strategically, the early dominance of the center area played an important part 
     of a good candidate to win a match. It would be useful to try other 
     variations, such as making the borders more important, or others shapes of the 
     map, such as stretched, in form of V, X, O, etc. This would benefit teams that 
     explicitly and thoughtfully look for and conquer good zones, rather than 
-    benefiting teams that assume that only one good zone exists, and it's in the 
-    middle of the map.
+    benefiting teams that assume that only one good zone exists in the middle of the map.
 
-    More informing feedback from the server would be appreciated, specially
-    involving errors. This is important for a better and quicker detection of bugs
+    More feedback from the server would be appreciated, specially
+    regarding errors. This is important for detection of bugs
     involving communication, i.e. problems with the connection, files sent.
 
-    It also would be really helpful that we have test matches 
-    in a more early stage, in order to have more time to correct errors in the 
-    client. Many of us reimplemented the eismassim module, so we are vulnerable to 
-    many errors that were difficult to foresee. Early testing would help with 
-    that, and detecting infrastructure issues, such as network problems.
+    Test matches in earlier stages of development would reduce technical
+    errors during the competition.  Teams reimplementing the eismassim
+    communication functionality are vulnerable to errors difficult to foresee. 
     
     Finally, we think Both Robotics and Gaming AI are interesting fields that could 
     benefit from participating in the contest.
