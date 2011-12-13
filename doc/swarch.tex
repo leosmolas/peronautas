@@ -355,15 +355,14 @@
     In DeLP, a query $L$ is \emph{warranted} from a program if a \emph{non-defeated}
     argument that supports $L$ exists. %\Arg\ 
     
-    DESIRE defensaPropia
-    
+    \begin{figure}
     \begin{small}
     \begin{Verbatim}
     selfDefense(1000) -<
         myStatus(normal),
         canParry,
         myPosition(Node),
-        saboteur(Node).  
+        enemySaboteurPosition(Node).  
 
     canParry -< myRole(repairer).
         
@@ -374,10 +373,19 @@
     ~canParry <- myEnergy(Energy), less(Energy, 2). 
     \end{Verbatim}
     \end{small}
- 
-    Si se cumple todo esto, y el deseo de autodefenderse esta warranted,
-    entonces el peso de ese deseo es de 1000 (mucho).
-
+    \caption{Desire \texttt{SelfDefense}}
+    \label{fig:SelfDefense}
+    \end{figure}
+    
+    Figure \ref{fig:SelfDefense}\ is an example of our representation of the 
+    possible intentions written in DeLP. 
+    Self defense has a weight of 1000. It is a high priority intention given 
+    that the average weight of the intentions is around 150.
+    
+    \texttt{myStatus}, \texttt{myPosition}, \texttt{enemySaboteurPosition}, \texttt{myRole} 
+    and \texttt{myEnergy} are facts of the knowledge base. \texttt{canParry} is an argument that supports 
+    or defeats the argument for the Self Defense intention.    
+    
     %}}}
 
 \subsection{Difficulties encountered}
