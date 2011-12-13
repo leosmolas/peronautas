@@ -404,10 +404,6 @@
     priority queue. Lately, we found a Prolog library that implemented this data 
     structure, and the migration was pleasantly straightforward.
 
-    Finally, for this last algorithm too, we added an important optimization 
-    that allowed us to call it several times, with the virtual cost of only one 
-    call. It was done using memoization, and a more thoughtful invocation.
-
     Initial plans were to distribute agents on several machines. Each agent runs 
     as a separate process, and communicates with others via TCP sockets. After 
     some experience and benchmarking, agents were run on one machine, due to 
