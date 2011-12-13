@@ -294,6 +294,7 @@
     even though this is unlikely.
     %}}}
 
+
 \subsubsection{Deliberation and DeLP.}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
@@ -340,9 +341,8 @@
     is a high priority intention given that the average weight of the intentions
     is around 150.  \texttt{myStatus}, \texttt{myPosition},
     \texttt{enemySaboteurPosition}, \texttt{myRole} and \texttt{myEnergy} are
-    facts of the knowledge base. \texttt{canParry} is an argument that supports
-    or defeats the argument for the Self Defense intention.    
-    canParry arguments will support or defeat arguments for selfdefense intention
+    facts of the knowledge base. \texttt{canParry} arguments will support or
+    defeat arguments for selfdefense intention.
     %}}}
 
 \subsection{Difficulties encountered}
@@ -365,8 +365,10 @@
     priority queue. Lately, we found a Prolog library that implemented this data 
     structure, and the migration was pleasantly straightforward.
 
-    performance issues. 
-    Having the choice was a benefit of the proposed design.
+    Our initial plan was to distribute agents on several machines. After some
+    benchmarking agents were run on one machine due to performance issues.
+    Having the option to easily try both approaches was a benefit of the
+    proposed design.
     %}}}
 
 In total, the system consists of 1336 lines of Python, 5059 lines of Prolog
