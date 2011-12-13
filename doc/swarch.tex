@@ -42,12 +42,12 @@
 % [ ] Question 3.10 is not discussed in the paper. Do you do reasoning between two steps?
 
 % [ ] How does the static, dynamic and initial data look like?
-% [ ] How does DeLP look like? Only explained later.
+% [x] How does DeLP look like? Only explained later.
 % [ ] How does an intention look like?
 
-% [ ]  8. Which algorithms are used/implemented?
+% [x]  8. Which algorithms are used/implemented?
 
-% [ ]  9. How did you distribute the agents on several machines? And if you did 
+% [x]  9. How did you distribute the agents on several machines? And if you did 
 %         not please justify why.
 
 % SECTION: DIFFICULTIES ENCOUNTERED
@@ -55,7 +55,7 @@
 %         problems have you found and how are they solved?
 
 % [x] 12. How many lines of code did you write for your software?
-% [ ] Question 3.12 not answered.
+% [x] Question 3.12 not answered.
 
 % This section is a little bit unsorted and too short. I think you should first
 % explain the overall structure, then describe each node in detail, i.e., parts
@@ -266,8 +266,27 @@
 \subsubsection{Belief revision}
     %{{{
     Once the remaining information is received from the percept server, the data
-    is then asserted into the agent's knowledge base. 
+    is then asserted into the agent's knowledge base. A collection of predicates
+    queried from the main Python module are in charge of verifying that
+    information is not overwritten, and that redundant information is not
+    inserted. Most predicates which represent the state of the environment
+    include a parameter bound to the turn the information was perceived, so that
+    information can be considered ``stale'' if the difference between the
+    current turn and the turn the information was acquired is too large.
     
+    Beliefs in the knowledge base are represented as terms, arguments to the
+    predicate \texttt{b/1}.  Desires are also represented as Prolog terms;
+    possible desires are \texttt{expansion} (increase the value of a zone),
+    \texttt{explore} (probe nodes and increase the team's knowledge of the
+    graph), \texttt{regroup} (move closer to team members),
+    \texttt{seekforrepair} (move closer to an agent with the \textit{repairer}
+    role), \texttt{selfdefense}, \texttt{parry}, \texttt{stay} (do not move),
+    \texttt{buy}, \texttt{probe}, \texttt{repair}, \texttt{attack}. The desires
+    an agent may entertain depend on the agent's role. 
+    
+    The intention is selected from the set of possible desires the agent may
+    entertain. 
+
     If the agent already has an intention stored, the \textit{cut condition}
     checks whether it makes sense to keep trying to fulfill it. It is a series
     of simple conditions that review the state of the world.
@@ -309,19 +328,6 @@
     % k(edge(vertex0, vertex11, unknown))   % If the edge has not been surveyed
     % k(edge(vertex3, vertex7, 2))      % If the edge has been surveyed
 
-% DESIRES
-
-% Expansion (Aumento)
-% Explore
-% Regroup
-% SeekForRepair (Auxilio)
-% SelfDefense
-% Block (Parry)
-% Stay
-% Buy
-% Probe
-% Repair
-% Attack
 \subsubsection{Deliberation and DeLP.}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
