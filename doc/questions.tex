@@ -55,12 +55,12 @@ used, how did you use it? If you did not what were the reasons?
 No design methodology specific to multi-agent systems was used. 
 
 \begin{question}
-Is the solution based on the centralisation of coordination / information on
-a specific agent? Conversely if you plan a decentralised solution, which
+Is the solution based on the centralization of coordination / information on
+a specific agent? Conversely if you plan a decentralized solution, which
 strategy do you plan to use?  
 \end{question}
 
-The solution follows a decentralised architecture in which agents run completely
+The solution follows a decentralized architecture in which agents run completely
 decoupled in different processes. Agents share no memory and decision-making
 takes place individually, even though every agent communicates part of his
 perception to the others.
@@ -83,15 +83,15 @@ the agent level, with no intervention from human operators or a central
 intelligence agency within the system. Agents assign priorities to different
 possible goals depending on their desires, and plan in order to achieve the most
 valuable goal. This results in more autonomous way in which an agent acts.  The
-agents' behaviour can be considered proactive, given they pursue their selected
+agents' behavior can be considered proactive, given they pursue their selected
 intentions over time, that is, they have persistent goals.
 
 \begin{question}
-Is the team a truly multi-agent system or rather a centralised system in
+Is the team a truly multi-agent system or rather a centralized system in
 disguise?  
 \end{question}
 
-The team is a truly multi-agent system, and has no centralised characteristics
+The team is a truly multi-agent system, and has no centralized characteristics
 beyond the sharing of all percepts among the team agents.
 
 \begin{question}
@@ -177,7 +177,7 @@ task?
 
 Python's amenity to rapid application development and 'batteries-included
 philosophy' facilitated implementing the communication layer to the MASSim
-server, parsing of peceptions, rapid addition of planned features and bug
+server, parsing of perceptions, rapid addition of planned features and bug
 correction.  We made use of Prolog's declarative nature to model states of the
 world, and it also made it more straightforward to implement search algorithms.
 
@@ -234,7 +234,7 @@ What is the main strategy of your team?
 The main strategy of the team consists of detecting profitable zones from the
 explored vertices, and positioning the agents correctly to maintain, defend and
 expand the zones.  Every agent, beyond its role, is concerned with the formation
-and expansion of zones.  The desicion-taking process is responsible for
+and expansion of zones.  The decision-taking process is responsible for
 calculating and selecting the most beneficial intention, which may be focused in
 the zone conquering (if possible), or not.
     
@@ -254,7 +254,7 @@ their findings?
 \end{question}
 
 Agents make no assumption about the map topology. The exploration of the map is
-done gradually, as a result of the reasoning proccess.
+done gradually, as a result of the reasoning process.
 
 \begin{question}
 How do your agents communicate with the server?  
@@ -292,11 +292,11 @@ How do you conquer zones? How do you defend zones if attacked? Do you attack
 zones?  
 \end{question}
 
-Both attacking and defense of zones are implicitly implemented.  Sabouteurs
+Both attacking and defense of zones are implicitly implemented.  saboteurs
 prefer to attack enemies that are near, so if an agent of another team enters
 our team's zone, it will be attacked by the saboteurs in the zone.  The same
 happens with enemies in their own zones. Zones are not intentionally destroyed,
-but any agent that is part of a zone may be attacked, affecting posibbly the
+but any agent that is part of a zone may be attacked, affecting possibly the
 structure of the enemy zone.
 
 \begin{question}
@@ -304,7 +304,7 @@ Can your agents change their behavior during runtime? If so, what triggers
 the changes?  
 \end{question}
 Our agents do not change their behavior during runtime. This feature was 
-    analysed, but the team did not have enough time to finish its implementation.
+    analyzed, but the team did not have enough time to finish its implementation.
     
     The approach proposed consists in adding a phase indicator that holds different 
     phase values like 'exploration', or 'expansion'. The phase is updated at runtime
@@ -313,7 +313,7 @@ Our agents do not change their behavior during runtime. This feature was
     
     The phase component is weight as an extra factor that modifies the potential 
     benefit of each action, so that its inclusion directly affects the action-selection 
-    proccess.
+    process.
     
 \begin{question}
 What algorithm(s) do you use for agent path planning?  
@@ -328,7 +328,7 @@ How do you make use of the buying-mechanism?
 \end{question}
 
 Agents follow a list of predefined buying actions, when the necessary amount of
-money is reached. This behaviour follows the idea of getting some specific skill
+money is reached. This behavior follows the idea of getting some specific skill
 upgrades that the team considered important to achieve early in the simulations.
 
 \begin{question}
@@ -338,7 +338,7 @@ How important are achievements for your overall strategy?
 Achievements are not explicitly taken under consideration. The agents'
 reasoning process is not affected by the possibility of completing
 achievements.    However, the team can manage to achieve a significant number of
-them, which results naturally from the agents' behaviour. 
+them, which results naturally from the agents' behavior. 
 
 \begin{question}
 Do your agents have an explicit mental state?
@@ -373,16 +373,16 @@ roles.
 Is most of your agents behavior emergent on an individual and team level?
 \end{question}
 
-The desicion-taking module makes use of other agents' status, but there is
+The decision-taking module makes use of other agents' status, but there is
 neither negotiation nor intentions exchange, so the team performance is emergent
-on an individual behaviour.
+on an individual behavior.
 
 \begin{question}
 If your agents perform some planning, how many steps do they plan ahead?
 \end{question}
 
-The agents make plans as long as the selected intention requieres. This may
-sound excesive, but the possible goals were previously selected for their
+The agents make plans as long as the selected intention requires. This may
+sound excessive, but the possible goals were previously selected for their
 potential, taking in consideration their distance (in nodes, not in actions).
 However, plans are recalculated in every step.
 
@@ -402,7 +402,7 @@ synchronizing versions of the technologies used.
 Which are the strong and weak points of the team?
 \end{question}
 
-In LIDIA, our teammates have done an important ammount of research in argumentation
+In LIDIA, our teammates have done an important amount of research in argumentation
 and multi-agent systems. This allowed the team to take advantage of previous experiences. 
 As a weak point can be considered the lack of experience in large projects.
 

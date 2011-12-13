@@ -155,7 +155,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     The agent architecture developed is based on the
     BDI model \cite{Rao:1991}, and is explained in detail in further sections.
 
-    The agents' behaviour can be considered proactive, given they pursue their 
+    The agents' behavior can be considered proactive, given they pursue their 
     selected intentions over time, that is, they have persistent goals. Plans 
     for achieving intentions are recalculated and followed for the number of
     steps requiered, unless the goal in question becomes impossible or no longer
@@ -207,7 +207,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     contributing to the team. 
     
     Agents coordination is implicit, only involving the percept information and
-    in particulat excluding processed beliefs and control variables. The agents
+    in particular excluding processed beliefs and control variables. The agents
     do not communicate intentions or plans.
 
     Agents do not change their behavior during runtime, maintaining the same
@@ -222,7 +222,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     map and other actions are unnecessary. Agents make no assumptions regarding
     the map topology.
 
-    Behaviour is not primarily focused on finding new zones, but agents do
+    Behavior is not primarily focused on finding new zones, but agents do
     attempt to expand and maximize the points of the existing ones.    They
     calculate whether they are part of a zone or not. This is achieved by
     checking the color of the current node and whether a neighbor of it is also
@@ -264,14 +264,14 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
 \subsubsection{Attacking and defending.}
     
     Both attacking and defense of zones are implicitly implemented. 
-    Sabouteurs prefer to attack enemies that are near, so if an agent of another 
+    Saboteurs prefer to attack enemies that are near, so if an agent of another 
     team enters our team's zone, it will be attacked by the saboteurs in the zone.
     This is the most likely scenario, unless the saboteur's position is so 
     important that it decides to stay in the formation in order to keep the zone.
 
     The same happens with enemies in their own zones. Zones are not intentionally 
     destroyed, but any agent that is part of a zone may be attacked, affecting 
-    posibbly the structure of the enemy zone.
+    possibly the structure of the enemy zone.
     
     Agents of other roles can also implicitly defend a zone. For example, an agent 
     can go to a node that has one agent of each team, with the purpose of coloring the 
@@ -280,7 +280,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
 \subsubsection{Buying.}
 
     Agents follow a list of predefined buying actions, when the necessary amount 
-    of money is reached. This behaviour follows the idea of getting some specific skill 
+    of money is reached. This behavior follows the idea of getting some specific skill 
     upgrades that the team considered important to achieve early in the simulations.
     
     % Many other approaches regarding the use of the earned money were considered as well.
@@ -291,9 +291,9 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
 \subsubsection{Achievements.}
 
     Achievements are not explicitly taken under consideration. That is, the agents'
-    reasoning proccess is not affected by the possibility of completing achievements.    
+    reasoning process is not affected by the possibility of completing achievements.    
     However, the team can manage to achieve a significant number of them, which 
-    results naturally from the agents' behaviour. 
+    results naturally from the agents' behavior. 
     This fact let the development team avoid the need of adding special features 
     dedicated to the seek of achievements.
     
@@ -325,7 +325,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     it. In the end, this allowed us to run all the agents in a single machine  
     during the competition.
     
-    The plans are as long as the selected intention requieres. This may 
+    The plans are as long as the selected intention requires. This may 
     sound excessive, but the possible goals were previously selected for their 
     potential, taking into consideration their distances (in nodes, not in 
     actions). However, plans are recalculated in every step, as explained earlier.    
@@ -334,7 +334,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
 
     The decision-taking module makes use of other agents' status, but there is
     neither negotiation nor intentions exchange, so the team performance is
-    emergent on individual behaviour.  
+    emergent on individual behavior.  
     
     Referring to our actual programming, all the agents have a strong core of
     common code, which is all the Python part, that servers as
@@ -408,7 +408,7 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
     explicitly and thoughtfully look for and conquer good zones, rather than 
     benefiting teams that assume that only one good zone exists in the middle of the map.
 
-    More feedback from the server would be appreciated, specially
+    More feedback from the server would be appreciated, especially
     regarding errors. This is important for detection of bugs
     involving communication, i.e. problems with the connection, files sent.
 
