@@ -32,7 +32,7 @@
 %         development task?
 
 % SECTION IMPLEMENTION
-% [ ]  3. How have you mapped the designed architecture (both multi-agent and 
+% [x]  3. How have you mapped the designed architecture (both multi-agent and 
 %         individual agent architectures) to programming codes, i.e., how did 
 %         you implement specific agent-oriented concepts and designed artifacts 
 %         using the programming language?
@@ -82,17 +82,16 @@
 
 \subsection{Programming languages, platforms and tools}
     %{{{
-    The agent system was implemented using Python 2.7 REFERENCIA and SWI Prolog
-    5.10.5 REFERENCIA.  Language integration was achieved using the
-    \textit{pyswip}\ library REFERENCIA, which facilitates the execution of
-    Prolog queries from Python.  The implementation of Defeasible Logic
-    Programming (DeLP) by the LIDIA \cite{Garcia:2004a} was used for the
-    deliberative process, in which desires and intentions are set.  The standard
-    Python and SWI-Prolog debugging tools were used.  DeLP includes a graphical
-    viewer for dialectical trees, allowing visualization of which arguments
-    attack others and facilitating debugging of the defeasible rules employed.
-    DeLP's capability to deal with conflicting pieces of information was also
-    very helpful in order to implement the decision-making module.
+    The agent system was implemented using Python 2.7 and SWI Prolog
+    5.10.5.  Language integration was achieved using the \textit{pyswip}\
+    library\footnote{http://code.google.com/p/pyswip/}, which facilitates the
+    execution of Prolog queries from Python.  The implementation of Defeasible
+    Logic Programming (DeLP) by the LIDIA \cite{Garcia:2004a} was used for the
+    deliberative process, in which desires and intentions are set.  The
+    standard Python and SWI-Prolog debugging tools were used.  DeLP includes
+    a graphical viewer for dialectical trees, allowing visualization of which
+    arguments attack others and facilitating debugging of the defeasible rules
+    employed.  
     
     These languages and platforms were well-known at the start of the project,
     and were chosen for precisely those reasons.
@@ -106,18 +105,21 @@
     Python's amenity to rapid application development and ``batteries-included 
     philosophy'' facilitated implementing the communication layer to the MASSim 
     server, parsing of perceptions, rapid addition of planned features and bug 
-    correction.
+    correction. DeLP's capability to deal with conflicting pieces of
+    information was also very helpful in order to implement the
+    decision-making module. 
     %}}}
 
 \subsection{Implementation}
     %{{{
     The system was implemented as a collection of independent operating system
-    processes, the percept server and each agent running in its own address
-    space.  The agents are started individually and synchronize via the percept
-    server.  Each one handles its own connection to the MASSim and percept
-    servers, as the \textit{eismassim} package provided by the contest
-    organizers was not used to avoid the difficulty of integrating yet another
-    language and runtime (Java) with the ones being used. 
+    processes, the percept server (PS from here onwards) and each agent running
+    in its own address space.  The agents are started individually and
+    synchronize via the PS.  Each one handles its own connection to
+    the MASSim and percep servers, as the \textit{eismassim} package provided
+    by the contest organizers was not used to avoid the difficulty of
+    integrating yet another language and runtime (Java) with the ones being
+    used. 
     
     \begin{figure}
     \centering
@@ -126,10 +128,6 @@
     represent process flow, solid lines represent data flow.}
     \label{fig:architecture}
     \end{figure}
-
-    In Fig. \ref{fig:architecture}, we sketch the architecture of our agent, 
-    i.e. its interactions with the servers (MASSim, and our Percept Server), 
-    and its internal components.
 
     \begin{figure}[!htb]
     \centering
@@ -150,15 +148,13 @@
     the percept into a form suitable for assertion in the agent's knowledge
     base, and generation of the XML representing the action taken which is
     returned to the MASSim server.
-    % TODO ver repeticion de which 
 
     On startup, an agent is passed the information needed to authenticate with
     the MASSim server and some configuration options such as network addresses
-    and ports, whether the percept server and the argumentation framework are to
+    and ports, whether the PS and the argumentation framework are to
     be used or not, and logging verbosity levels.
-
     Initialization consists of opening the connections to the MASSim server,
-    authenticating, opening the connection to the percept server, and starting
+    authenticating, opening the connection to the PS, and starting
     the Prolog engine. The main program loop is then entered, in which messages
     from the MASSim server are received and parsed. 
 
@@ -168,53 +164,110 @@
     loop is started.
 
     Each iteration of the perceive-act loop expects a \texttt{request-action}
-    message from the MASSim server and parses the XML into a Python
-    datastructure:
+    message from the MASSim server and parses the XML into a Python dictionary.
+    Elements in the percept are divided into a ``public'' section, which is sent
+    to the PS to be shared with other team agents and a ``private''
+    section.
 
-    \begin{verbatim}
-    EJEMPLO DE PERCEPT EN PYTHON
-    \end{verbatim}
-    
-    If so configured, the agent will then send the percept to the percept server
-    and await the global percept containing the remainig information perceived
-    by the team. The global percept is merged with it's own, and asserted into
-    the agent's knowledge base, establishing the agent's beliefs.
+    If so configured, the agent will then send the percept to the PS and await
+    the global percept containing the remainig information perceived by the
+    team. The global percept is merged with it's own, and asserted into the
+    agent's knowledge base, establishing the agent's beliefs.  Note that no
+    information is included in the percept other than what is received in the
+    percept.
 
     The decision making module implemented in Prolog is then queried for the
     next action to be performed by the agent.
     
     Once control flow returns to the Python program with the determined action,
     the corresponding XML message is generated and sent to the MASSim server. 
-
-    % main loop
-    %   initialize
-    %   perceiveActLoop
-    %       massim-recv
-    %       parse
-    %       processActionRequest
-    %           percept-server-send-recv
-    %           processPercept
-    %           run prolog
-    %           send action
     %}}}
 
 \subsubsection{Percept Server}
     %{{{
-    When the first action-request message is received, this loop starts. It 
-    first processes the perception, and then sends it to the Percept Server. 
-    This waits for all the other agents' perceptions, merges them, and then sends 
-    back a new version that contains everything that has been seen by the agent 
-    teammates, but not by itself. Finally, this global perception is asserted 
-    into Prolog. 
+    The PS maintains a connection for each agent. 
+    The connection handling methods encode the associate array into a form
+    suitable for conversion into a set datastructure, which is then sent over
+    the network. 
+    On each iteration, the PS waits for each agent's data, performs a union of
+    all data sets, and returns to each agent the set difference between the data
+    the agent sent and the total union.
 
+    Figures \ref{fig:pythonperceptpublic} and \ref{fig:pythonperceptprivate}
+    show example percepts after parsing, before being sent to the percept
+    server.
+
+    \begin{figure}
+    \centering
+    \label{fig:pythonperceptpublic}
+    \begin{small}
+    \begin{verbatim}
+    { 'surveyed_edges' : [ ], 
+      'vis_verts'      : [ { 'name': 'vertex65',  
+                             'team': 'none' }, 
+                           ...
+                           { 'name': 'vertex141', 
+                             'team': 'B' } 
+                         ],  
+      'vis_ents'       : [ { 'node':   'vertex97',  
+                             'status': 'normal', 
+                             'name':   'a6',  
+                             'team':   'A' }, 
+                             ...
+                         ],  
+      'inspected_ents' : [ ],  
+      'vis_edges'      : [ { 'node1': 'vertex141', 
+                             'node2': 'vertex65' }, 
+                           ...
+                         ], 
+      'position'       : [ { 'node':       'vertex141', 
+                             'vis_range':  '1', 
+                             'health':     '6', 
+                             'name':       'self', 
+                             'max_health': '6' }
+                         ], 
+      'probed_verts'   : [ ] }
+    \end{verbatim}
+    \end{small}
+    \caption{A sample public section of a percept, after parsing.}
+    \end{figure}
+
+    \begin{figure}
+    \centering
+    \label{fig:pythonperceptprivate}
+    \begin{small}
+    \begin{verbatim}
+    { 'total_time':          2000L, 
+      'last_step_score':     '20', 
+      'strength':            '0', 
+      'money':               '12', 
+      'last_action':         'recharge', 
+      'zone_score':          '0', 
+      'timestamp':           '1323732915832', 
+      'energy':              '11', 
+      'max_energy_disabled': '16', 
+      'max_health':          '6', 
+      'step':                '7', 
+      'score':               '160', 
+      'deadline':            '1323732917832', 
+      'vis_range':           '1', 
+      'last_action_result':  'successful', 
+      'health':              '6', 
+      'achievements':        ['proved5'], 
+      'type':                'request-action', 
+      'id':                  '8', 
+      'max_energy':          '16' }
+    \end{verbatim}
+    \end{small}
+    \caption{A sample private section of a percept.}
+    \end{figure}
     %}}}
 
-\subsubsection{Percept processing and belief revision}
+\subsubsection{Belief revision}
     %{{{
-    As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
-    all the processing in Prolog. The perception is already in the knowledge 
-    base, that is formed by the ``static'' and ``dynamic'' data. 
-
+    Once the remaining information is received from the percept server, the data
+    is then asserted into the agent's knowledge base. 
+    
     If the agent already has an intention stored, the \textit{cut condition}
     checks whether it makes sense to keep trying to fulfill it. It is a series
     of simple conditions that review the state of the world.
@@ -245,30 +298,9 @@
     even though this is unlikely.
     %}}}
 
-\subsubsection{Knowledge representation}
-
-% XML representation:
-
-% <visibleEdges>
-    % <visibleEdge node1="vertex0" node2="vertex11"/>
-    % ...
-% </visibleEdges>
-% <surveyedEdges>                                                         
-    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
-    % ...
-% </surveyedEdges>
-
-
-% Visible and surveyed edges. Python list representation after the XML parsing:
-
-% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
-% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
-
-
 % Prolog interface to Python:
 
 % updateEdge(Node1, Node2, Weight)        % Predicate called from Python
-
 
 % Prolog Knowledge Base representation:
 
@@ -276,8 +308,6 @@
     
     % k(edge(vertex0, vertex11, unknown))   % If the edge has not been surveyed
     % k(edge(vertex3, vertex7, 2))      % If the edge has been surveyed
-    
-    
 
 % DESIRES
 
@@ -366,38 +396,6 @@
     stayWeight(WithoutMe, Weight) :- Weight is - WithoutMe * 5.
         
     is_a_built_in(stayWeight(_WithoutMe, _Weight)).
-    \end{verbatim}
-    \end{small}
-
-    SABOTEUR AGENT ATTACK DESIRE
-
-    \begin{small}
-    \begin{verbatim}
-
-    is_a_built_in( attackValue(_, _, _, _, _, _) ).
-
-    attack(Value, Agent) -<
-        b( enemyPosition( Agent, Position )                           ),
-        b( distance( Position, [[attack, Agent]], Turns, EnergyLeft ) ),
-        b( diffPointsWithoutMe( PointDifference )                     ),
-        role(Agent, Role),
-        agentRolePoints(attack, Role, RolePoints),
-        attackOrDie(Points),
-        attackValue(Turns, EnergyLeft, PointDifference, 
-                    RolePoints, Points, Value).
-        
-    agentRolePoints(attack, saboteur, 80) <- true.
-    agentRolePoints(attack, repairer, 80) <- true.
-
-    attackOrDie(0) <- 
-        b( myPosition( MyPosition ) ),
-        isSafe(MyPosition ).
-
-    attackOrDie(100) <- 
-        b( myPosition( MyPosition ) ),
-        ~isSafe( MyPosition ).  
-
-    isSafe(_) <- true.
     \end{verbatim}
     \end{small}
     %}}}
