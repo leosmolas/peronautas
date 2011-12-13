@@ -305,10 +305,18 @@ structure of the enemy zone.
 Can your agents change their behavior during runtime? If so, what triggers
 the changes?  
 \end{question}
-
-Our agents do not change their behavior during runtime. This feature was
-analysed, but the team did not have enough time to finish its implementation.
-
+Our agents do not change their behavior during runtime. This feature was 
+    analysed, but the team did not have enough time to finish its implementation.
+    
+    The approach proposed consists in adding a phase indicator that holds different 
+    phase values like 'exploration', or 'expansion'. The phase is updated at runtime
+    considering elements like the number of steps or the team's overall performance 
+    in the simulation in progress.
+    
+    The phase component is weight as an extra factor that modifies the potential 
+    benefit of each action, so that its inclusion directly affects the action-selection 
+    proccess.
+    
 \begin{question}
 What algorithm(s) do you use for agent path planning?  
 \end{question}
@@ -389,27 +397,26 @@ What have you learned from the participation in the contest?
 \end{question}
 
 Being our first experience building a system this size, we learned several
-lessons about working in big projects, such as setting standards and
+lessons about working in large projects, such as setting standards and
 synchronizing versions of the technologies used.
 
 \begin{question}
 Which are the strong and weak points of the team?
 \end{question}
 
-Our team is formed by a group of friends, so a strong point in the developing
-proccess was the cohesion and comradeship. We had already worked together, both
-in university's projects and in small freelance projects, so we well knew what
-to expect from each other, and each member's capabilities.
+In LIDIA, our teammates have done an important ammount of research in argumentation
+and multi-agent systems. This allowed the team to take advantage of previous experiences. 
+As a weak point can be considered the lack of experience in large projects.
 
 \begin{question}  
 How suitable was the chosen programming language, methodology, tools, and
 algorithms?
 \end{question}
 
-We are really happy with our decisions involving programming languages, tools
-and algorithms. Of course, we had many problems, and much time was spent
-deciding what to choose, but having all the proccess in consideration, we may
-had took the right calls.
+In retrospective, we may have taken the right decisions regarding the programming languages. 
+DeLP resulted to be suitable for the implementation of the decision-making module since
+it was flexible enough to develop our argumentation approach.
+
 
 \begin{question}
 What can be improved in the context for next year?
@@ -425,10 +432,10 @@ Why did your team perform as it did? Why did the other teams perform
 better/worse than you did?
 \end{question}
 
-We had several problems that didn't let us perform as good as we expected.  Our
+We had several problems that did not let us perform as good as we expected.  Our
 lack of experience in this kind of contests, unexpected network and latency
 problems, as well as some bugs that caused critical performance issues, caused
-our team to lose several matches that could've been won otherwise.
+our team to lose several matches that could have been won otherwise.
 
 \begin{question}
 Which other research fields might be interested in the Multi-Agent
@@ -444,13 +451,12 @@ How can the current scenario be optimized? How would those optimization pay off?
 
 More information for the nodes, including something useful for a directed search
 (i.e., absolute coordinates), would help in the implementation of a A* search
-(which would decrease execution time).  Defining the most valuable zones
+(which would decrease execution time). Defining the most valuable zones
 randomly would benefit teams that thoughtfully look for and conquer good zones,
 rather than teams that assume that the center of the map is the most valuable
-zone and don't explore the rest.
+zone and do not explore the rest.
 
-A more informing/informational/apprising? feedback from the server would be
-appreciated, specially involving errors.
+More feedback from the server would be appreciated, specially involving errors.
 
-Finally, we think it will be really helpful for all that we had test matches in
+Finally, we think it would be really helpful that we have test matches in
 a more early stage, in order to have more time to correct errors in the client.

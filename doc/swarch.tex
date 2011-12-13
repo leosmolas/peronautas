@@ -143,7 +143,7 @@
     DeLP.
     %}}}
     
-\subsubsection{Agent main program}
+\subsubsection{Agent main program.}
     %{{{
     The agent main program is implemented in Python, and handles all
     communication with the servers, XML parsing, processing the information in
@@ -198,7 +198,7 @@
     %           send action
     %}}}
 
-\subsubsection{Percept Server}
+\subsubsection{Percept Server.}
     %{{{
     When the first action-request message is received, this loop starts. It 
     first processes the perception, and then sends it to the Percept Server. 
@@ -209,7 +209,7 @@
 
     %}}}
 
-\subsubsection{Percept processing and belief revision}
+\subsubsection{Percept processing and belief revision.}
     %{{{
     As seen in the Figure \ref{fig:architecture}, after the Python part, comes 
     all the processing in Prolog. The perception is already in the knowledge 
@@ -245,7 +245,7 @@
     even though this is unlikely.
     %}}}
 
-\subsubsection{Knowledge representation}
+\subsubsection{Knowledge representation.}
 
 % XML representation:
 
@@ -292,7 +292,7 @@
 % Probe
 % Repair
 % Attack
-\subsubsection{Deliberation and DeLP}
+\subsubsection{Deliberation and DeLP.}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
     \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
@@ -410,7 +410,7 @@
 
     For the coloring algorithm, we added several improvements, for both 
     optimization and correctness. In essence, since we only had an incomplete 
-    version of the full map in every step, we added the concept of ``fog of war`'' 
+    version of the full map in every step, we added the concept of ``fog of war'' 
     to the agents, assuming always in a pessimistic way. 
 
     For both search algorithms, the Depth First Search and the Uniform Cost 
