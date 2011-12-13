@@ -86,7 +86,7 @@ This section details the implementation and module organization of the proposed 
     %{{{
     The agent system was implemented using Python 2.7 and SWI Prolog
     5.10.5.  Language integration was achieved using the \textit{pyswip}\
-    library\footnote{http://code.google.com/p/pyswip/}, which facilitates the
+    library\footnote{\texttt{http://code.google.com/p/pyswip/}}, which facilitates the
     execution of Prolog queries from Python.  The implementation of Defeasible
     Logic Programming (DeLP) by the LIDIA \cite{Garcia:2004a} was used for the
     deliberative process, in which desires and intentions are set.  The
@@ -190,7 +190,7 @@ This section details the implementation and module organization of the proposed 
 
     \begin{figure}
     \centering
-    \label{fig:pythonperceptpublic}
+    
     \begin{small}
     \begin{verbatim}
     { 'surveyed_edges' : [ ], 
@@ -215,12 +215,13 @@ This section details the implementation and module organization of the proposed 
     \end{verbatim}
     \end{small}
     \caption{A sample public section of a percept, after parsing.}
+    \label{fig:pythonperceptpublic}
     \end{figure}
 
     \begin{figure}
-    \centering
-    \label{fig:pythonperceptprivate}
-    \begin{small}
+   
+
+
     \begin{verbatim}
     { 'total_time':      2000L, 'zone_score': '0',            
       'last_step_score': '20',  'timestamp':  '1323732915832',       
@@ -229,8 +230,8 @@ This section details the implementation and module organization of the proposed 
       'last_action':     'recharge', 'max_health':     '6',
       ... }
     \end{verbatim}
-    \end{small}
     \caption{A sample private section of a percept.}
+	\label{fig:pythonperceptprivate}
     \end{figure}
     %}}}
 
