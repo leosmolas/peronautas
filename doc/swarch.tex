@@ -141,7 +141,7 @@
     DeLP.
     %}}}
     
-\subsubsection{Agent main program}
+\subsubsection{Agent main program.}
     %{{{
     The agent main program is implemented in Python, and handles all
     communication with the servers, XML parsing, processing the information in
@@ -183,7 +183,7 @@
     the corresponding XML message is generated and sent to the MASSim server. 
     %}}}
 
-\subsubsection{Percept Server}
+\subsubsection{Percept Server.}
     %{{{
     The PS maintains a connection for each agent. 
     The connection handling methods encode the associate array into a form
@@ -263,7 +263,11 @@
     \end{figure}
     %}}}
 
+<<<<<<< HEAD
 \subsubsection{Belief revision}
+=======
+\subsubsection{Percept processing and belief revision.}
+>>>>>>> 781056f66bc502e73d496beef9a82e1e4ce522e2
     %{{{
     Once the remaining information is received from the percept server, the data
     is then asserted into the agent's knowledge base. 
@@ -298,6 +302,29 @@
     even though this is unlikely.
     %}}}
 
+<<<<<<< HEAD
+=======
+\subsubsection{Knowledge representation.}
+
+% XML representation:
+
+% <visibleEdges>
+    % <visibleEdge node1="vertex0" node2="vertex11"/>
+    % ...
+% </visibleEdges>
+% <surveyedEdges>                                                         
+    % <surveyedEdge node1="vertex3" node2="vertex7" weight="2"/>
+    % ...
+% </surveyedEdges>
+
+
+% Visible and surveyed edges. Python list representation after the XML parsing:
+
+% vis_edges = [{node1: vertex0, node2: vertex11}, ...]                   % Visible edges, Python list representation
+% surveyed_edges = [{node1: vertex3, node2: vertex7, weight: 2}, ...]    % Surveyed edges, Python list representation
+
+
+>>>>>>> 781056f66bc502e73d496beef9a82e1e4ce522e2
 % Prolog interface to Python:
 
 % updateEdge(Node1, Node2, Weight)        % Predicate called from Python
@@ -322,7 +349,7 @@
 % Probe
 % Repair
 % Attack
-\subsubsection{Deliberation and DeLP}
+\subsubsection{Deliberation and DeLP.}
     \newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
     \newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
     \newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
@@ -408,7 +435,7 @@
 
     For the coloring algorithm, we added several improvements, for both 
     optimization and correctness. In essence, since we only had an incomplete 
-    version of the full map in every step, we added the concept of ``fog of war`'' 
+    version of the full map in every step, we added the concept of ``fog of war'' 
     to the agents, assuming always in a pessimistic way. 
 
     For both search algorithms, the Depth First Search and the Uniform Cost 

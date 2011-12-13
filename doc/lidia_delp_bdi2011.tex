@@ -219,13 +219,11 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     preprocessed beliefs, nor control variables. The agents do not communicate
     their intentions nor plans, so any coordination that they may exhibit is 
     accomplished implicitly.
-    % TODO revisar el doble uso de neither nor, juntar las oraciones?
-       
-\subsubsection{Zone analysis}
 
-    EXPLICAR EL ALGORITMO DE COLOREO Y LAS DIFERENCIAS 
-
-\subsubsection{Zone conquering}
+    Our agents do not change their behavior during runtime. This feature was 
+    analysed, but the team did not have enough time to finish its implementation.
+    
+\subsubsection{Zone conquering.}
     
     The exploration of the map is done gradually, as a result of the reasoning 
     proccess. The actions related to the exploration (probe, survey) are weight 
@@ -249,10 +247,33 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     If the expansion intention explained is selected and carried on, then a new 
     better zone is implicitly conquered.
     
+\subsubsection{Coloring algorithm.}    
+    
     This estimations are done with our reimplementation of the coloring algorithm used 
     by the MASSim server. The information is used by the decision taking module.  
+    
+    Our approach makes several assumptions that facilitate the application of the algorithm
+    in a map that has not been completely explored.
+    
+    % The steps of the coloring algorithm are:
+    
+% \begin{enumerate}
+    % \item In the first phase of the calculation, vertex are dominated by a team $t$ if
+    % $t$ has the majority of agents on it.
+    
+    % \item The coloring is extended to empty vertices that are direct neighbors of
+    % dominated vertices. They are colored by a team $t$ if $t$ dominates the largest subset 
+    % of neighbors and dominates at least two neighbors.
+    
+    % \item Vertices that were isolated by a team $t$ in the previous steps are colored by $t$.
+    % A vertex $v$ is considered isolated if there is no path from any of the other team's agents
+    % to $v$ that does not include a vertex previously colored by $t$.
+    
+    % \item All vertices that were not colored by the previous steps are colored with $none$.
+% \end{enumerate}
 
-\subsubsection{Attacking and defending}
+
+\subsubsection{Attacking and defending.}
     
     Both attacking and defense of zones are implicitly implemented. 
     Sabouteurs prefer to attack enemies that are near, so if an agent of another 
@@ -267,34 +288,19 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     Agents of other roles can also implicitly defend a zone. For example, an agent 
     can go to a node that has one agent of each team, with the purpose of coloring the 
     contested node and defending the zone.
-    
-\subsubsection{Phases}
 
-    Our agents do not change their behavior during runtime. This feature was 
-    analysed, but the team did not have enough time to finish its implementation.
-    
-    The approach proposed consists in adding a phase indicator that holds different 
-    phase values like 'exploration', or 'expansion'. The phase is updated at runtime
-    considering elements like the number of steps or the team's overall performance 
-    in the simulation in progress.
-    
-    The phase component is weight as an extra factor that modifies the potential 
-    benefit of each action, so that its inclusion directly affects the action-selection 
-    proccess.
-    
-\subsubsection{Buying}
+\subsubsection{Buying.}
 
     Agents follow a list of predefined buying actions, when the necessary amount 
     of money is reached. This behaviour follows the idea of getting some specific skill 
     upgrades that the team considered important to achieve early in the simulations.
     
-    Many other approaches regarding the use of the earned money were considered as well.
-    % No se si el regarding esta bien usado.
-    For example a more thoughtful one, taking into consideration the amount of deaths 
-    of our team and our enemy. However, this simple approach was the easiest to implement, 
-    and it was proven to be the most succesful one.
+    % Many other approaches regarding the use of the earned money were considered as well.
+    % For example a more thoughtful one, taking into consideration the amount of deaths 
+    % of our team and our enemy. However, this simple approach was the easiest to implement, 
+    % and it was proven to be the most succesful one.
 
-\subsubsection{Achievements}
+\subsubsection{Achievements.}
 
     Achievements are not explicitly taken under consideration. That is, the agents'
     reasoning proccess is not affected by the possibility of completing achievements.    
@@ -358,35 +364,26 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
     which is the roles.
     
     Refering to our actual programming, all the agents have a strong core of common
-    code, which is:
-    
-    \begin{itemize}
-    \item all the Python part, that servers as a receive-percepts/send-action client 
-    of the server,
-    
-    \item the Percept Server,
-    
-    \item an important part of the Prolog code, including all the utilities used, the
-    implementation of the BDI architecture, the structure of the 
+    code, which is all the Python part, that servers as a receive-percepts/send-action client 
+    of the server; the Percept Server; and an important part of the Prolog code. This includes all the 
+    utilities used, the implementation of the BDI architecture, the structure of the 
     decision-taking module, and a considerable part of the arguments used, that
     are common to all the roles.
-    \end{itemize}
-    
+        
     Apart from all this, each role has a couple of separate files, that have 
     specific code, including the arguments used in the decision-taking module, and
     the setting of the beliefs needed for those arguments. Here is where the 
     individual behavior is set, since the specific actions that can be done by each
     role are taken into consideration here.
     
-    Specific values for the decision-taking module for each role are also included
-    in these files, and this is what can make that agents of different roles act 
-    differently faced to the same situation, according to our judgement.
+    % Specific values for the decision-taking module for each role are also included
+    % in these files, and this is what can make that agents of different roles act 
+    % differently faced to the same situation, according to our judgement.
     
-    This separation is negligible, having in consideration the amount of code 
-    written for the agents, and may be near a 5\% of it. However, this has been proven to
-    be more than enough to modify considerably the behavior of the agents, thanks to
-    the non-monotonic nature of DeLP, the argumentation language used in the 
-    decision-taking module.
+    % This separation is negligible, having in consideration the amount of code 
+    % written for the agents, and may be near a 5\% of it. However, this has been proven to
+    % be more than enough to modify considerably the behavior of the agents, thanks to
+    % the non-monotonic nature of DeLP.
 
 \section{Conclusion}
 
@@ -399,47 +396,31 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 % [ ] 6. Which other research fields might be interested in the Multi-Agent Programming Contest?
 % [ ] 7. How can the current scenario be optimized? How would those optimization pay off?
 
+    In this section, we make some final comments about the contest and our experience.
+
 \subsection{Our team, and its development}
 
-    Our team is formed by a group of friends, so a strong point in the developing 
-    process has been the cohesion and comradeship. We had also worked together,
-    in university's projects as well as outside them, in small freelance 
-    projects, so we well knew what to expect from each other, and each member's 
-    capabilities. 
+    Being our first experience building a system this size, we learned several
+    lessons about working in large projects, such as setting standards and
+    synchronizing versions of the technologies used.
 
-    Several events in the developing process depended on this bond, i.e. the 
-    deployment. We could not connect to the server in the test matches from our 
-    university, because of several network problems. Only one day before 
-    the competition, we decided to connect everything from one of our partner's house, 
-    who had the best infrastructure (connection to Internet, and space in his 
-    apartment). Given the fact that we had to spend all night working and testing
-    there, for a week the headquarters for our team also became our home.
+    In LIDIA, our teammates have done an important ammount of research in argumentation
+    and multi-agent systems. This allowed the team to take advantage of previous experiences. 
+    As a weak point can be considered the lack of experience in large projects.
 
-    However, we had many problems. Many of them were related with our lack of 
-    professionality, and lack of experience working in a large project. 
-    For example, we had several simple but annoying problems, such as the 
-    encoding of our source files, or having different versions of the programs 
-    we used to program installed in our computers.
+    In retrospective, we may have taken the right decisions regarding the programming languages. 
+    DeLP resulted to be suitable for the implementation of the decision-making module since
+    it was flexible enough to develop our argumentation approach.
 
-    We are really grateful with our decisions involving programming languages, 
-    tools and algorithms. Of course, we had many problems, and much time was spent 
-    deciding what to choose. Nevertheless, having all the process in 
-    consideration, we may had took the right calls. We should thank the great 
-    education given by our university (Universidad Nacional del Sur), and a 
-    great mentoring from our professors.
+    There were several hotfixes that were written and deployed at the same time we
+    were facing our competitors due to the lack of testing in the actual context of
+    the competition. This situation should obviously not happen, and adding much
+    more real testing is one of our main priorities for next year's competition.
 
-    Many things should and will be improved for next year competence. We have
-    gained an important amount of knowledge, capability and experience, that shall 
-    help us in all aspects of the developing process, not to mention the 
-    important amount of code already written, and all the good decisions already 
-    made.
-
-    In particular, we now know the importance of all the testing actually needed 
-    for this sort of competition, not only in a virtual environment, as we did, 
-    but also in the real context of the contest. There were several hotfixes that 
-    were written and deployed at the same time we were facing our competitors, in 
-    all but the last day of competition, in which we already had everything in 
-    consideration and control.
+    We had several problems that did not let us perform as good as we expected.  Our
+    lack of experience in this kind of contests, unexpected network and latency
+    problems, as well as some bugs that caused critical performance issues, caused
+    our team to lose several matches that could have been won otherwise.
 
 \subsection{Our thoughts about possible optimizations to the contest}
     
@@ -458,16 +439,16 @@ emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{sg,ajg,dcm,grs\}%
 
     More informing feedback from the server would be appreciated, specially
     involving errors. This is important for a better and quicker detection of bugs
-    involving the communication, i.e. problems with the connection, files sent.
+    involving communication, i.e. problems with the connection, files sent.
 
-    Finally, we think it will be really helpful for all that we had test matches 
+    It also would be really helpful that we have test matches 
     in a more early stage, in order to have more time to correct errors in the 
     client. Many of us reimplemented the eismassim module, so we are vulnerable to 
     many errors that were difficult to foresee. Early testing would help with 
     that, and detecting infrastructure issues, such as network problems.
     
-    % TODO pregunta 6 que otros campos
-    % Game AI, Robotics
+    Finally, we think Both Robotics and Gaming AI are interesting fields that could 
+    benefit from participating in the contest.
 
 %BIBTEX
     
