@@ -1,6 +1,6 @@
 ﻿:- dynamic mejorMeta/2.
 
-:- [utils/utilisima].
+:- [utils/utilisima]. % interprete
 
 :- consult('arg.delp'). % reglas de argumentación
 

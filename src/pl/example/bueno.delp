@@ -1,0 +1,2 @@
+bueno(X,Y) -< multiplicar(X,2,Y).
+~bueno(X,Y) -< multiplicar(X,2,Y), mayor(Y,10).

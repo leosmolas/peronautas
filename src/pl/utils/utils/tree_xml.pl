@@ -1,9 +1,9 @@
 ﻿%
 % This file contains the predicates to build the xml tree representation used by the VigLab representation
 % Is uses the files:
-%   - aux_tree_drwaing = which gives the basic predicates used for tree building
-%   - intern_config = dynamic save_tree/1
-%	- aux_predicates = multiconcat
+% - aux_tree_drwaing = which gives the basic predicates used for tree building
+% - intern_config    = dynamic save_tree/1
+% - aux_predicates   = multiconcat
 
 %%%%%%%%%%%%%%%%%%%%
 %%% DYNAMIC TREE %%%
@@ -85,18 +85,18 @@ nextArgID(ArgID):- %...creates alphanumeric IDs starting from 'Z1'
 
 
 escapeChars(Sentence,EscapedS):-
-	char_code('<',LessCode),
-	char_code('>',GreatCode),
-	
-	string_to_atom(String,Sentence),
-	string_to_list(String,List),
+    char_code('<',LessCode),
+    char_code('>',GreatCode),
+    
+    string_to_atom(String,Sentence),
+    string_to_list(String,List),
 
-	replace(LessCode,"&amp;lt;",List,NoLessStr),
-	replace(GreatCode,"&amp;gt;",NoLessStr,EscStrNonFlat),
+    replace(LessCode,"&amp;lt;",List,NoLessStr),
+    replace(GreatCode,"&amp;gt;",NoLessStr,EscStrNonFlat),
 
-	flatten(EscStrNonFlat,EscStr),
+    flatten(EscStrNonFlat,EscStr),
 
-	string_to_atom(EscStr,EscapedS).
+    string_to_atom(EscStr,EscapedS).
 
 
 %replaces an element of the list by other, and returns the resulting list
@@ -120,7 +120,7 @@ xml_toRoot(Arg):-
         toArrow(Arg,ArrowArg),
         term_to_atom(ArrowArg,AtomicArg),
 
-		escapeChars(AtomicArg,ArgFullLabel),
+        escapeChars(AtomicArg,ArgFullLabel),
 
         %getConclusion(Arg,Conc), %abbreviated form of the argument
         %term_to_atom(Conc,Label),
@@ -158,7 +158,7 @@ xml_toRoot(ARG):-write('Error writing XML tree info about root '),write(ARG),nl.
 %AHORA RECIBE TAMBIEN EL PUNTO DE ATAQUE Y EL STATUS DEL ARCO
 xml_toTree(Arg,Def,AttackedPoint,Edge_Status):-
         save_tree(yes),
-	        
+            
         xml_nodeID(Arg,ArgID),!, %existing node
         xml_newNodeID(Def,DefID), %a new one
 
@@ -171,7 +171,7 @@ xml_toTree(Arg,Def,AttackedPoint,Edge_Status):-
         getAbbrevLabel(Def,Label), %abreviated form of the argument
         
         term_to_atom(ArrowDef,AtomicDef),
-		escapeChars(AtomicDef,EscapedDef),
+        escapeChars(AtomicDef,EscapedDef),
 
         multi_concat(['    <node id= "',DefID,'" label= "',Label,'" fullLabel="',EscapedDef,'" tooltip="',EscapedDef,'"'],XML_node),
         assert(xml_sentence(node(DefID),XML_node)),
@@ -182,22 +182,22 @@ xml_toTree(Arg,Def,AttackedPoint,Edge_Status):-
         
 %%%set_edge_status(Arg,Def,AttackedPoint,Edge_Status), %%% no longer needed (done in delp.pl)
 
-	%XMLIZEARG
-	resetNodeCount,xmlizeArg(Def,DefID,SrcNodeID), 
+    %XMLIZEARG
+    resetNodeCount,xmlizeArg(Def,DefID,SrcNodeID), 
         
         assert(xml_sentence(noID,'      </graph>     </att>    </node>')),
 
-	possibleAttack(ArgID,AttackedPoint,AttPtID),!,
-	assert(attacked(AttPtID)),
-	(Edge_Status = proper -> XML_Status = 'Proper'
-	;
-	XML_Status = 'Blocking'
-	),
+    possibleAttack(ArgID,AttackedPoint,AttPtID),!,
+    assert(attacked(AttPtID)),
+    (Edge_Status = proper -> XML_Status = 'Proper'
+    ;
+    XML_Status = 'Blocking'
+    ),
 
         multi_concat(['    <edge source="',SrcNodeID,'" target="',AttPtID,'" status ="',XML_Status,'"/>'],XML_edge),
         assert(xml_sentence(noID,XML_edge)),
 
-	assert(xml_node(ArgID,DefID)),!.
+    assert(xml_node(ArgID,DefID)),!.
 
 xml_toTree(_,_,_,_):-save_tree(no),!.
 
@@ -231,101 +231,101 @@ disagreement_subarg(A,Apoint,SubA):-
 xmlizeArg([],_,_):-retractall(litID(_,_)),!.
 %ArgID is used to create its nodes' IDs
 xmlizeArg([Rule|Rules],ArgID,SrcNodeID):-
-	xmlizeRule(Rule,ArgID,SrcNodeID), %SrcNodeID is instantiated by the first rule of the argument
-	xmlizeArg(Rules,ArgID,_). %the anonymous variable ensures that SrcNodeID is instantiated by the 1st rule of the arg
+    xmlizeRule(Rule,ArgID,SrcNodeID), %SrcNodeID is instantiated by the first rule of the argument
+    xmlizeArg(Rules,ArgID,_). %the anonymous variable ensures that SrcNodeID is instantiated by the 1st rule of the arg
 
 
 xmlizeRule(Rule,ArgID,HEAD_ID):-
-	(%whether the edge's status is 'Defeasible' or 'Strict'%
-	Rule = d_rule(HEAD,BODY),Status = 'Defeasible',!
-	;
-	Rule = s_rule(HEAD,BODY),Status = 'Strict'
-	),
-	
-	(
-	litID(HEAD,HEAD_ID),! %if the HEAD lit of the rule already has an ID, no node is created%
-	;
-	newLitsNodeID(ArgID,HEAD_ID),
-	xmlizeLits(ArgID,[HEAD],HEAD_ID,head)
-	),
-	toList(BODY,BLIST),
-	(
-	not((Status = 'Strict',BLIST = [true])),!,
-	insertCommas(BLIST,BODYwithCOMMAS),
-	newLitsNodeID(ArgID,BODY_ID),
-	xmlizeLits(ArgID,BODYwithCOMMAS,BODY_ID,body),
-	litID(HEAD,HLIT_ID),
-	assert(possibleAttack(ArgID,HEAD,HLIT_ID)),
-	multi_concat(['        <edge source= "',BODY_ID,'" target="',HLIT_ID,'" status ="',Status,'"/>'],XML_EDGE),
-	assert(xml_sentence(noID,XML_EDGE))
-	;
-	true).
+    (%whether the edge's status is 'Defeasible' or 'Strict'%
+    Rule = d_rule(HEAD,BODY),Status = 'Defeasible',!
+    ;
+    Rule = s_rule(HEAD,BODY),Status = 'Strict'
+    ),
+    
+    (
+    litID(HEAD,HEAD_ID),! %if the HEAD lit of the rule already has an ID, no node is created%
+    ;
+    newLitsNodeID(ArgID,HEAD_ID),
+    xmlizeLits(ArgID,[HEAD],HEAD_ID,head)
+    ),
+    toList(BODY,BLIST),
+    (
+    not((Status = 'Strict',BLIST = [true])),!,
+    insertCommas(BLIST,BODYwithCOMMAS),
+    newLitsNodeID(ArgID,BODY_ID),
+    xmlizeLits(ArgID,BODYwithCOMMAS,BODY_ID,body),
+    litID(HEAD,HLIT_ID),
+    assert(possibleAttack(ArgID,HEAD,HLIT_ID)),
+    multi_concat(['        <edge source= "',BODY_ID,'" target="',HLIT_ID,'" status ="',Status,'"/>'],XML_EDGE),
+    assert(xml_sentence(noID,XML_EDGE))
+    ;
+    true).
 
 insertCommas([Lit],[Lit]):-!.
 insertCommas([Lit|MoreLits],[Lit,comma|MoreLitsWithCommas]):-
-	insertCommas(MoreLits,MoreLitsWithCommas).
+    insertCommas(MoreLits,MoreLitsWithCommas).
 
 
 xmlizeLits(ArgID,Lits,LitsID,LitsType):-
-	resetLitCount,
-	term_to_atom(Lits,AtomicLits),
-	multi_concat(['        <node id= "',LitsID,'" label= "',AtomicLits,'" fullLabel="',AtomicLits,'" tooltip="',AtomicLits,'">'],XML_NODE),
-	assert(xml_sentence(noID,XML_NODE)),
-	assert(xml_sentence(noID,'         <att>')),
-	assert(xml_sentence(noID,'           <graph>')),
+    resetLitCount,
+    term_to_atom(Lits,AtomicLits),
+    multi_concat(['        <node id= "',LitsID,'" label= "',AtomicLits,'" fullLabel="',AtomicLits,'" tooltip="',AtomicLits,'">'],XML_NODE),
+    assert(xml_sentence(noID,XML_NODE)),
+    assert(xml_sentence(noID,'         <att>')),
+    assert(xml_sentence(noID,'           <graph>')),
 
-	xmlizeLitsAsNodes(ArgID,Lits,LitsID,LitsType),
+    xmlizeLitsAsNodes(ArgID,Lits,LitsID,LitsType),
 
-	assert(xml_sentence(noID,'           </graph>')),
-	assert(xml_sentence(noID,'         </att>')),
-	assert(xml_sentence(noID,'        </node>')).
+    assert(xml_sentence(noID,'           </graph>')),
+    assert(xml_sentence(noID,'         </att>')),
+    assert(xml_sentence(noID,'        </node>')).
 
 
 xmlizeLitsAsNodes(_,[],_,_):-!.
 xmlizeLitsAsNodes(ArgID,[Lit|MoreLits],NodeID,LitsType):-
-	newLitID(Lit,NodeID,LitID),
-	(
-	LitsType = head,! %%%,assert(possibleAttack(ArgID,Lit,LitID))
-	;
-	LitsType = body
-	),
-	(
-	Lit = comma,!,
-	multi_concat(['             <node id="',LitID,'" label="," fullLabel="," tooltip=","'],XML_LIT)
-	;
-	term_to_atom(Lit,AtomicLit),
-	multi_concat(['             <node id="',LitID,'" label="',AtomicLit,'" fullLabel="',AtomicLit,'" tooltip="',AtomicLit,'"'],XML_LIT)
-	),
+    newLitID(Lit,NodeID,LitID),
+    (
+    LitsType = head,! %%%,assert(possibleAttack(ArgID,Lit,LitID))
+    ;
+    LitsType = body
+    ),
+    (
+    Lit = comma,!,
+    multi_concat(['             <node id="',LitID,'" label="," fullLabel="," tooltip=","'],XML_LIT)
+    ;
+    term_to_atom(Lit,AtomicLit),
+    multi_concat(['             <node id="',LitID,'" label="',AtomicLit,'" fullLabel="',AtomicLit,'" tooltip="',AtomicLit,'"'],XML_LIT)
+    ),
 
-	assert(xml_sentence(lit(LitID),XML_LIT)),
-	xmlizeLitsAsNodes(ArgID,MoreLits,NodeID,body).
+    assert(xml_sentence(lit(LitID),XML_LIT)),
+    xmlizeLitsAsNodes(ArgID,MoreLits,NodeID,body).
 
 
 :-dynamic litID/2,litCount/1.
 litCount(0).
 resetLitCount:-retract(litCount(_)),assert(litCount(0)).
 newLitID(Lit,NodeID,LitID):-
-	litCount(Count),
-	LitID is NodeID*100+Count,
+    litCount(Count),
+    LitID is NodeID*100+Count,
 
-	asserta(litID(Lit,LitID)),
+    asserta(litID(Lit,LitID)),
 
-	NewCount is Count+1,
-	retract(litCount(_)),
-	assert(litCount(NewCount)).
+    NewCount is Count+1,
+    retract(litCount(_)),
+    assert(litCount(NewCount)).
 
 :- dynamic nodeCount/1.
 nodeCount(0).
 resetNodeCount:-retract(nodeCount(_)),assert(nodeCount(0)).
 newLitsNodeID(ArgID,ID):-
-	nodeCount(Count),
-	ID is ArgID*100+Count,
+    nodeCount(Count),
+    ID is ArgID*100+Count,
 
-	NewCount is Count+1,
-	retract(nodeCount(_)),
-	assert(nodeCount(NewCount)).
+    NewCount is Count+1,
+    retract(nodeCount(_)),
+    assert(nodeCount(NewCount)).
 
-	
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%% AUX %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -375,10 +375,10 @@ xml_dumpTree:-
         %%%write(T,''), %debera ser redundante
         %%%dumpXML(T),
         %%%close(T).
-	getXML(XML),
-	retractall(explanation_list(_)),
-	retractall(notTheFirst),
-	assert(explanation_list(XML)).
+    getXML(XML),
+    retractall(explanation_list(_)),
+    retractall(notTheFirst),
+    assert(explanation_list(XML)).
 
 xml_dumpTree:-save_tree(no).
 
@@ -419,7 +419,7 @@ dumpXML(File):-
 
 %GETXML/1 idem DUMPXML/1, pero instancia XMLdata con un string con la info codificada
 getXML(XMLdata):-
-	findall(CompleteSentence,(xml_sentence(ID,Sentence),getXMLsentence(ID,Sentence,CompleteSentence)),XMLdata).
+    findall(CompleteSentence,(xml_sentence(ID,Sentence),getXMLsentence(ID,Sentence,CompleteSentence)),XMLdata).
 
 
 %DUMP/3 recibe una etiqueta, una sentencia y un nombre de archivo y, segun si la
@@ -429,13 +429,13 @@ getXML(XMLdata):-
 dump(noID,Sentence,File):-write(File,Sentence),!.
 
 dump(lit(ID),Sentence,File):-
-	attacked(ID),!,
-	multi_concat([Sentence,' status="Attacked"/>'],CompleteSentence),
-	write(File,CompleteSentence).
+    attacked(ID),!,
+    multi_concat([Sentence,' status="Attacked"/>'],CompleteSentence),
+    write(File,CompleteSentence).
 
 dump(lit(_ID),Sentence,File):-
-	multi_concat([Sentence,' status="Free"/>'],CompleteSentence),
-	write(File,CompleteSentence),!.
+    multi_concat([Sentence,' status="Free"/>'],CompleteSentence),
+    write(File,CompleteSentence),!.
 
 dump(node(ID),Sentence,File):-
         mark(ID,Mark),
@@ -447,11 +447,11 @@ dump(node(ID),Sentence,File):-
 getXMLsentence(noID,Sentence,Sentence):-!.
 
 getXMLsentence(lit(ID),Sentence,CompleteSentence):-
-	attacked(ID),!,
-	multi_concat([Sentence,' status="Attacked"/>'],CompleteSentence),!.
+    attacked(ID),!,
+    multi_concat([Sentence,' status="Attacked"/>'],CompleteSentence),!.
 
 getXMLsentence(lit(_ID),Sentence,CompleteSentence):-
-	multi_concat([Sentence,' status="Free"/>'],CompleteSentence),!.
+    multi_concat([Sentence,' status="Free"/>'],CompleteSentence),!.
 
 getXMLsentence(node(ID),Sentence,CompleteSentence):-
         mark(ID,Mark),
@@ -472,8 +472,8 @@ getXMLsentence(node(ID),Sentence,CompleteSentence):-
 explanation_list([]).
 
 xml_explanation(EXPLANATION):-
-	explanation_list(LIST),
-	multi_concat(LIST,EXPLANATION).
+    explanation_list(LIST),
+    multi_concat(LIST,EXPLANATION).
 
 
 

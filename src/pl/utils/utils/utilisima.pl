@@ -1,4 +1,5 @@
-﻿:- dynamic volatile_knowledge/2.
+﻿% This file is delp.pl reformatted.
+:- dynamic volatile_knowledge/2.
 :- dynamic volatile_knowledge/2.
 :- dynamic context_add/1, context_ignore/1.
 :- dynamic <- /2, -< /2.

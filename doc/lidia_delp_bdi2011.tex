@@ -1,0 +1,430 @@
+\documentclass{llncs2e/llncs}
+
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{bibentry}
+\usepackage[numbers]{natbib}
+\usepackage{fancyvrb}
+\usepackage{epstopdf}
+
+\title{An Argumentative Approach for a BDI Agent} 
+        
+\author{I\~{n}aki Garay \and      % igarai@gmail.com
+        Diego Marcovecchio \and   % diegomarcov@gmail.com
+        Leonardo Molas \and       % leos.molas@gmail.com
+        Emiliano Montenegro \and  % emm.montenegro@gmail.com
+        Fernando Sisul \and       % fsisul@gmail.com
+        Manuel Torres \and        % jmtorresluc@gmail.com
+        Sebastián Gottifredi \and % sebastian.gottifredi@gmail.com
+        Alejandro García \and     % ajg@cs.uns.edu.ar
+        Diego Martínez \and       % dcm@cs.uns.edu.ar
+        Guillermo Simari          % grs@cs.uns.edu.ar
+        }
+
+\institute{Universidad Nacional del Sur \\\email{\{igarai,diegomarcov,%
+emm.montenegro,fsisul,jmtorresluc\}@gmail.com,\\\{lam,sg,ajg,dcm,grs\}%
+@cs.uns.edu.ar}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    This report presents the design and results of the d3lp0r multi-agent system 
+    developed by the LIDIA team for the Multi-Agent Programming Contest 2011 (MAPC).
+    The d3lp0r agents use a BDI architecture extended with planning and 
+    argumentation (via Defeasible Logic Programming) to model a cooperating team 
+    operating in a dynamic and competitive environment.
+
+    In particular, the main goal of this report is to describe the chosen 
+    architecture, the communication scheme and the way argumentation was put to 
+    use in the agent's reasoning process and the technical details thereof.
+\end{abstract}
+
+\section{Introduction}
+
+    The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
+    Programming Contest 2011 (MAPC) \cite{BehrensAMAI2010b} hosted by the
+    Clausthal University of Technology \footnote{More information in
+    \texttt{www.tu-clausthal.de}}.  The LIDIA (Laboratorio de Investigación
+    y Desarrollo en Inteligencia Artificial, Artificial Intelligence Research
+    and Development Laboratory) research group was established in 1992 at the
+    Universidad Nacional del Sur.  The d3lp0r team was formed incorporating six
+    graduate students, two Ph.D.  students and three professors. The
+    undergraduate students fully developed the system, while the Ph.D. students
+    and professors provided guidance. The group's main motivation was to apply
+    argumentation \cite{Prakken:1997} \cite{Rahwan:2009}
+    \cite{Bench-Capon:2007}\ via defeasible logic programming (DeLP
+    \cite{Garcia:2004a}) in a BDI based agent \cite{Amgoud:2008}, in the context
+    of a multi-agent gaming situation, and to test the integration of the
+    different technologies used.
+
+%{{{
+%\section{Preliminaries}
+%
+%    The \texttt{d3lp0r} system was developed in the context of the Multi-Agent
+%    Programming Contest 2011 (MAPC) hosted by the Clausthal University of
+%    Technology (www.tu-clausthal.de). 
+
+%    The simulation scenario is represented as an undirected graph, in which 
+%    nodes are valid agent locations weighted by value, and edges are valid
+%    transitions weighted by cost. 
+%    Agent state includes energy, health, and strength parameters. Agent percepts
+%    include visible nodes, edges, and other agents. 
+%    Each agent is assigned a role in the simulation (Explorer, Saboteur,
+%    Repairer, Sentinel and Inspector) which determines its valid actions and
+%    initial maximum values for the agent state parameters. 
+%    Actions in general have an energy cost, movement action costs depend on edge
+%    weights, successful attack actions decrease enemy agent's health subject to
+%    a comparison of their strength attributes. Certain actions may cause further
+%    information to be included in subsequent percepts. 
+%
+%    A match consists of several simulations, and each simulation proceeds as
+%    a series of steps. In each step, each agent is provided with a percept with
+%    partial information about the current simulation state and is
+%    queried for its action. 
+%
+%    The goal is to maximize the score function each step. A team is awarded
+%    points according to the value of the nodes controlled by the team, and
+%    in addition certain achievements. Agents may control more nodes than 
+%    those they are positioned in by forming zones, groups of nodes under the
+%    influence of a team determined by a graph coloring algorithm specified in
+%    the scenario description. 
+%
+%    The final score for a team is the sum of points over all steps; at the end
+%    of the match, the team with the most points is the winner.
+%}}}
+
+\section{System Analysis and Design}
+
+% 2 System Analysis and Design
+% [x] 1. If some multi-agent system methodology such as Prometheus, O-MaSE, or
+%        Tropos was used, how did you use it? If you did not what were the
+%        reasons?
+% [x] 2. Is the solution based on the centralisation of coordination/information 
+%        on a specific agent? Conversely if you plan a decentralised solution, 
+%        which strategy do you plan to use?
+% [x] 3. What is the communication strategy and how complex is it?
+% [x] 4. How are the following agent features considered/implemented: autonomy, 
+%        proactiveness, reactiveness?
+% [x] 5. Is the team a truly multi-agent system or rather a centralised system 
+%        in disguise?
+% [x] 6. How much time (man hours) have you invested (approximately) for 
+%        implementing your team?
+% [x] 7. Did you discuss the design and strategies of your agent team with other 
+%        developers? To which extent did your test your agents playing with 
+%        other teams?
+
+    Despite many man-hours dedicated to design in the early stages of the
+    competition, the development team's lack of experience in multi-agent
+    systems made several changes and additions necessary and precluded the use
+    of design methodologies specific to multi-agent systems.  Nevertheless, our
+    approach was more than satisfying, resulting to be modular, correct and in
+    close correspondence with the literature.
+
+    The solution follows a decentralised architecture in which agents run
+    completely decoupled in different processes with no shared state. 
+    
+    % COMMUNICATION STRATEGY
+    In addition to the agent processes, the system design includes an
+    independent ``percept server'', through which percepts are communicated
+    among agent team members via a broadcast mechanism running on standard
+    network sockets.  Each agent handles his own connection to the MASSim
+    server, and upon receiving its percept, retransmits it to the percept
+    server.  The percept server joins all percepts into a ``global percept'',
+    and sends each agent the set difference between its own and the global
+    percept.  The agent then enters its reasoning phase and decides which
+    action it will send back to the MASSim server.  Other than the percept
+    server mechanism, there is no communication among team agents. This design
+    was chosen for its minimal complexity.
+
+    Agents can also be configured to run in a standalone mode, in which they will
+    not use the percept server and thus have no communication with the rest of
+    the team.  Team performance drops noticeably in this case, as the actions
+    are less informed. 
+
+    % DECENTRALISED, AUTONOMY
+    Agents are completely autonomous meaning that decision-making takes place
+    individually at the agent level, with no intervention from human operators
+    or a central intelligence agency within the system, and that decisions made
+    by an agent are influenced solely by the current simulation state and the
+    results of previous steps.  
+    Despite the sharing of all percepts among the team agents in the initial
+    phase of the turn, no control variables or instructions are included. 
+    The agent architecture developed is based on the
+    BDI model \cite{Rao:1991}, and is explained in detail in further sections.
+
+    The agents' behavior can be considered proactive, given they pursue their 
+    selected intentions over time, that is, they have persistent goals. Plans 
+    for achieving intentions are recalculated and followed for the number of
+    steps requiered, unless the goal in question becomes impossible or no longer
+    relevant.
+
+    Approximately 1500 man-hours were invested in the team development.
+    Experience from a previous instance of the MAPC was shared with our teams by
+    members of the ARGONAUTS team from TU Dortmund\cite{Holzgen:2011}. Although
+    the initial plan was to run tests against other agent teams prior to the
+    competition, time constraints made this impossible.
+
+\input{swarch}
+
+\section{Strategies, Details, and Statistics}
+
+% 4 Strategies, Details and Statistics
+% [x]  1. What is the main strategy of your team?
+% [x]  2. How does the overall team work together? (coordination, information sharing, ...)
+% [ ]  3. How do your agents analyze the topology of the map? And how do they exploit their findings?
+% [ ]  4. How do your agents communicate with the server?
+% [ ]  5. How do you implement the roles of the agents? Which strategies do the different roles implement?
+% [ ]  6. How do you find good zones? How do you estimate the value of zones?
+% [ ]  7. How do you conquer zones? How do you defend zones if attacked? Do you attack zones?
+% [ ]  8. Can your agents change their behavior during runtime? If so, what triggers the changes?
+% [ ]  9. What algorithm(s) do you use for agent path planning?
+% [ ] 10. How do you make use of the buying-mechanism?
+% [ ] 11. How important are achievements for your overall strategy?
+% [ ] 12. Do your agents have an explicit mental state?
+% [ ] 13. How do your agents communicate? And what do they communicate?
+% [ ] 14. How do you organize your agents? Do you use e.g. hierarchies? Is your organization implicit or explicit?
+% [ ] 15. Is most of your agents’ behavior emergent on and individual and team level?
+% [ ] 16. If your agents perform some planning, how many steps do they plan ahead?
+    
+    In this section, we will explain the main characteristics of the team's 
+    overall strategy, as well as several implementation details, such as 
+    algorithms used and agents' organization.
+
+\subsection{Strategy}
+
+    The main strategy of the team consists of detecting profitable zones from the 
+    explored nodes, and positioning the agents correctly to maintain, defend 
+    and expand the zones formed. 
+    
+    Every agent is concerned with the formation and expansion of zones, beyond
+    its role.  The decision-taking process is responsible for calculating and
+    selecting the most beneficial intention. This selection process is based on
+    the gain in terms of score, the need of the team for the execution of
+    a role-specific action, or the benefit that the agent is currently
+    contributing to the team. 
+    
+    Agents coordination is implicit, only involving the percept information and
+    in particular excluding processed beliefs and control variables. The agents
+    do not communicate intentions or plans.
+
+    Agents do not change their behavior during runtime, maintaining the same
+    strategy throughout all simulation stages. 
+
+\subsubsection{Zone conquering.}
+    
+    The exploration of the map is done gradually. Actions related to the
+    exploration (probe, survey) are weighed along with all other actions and
+    selected when considered important.  This occurs to a greater extent during
+    the initial steps of the simulations, when the team lacks knowledge of the
+    map and other actions are unnecessary. Agents make no assumptions regarding
+    the map topology.
+
+    Behavior is not primarily focused on finding new zones, but agents do
+    attempt to expand and maximize the points of the existing ones.    They
+    calculate whether they are part of a zone or not. This is achieved by
+    checking the color of the current node and whether a neighbor of it is also
+    colored by the agent team (if this is not the case, the node does not
+    increase the zone points).  If an agent is not part of any zone it tries to
+    regroup with its teammates. 
+
+    When a zone is formed and an agent is part of it, for each potentially
+    beneficial neighbor node, the agent calculates how much points the team
+    would gain if it moves, and tries to expand the zone.  If the expansion
+    intention is selected and acted upon, then a new better zone is implicitly
+    conquered.
+    
+\subsubsection{Coloring algorithm.}    
+    
+    This estimations are done with our reimplementation of the coloring
+    algorithm used by the MASSim server. The information is used by the decision
+    taking module.  Our approach makes several assumptions that facilitate the
+    application of the algorithm in a map that has not been completely explored.
+    
+    % The steps of the coloring algorithm are:
+    
+% \begin{enumerate}
+    % \item In the first phase of the calculation, vertex are dominated by a team $t$ if
+    % $t$ has the majority of agents on it.
+    
+    % \item The coloring is extended to empty vertices that are direct neighbors of
+    % dominated vertices. They are colored by a team $t$ if $t$ dominates the largest subset 
+    % of neighbors and dominates at least two neighbors.
+    
+    % \item Vertices that were isolated by a team $t$ in the previous steps are colored by $t$.
+    % A vertex $v$ is considered isolated if there is no path from any of the other team's agents
+    % to $v$ that does not include a vertex previously colored by $t$.
+    
+    % \item All vertices that were not colored by the previous steps are colored with $none$.
+% \end{enumerate}
+
+
+\subsubsection{Attacking and defending.}
+    
+    Both attacking and defense of zones are implicitly implemented. 
+    Saboteurs prefer to attack enemies that are near, so if an agent of another 
+    team enters our team's zone, it will be attacked by the saboteurs in the zone.
+    This is the most likely scenario, unless the saboteur's position is so 
+    important that it decides to stay in the formation in order to keep the zone.
+
+    The same happens with enemies in their own zones. Zones are not intentionally 
+    destroyed, but any agent that is part of a zone may be attacked, affecting 
+    possibly the structure of the enemy zone.
+    
+    Agents of other roles can also implicitly defend a zone. For example, an agent 
+    can go to a node that has one agent of each team, with the purpose of coloring the 
+    contested node and defending the zone.
+
+\subsubsection{Buying.}
+
+    Agents follow a list of predefined buying actions, when the necessary amount 
+    of money is reached. This behavior follows the idea of getting some specific skill 
+    upgrades that the team considered important to achieve early in the simulations.
+    
+    % Many other approaches regarding the use of the earned money were considered as well.
+    % For example a more thoughtful one, taking into consideration the amount of deaths 
+    % of our team and our enemy. However, this simple approach was the easiest to implement, 
+    % and it was proven to be the most succesful one.
+
+\subsubsection{Achievements.}
+
+    Achievements are not explicitly taken under consideration. That is, the agents'
+    reasoning process is not affected by the possibility of completing achievements.    
+    However, the team can manage to achieve a significant number of them, which 
+    results naturally from the agents' behavior. 
+    This fact let the development team avoid the need of adding special features 
+    dedicated to the seek of achievements.
+    
+\subsection{Implementation}
+
+    Here are some implementation details of the different parts of the agents.
+    
+\subsubsection{Mental state.}
+
+    Agents have a complete and explicit mental state. It consists of a set of 
+    components, such as beliefs, desires, intentions, and plans. 
+    The belief base includes the information obtained from the perceptions, as
+    well as different kinds of beliefs required by the decision-taking module.
+    The desires are set every step that the agent decides to select a new intention.
+    The intentions and plans kept in the knowledge base are those that the agent
+    is currently carrying out.
+    
+\subsubsection{Path planning.}
+
+    Path planning is implemented with an Uniform Cost Search
+    \cite{Russell:2003:AIM:773294}.  We tried to minimize the amount of
+    steps required to achieve the goal, rather than the energy spent.  The
+    returned result is a list of actions to be done, rather than a list of
+    nodes.
+    
+    Since this algorithm can be called several times in one step, and given that the 
+    actual amount of steps spent by an intention is taken under consideration by 
+    the decision-taking module, it was crucial to perform several optimizations in 
+    it. In the end, this allowed us to run all the agents in a single machine  
+    during the competition.
+    
+    The plans are as long as the selected intention requires. This may 
+    sound excessive, but the possible goals were previously selected for their 
+    potential, taking into consideration their distances (in nodes, not in 
+    actions). However, plans are recalculated in every step, as explained earlier.    
+
+\subsection{Agents' organization}
+
+    The decision-taking module makes use of other agents' status, but there is
+    neither negotiation nor intentions exchange, so the team performance is
+    emergent on individual behavior.  
+    
+    Referring to our actual programming, all the agents have a strong core of
+    common code, which is all the Python part, that servers as
+    a receive-percepts/send-action client of the server; the Percept Server; and
+    an important part of the Prolog code. This includes all the utilities used,
+    the implementation of the BDI architecture, the structure of the
+    decision-taking module, and a considerable part of the arguments used, that
+    are common to all the roles.
+        
+    Apart from all this, each role has a couple of separate files, that have 
+    specific code, including the arguments used in the decision-taking module, and
+    the setting of the beliefs needed for those arguments. Here is where the 
+    individual behavior is set, since the specific actions that can be done by each
+    role are taken into consideration here.
+    
+    % Specific values for the decision-taking module for each role are also included
+    % in these files, and this is what can make that agents of different roles act 
+    % differently faced to the same situation, according to our judgement.
+    
+    % This separation is negligible, having in consideration the amount of code 
+    % written for the agents, and may be near a 5\% of it. However, this has been proven to
+    % be more than enough to modify considerably the behavior of the agents, thanks to
+    % the non-monotonic nature of DeLP.
+
+\section{Conclusion}
+
+% 5 Conclusion
+% [ ] 1. What have you learned from the participation in the contest?
+% [ ] 2. Which are the strong and weak points of the team?
+% [ ] 3. How suitable was the chosen programming language, methodology, tools, and algorithms?
+% [ ] 4. What can be improved in the context for next year?
+% [ ] 5. Why did your team perform as it did? Why did the other teams perform better/worse than you did?
+% [ ] 6. Which other research fields might be interested in the Multi-Agent Programming Contest?
+% [ ] 7. How can the current scenario be optimized? How would those optimization pay off?
+
+    In this section, we make some final comments about the contest and our experience.
+
+\subsection{Our team, and its development}
+
+    Being our first experience building a system this size, we learned several
+    lessons about working in large projects, such as setting standards and
+    synchronizing versions of the technologies used.
+
+    In LIDIA, our teammates have done an important amount of research in
+    argumentation and multi-agent systems, providing valuable experience and
+    guidance. 
+
+    We believe the right decisions were taken regarding the
+    programming languages.  DeLP resulted suitable for the implementation
+    of the decision-making module since it was flexible enough to develop our
+    argumentation approach.
+
+    Several hotfixes that were written and deployed during the competion due to
+    the lack of testing. Avoiding this undesireable situation is one of our main
+    priorities for next year's competition.
+
+    Our lack of experience in this kind of contests, unexpected network and
+    latency problems, as well as some bugs that caused critical performance
+    issues, caused our team to lose several matches that could have been won
+    otherwise.
+
+\subsection{Our thoughts about possible optimizations to the contest}
+    
+    More information associated to nodes, e.g. absolute coordinates, would help
+    in the implementation of directed search decreasing execution time.
+
+    Strategically, the early dominance of the center area played an important part 
+    of a good candidate to win a match. It would be useful to try other 
+    variations, such as making the borders more important, or others shapes of the 
+    map, such as stretched, in form of V, X, O, etc. This would benefit teams that 
+    explicitly and thoughtfully look for and conquer good zones, rather than 
+    benefiting teams that assume that only one good zone exists in the middle of the map.
+
+    More feedback from the server would be appreciated, especially
+    regarding errors. This is important for detection of bugs
+    involving communication, i.e. problems with the connection, files sent.
+
+    Test matches in earlier stages of development would reduce technical
+    errors during the competition.  Teams reimplementing the eismassim
+    communication functionality are vulnerable to errors difficult to foresee. 
+    
+    Finally, we think both Robotics and Game AI are interesting fields that could 
+    benefit from participating in the contest.
+
+%BIBTEX
+    
+\bibliographystyle{plainnat} 
+\bibliography{bib} 
+
+\include{questions}
+
+\end{document} 
+

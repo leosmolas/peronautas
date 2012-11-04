@@ -215,6 +215,11 @@ def parse_request_action(xml):
         result_public['inspected_ents'] = inspected_ents_list
     else:
         result_public['inspected_ents'] = []
+
+    print "PUBLIC"
+    print result_public
+    print "PRIVATE"
+    print result_private
     return ('request-action', action_id, result_private, result_public)
 
 #------------------------------------------------------------------------------#
