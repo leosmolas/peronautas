@@ -1,8 +1,8 @@
 *.svg
 *.aux
-*.pdf
-!tech-report-template.pdf
 *.log
 *.gz
 *.bbl
 *.blg
+!tech-report-template.pdf
+!tech-report-template.pdf
