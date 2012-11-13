@@ -1,6 +1,65 @@
-Instalar python 2.6/2.7
-Instalar beautifulSoup:
-	Para esto está la carpeta en / beautifulSoup. Ejecutar:
-	
-$ python setup.py install
+Install Python, version 2
+    For ArchLinux, in 2012, there is a package in the official repositories:
+    sudo pacman -S python2
+
+Install BeautifulSoup, version 3, for Python 2.
+    For ArchLinux, in 2012, there is a package in the official repositories:
+    sudo pacman -S python2-beautifulsoup3 3.2.1-1
+
+Install SWI-Prolog version 5.10.5, 
+    It must be this version, one of the later versions will not work, and it is
+    unknown which version breaks compatibility.
+    Old versions of SWI-Prolog can be found at 
+    http://www.swi-prolog.org/download/stable?show=all
+    
+    cd %HOME
+    mkdir -p bin/{prolog,prolog-src}
+    cd bin/prolog-src
+    wget http://www.swi-prolog.org/download/stable/src/pl-5.10.5.tar.gz
+    tar xzf pl-5.10.5.tar.gz
+    cd pl-5.10.5/src
+    ./configure --prefix=$HOME/bin/prolog --enable-shared
+    make
+    make install
+    # make sure the prolog binary is in $PATH
+    export PATH=$HOME/bin/prolog/bin:$PATH
+    cd ../packages
+    ./configure --prefix=$HOME/bin/prolog
+    make
+    make install
+    # you should now have a fully functional SWI-Prolog installation in $HOME/bin/prolog
+
+Install pyswip, version 0.2.2
+
+    For ArchLinux, there is a package in the AUR, but it depends on swi-prolog,
+    and we have a custom install.
+    To make pacman satisfy the dependency, you can install SWI-prolog through
+    the AUR.
+    The version that the AUR packages installs as of the writing of this
+    document is 6.2.1
+
+    # install SWI-Prolog from the AUR
+    wget https://aur.archlinux.org/packages/sw/swi-prolog/swi-prolog.tar.gz
+    tar xzf swi-prolog.tar.gz
+    cd swi-prolog
+    makepkg
+    sudo pacman -U swi-prolog-6.2.1-1-i686.pkg.tar.xz
+
+    # install pyswip from the AUR
+    cd $HOME/bin
+    wget https://aur.archlinux.org/packages/py/pyswip/pyswip.tar.gz
+    tar xzf pyswip.tar.gz
+    cd pyswip
+    makepkg
+    sudo pacman -U pyswip-0.2.2-1-i686.pkg.tar.xz
+    
+    # now make the symlink to the prolog library shared object so pyswip can find it
+    sudo ln -s $HOME/bin/prolog/lib/swipl-5.10.5/lib/i686-linux/libswipl.so.5.10.5 /usr/libpl.so
+
+Test the pyswip installation
+    $ python2
+    >>> from pyswip import Prolog
+    >>> prolog = Prolog()
+    >>> list(prolog.query("current_prolog_flag(version,X)"))
+    [{'X': 51005}]
 

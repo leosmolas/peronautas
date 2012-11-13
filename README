@@ -1,67 +1,52 @@
-﻿doc: design documentation
-pyeismassim: partial implementation in Python of the eismassim library.
-pyswig test: code testing the pyswig python-prolog bridge
+﻿d3lp0r is a multi-agent system developed as an entry in the 2011 MAPC
+(Multi-Agent Programming Contest).
 
-eismassim: the eismassim jar files
-javaagents: the javaagents jar files
-    This has one additional directory in the conf directory named my dummyteam,
-    which configures the agent interpreter to start two teams with one explorer 
-    agent each.
-massim: the original massim server jar files
-massim-netbeans: a folder containing a netbeans project with the code for the 
-    massim server, with some small modifications. 
-    The massim-netbeans/AgentContest/save folder contains the modified scripts 
-    necessary to run the server, and also contain a modified xml file named 
-    my2011-conf1.xml to configure the server for a single match between two 
-    teams with one explorer agent each.
-    A copy of this file is also located in the original server's conf directory.
-    Instructions: 
-        import into netbeans, 
-        create a library in library manager called AgentContest 
-            (Tools menu -> 
-             Libraries -> 
-             New Library -> 
-             OK -> 
-             Add Jar/Folder -> 
-             add all jar files in massim-netbeans/AgentContest/dependency -> 
-             Ok) 
-        add library to AgentContest project
-            (right click on AgentContest project in Projects pane ->
-            Properties ->
-            Libraries ->
-            Add Library ->
-            select AgentContest ->
-            Add Library ->
-            Ok)
-        build, 
-        *copy* massim-netbeans/AgentContest/save/* to the generated dist folder, 
-        and run the startServer.sh script to run the modified server,
-        choosing the my2011-conf1.xml file.
+Contents:
+---
 
------------------------------------------------------------------------------------
-    
-Situación de los branchs en este momento:
+doc: design documentation
+src: source code
 
+Running the MASSim Server:
+---
 
-master: 
-    Tiene todas las versiones más viejas de todo. Se actualizará cuando tengamos algo estable (por más ínfimo que sea).
-    
-dev-limpieza:
-    Branch actualmente en desuso. (candidato a volar)
-    
-dev-comunicacion:
-    No sé en que estado está este branch. cc @aki
-    
-dev-graph-coloring:
-    En este branch principalmente hay una implementación del algoritmo de coloreo. Fue hecho principalmente con Fer, con cosas agregadas por Manu y Leo. También hay muchas utilidades que hacen inferencia sobre cosas del mapa.
-    
-    graph-optimization:
-        Topic branch del anterior. 
-        Este branch ya dejó de tener sentido...
-        
-dev-agents:
-    Aquí se encuentra la implementación del servidor central de percepciones, por Aki. A su vez, se encuentra la versión del agente más actualizada (y funcional).
-    
-dev-estrategias:
+$ 
 
-    Branch con estrategias, o documentación. Nada de código.
+Running d3lp0r:
+---
+
+usage: Agent.py [-h] [-ms MASSIM_SERVER_HOST] [-sh SH_PERCEPTION_SERVER_HOST]
+                [-sp SH_PERCEPTION_SERVER_PORT] [-l] [-d] [-c] [-v]
+                USER PASSWORD
+               
+positional arguments:
+  USER                  the agent's username
+  PASSWORD              the agent's password
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+  -ms MASSIM_SERVER_HOST
+                        the massim server host
+                        if not specified it will default to 127.0.0.1
+
+  -sh SH_PERCEPTION_SERVER_HOST
+                        use shared perception server on specified host
+                        if not specified the agent will not attempt
+                        to connect to and use the percept server
+
+  -sp SH_PERCEPTION_SERVER_PORT
+                        use shared perception server on specified port
+
+  -l                    write-to-log mode
+
+  -d                    dummy mode
+
+                        defeasible logic programming will not be used
+                        in the decision making process
+
+  -c                    use communication after decision making
+                        not implemented
+
+  -v                    verbose mode
+ 
