@@ -1,0 +1,298 @@
+\documentclass[twocolumn]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{epstopdf}
+\usepackage{bibentry}
+\usepackage[numbers]{natbib}
+\usepackage{authblk}
+\usepackage{float}
+%\usepackage{fullpage}
+%\usepackage{babelbib}
+
+\floatstyle{ruled} 
+\restylefloat{figure}
+
+\addtolength{\voffset}{-35pt}
+
+%\selectbiblanguage{spanish}
+
+\renewcommand\Affilfont{\small}
+\renewcommand\Authands{, y }
+\renewcommand\Authand{ y }
+
+\newcommand{\DLP}{\mbox{\textit{DeLP}}}
+
+\title{\huge \bf Modelo DBI con argumentación y planificación\\ aplicado a juegos con agentes inteligentes autónomos}
+
+%\author{I\~{n}aki Garay \and      % igarai@gmail.com
+%        Diego Marcovecchio \and   % diegomarcov@gmail.com
+%        Leonardo Molas \and       % leos.molas@gmail.com
+%        Emiliano Montenegro \and  % emm.montenegro@gmail.com
+%        Fernando Sisul \and       % fsisul@gmail.com
+%        Manuel Torres \and        % jmtorresluc@gmail.com
+%        Sebastián Gottifredi \and % sebastian.gottifredi@gmail.com
+%        Alejandro García \and     % ajg@cs.uns.edu.ar
+%        Diego Martínez \and       % dcm@cs.uns.edu.ar
+%        Guillermo Simari          % grs@cs.uns.edu.ar
+%        }
+
+\author{I\~{n}aki Garay}
+\author{Diego Marcovecchio}
+\author{Leonardo Molas}
+\author{Emiliano Montenegro}
+\author{Fernando Sisul}
+\author{Manuel Torres}
+\author{Sebastián Gottifredi}
+\author{Alejandro García}
+\author{Diego Martínez}
+\author{Guillermo Simari}
+
+
+\affil{Laboratorio de Investigación y Desarrollo en Inteligencia Artificial (LIDIA)\\
+Departamento de Ciencias e Ingeniería de la Computación (DCIC)\\
+Universidad Nacional del Sur (UNS)\\
+Av. Alem 1253, (B8000CBP), Bahía Blanca, Argentina\\
+Tel: (0291) 459-5135 / Fax: (0291) 459-5136}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+%    This report presents the design and results of the d3lp0r multi-agent system 
+%    developed by the LIDIA team for the Multi-Agent Programming Contest 2011 (MAPC).
+%    The d3lp0r agents use a BDI architecture extended with planning and 
+%    argumentation (via Defeasible Logic Programming) to model a cooperating team 
+%    operating in a dynamic and competitive environment.
+%
+%    In particular, the main goal of this report is to describe the chosen 
+%    architecture, the communication scheme and the way argumentation was put to 
+%    use in the agent's reasoning process and the technical details thereof.
+
+Este artículo presenta el diseño y los resultados del sistema multi-agente 
+\texttt{d3lp0r}, desarrollado por un grupo de estudiantes del Laboratorio de 
+Investigación y Desarrollo en Inteligencia Artifial (LIDIA) para el 
+Multi-Agent Programming Contest 2011 (MAPC). Los agentes diseñados para el sistema 
+utilizan una arquitectura BDI extendida con \textit{planning} y argumentación 
+(utilizando Programación Lógica Rebatible) para modelar un equipo que opera de manera 
+cooperativa en un entorno dinámico de competencia.
+
+En particular, el principal objetivo de este artículo es describir la arquitectura 
+elegida, el esquema de comunicación, y el uso dado a la argumentación en el 
+proceso de razonamiento de los agentes.
+\end{abstract}
+
+\section{Contexto}
+
+El grupo de investigación del Laboratorio de Investigación y Desarrollo en 
+Inteligencia Artificial (LIDIA) fue creado en 1992 en la Universidad Nacional 
+del Sur. En el año 2011, un conjunto de sus integrantes decidió conformar un 
+equipo de desarrollo con el objetivo de participar en el concurso de programación 
+Multi-Agent Programming Contest 2011 (MAPC). El equipo \texttt{d3lp0r}\ estuvo compuesto
+por los profesores Guillermo Simari, Diego Martínez y Alejandro García, el estudiante
+de posgrado Sebastián Gottifredi, y los estudiantes de grado Leonardo Molas, 
+Juan Manuel Torres, Diego Marcovecchio, Iñaki Garay, Fernando Sisul y Emiliano Montenegro.
+Estos últimos fueron los encargados del desarrollo del sistema, mientras que tanto
+los profesores como el estudiando de posgrado fueron fuente de consulta y orientación
+para los desarrolladores.
+	
+\section{Introducción}
+
+La motivación principal del equipo consistió en aplicar argumentación \cite{Prakken:1997} 
+\cite{Rahwan:2009} \cite{Bench-Capon:2007}\ mediante programación lógica rebatible (\DLP
+\cite{Garcia:2004a}) en un agente basado en la arquitectura BDI \cite{Amgoud:2008}. Esto
+fue aplicado en el contexto de un sistema multi-agente que opera en un ambiente dinámico
+y competitivo como el que provee el juego propuesto por los organizadores de la competencia. 
+
+%BDI
+
+El comportamiento de los 
+agentes está regido por el sucesivo planteo de situaciones deseables del 
+mundo y la búsqueda a largo plazo, es decir, prolongada en el tiempo, de 
+alcanzar dichas situaciones. La existencia de un conjunto de estados deseables 
+posibles, la información que el agente considera para determinarlos, y la 
+selección de uno de ellos para adoptarlo como el próximo objetivo son 
+conceptos introducidos por el modelo de creencias, deseos e intenciones. 
+
+El \textit{modelo Creencia-Deseo-Intención}\cite{Rao:1991}, en adelante 
+\textit{BDI} (\textit{Belief-Desire-Inten\-tion}),
+es un modelo desarrollado para el diseño de agentes inteligentes, basado en una
+vista simplificada de la inteligencia humana. El sistema presentado implementa una 
+adaptación de dicho modelo. 
+
+Estos conceptos son incorporados al modelo mediante la implementación de los 
+aspectos principales de la teoría del razonamiento práctico humano de Michael 
+Bratman \cite{citeulike:2063638} (también referido como 
+\textit{Belief-Desire-Intention}, o BDI). Es decir, implementa las nociones 
+de creencia, deseo y (en particular) intención,de una manera inspirada por 
+Bratman. Una discusión más extensa puede ser encontrada en el mencionado 
+trabajo de Bratman y en Searle\cite{searle:1985}.
+
+Las \textit{creencias, deseos e intenciones} son consideradas estados mentales 
+intencionales (de forma opuesta a, por ejemplo, el dolor o el placer). Las \textit{creencias} 
+describen la percepción de la realidad a través de datos provenientes de 
+los sentidos. Representan el estado \textit{informacional} del agente; comprenden
+el conocimiento (tanto de sentido común como teórico) sobre el mundo, ya sea 
+externo o interno. Están sujetas a revisión, lo que implica que pueden 
+cambiar en el futuro, pueden ser rechazadas o agregadas. 
+
+Los deseos representan el 
+estado \textit{motivacional} del agente; consisten en su voluntad de alcanzar 
+ciertos objetivos o situaciones. Entre los deseos, se distingue la noción de 
+\textit{meta}. Una meta es un deseo que ha sido adoptado por el agente para 
+ser perseguido activamente. Esta definición impone la restricción de que el 
+conjunto de metas, o deseos activos, debe ser consistente.
+
+Por último, el concepto de intención representa el estado \textit{deliberativo}
+del agente, lo que el agente ha elegido hacer. Constituyen deseos para los cuales
+el agente se ha comprometido. Es una noción más ligado al compromiso que es 
+asumido, en función alcanzar los estados o situaciones deseadas. 
+
+%DELP
+
+En particular, la selección de un nuevo objetivo o \textit{intención} en 
+nuestro sistema es llevada a cabo
+a través de un complejo proceso de razonamiento, que conlleva el análisis y comparación 
+de las diferentes alternativas. Estas evaluaciones son realizadas por un módulo especial
+que aplica argumentación mediante programación lógica rebatible (\DLP). Muchos conceptos
+relacionados a \DLP\ fueron incorporados directa o indirectamente en el desarrollo de este
+módulo.
+
+Los formalismos de argumentación ofrecen
+una metodología natural para razonar evaluando diferentes puntos de vista, y 
+proveen herramientas para tomar decisiones y resolver conflictos. Sin embargo, 
+en la actualidad los sistemas multi-agente carecen de técnicas avanzadas para 
+reaccionar ante cambios en un entorno
+dinámico y poder evaluar argumentos para la toma de decisiones. Por lo tanto, 
+se espera que
+las áreas de revisión de creencias y argumentación puedan complementarse, y 
+también puedan ser usadas en forma combinada para resolver problemas en 
+escenarios complejos de sistemas multi-agente que exceden el alcance de cada 
+área en forma individual.
+
+%BIBTEX
+
+\section{Líneas de investigación y desarrollo}
+
+La línea principal del trabajo consiste en el desarrollo de un sistema 
+multi-agente basado en la arquitectura BDI, utilizando argumentación a
+través de \DLP\ para la selección de la intención. Su objetivo es
+desarrollar formalismos avanzados de representación de conocimiento y 
+razonamiento basados en argumentación. En particular, 
+de esta línea principal se desprenden sub-líneas
+de trabajo:
+
+\begin{enumerate}
+	\item El diseño de una arquitectura BDI para agentes deliberativos que formen 
+	parte de un 
+	equipo cooperativo, adaptada para ajustarse al entorno de la competencia.
+	El formato del escenario que plantea conduce a considerar la inclusión de 
+	tareas como la revisión de las intenciones y el cálculo reiterado de planes 
+	para éstas.
+	\item El desarrollo de dicha arquitectura. Para esto, se debió seleccionar
+	las plataformas (lenguajes de programación, arquitecturas de computadora), asi
+	como las metodologías de trabajo.
+	\item El diseño y desarrollo de un sistema de razonamiento basado en 
+	argumentación, a 
+	partir del cual se seleccionen de un conjunto de deseos la intención de un 
+	agente. Se deben en cuenta los ítems anteriores para que estos sistemas
+	se relacionen de manera correcta.
+\end{enumerate}
+
+
+\section{Resultados Obtenidos}
+
+Dentro de la primer línea de trabajo, se diseñó el sistema que se encuentra en la Fig.
+\ref{fig:architecture} (las líneas punteadas representan el 
+ flujo de control, y las líneas contínuas representan el flujo de datos), la cual se explica a continuación.
+
+\begin{figure}[h]
+ \centering
+\includegraphics[width=0.9\columnwidth]{agent_architecture.eps}
+ \caption{Diagrama de la arquitectura del agente.}
+ \label{fig:architecture}
+\end{figure}
+
+El programa principal del agente es el encargado de manejar la comunicación con los 
+servidores, tanto el del juego como el de percepciones (presentado 
+a continuación). También es responsable de parsear y procesar la información contenida 
+en la percepción para darle el formato interpretado por la base de conocimientos, y 
+enviar la acción que ha sido elegida por el módulo de toma de decisiones.
+
+El servidor de percepciones (SP) es un programa independiente, encargado de unificar las 
+percepciones de todos los agentes que se encuentran en ejecución. Recibe sus percepciones 
+individuales y retorna a cada uno de ellos el conjunto de datos que aún no poseen, de 
+manera que todos los agentes del equipo cuenten con la misma información en cuanto al estado 
+del escenario.
+
+El módulo de \textbf{Toma de Decisiones} es consultado por el programa 
+principal, obtiene la próxima acción a ser ejecutada, y la retorna para que 
+pueda ser enviada. Esta es una secuencia que se reitera en cada uno de los 
+turnos de la simulación, con la característica de que cuando es necesario 
+plantear y planificar una nueva meta, intervienen una serie de componentes 
+especiales, que difieren de aquellos involucrados cuando se cuenta con una 
+meta ya planificada. 
+
+En la Fig. \ref{fig:agentProlog} se pueden observar las diferentes partes de la
+arquitectura interna de este módulo, sus interacciones el exterior (el 
+\textbf{Módulo principal}), y sus interacciones internas con sus componentes,
+tanto bases de datos como sub-módulos. 
+
+\begin{figure*}[t]
+% \includegraphics[width = 1.2 \textwidth]{agentprolog.eps}
+ \begin{center}
+ \includegraphics[width=.9\textwidth]{agent_prolog.eps}
+ \end{center}
+ \caption{Diagrama de la arquitectura del módulo de \textbf{Toma de Decisiones}.}
+ \label{fig:agentProlog}
+\end{figure*}
+
+El seteo de creencias es llevado a cabo cada vez que el agente se dispone a 
+seleccionar una nueva intención. Incluye la generación de aquellos datos que pueden 
+permitir al agente realizar una elección lo más acertada posible. Se trata de 
+inferencias realizadas en base al estado del escenario.
+
+Una vez finalizado el seteo de creencias, el agente procede a la selección de la próxima 
+intención. Para esto, se toma cada uno de los deseos marcados como factibles en la base 
+de conocimiento, y se consulta al módulo de argumentación \cite{Amgoud:2008}
+\cite{Rotstein:2007}(implementado en \DLP\cite{Ferretti:2008}) sobre éstos. 
+Dicho módulo devuelve los deseos que son realizables, es 
+decir aquellos que satisfacen una serie de condiciones.
+Para éstos, obtiene un valor que representa su peso, en términos del 
+beneficio que conllevan para el equipo. El deseo que presenta el mayor peso entre los 
+analizados, se convierte en la nueva intención del agente, la cual es almacenada hasta ser 
+alcanzada o reemplazada. Tanto la evaluación como el pesaje de los deseos, son llevados a cabo empleando \textit{argumentación} 
+en un módulo especial, implementado con la ayuda de \DLP. 
+
+La planificación fue realizada desarrollando una serie de modelos de planes, algunos
+de los cuales requirieron la búsqueda de caminos, la cual se implementó a partir del algoritmo \textit{Uniform Cost Search} (UCS) \cite{Russell:2003:AIM:773294}. Ésta genera una serie de acciones 
+que son almacenadas por el agente para su posterior realización. 
+
+Existen situaciones en las que el paso de los turnos genera que el cumplimiento de una 
+meta se vuelva inalcanzable, innecesario, riesgoso, o menos productivo de lo previsto, por 
+lo que resulta más beneficioso abortar el plan existente, y seleccionar una nueva intención. 
+Ésta es una etapa de verificación, que tiene como objetivo la detección de este tipo de 
+situaciones. Es ejecutada sólo en aquellos turnos en los que el agente se encuentra 
+siguiendo el plan de una intención previamente determinada.
+
+Cada deseo o esquema de deseo cuenta con una serie de \textbf{condiciones de corte}, que 
+son evaluadas al inicio de cada turno, en caso de existir un plan establecido. Si se verifica 
+que alguna de estas condiciones se satisface, entonces la intención es descartada, y el 
+agente ingresa en un nuevo proceso de selección. 
+
+\section{Formación de Recursos Humanos}
+
+El proceso de desarrollo del proyecto permite la formación de los miembros del 
+grupo de desarrollo, estudiantes de la carrera de Licenciatura en Ciencias de 
+la Computación, en proyectos de investigación científica en áreas de la 
+Inteligencia Artificial, como los sistemas multi-agente, y la argumentación.
+A su vez, algunos de los miembros comenzarán sus estudios de posgrado en dichas
+áreas.
+    
+\bibliographystyle{plain}
+\bibliography{bib}
+
+\end{document}

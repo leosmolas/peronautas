@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="27cm" height="18cm" viewBox="177 183 534 349" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <polygon style="fill: #ffffff" points="340,427 533,427 436.5,220 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="340,427 533,427 436.5,220 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="436.5" y="380.25">
+      <tspan x="436.5" y="380.25"></tspan>
+    </text>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:16.7525;font-family:sanserif;font-style:normal;font-weight:normal" x="220" y="200">
+    <tspan x="220" y="200">explore</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:16.7525;font-family:sanserif;font-style:normal;font-weight:normal" x="420" y="200">
+    <tspan x="420" y="200">attack</tspan>
+  </text>
+  <g>
+    <polygon style="fill: #ffffff" points="180,354 305,354 242.5,220 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="180,354 305,354 242.5,220 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="242.5" y="325.5">
+      <tspan x="242.5" y="325.5"></tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="413,396 464,396 438.5,350 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="413,396 464,396 438.5,350 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="438.5" y="389.5">
+      <tspan x="438.5" y="389.5"></tspan>
+    </text>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:16.7525;font-family:sanserif;font-style:normal;font-weight:normal" x="420" y="340">
+    <tspan x="420" y="340">isSafe</tspan>
+  </text>
+  <g>
+    <polygon style="fill: #ffffff" points="540,530 708.3,530 624.15,360 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="540,530 708.3,530 624.15,360 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="624.15" y="492.5">
+      <tspan x="624.15" y="492.5">twoSaboteurs</tspan>
+    </text>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:16.7525;font-family:sanserif;font-style:normal;font-weight:normal" x="600" y="340">
+    <tspan x="600" y="340">~isSafe</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" x1="406" y1="194" x2="296.854" y2="194"/>
+    <polygon style="fill: #000000" points="289.354,194 299.354,189 296.854,194 299.354,199 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="289.354,194 299.354,189 296.854,194 299.354,199 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" x1="590" y1="335" x2="480.854" y2="335"/>
+    <polygon style="fill: #000000" points="473.354,335 483.354,330 480.854,335 483.354,340 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 3; stroke: #000000" points="473.354,335 483.354,330 480.854,335 483.354,340 "/>
+  </g>
+</svg>

@@ -1,0 +1,53 @@
+﻿% se instancia con lo que no esta probeado
+% DESIRE explorar(Nodo)
+probear(Value, X) -< 
+    probeoYGanoZona(Value, X).
+
+probear(Value, X) -< 
+    probeoSinPerderMucho(Value, X).
+    
+probeoYGanoZona(Value, X) -<
+
+    b(distancia(X, [[probe]], Dist, EnergyLeft)),
+    notProbedInZone(X, InZone),
+    b(difPuntosZona(X, DifPuntos)),
+    promedioValorVecinos(X, Promedio),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(probear, Coef),
+    probearValue(Dist, EnergyLeft, InZone, Promedio, Positivo, Negativo, Coef, Value).
+    
+~probeoYGanoZona(_Value, X) <-
+    b(distancia(X, [[probe]], Dist, _EnergyLeft)),
+    greater(Dist, 3).
+    
+probeoSinPerderMucho(Value, X) -<
+    b(distancia(X, [[probe]], Dist, EnergyLeft)),
+    notProbedInZone(X, InZone),
+    b(difPuntosSinMi(DifPuntos)),
+    promedioValorVecinos(X, Promedio),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(probear, Coef),
+    probearValue(Dist, EnergyLeft, InZone, Promedio, Positivo, Negativo, Coef, Value).
+    
+~probeoSinPerderMucho(_Value, X)  <-
+    b(distancia(X, [[probe]], Dist, _EnergyLeft)),
+    lessEq(Dist, 3).        
+        
+probearValue(Dist, EnergyLeft, InZone, Promedio, Positivo, Negativo, Coef, Value) :-
+    Value is ((10 - Dist) ** 2 * 2 + Positivo - Negativo ** 2 + InZone + EnergyLeft + (Promedio - 3) ** 3) * Coef.
+    
+is_a_built_in(probearValue(_Dist, _EnergyLeft, _InZone, _Promedio, _Positivo, _Negativo, _Coef, _Value)).
+
+promedioValorVecinos(_X, 3) -< true.
+promedioValorVecinos(X, Promedio) -<
+    b(promedioValorVecinos(X, Promedio)).
+    
+~promedioValorVecinos(X, 3) <-
+    b(promedioValorVecinos(X, Promedio)),
+    notEq(Promedio, 3).
+               
+notProbedInZone(_X, 0) -< true.
+notProbedInZone(X, 50) <- b(inZone(X)).
+~notProbedInZone(X, 0) <- notProbedInZone(X, 50).
+
+phaseCoef(probear, 1.5) <- phase(exploration).
